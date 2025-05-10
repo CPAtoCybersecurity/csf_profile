@@ -7,8 +7,12 @@ const App = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterFunction, setFilterFunction] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterFunctions, setFilterFunctions] = useState([]);
+  const [filterCategories, setFilterCategories] = useState([]);
+  const [filterInScope, setFilterInScope] = useState('');
+  const [functionDropdownOpen, setFunctionDropdownOpen] = useState(false);
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const [inScopeDropdownOpen, setInScopeDropdownOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState(null);
   const [editMode, setEditMode] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -78,17 +82,20 @@ const App = () => {
           value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
         );
       
-      const matchesFunction = filterFunction === '' || item.Function === filterFunction;
+      const matchesFunction = filterFunctions.length === 0 || filterFunctions.includes(item.Function);
       
       // Extract category ID for matching
       const categoryId = item.Category && item.Category.match(/\(([^)]+)\)/) ? 
         item.Category.match(/\(([^)]+)\)/)[1] : 
         item.Category;
-      const matchesCategory = filterCategory === '' || categoryId === filterCategory;
+      const matchesCategory = filterCategories.length === 0 || filterCategories.includes(categoryId);
       
-      return matchesSearch && matchesFunction && matchesCategory;
+      // Filter by In Scope
+      const matchesInScope = filterInScope === '' || item["In Scope? "] === filterInScope;
+      
+      return matchesSearch && matchesFunction && matchesCategory && matchesInScope;
     });
-  }, [data, searchTerm, filterFunction, filterCategory]);
+  }, [data, searchTerm, filterFunctions, filterCategories, filterInScope]);
   
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -199,14 +206,14 @@ const App = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="bg-blue-700 text-white p-4">
-        <h1 className="text-2xl font-bold">CSF Audit Database</h1>
+        <h1 className="text-2xl font-bold">CSF Profile Assessment Database</h1>
         <p className="opacity-80">Manage controls, document observations, and track audit progress</p>
       </div>
       
       {/* Toolbar */}
       <div className="bg-gray-100 p-4 flex flex-wrap items-center gap-4 border-b">
         {/* Search */}
-        <div className="relative flex-grow max-w-md">
+        <div className="relative w-64">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
             <Search size={16} className="text-gray-500" />
           </div>
@@ -221,30 +228,138 @@ const App = () => {
         
         {/* Function filter */}
         <div className="flex-grow max-w-xs">
-          <select
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={filterFunction}
-            onChange={(e) => setFilterFunction(e.target.value)}
-          >
-            <option value="">All Functions</option>
-            {functions.map(func => (
-              <option key={func} value={func}>{func}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <div 
+              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer flex items-center justify-between"
+              onClick={() => setFunctionDropdownOpen(!functionDropdownOpen)}
+            >
+              <span>{filterFunctions.length === 0 ? "All Functions" : `${filterFunctions.length} selected`}</span>
+              <Filter size={16} className="text-gray-500" />
+            </div>
+            {functionDropdownOpen && (
+              <div className="absolute z-[9999] mt-1 w-full bg-white border rounded-lg shadow-lg max-h-60 overflow-auto">
+                <div className="p-2">
+                  <label className="flex items-center p-2 hover:bg-gray-100 rounded">
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      checked={filterFunctions.length === 0}
+                      onChange={() => setFilterFunctions([])}
+                    />
+                    <span>All Functions</span>
+                  </label>
+                  {functions.map(func => (
+                    <label key={func} className="flex items-center p-2 hover:bg-gray-100 rounded">
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={filterFunctions.includes(func)}
+                        onChange={() => {
+                          if (filterFunctions.includes(func)) {
+                            setFilterFunctions(filterFunctions.filter(f => f !== func));
+                          } else {
+                            setFilterFunctions([...filterFunctions, func]);
+                          }
+                        }}
+                      />
+                      <span>{func}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Category ID filter */}
         <div className="flex-grow max-w-xs">
-          <select
-            className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-          >
-            <option value="">All Category IDs</option>
-            {categoryIds.map(categoryId => (
-              <option key={categoryId} value={categoryId}>{categoryId}</option>
-            ))}
-          </select>
+          <div className="relative">
+            <div 
+              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer flex items-center justify-between"
+              onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+            >
+              <span>{filterCategories.length === 0 ? "All Category IDs" : `${filterCategories.length} selected`}</span>
+              <Filter size={16} className="text-gray-500" />
+            </div>
+            {categoryDropdownOpen && (
+              <div className="absolute z-[9999] mt-1 w-full bg-white border rounded-lg shadow-lg max-h-60 overflow-auto">
+                <div className="p-2">
+                  <label className="flex items-center p-2 hover:bg-gray-100 rounded">
+                    <input
+                      type="checkbox"
+                      className="mr-2"
+                      checked={filterCategories.length === 0}
+                      onChange={() => setFilterCategories([])}
+                    />
+                    <span>All Category IDs</span>
+                  </label>
+                  {categoryIds.map(categoryId => (
+                    <label key={categoryId} className="flex items-center p-2 hover:bg-gray-100 rounded">
+                      <input
+                        type="checkbox"
+                        className="mr-2"
+                        checked={filterCategories.includes(categoryId)}
+                        onChange={() => {
+                          if (filterCategories.includes(categoryId)) {
+                            setFilterCategories(filterCategories.filter(c => c !== categoryId));
+                          } else {
+                            setFilterCategories([...filterCategories, categoryId]);
+                          }
+                        }}
+                      />
+                      <span>{categoryId}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* In Scope filter */}
+        <div className="flex-grow max-w-xs">
+          <div className="relative">
+            <div 
+              className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white cursor-pointer flex items-center justify-between"
+              onClick={() => setInScopeDropdownOpen(!inScopeDropdownOpen)}
+            >
+              <span>{filterInScope === '' ? "All In Scope" : `In Scope: ${filterInScope}`}</span>
+              <Filter size={16} className="text-gray-500" />
+            </div>
+            {inScopeDropdownOpen && (
+              <div className="absolute z-[9999] mt-1 w-full bg-white border rounded-lg shadow-lg overflow-auto">
+                <div className="p-2">
+                  <label className="flex items-center p-2 hover:bg-gray-100 rounded">
+                    <input
+                      type="radio"
+                      className="mr-2"
+                      checked={filterInScope === ''}
+                      onChange={() => setFilterInScope('')}
+                    />
+                    <span>All</span>
+                  </label>
+                  <label className="flex items-center p-2 hover:bg-gray-100 rounded">
+                    <input
+                      type="radio"
+                      className="mr-2"
+                      checked={filterInScope === 'Yes'}
+                      onChange={() => setFilterInScope('Yes')}
+                    />
+                    <span>Yes</span>
+                  </label>
+                  <label className="flex items-center p-2 hover:bg-gray-100 rounded">
+                    <input
+                      type="radio"
+                      className="mr-2"
+                      checked={filterInScope === 'No'}
+                      onChange={() => setFilterInScope('No')}
+                    />
+                    <span>No</span>
+                  </label>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
         
         {/* Export button */}
@@ -261,7 +376,7 @@ const App = () => {
         {/* Data table */}
         <div className="w-2/3 overflow-auto border-r">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
+            <thead className="bg-gray-50 sticky top-0" style={{ zIndex: -1 }}>
               <tr>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Function/Category</th>
@@ -402,7 +517,11 @@ const App = () => {
                   </div>
                   <div>
                     <span className="text-sm font-medium text-gray-500">Implementation Examples:</span>
-                    <p>{currentItem["Implementation Examples"]}</p>
+                    <p>
+                      {currentItem["Implementation Example"]}
+                      <br />
+                      <span className="text-sm text-gray-600">{currentItem["Implementation Examples"]}</span>
+                    </p>
                   </div>
                 </div>
               </div>
