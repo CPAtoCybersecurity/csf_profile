@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, Edit, Save, CheckCircle, XCircle, AlertTriangle, Download, X, ChevronLeft } from 'lucide-react';
+import { Search, Filter, Edit, Save, CheckCircle, XCircle, AlertTriangle, Download, Upload, X, ChevronLeft } from 'lucide-react';
 import UserSelector from '../components/UserSelector';
 
 const Controls = ({ 
@@ -41,7 +41,8 @@ const Controls = ({
   handleFieldChange, 
   handleToggleInScope, 
   handleClearAllScope,
-  handleExport, 
+  handleExport,
+  handleImport, 
   getStatusColor, 
   getScoreColor 
 }) => {
@@ -213,14 +214,24 @@ const Controls = ({
           </div>
         </div>
         
-        {/* Export button */}
-        <button 
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
-          onClick={handleExport}
-        >
-          <Download size={16} />
-          Export CSV
-        </button>
+        {/* Import/Export buttons */}
+        <div className="flex gap-2">
+          <button 
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+            onClick={handleImport}
+            title="Import CSV to overwrite database"
+          >
+            <Upload size={16} />
+            Import CSV
+          </button>
+          <button 
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+            onClick={handleExport}
+          >
+            <Download size={16} />
+            Export CSV
+          </button>
+        </div>
       </div>
       
       <div className="flex flex-1 overflow-hidden">

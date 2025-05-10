@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Download } from 'lucide-react';
+import { Download, Upload } from 'lucide-react';
 import Papa from 'papaparse';
 
 // Import components
@@ -185,6 +185,75 @@ const App = () => {
     }
   };
   
+// Import from CSV
+const handleImport = () => {
+  // Create a file input element
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.csv';
+  
+  // Set up event listener for when a file is selected
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const csvText = event.target.result;
+      
+      // Parse the CSV data
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        dynamicTyping: true,
+        complete: (results) => {
+          // Process the data to match the application's internal structure
+          const importedData = results.data.map(row => {
+            // Convert stakeholders from comma-separated string to array if needed
+            let stakeholderIds = row.Stakeholders || row.stakeholderIds || [];
+            if (typeof stakeholderIds === 'string') {
+              stakeholderIds = stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
+            }
+            
+            return {
+              ...row,
+              "In Scope? ": row["In Scope? "] || row.Owner || "No",
+              "Observations": row["Observations"] || "",
+              "Current State Score": row["Current State Score"] !== null ? row["Current State Score"] : 0,
+              "Desired State Score": row["Desired State Score"] !== null ? row["Desired State Score"] : 0,
+              "Testing Status": row["Testing Status"] || "Not Started",
+              // Map external field names to internal field names
+              "ownerId": row.Owner || row.ownerId || null,
+              "stakeholderIds": stakeholderIds,
+              "auditorId": row.Auditor || row.auditorId || null,
+              "Observation Date": row["Observation Date"] || "",
+              "Action Plan": row["Action Plan"] || ""
+            };
+          });
+          
+          // Update the data state with the imported data
+          setData(importedData);
+          
+          // Reset current item and page
+          setCurrentItem(null);
+          setCurrentPage(1);
+          
+          // Show success message
+          alert('CSV data imported successfully!');
+        },
+        error: (error) => {
+          alert(`Error parsing CSV: ${error.message}`);
+        }
+      });
+    };
+    
+    reader.readAsText(file);
+  });
+  
+  // Trigger the file input click
+  fileInput.click();
+};
+
 // Export to CSV
 const handleExport = () => {
   // Create date stamp in format yyyy-mm-dd
@@ -325,6 +394,7 @@ const handleExport = () => {
                 handleToggleInScope={handleToggleInScope}
                 handleClearAllScope={handleClearAllScope}
                 handleExport={handleExport}
+                handleImport={handleImport}
                 getStatusColor={getStatusColor}
                 getScoreColor={getScoreColor}
               />
