@@ -524,11 +524,17 @@ const Controls = ({
                           onChange={(e) => handleFieldChange("Current State Score", Number(e.target.value))}
                           className="mt-1 w-full p-2 border rounded"
                         >
-                          <option value={0}>0 - Not Implemented</option>
-                          <option value={1}>1 - Partially Implemented</option>
-                          <option value={2}>2 - Risk Informed</option>
-                          <option value={3}>3 - Repeatable</option>
-                          <option value={4}>4 - Adaptive</option>
+                          <option value={0}>0 - Insecurity - Our organization rarely or never does this</option>
+                          <option value={1}>1 - Insecurity - Our organization rarely or never does this</option>
+                          <option value={2}>2 - Some Security - Our organization sometimes does this, but unreliably</option>
+                          <option value={3}>3 - Some Security - Our organization sometimes does this, but unreliably</option>
+                          <option value={4}>4 - Some Security - Our organization sometimes does this, but unreliably</option>
+                          <option value={5}>5 - Minimally Acceptable Security - Our organization does this consistently, with some minor flaws</option>
+                          <option value={6}>6 - Optimized Security - Our organization does this consistently, with great effectiveness</option>
+                          <option value={7}>7 - Fully Optimized Security - Our organization does this consistently, with fully optimized effectiveness</option>
+                          <option value={8}>8 - Too Much Security - Our organization does this at excessive financial cost</option>
+                          <option value={9}>9 - Too Much Security - Our organization does this at excessive financial cost</option>
+                          <option value={10}>10 - Too Much Security - Our organization does this at excessive financial cost</option>
                         </select>
                       ) : (
                         <div className="mt-1 text-lg font-bold">
@@ -545,11 +551,17 @@ const Controls = ({
                           onChange={(e) => handleFieldChange("Desired State Score", Number(e.target.value))}
                           className="mt-1 w-full p-2 border rounded"
                         >
-                          <option value={0}>0 - Not Implemented</option>
-                          <option value={1}>1 - Partially Implemented</option>
-                          <option value={2}>2 - Risk Informed</option>
-                          <option value={3}>3 - Repeatable</option>
-                          <option value={4}>4 - Adaptive</option>
+                          <option value={0}>0 - Insecurity - Our organization rarely or never does this</option>
+                          <option value={1}>1 - Insecurity - Our organization rarely or never does this</option>
+                          <option value={2}>2 - Some Security - Our organization sometimes does this, but unreliably</option>
+                          <option value={3}>3 - Some Security - Our organization sometimes does this, but unreliably</option>
+                          <option value={4}>4 - Some Security - Our organization sometimes does this, but unreliably</option>
+                          <option value={5}>5 - Minimally Acceptable Security - Our organization does this consistently, with some minor flaws</option>
+                          <option value={6}>6 - Optimized Security - Our organization does this consistently, with great effectiveness</option>
+                          <option value={7}>7 - Fully Optimized Security - Our organization does this consistently, with fully optimized effectiveness</option>
+                          <option value={8}>8 - Too Much Security - Our organization does this at excessive financial cost</option>
+                          <option value={9}>9 - Too Much Security - Our organization does this at excessive financial cost</option>
+                          <option value={10}>10 - Too Much Security - Our organization does this at excessive financial cost</option>
                         </select>
                       ) : (
                         <div className="mt-1 text-lg font-bold">
