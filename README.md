@@ -1,70 +1,94 @@
-# Getting Started with Create React App
+# CSF Profile Assessment Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A comprehensive tool to manage assessment details, document observations, and track progress during NIST Cybersecurity Framework (CSF) assessments.
 
-## Available Scripts
+## Overview
 
-In the project directory, you can run:
+The CSF Profile Assessment Tool is designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework. This application provides a structured approach to:
 
-### `npm start`
+- Track and manage CSF controls
+- Document observations and findings
+- Assign ownership and stakeholders to controls
+- Score current and desired security states
+- Generate reports and visualize assessment data
+- Track remediation progress
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Credit
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+This tool is based on the NIST Cybersecurity Framework (CSF), developed by the National Institute of Standards and Technology. The framework and implementation examples that make up the basis of this assessment are sourced from [NIST.gov](https://www.nist.gov/cyberframework). We acknowledge and appreciate NIST's work in creating this valuable resource for improving cybersecurity risk management.
 
-### `npm test`
+## Welcome
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Welcome to the CSF Profile Assessment Tool! This application is designed to streamline your cybersecurity assessment process by providing a structured, user-friendly interface for working with the NIST Cybersecurity Framework. Whether you're conducting a full assessment, tracking remediation efforts, or building a target profile, this tool will help you manage the process efficiently.
 
-### `npm run build`
+## Installation and Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Follow these steps to get the CSF Profile Assessment Tool up and running:
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Clone the repository**
+   ```
+   git clone <repository-url>
+   cd csf-audit-app
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+2. **Install dependencies**
+   ```
+   npm install
+   ```
 
-### `npm run eject`
+3. **Start the development server**
+   ```
+   npm start
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+4. **Access the application**
+   Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Features
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### CSV Import and Export
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+#### Export CSV
 
-## Learn More
+The Export CSV function allows you to:
+- Export your entire assessment database to a CSV file
+- Include all control details, observations, scores, and action plans
+- Generate date-stamped files for version control
+- Create reports that can be shared with stakeholders
+- Use the data in Excel for further analysis and charting
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+To export your data, click the "Export CSV" button in the controls view. The file will be automatically downloaded with a filename that includes the current date.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+#### Import CSV
 
-### Code Splitting
+The Import CSV function allows you to:
+- Import assessment data from a CSV file
+- Update your assessment with data from external sources
+- Restore from a previous export
+- Collaborate by sharing and merging assessment files
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+**Important Note:** Importing a CSV will overwrite all data currently in the database. Make sure to export your current data first if you want to preserve it. CSV files are particularly useful for creating charts and visualizations in Excel or other spreadsheet applications.
 
-### Analyzing the Bundle Size
+## Navigation
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The application includes several key sections:
 
-### Making a Progressive Web App
+- **Subcategories**: View and manage all CSF controls
+- **Dashboard**: Visualize assessment data and progress
+- **Scoring**: Reference the scoring legend and methodology
+- **User Management**: Manage users involved in the assessment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Scoring System
 
-### Advanced Configuration
+The tool uses a scoring system from 0-10 to assess the current and desired state of each control:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+- **0-1.9**: Insecurity - Organization rarely or never implements this control
+- **2.0-4.9**: Some Security - Organization sometimes implements this control, but unreliably
+- **5.0-5.9**: Minimally Acceptable Security - Organization consistently implements this control with minor flaws
+- **6.1-6.9**: Optimized Security - Organization consistently implements this control with great effectiveness
+- **7.0-7.9**: Fully Optimized Security - Organization implements this control with fully optimized effectiveness
+- **8.1-10.0**: Too Much Security - Organization implements this control at excessive financial cost
 
-### Deployment
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is licensed under the terms of the license included in the repository.
