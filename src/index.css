@@ -25,13 +25,23 @@ code {
 .flex-wrap { flex-wrap: wrap; }
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
-.justify-between { justify-between: space-between; }
+.justify-between { justify-content: space-between; }
 .gap-2 { gap: 0.5rem; }
 .gap-4 { gap: 1rem; }
+.gap-6 { gap: 1.5rem; }
 .space-y-2 > * + * { margin-top: 0.5rem; }
 .space-y-4 > * + * { margin-top: 1rem; }
 .space-y-6 > * + * { margin-top: 1.5rem; }
 .space-x-2 > * + * { margin-left: 0.5rem; }
+
+/* Grid classes */
+.grid { display: grid; }
+.grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.md\:col-span-2 { grid-column: span 2 / span 2; }
 .p-3 { padding: 0.75rem; }
 .p-4 { padding: 1rem; }
 .px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
