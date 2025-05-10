@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Search, Filter, Edit, Save, CheckCircle, XCircle, AlertTriangle, Download } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Search, Filter, Edit, Save, CheckCircle, XCircle, AlertTriangle, Download, X, ChevronLeft } from 'lucide-react';
 import UserSelector from '../components/UserSelector';
 
 const Controls = ({ 
@@ -43,6 +43,8 @@ const Controls = ({
   getStatusColor, 
   getScoreColor 
 }) => {
+  // State to track if the detail panel is open or closed
+  const [detailPanelOpen, setDetailPanelOpen] = useState(true);
   if (loading) {
     return <div className="flex items-center justify-center h-64">
       <div className="text-xl font-semibold">Loading audit database...</div>
@@ -221,7 +223,7 @@ const Controls = ({
       
       <div className="flex flex-1 overflow-hidden">
         {/* Data table */}
-        <div className="w-2/3 overflow-auto border-r">
+        <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto ${detailPanelOpen ? 'border-r' : ''} transition-all duration-300`}>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0" style={{ zIndex: -1 }}>
               <tr>
@@ -279,6 +281,15 @@ const Controls = ({
           
           {/* Pagination */}
           <div className="flex items-center justify-between bg-white px-4 py-3 border-t">
+            {!detailPanelOpen && currentItem && (
+              <button
+                onClick={() => setDetailPanelOpen(true)}
+                className="flex items-center gap-1 text-blue-600 hover:text-blue-800"
+              >
+                <ChevronLeft size={16} />
+                Show Details
+              </button>
+            )}
             <div className="flex items-center">
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
@@ -322,9 +333,17 @@ const Controls = ({
         </div>
         
         {/* Detail panel */}
-        <div className="w-1/3 overflow-auto p-4 bg-gray-50">
-          {currentItem ? (
-            <div className="space-y-6">
+        {detailPanelOpen && (
+          <div className="w-1/3 overflow-auto p-4 bg-gray-50 relative">
+            <button
+              onClick={() => setDetailPanelOpen(false)}
+              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200 text-gray-500 hover:text-gray-700"
+              title="Close details panel"
+            >
+              <X size={18} />
+            </button>
+            {currentItem ? (
+              <div className="space-y-6 mt-4">
               <div className="flex items-center justify-between">
                 <h2 className="text-xl font-bold">{currentItem.ID}</h2>
                 {editMode ? (
@@ -519,14 +538,15 @@ const Controls = ({
                   </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <AlertTriangle size={48} className="mb-4" />
-              <p>Select a control to view and edit details</p>
-            </div>
-          )}
-        </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                <AlertTriangle size={48} className="mb-4" />
+                <p>Select a control to view and edit details</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
