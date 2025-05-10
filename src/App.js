@@ -185,25 +185,49 @@ const App = () => {
     }
   };
   
-  // Export to CSV
-  const handleExport = () => {
-    // Create date stamp in format yyyy-mm-dd
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const dateStamp = `${year}-${month}-${day}`;
-    
-    const csv = Papa.unparse(data);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `${dateStamp}_CSF_Profile.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
+// Export to CSV
+const handleExport = () => {
+  // Create date stamp in format yyyy-mm-dd
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const dateStamp = `${year}-${month}-${day}`;
+  
+  // Map the data to match the expected CSV format
+  const exportData = data.map(item => ({
+    "ID": item.ID,
+    "Function": item.Function,
+    "Function Description": item["Function Description"],
+    "Category": item.Category,
+    "Category Description": item["Category Description"],
+    "Subcategory ID": item["Subcategory ID"],
+    "Subcategory Description": item["Subcategory Description"],
+    "Implementation Example": item["Implementation Example"],
+    "In Scope? ": item["In Scope? "],
+    "Owner": item.ownerId || "",
+    "Stakeholders": item.stakeholderIds ? (Array.isArray(item.stakeholderIds) ? item.stakeholderIds.join(", ") : item.stakeholderIds) : "",
+    "Auditor": item.auditorId || "",
+    "Control Implementation Description": item["Control Implementation Description"] || "",
+    "Test Procedure(s)": item["Test Procedure(s)"] || "",
+    "Observation Date": item["Observation Date"] || "",
+    "Observations": item["Observations"] || "",
+    "Current State Score": item["Current State Score"],
+    "Desired State Score": item["Desired State Score"],
+    "Testing Status": item["Testing Status"] || "",
+    "Action Plan": item["Action Plan"] || ""
+  }));
+  
+  const csv = Papa.unparse(exportData);
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.setAttribute('download', `${dateStamp}_CSF_Profile.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
   
   // Status color mapping
   const getStatusColor = (status) => {
