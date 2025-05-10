@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Search, Filter, Edit, Save, CheckCircle, XCircle, AlertTriangle, Download } from 'lucide-react';
+import UserSelector from '../components/UserSelector';
 
 const Controls = ({ 
   data, 
@@ -399,20 +400,27 @@ const Controls = ({
                     )}
                   </div>
                   
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium text-gray-500 min-w-32">Owner:</span>
-                    <span className="ml-2">{currentItem.Owner || "Not assigned"}</span>
-                  </div>
+                  <UserSelector
+                    label="Owner"
+                    selectedUsers={currentItem.ownerId}
+                    onChange={(userId) => handleFieldChange("ownerId", userId)}
+                    disabled={!editMode}
+                  />
                   
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium text-gray-500 min-w-32">Stakeholders:</span>
-                    <span className="ml-2">{currentItem.Stakeholders || "None"}</span>
-                  </div>
+                  <UserSelector
+                    label="Stakeholders"
+                    selectedUsers={currentItem.stakeholderIds || []}
+                    onChange={(userIds) => handleFieldChange("stakeholderIds", userIds)}
+                    multiple={true}
+                    disabled={!editMode}
+                  />
                   
-                  <div className="flex items-center">
-                    <span className="text-sm font-medium text-gray-500 min-w-32">Auditor:</span>
-                    <span className="ml-2">{currentItem.Auditor || "Not assigned"}</span>
-                  </div>
+                  <UserSelector
+                    label="Auditor"
+                    selectedUsers={currentItem.auditorId}
+                    onChange={(userId) => handleFieldChange("auditorId", userId)}
+                    disabled={!editMode}
+                  />
                   
                   <div>
                     <span className="text-sm font-medium text-gray-500">Testing Status:</span>

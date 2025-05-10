@@ -95,6 +95,9 @@ const UserManagement = () => {
     setUsers(updatedUsers);
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     
+    // Dispatch custom event to notify other components
+    window.dispatchEvent(new Event('userUpdate'));
+    
     // Reset form
     resetForm();
   };
@@ -111,6 +114,9 @@ const UserManagement = () => {
       const updatedUsers = users.filter(user => user.id !== id);
       setUsers(updatedUsers);
       localStorage.setItem('users', JSON.stringify(updatedUsers));
+      
+      // Dispatch custom event to notify other components
+      window.dispatchEvent(new Event('userUpdate'));
     }
   };
   

@@ -46,7 +46,11 @@ const App = () => {
               "Observations": row["Observations"] || "",
               "Current State Score": row["Current State Score"] !== null ? row["Current State Score"] : 0,
               "Desired State Score": row["Desired State Score"] !== null ? row["Desired State Score"] : 0,
-              "Testing Status": row["Testing Status"] || "Not Started"
+              "Testing Status": row["Testing Status"] || "Not Started",
+              // Initialize user-related fields
+              "ownerId": row["ownerId"] || null,
+              "stakeholderIds": row["stakeholderIds"] || [],
+              "auditorId": row["auditorId"] || null
             }));
             
             setData(processedData);

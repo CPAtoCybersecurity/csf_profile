@@ -17,7 +17,7 @@ const Navigation = () => {
         end
       >
         <FileText size={18} />
-        <span>Controls</span>
+        <span>Subcategories</span>
       </NavLink>
       
       <NavLink 
