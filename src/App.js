@@ -8,6 +8,7 @@ import Navigation from './components/Navigation';
 import Controls from './pages/Controls';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
+import ScoringLegend from './pages/ScoringLegend';
 
 const App = () => {
   const [data, setData] = useState([]);
@@ -299,6 +300,7 @@ const App = () => {
             } 
           />
           <Route path="/dashboard" element={<Dashboard data={data} />} />
+          <Route path="/scoring" element={<ScoringLegend />} />
           <Route path="/users" element={<UserManagement />} />
         </Routes>
       </div>

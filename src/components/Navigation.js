@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Award } from 'lucide-react';
 
 const Navigation = () => {
   return (
@@ -32,6 +32,20 @@ const Navigation = () => {
       >
         <LayoutDashboard size={18} />
         <span>Dashboard</span>
+      </NavLink>
+      
+      <NavLink 
+        to="/scoring" 
+        className={({ isActive }) => 
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive 
+              ? 'bg-blue-800 text-white' 
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <Award size={18} />
+        <span>Scoring</span>
       </NavLink>
       
       <NavLink 
