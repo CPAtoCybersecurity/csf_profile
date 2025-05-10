@@ -26,7 +26,7 @@ const App = () => {
   
   // For pagination
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   
   useEffect(() => {
     const loadData = async () => {
@@ -202,6 +202,13 @@ const App = () => {
     return 'text-red-600';
   };
   
+  // Handle items per page change
+  const handleItemsPerPageChange = (newItemsPerPage) => {
+    setItemsPerPage(newItemsPerPage);
+    // Reset to first page when changing items per page
+    setCurrentPage(1);
+  };
+  
   return (
     <Router>
       <div className="flex flex-col h-full">
@@ -246,6 +253,7 @@ const App = () => {
                 currentPage={currentPage}
                 setCurrentPage={setCurrentPage}
                 itemsPerPage={itemsPerPage}
+                setItemsPerPage={handleItemsPerPageChange}
                 filteredData={filteredData}
                 currentItems={currentItems}
                 totalPages={totalPages}

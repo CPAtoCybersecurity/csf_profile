@@ -29,6 +29,7 @@ const Controls = ({
   currentPage, 
   setCurrentPage, 
   itemsPerPage, 
+  setItemsPerPage,
   filteredData, 
   currentItems, 
   totalPages, 
@@ -291,13 +292,29 @@ const Controls = ({
               </button>
             )}
             <div className="flex items-center">
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-gray-700 mr-4">
                 Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{" "}
                 <span className="font-medium">
                   {Math.min(currentPage * itemsPerPage, filteredData.length)}
                 </span>{" "}
                 of <span className="font-medium">{filteredData.length}</span> results
               </p>
+              
+              {/* Items per page selector */}
+              <div className="flex items-center">
+                <span className="text-sm text-gray-700 mr-2">Show:</span>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => setItemsPerPage(e.target.value === 'All' ? filteredData.length : Number(e.target.value))}
+                  className="border rounded p-1 text-sm"
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                  <option value="All">All</option>
+                </select>
+              </div>
             </div>
             
             <div className="flex items-center space-x-2">
