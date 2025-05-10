@@ -500,6 +500,22 @@ const Controls = ({
                   </div>
                   
                   <div>
+                    <span className="text-sm font-medium text-gray-500">Observation Date:</span>
+                    {editMode ? (
+                      <input
+                        type="date"
+                        value={currentItem["Observation Date"] || ""}
+                        onChange={(e) => handleFieldChange("Observation Date", e.target.value)}
+                        className="mt-1 w-full p-2 border rounded"
+                      />
+                    ) : (
+                      <p className="mt-1">
+                        {currentItem["Observation Date"] || "No date recorded"}
+                      </p>
+                    )}
+                  </div>
+                  
+                  <div>
                     <span className="text-sm font-medium text-gray-500">Observations:</span>
                     {editMode ? (
                       <textarea
@@ -569,6 +585,22 @@ const Controls = ({
                         </div>
                       )}
                     </div>
+                  </div>
+                  
+                  <div>
+                    <span className="text-sm font-medium text-gray-500">Action Plan (who will do what, when?):</span>
+                    {editMode ? (
+                      <textarea
+                        value={currentItem["Action Plan"] || ""}
+                        onChange={(e) => handleFieldChange("Action Plan", e.target.value)}
+                        className="mt-1 w-full p-2 border rounded h-32"
+                        placeholder="Document action plan details here..."
+                      />
+                    ) : (
+                      <p className="mt-1 whitespace-pre-wrap">
+                        {currentItem["Action Plan"] || "No action plan documented"}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>

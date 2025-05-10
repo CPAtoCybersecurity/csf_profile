@@ -187,12 +187,19 @@ const App = () => {
   
   // Export to CSV
   const handleExport = () => {
+    // Create date stamp in format yyyy-mm-dd
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const dateStamp = `${year}-${month}-${day}`;
+    
     const csv = Papa.unparse(data);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'csf_audit_updated.csv');
+    link.setAttribute('download', `${dateStamp}_CSF_Profile.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -235,7 +242,7 @@ const App = () => {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-2xl font-bold">CSF Profile Assessment Database</h1>
-              <p className="opacity-80">Manage controls, document observations, and track audit progress</p>
+              <p className="opacity-80">Manage assessment details, document observations and track progress</p>
             </div>
             <div className="flex items-center gap-4">
               <button
