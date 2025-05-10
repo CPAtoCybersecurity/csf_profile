@@ -40,6 +40,7 @@ const Controls = ({
   handleSave, 
   handleFieldChange, 
   handleToggleInScope, 
+  handleClearAllScope,
   handleExport, 
   getStatusColor, 
   getScoreColor 
@@ -228,9 +229,10 @@ const Controls = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0" style={{ zIndex: -1 }}>
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Function/Category</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Implementation Example</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">In Scope</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Scores</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -243,7 +245,6 @@ const Controls = ({
                   className={`hover:bg-blue-50 cursor-pointer ${currentItem?.ID === item.ID ? 'bg-blue-100' : ''}`}
                   onClick={() => handleSelectItem(item)}
                 >
-                  <td className="p-3 text-sm">{item.ID}</td>
                   <td className="p-3 text-sm">
                     <div className="font-medium">{item.Function}</div>
                     <div className="text-xs text-gray-500">{item.Category}</div>
@@ -251,6 +252,10 @@ const Controls = ({
                   <td className="p-3 text-sm">
                     <div className="font-medium">{item["Subcategory ID"]}</div>
                     <div className="text-xs text-gray-500 line-clamp-2">{item["Subcategory Description"]}</div>
+                  </td>
+                  <td className="p-3 text-sm">{item.ID}</td>
+                  <td className="p-3 text-sm">
+                    <div className="text-xs text-gray-700 line-clamp-2">{item["Implementation Example"]}</div>
                   </td>
                   <td className="p-3 text-sm">
                     <button

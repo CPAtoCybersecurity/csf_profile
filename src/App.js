@@ -166,6 +166,24 @@ const App = () => {
     }
   };
   
+  // Handle clear all scope
+  const handleClearAllScope = () => {
+    const updatedData = data.map(item => ({
+      ...item,
+      "In Scope? ": "No"
+    }));
+    
+    setData(updatedData);
+    
+    // Update current item if one is selected
+    if (currentItem) {
+      setCurrentItem({
+        ...currentItem,
+        "In Scope? ": "No"
+      });
+    }
+  };
+  
   // Export to CSV
   const handleExport = () => {
     const csv = Papa.unparse(data);
@@ -218,7 +236,16 @@ const App = () => {
               <h1 className="text-2xl font-bold">CSF Profile Assessment Database</h1>
               <p className="opacity-80">Manage controls, document observations, and track audit progress</p>
             </div>
-            <Navigation />
+            <div className="flex items-center gap-4">
+              <button
+                onClick={handleClearAllScope}
+                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-black transition-colors"
+                title="Set all items as out of scope"
+              >
+                Clear Scope
+              </button>
+              <Navigation />
+            </div>
           </div>
         </header>
         
@@ -264,6 +291,7 @@ const App = () => {
                 handleSave={handleSave}
                 handleFieldChange={handleFieldChange}
                 handleToggleInScope={handleToggleInScope}
+                handleClearAllScope={handleClearAllScope}
                 handleExport={handleExport}
                 getStatusColor={getStatusColor}
                 getScoreColor={getScoreColor}
