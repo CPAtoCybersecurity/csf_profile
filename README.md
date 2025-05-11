@@ -4,6 +4,10 @@
 
 A comprehensive tool to manage assessment details, document observations, and track progress during NIST Cybersecurity Framework (CSF) assessments.
 
+The tool is open source and improvement ideas to drive cyber risk reduction with CSF assessments are welcome from the Simply Cyber and other awesome communities. 
+
+In depth videos and guides for CSF profile assessments and this tool are featured in Simply Cyber Academy: https://academy.simplycyber.io/p/accrp
+
 ## Overview
 
 The CSF Profile Assessment Tool is designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework. This application provides a structured approach to:
