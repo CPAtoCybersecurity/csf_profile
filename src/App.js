@@ -9,6 +9,7 @@ import Controls from './pages/Controls';
 import Dashboard from './pages/Dashboard';
 import UserManagement from './pages/UserManagement';
 import ScoringLegend from './pages/ScoringLegend';
+import Artifacts from './pages/Artifacts';
 
 const App = () => {
   const [data, setData] = useState([]);
@@ -402,6 +403,7 @@ const handleExport = () => {
           />
           <Route path="/dashboard" element={<Dashboard data={data} />} />
           <Route path="/scoring" element={<ScoringLegend />} />
+          <Route path="/artifacts" element={<Artifacts data={data} />} />
           <Route path="/users" element={<UserManagement />} />
         </Routes>
       </div>

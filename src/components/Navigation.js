@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Award } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Award, FileArchive } from 'lucide-react';
 
 const Navigation = () => {
   return (
@@ -46,6 +46,20 @@ const Navigation = () => {
       >
         <Award size={18} />
         <span>Scoring</span>
+      </NavLink>
+      
+      <NavLink 
+        to="/artifacts" 
+        className={({ isActive }) => 
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive 
+              ? 'bg-blue-800 text-white' 
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <FileArchive size={18} />
+        <span>Artifacts</span>
       </NavLink>
       
       <NavLink 
