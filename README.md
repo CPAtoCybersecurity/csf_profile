@@ -1,4 +1,4 @@
-![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy.png)
+![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
 # Simply Cyber CSF Profile Assessment Tool
 
