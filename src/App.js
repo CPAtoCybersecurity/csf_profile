@@ -33,36 +33,52 @@ const App = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetch('/csf2normalizedcsv.csv');
-        const csvText = await response.text();
+        // Check if data is already in localStorage
+        const storedData = localStorage.getItem('mainData');
         
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          dynamicTyping: true,
-          complete: (results) => {
-            // Ensure every row has the expected fields
-            const processedData = results.data.map(row => ({
-              ...row,
-              "In Scope? ": row["In Scope? "] || "No",
-              "Observations": row["Observations"] || "",
-              "Current State Score": row["Current State Score"] !== null ? row["Current State Score"] : 0,
-              "Desired State Score": row["Desired State Score"] !== null ? row["Desired State Score"] : 0,
-              "Testing Status": row["Testing Status"] || "Not Started",
-              // Initialize user-related fields
-              "ownerId": row["ownerId"] || null,
-              "stakeholderIds": row["stakeholderIds"] || [],
-              "auditorId": row["auditorId"] || null
-            }));
-            
-            setData(processedData);
-            setLoading(false);
-          },
-          error: (error) => {
-            setError(`Error parsing CSV: ${error.message}`);
-            setLoading(false);
-          }
-        });
+        if (storedData) {
+          // Use the data from localStorage
+          setData(JSON.parse(storedData));
+          setLoading(false);
+        } else {
+          // Load data from CSV file
+          const response = await fetch('/csf2normalizedcsv.csv');
+          const csvText = await response.text();
+          
+          Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            dynamicTyping: true,
+            complete: (results) => {
+              // Ensure every row has the expected fields
+              const processedData = results.data.map(row => ({
+                ...row,
+                "In Scope? ": row["In Scope? "] || "No",
+                "Observations": row["Observations"] || "",
+                "Current State Score": row["Current State Score"] !== null ? row["Current State Score"] : 0,
+                "Desired State Score": row["Desired State Score"] !== null ? row["Desired State Score"] : 0,
+                "Testing Status": row["Testing Status"] || "Not Started",
+                // Initialize user-related fields
+                "ownerId": row["ownerId"] || null,
+                "stakeholderIds": row["stakeholderIds"] || [],
+                "auditorId": row["auditorId"] || null,
+                // Initialize linked artifacts
+                "linkedArtifacts": row["linkedArtifacts"] || []
+              }));
+              
+              setData(processedData);
+              
+              // Save the processed data to localStorage
+              localStorage.setItem('mainData', JSON.stringify(processedData));
+              
+              setLoading(false);
+            },
+            error: (error) => {
+              setError(`Error parsing CSV: ${error.message}`);
+              setLoading(false);
+            }
+          });
+        }
       } catch (err) {
         setError(`Error loading file: ${err.message}`);
         setLoading(false);
@@ -70,6 +86,32 @@ const App = () => {
     };
     
     loadData();
+  }, []);
+  
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    if (data.length > 0) {
+      localStorage.setItem('mainData', JSON.stringify(data));
+    }
+  }, [data]);
+  
+  // Listen for mainDataUpdate event from Artifacts.js
+  useEffect(() => {
+    const handleMainDataUpdate = () => {
+      // Load the updated data from localStorage
+      const storedData = localStorage.getItem('mainData');
+      if (storedData) {
+        setData(JSON.parse(storedData));
+      }
+    };
+    
+    // Add event listener
+    window.addEventListener('mainDataUpdate', handleMainDataUpdate);
+    
+    // Clean up
+    return () => {
+      window.removeEventListener('mainDataUpdate', handleMainDataUpdate);
+    };
   }, []);
   
   // Unique values for filters
@@ -148,6 +190,40 @@ const App = () => {
       ...currentItem,
       [field]: value
     });
+
+    // If the field is linkedArtifacts, update the artifacts in localStorage
+    if (field === "linkedArtifacts") {
+      const storedArtifacts = localStorage.getItem('artifacts');
+      if (storedArtifacts) {
+        const artifacts = JSON.parse(storedArtifacts);
+        
+        // For each artifact, check if it's in the new linkedArtifacts array
+        const updatedArtifacts = artifacts.map(artifact => {
+          // If the artifact is in the linkedArtifacts array, make sure the full ID is in its linkedSubcategoryIds
+          if (value.includes(artifact.name)) {
+            // If the full ID is not already in the linkedSubcategoryIds array, add it
+            if (!artifact.linkedSubcategoryIds.includes(currentItem.ID)) {
+              return {
+                ...artifact,
+                linkedSubcategoryIds: [...artifact.linkedSubcategoryIds, currentItem.ID]
+              };
+            }
+          } else {
+            // If the artifact is not in the linkedArtifacts array, remove the full ID from its linkedSubcategoryIds
+            if (artifact.linkedSubcategoryIds.includes(currentItem.ID)) {
+              return {
+                ...artifact,
+                linkedSubcategoryIds: artifact.linkedSubcategoryIds.filter(id => id !== currentItem.ID)
+              };
+            }
+          }
+          return artifact;
+        });
+        
+        // Save the updated artifacts to localStorage
+        localStorage.setItem('artifacts', JSON.stringify(updatedArtifacts));
+      }
+    }
   };
   
   // Handle toggle in scope
@@ -228,7 +304,9 @@ const handleImport = () => {
               "stakeholderIds": stakeholderIds,
               "auditorId": row.Auditor || row.auditorId || null,
               "Observation Date": row["Observation Date"] || "",
-              "Action Plan": row["Action Plan"] || ""
+              "Action Plan": row["Action Plan"] || "",
+              // Initialize linked artifacts
+              "linkedArtifacts": row["linkedArtifacts"] || []
             };
           });
           
@@ -285,7 +363,8 @@ const handleExport = () => {
     "Current State Score": item["Current State Score"],
     "Desired State Score": item["Desired State Score"],
     "Testing Status": item["Testing Status"] || "",
-    "Action Plan": item["Action Plan"] || ""
+    "Action Plan": item["Action Plan"] || "",
+    "Linked Artifacts": item.linkedArtifacts ? (Array.isArray(item.linkedArtifacts) ? item.linkedArtifacts.join(", ") : item.linkedArtifacts) : ""
   }));
   
   const csv = Papa.unparse(exportData);

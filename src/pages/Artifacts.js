@@ -65,8 +65,95 @@ const Artifacts = ({ data }) => {
     }
   }, [artifacts]);
   
+  // Update subcategory linkages in the main data
+  const updateSubcategoryLinkages = (artifact, oldLinkedSubcategoryIds = []) => {
+    // Get the main data from localStorage
+    const storedData = localStorage.getItem('mainData');
+    if (!storedData) {
+      // If there's no mainData in localStorage, use the data prop
+      if (!data) return;
+      
+      // Store the data prop in localStorage for future use
+      localStorage.setItem('mainData', JSON.stringify(data));
+    }
+    
+    try {
+      // Get the main data from localStorage or use the data prop
+      let mainData = storedData ? JSON.parse(storedData) : [...data];
+      
+      // For each subcategory ID in the artifact's linkedSubcategoryIds
+      artifact.linkedSubcategoryIds.forEach(fullId => {
+        // Find the corresponding item in the main data
+        const item = mainData.find(item => item.ID === fullId);
+        if (item) {
+          // If the artifact is not already in the item's linkedArtifacts, add it
+          if (!item.linkedArtifacts) {
+            item.linkedArtifacts = [];
+          }
+          
+          if (!item.linkedArtifacts.includes(artifact.name)) {
+            item.linkedArtifacts.push(artifact.name);
+            console.log(`Added artifact ${artifact.name} to item ${item.ID}`);
+          }
+        } else {
+          console.log(`Could not find item with ID ${fullId} in mainData`);
+          // Try to find the item by Subcategory ID instead
+          const itemBySubcategoryId = mainData.find(item => item["Subcategory ID"] === fullId);
+          if (itemBySubcategoryId) {
+            console.log(`Found item with Subcategory ID ${fullId}`);
+            // If the artifact is not already in the item's linkedArtifacts, add it
+            if (!itemBySubcategoryId.linkedArtifacts) {
+              itemBySubcategoryId.linkedArtifacts = [];
+            }
+            
+            if (!itemBySubcategoryId.linkedArtifacts.includes(artifact.name)) {
+              itemBySubcategoryId.linkedArtifacts.push(artifact.name);
+              console.log(`Added artifact ${artifact.name} to item ${itemBySubcategoryId.ID}`);
+            }
+          } else {
+            console.log(`Could not find item with Subcategory ID ${fullId} in mainData`);
+          }
+        }
+      });
+      
+      // For each subcategory ID that was removed
+      oldLinkedSubcategoryIds.forEach(fullId => {
+        if (!artifact.linkedSubcategoryIds.includes(fullId)) {
+          // Find the corresponding item in the main data
+          const item = mainData.find(item => item.ID === fullId);
+          if (item && item.linkedArtifacts) {
+            // Remove the artifact from the item's linkedArtifacts
+            item.linkedArtifacts = item.linkedArtifacts.filter(name => name !== artifact.name);
+            console.log(`Removed artifact ${artifact.name} from item ${item.ID}`);
+          } else {
+            console.log(`Could not find item with ID ${fullId} in mainData for removal`);
+            // Try to find the item by Subcategory ID instead
+            const itemBySubcategoryId = mainData.find(item => item["Subcategory ID"] === fullId);
+            if (itemBySubcategoryId && itemBySubcategoryId.linkedArtifacts) {
+              console.log(`Found item with Subcategory ID ${fullId} for removal`);
+              // Remove the artifact from the item's linkedArtifacts
+              itemBySubcategoryId.linkedArtifacts = itemBySubcategoryId.linkedArtifacts.filter(name => name !== artifact.name);
+              console.log(`Removed artifact ${artifact.name} from item ${itemBySubcategoryId.ID}`);
+            } else {
+              console.log(`Could not find item with Subcategory ID ${fullId} in mainData for removal`);
+            }
+          }
+        }
+      });
+      
+      // Save the updated main data to localStorage
+      localStorage.setItem('mainData', JSON.stringify(mainData));
+      
+      // Dispatch a custom event to notify App.js that the main data has been updated
+      const event = new Event('mainDataUpdate');
+      window.dispatchEvent(event);
+    } catch (error) {
+      console.error('Error updating subcategory linkages:', error);
+    }
+  };
+  
   // Extract all subcategory IDs from the data
-  const subcategoryIds = data ? [...new Set(data.map(item => item["Subcategory ID"]))].filter(Boolean).sort() : [];
+  const subcategoryIds = data ? [...new Set(data.map(item => item.ID))].filter(Boolean).sort() : [];
   
   // Form validation
   const validateForm = () => {
@@ -100,6 +187,7 @@ const Artifacts = ({ data }) => {
   // Handle subcategory ID selection
   const handleSubcategoryIdChange = (subcategoryId) => {
     const updatedIds = [...formData.linkedSubcategoryIds];
+    const oldIds = [...updatedIds]; // Save the old IDs for comparison
     
     if (updatedIds.includes(subcategoryId)) {
       // Remove the ID if it's already selected
@@ -110,10 +198,25 @@ const Artifacts = ({ data }) => {
       updatedIds.push(subcategoryId);
     }
     
-    setFormData({
+    // Update the form data
+    const updatedFormData = {
       ...formData,
       linkedSubcategoryIds: updatedIds
-    });
+    };
+    
+    setFormData(updatedFormData);
+    
+    // If we're in edit mode, update the subcategory linkages in real-time
+    if (editMode && formData.id) {
+      // Create a temporary artifact object with the updated linkedSubcategoryIds
+      const tempArtifact = {
+        ...formData,
+        linkedSubcategoryIds: updatedIds
+      };
+      
+      // Update the subcategory linkages
+      updateSubcategoryLinkages(tempArtifact, oldIds);
+    }
   };
   
   // Handle form submission
@@ -125,8 +228,15 @@ const Artifacts = ({ data }) => {
     }
     
     let updatedArtifacts = [];
+    let oldLinkedSubcategoryIds = [];
     
     if (editMode) {
+      // Get the old linkedSubcategoryIds for the artifact being edited
+      const oldArtifact = artifacts.find(a => a.id === formData.id);
+      if (oldArtifact) {
+        oldLinkedSubcategoryIds = [...oldArtifact.linkedSubcategoryIds];
+      }
+      
       // Update existing artifact
       updatedArtifacts = artifacts.map(artifact => 
         artifact.id === formData.id ? formData : artifact
@@ -143,6 +253,13 @@ const Artifacts = ({ data }) => {
     // Update state and localStorage
     setArtifacts(updatedArtifacts);
     
+    // Update subcategory linkages in the main data
+    if (editMode) {
+      updateSubcategoryLinkages(formData, oldLinkedSubcategoryIds);
+    } else if (formData.linkedSubcategoryIds.length > 0) {
+      updateSubcategoryLinkages(formData);
+    }
+    
     // Reset form
     resetForm();
   };
@@ -157,6 +274,17 @@ const Artifacts = ({ data }) => {
   // Handle delete artifact
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this artifact?')) {
+      // Get the artifact to be deleted
+      const artifactToDelete = artifacts.find(artifact => artifact.id === id);
+      
+      // Update subcategory linkages in the main data
+      if (artifactToDelete) {
+        updateSubcategoryLinkages({
+          ...artifactToDelete,
+          linkedSubcategoryIds: [] // Empty array to remove all linkages
+        }, artifactToDelete.linkedSubcategoryIds);
+      }
+      
       const updatedArtifacts = artifacts.filter(artifact => artifact.id !== id);
       setArtifacts(updatedArtifacts);
       

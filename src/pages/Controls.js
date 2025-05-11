@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Search, Filter, Edit, Save, CheckCircle, XCircle, AlertTriangle, Download, Upload, X, ChevronLeft } from 'lucide-react';
 import UserSelector from '../components/UserSelector';
+import ArtifactSelector from '../components/ArtifactSelector';
 
 const Controls = ({ 
   data, 
@@ -541,6 +542,13 @@ const Controls = ({
                       </p>
                     )}
                   </div>
+                  
+                  <ArtifactSelector
+                    label="Linked Artifacts"
+                    selectedArtifacts={currentItem.linkedArtifacts || []}
+                    onChange={(artifactNames) => handleFieldChange("linkedArtifacts", artifactNames)}
+                    disabled={!editMode}
+                  />
                   
                   <div className="flex gap-4">
                     <div>
