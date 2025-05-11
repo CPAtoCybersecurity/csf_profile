@@ -1,4 +1,4 @@
-# CSF Profile Assessment Tool
+# Simply Cyber CSF Profile Assessment Tool
 
 A comprehensive tool to manage assessment details, document observations, and track progress during NIST Cybersecurity Framework (CSF) assessments.
 

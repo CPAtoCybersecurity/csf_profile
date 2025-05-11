@@ -413,9 +413,16 @@ const handleExport = () => {
       <div className="flex flex-col h-full">
         <header className="bg-blue-700 text-white p-4">
           <div className="flex justify-between items-center">
-            <div>
-              <h1 className="text-2xl font-bold">CSF Profile Assessment Database</h1>
-              <p className="opacity-80">Manage assessment details, document observations and track progress</p>
+            <div className="flex items-center gap-4">
+              <img 
+                src="/SC_SimplyCyberAcademy.png" 
+                alt="Simply Cyber Academy Logo" 
+                className="h-16 mr-4"
+              />
+              <div>
+                <h1 className="text-2xl font-bold">CSF Profile Assessment Database</h1>
+                <p className="opacity-80">Manage assessment details, document observations and track progress</p>
+              </div>
             </div>
             <div className="flex items-center gap-4">
               <button
