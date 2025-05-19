@@ -42,7 +42,7 @@ const App = () => {
           setLoading(false);
         } else {
           // Load data from CSV file
-          const response = await fetch('/csf2normalizedcsv.csv');
+          const response = await fetch('/tblProfile_Demo.csv');
           const csvText = await response.text();
           
           Papa.parse(csvText, {
