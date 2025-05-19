@@ -574,13 +574,17 @@ const handleExport = () => {
   // Status color mapping
   const getStatusColor = (status) => {
     switch(status) {
-      case 'Completed':
+      case 'Complete':
+        return 'text-green-600';
+      case 'Completed': // For backward compatibility
         return 'text-green-600';
       case 'In Progress':
         return 'text-blue-600';
       case 'Not Started':
         return 'text-gray-500';
-      case 'Issues Found':
+      case 'Submitted':
+        return 'text-orange-600';
+      case 'Issues Found': // For backward compatibility
         return 'text-red-600';
       default:
         return 'text-gray-500';

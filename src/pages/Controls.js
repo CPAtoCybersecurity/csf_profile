@@ -485,8 +485,8 @@ const Controls = ({
                       >
                         <option value="Not Started">Not Started</option>
                         <option value="In Progress">In Progress</option>
-                        <option value="Issues Found">Issues Found</option>
-                        <option value="Completed">Completed</option>
+                        <option value="Submitted">Submitted</option>
+                        <option value="Complete">Complete</option>
                       </select>
                     ) : (
                       <div className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(currentItem["Testing Status"])}`}>
