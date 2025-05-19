@@ -53,20 +53,23 @@ const UserSelector = ({
     }
   };
   
-  // Get user name by ID
-  const getUserName = (userId) => {
+  // Get user display info by ID (name and email)
+  const getUserDisplayInfo = (userId) => {
     const user = users.find(u => u.id === userId);
-    return user ? user.name : "Not assigned";
+    if (!user) return "Not assigned";
+    
+    // Format as "Name <email>" if email exists, otherwise just name
+    return user.email ? `${user.name} <${user.email}>` : user.name;
   };
   
   // Get user names for multiple selection
-  const getSelectedUserNames = () => {
+  const getSelectedUserDisplayInfo = () => {
     if (!selectedUsers || selectedUsers.length === 0) {
       return "None";
     }
     
     return selectedUsers
-      .map(id => getUserName(id))
+      .map(id => getUserDisplayInfo(id))
       .join(", ");
   };
   
@@ -90,7 +93,7 @@ const UserSelector = ({
       
       {disabled ? (
         <span className="ml-2">
-          {multiple ? getSelectedUserNames() : getUserName(selectedUsers)}
+          {multiple ? getSelectedUserDisplayInfo() : getUserDisplayInfo(selectedUsers)}
         </span>
       ) : (
         <div className="relative ml-2">
@@ -105,7 +108,7 @@ const UserSelector = ({
                     ? `${selectedUsers.length} selected` 
                     : "Select users")
                 : (selectedUsers 
-                    ? getUserName(selectedUsers) 
+                    ? getUserDisplayInfo(selectedUsers) 
                     : "Select user")}
             </span>
           </div>
@@ -145,7 +148,13 @@ const UserSelector = ({
                       >
                         <div>
                           <div>{user.name}</div>
-                          <div className="text-xs text-gray-500">{user.title}</div>
+                          <div className="text-xs text-gray-500">
+                            {user.email && (
+                              <span className="text-blue-600">{user.email}</span>
+                            )}
+                            {user.email && user.title && <span className="mx-1">•</span>}
+                            {user.title && <span>{user.title}</span>}
+                          </div>
                         </div>
                         
                         {multiple && selectedUsers && selectedUsers.includes(user.id) && (

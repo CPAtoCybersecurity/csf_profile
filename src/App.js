@@ -288,6 +288,64 @@ const App = () => {
     }
   };
   
+// Utility function to parse user information from strings like "John Doe <john@email.com>"
+const parseUserInfo = (userString) => {
+  if (!userString) return { name: null, email: null };
+  
+  // Check if the string has the format "Name <email>"
+  const emailMatch = userString.match(/([^<]+)<([^>]+)>/);
+  if (emailMatch) {
+    return {
+      name: emailMatch[1].trim(),
+      email: emailMatch[2].trim()
+    };
+  }
+  
+  // If no email format is found, just return the string as the name
+  return {
+    name: userString.trim(),
+    email: null
+  };
+};
+
+// Function to find or create a user
+const findOrCreateUser = (userInfo, existingUsers) => {
+  if (!userInfo.name) return null;
+  
+  // If we have an email, try to find a user with that email
+  if (userInfo.email) {
+    const existingUser = existingUsers.find(user => 
+      user.email.toLowerCase() === userInfo.email.toLowerCase()
+    );
+    
+    if (existingUser) {
+      return existingUser.id;
+    }
+  }
+  
+  // If no email or no user found with that email, try to find by name
+  const existingUser = existingUsers.find(user => 
+    user.name.toLowerCase() === userInfo.name.toLowerCase()
+  );
+  
+  if (existingUser) {
+    return existingUser.id;
+  }
+  
+  // If no user found, create a new one
+  const newUser = {
+    id: Date.now() + Math.floor(Math.random() * 1000), // Generate a unique ID
+    name: userInfo.name,
+    title: "Imported User", // Default title
+    email: userInfo.email || `${userInfo.name.replace(/\s+/g, '.').toLowerCase()}@example.com` // Default email if none provided
+  };
+  
+  // Add the new user to the existing users
+  existingUsers.push(newUser);
+  
+  return newUser.id;
+};
+
 // Import from CSV
 const handleImport = () => {
   // Create a file input element
@@ -304,6 +362,16 @@ const handleImport = () => {
     reader.onload = (event) => {
       const csvText = event.target.result;
       
+      // Get existing users from localStorage
+      let existingUsers = [];
+      const storedUsers = localStorage.getItem('users');
+      if (storedUsers) {
+        existingUsers = JSON.parse(storedUsers);
+      }
+      
+      // Track new users created during import
+      const newUsers = [];
+      
       // Parse the CSV data
       Papa.parse(csvText, {
         header: true,
@@ -312,10 +380,38 @@ const handleImport = () => {
         complete: (results) => {
           // Process the data to match the application's internal structure
           const importedData = results.data.map(row => {
-            // Convert stakeholders from comma-separated string to array if needed
-            let stakeholderIds = row.Stakeholders || row.stakeholderIds || [];
-            if (typeof stakeholderIds === 'string') {
-              stakeholderIds = stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
+            // Process Owner field
+            let ownerId = null;
+            if (row.Owner) {
+              const ownerInfo = parseUserInfo(row.Owner);
+              ownerId = findOrCreateUser(ownerInfo, existingUsers);
+            }
+            
+            // Process Auditor field
+            let auditorId = null;
+            if (row.Auditor) {
+              const auditorInfo = parseUserInfo(row.Auditor);
+              auditorId = findOrCreateUser(auditorInfo, existingUsers);
+            }
+            
+            // Process Stakeholders field
+            let stakeholderIds = [];
+            if (row.Stakeholders) {
+              // Split by commas, but be careful not to split email addresses that might contain commas
+              const stakeholderStrings = row.Stakeholders.split(/,(?![^<]*>)/).map(s => s.trim()).filter(Boolean);
+              
+              stakeholderIds = stakeholderStrings.map(stakeholderString => {
+                const stakeholderInfo = parseUserInfo(stakeholderString);
+                return findOrCreateUser(stakeholderInfo, existingUsers);
+              }).filter(Boolean); // Remove null values
+            } else if (row.stakeholderIds) {
+              // If stakeholderIds is already an array, use it
+              if (Array.isArray(row.stakeholderIds)) {
+                stakeholderIds = row.stakeholderIds;
+              } else if (typeof row.stakeholderIds === 'string') {
+                // If it's a string, split it
+                stakeholderIds = row.stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
+              }
             }
             
             // Handle renamed fields
@@ -332,7 +428,7 @@ const handleImport = () => {
             
             return {
               ...row,
-              "In Scope? ": row["In Scope? "] || row.Owner || "No",
+              "In Scope? ": row["In Scope? "] || "No",
               "Observations": row["Observations"] || "",
               "Current State Score": actualScore,
               "Actual Score": actualScore,
@@ -342,9 +438,9 @@ const handleImport = () => {
               "Gap to Minimum Target": minimumTarget - actualScore,
               "Testing Status": row["Testing Status"] || "Not Started",
               // Map external field names to internal field names
-              "ownerId": row.Owner || row.ownerId || null,
+              "ownerId": ownerId || row.ownerId || null,
               "stakeholderIds": stakeholderIds,
-              "auditorId": row.Auditor || row.auditorId || null,
+              "auditorId": auditorId || row.auditorId || null,
               "Control Implementation Description": controlRef,
               "NIST 800-53 Control Ref": controlRef,
               "Observation Date": row["Observation Date"] || "",
@@ -353,6 +449,12 @@ const handleImport = () => {
               "linkedArtifacts": row["linkedArtifacts"] || []
             };
           });
+          
+          // Save updated users to localStorage
+          localStorage.setItem('users', JSON.stringify(existingUsers));
+          
+          // Dispatch custom event to notify other components about user updates
+          window.dispatchEvent(new Event('userUpdate'));
           
           // Update the data state with the imported data
           setData(importedData);
@@ -377,6 +479,17 @@ const handleImport = () => {
   fileInput.click();
 };
 
+// Utility function to format user information
+const formatUserInfo = (userId, users) => {
+  if (!userId) return "";
+  
+  const user = users.find(u => u.id === userId);
+  if (!user) return userId; // Return the ID if user not found
+  
+  // Format as "Name <email>"
+  return user.email ? `${user.name} <${user.email}>` : user.name;
+};
+
 // Export to CSV
 const handleExport = () => {
   // Create date stamp in format yyyy-mm-dd
@@ -385,6 +498,13 @@ const handleExport = () => {
   const month = String(today.getMonth() + 1).padStart(2, '0');
   const day = String(today.getDate()).padStart(2, '0');
   const dateStamp = `${year}-${month}-${day}`;
+  
+  // Get users from localStorage
+  let users = [];
+  const storedUsers = localStorage.getItem('users');
+  if (storedUsers) {
+    users = JSON.parse(storedUsers);
+  }
   
   // Map the data to match the expected CSV format
   const exportData = data.map(item => {
@@ -397,6 +517,21 @@ const handleExport = () => {
     const minimumTarget = item["Minimum Target"] || 0;
     const gapToMinimum = minimumTarget - actualScore;
     
+    // Format Owner information
+    const ownerFormatted = formatUserInfo(item.ownerId, users);
+    
+    // Format Stakeholders information
+    let stakeholdersFormatted = "";
+    if (item.stakeholderIds && Array.isArray(item.stakeholderIds) && item.stakeholderIds.length > 0) {
+      stakeholdersFormatted = item.stakeholderIds
+        .map(id => formatUserInfo(id, users))
+        .filter(Boolean)
+        .join(", ");
+    }
+    
+    // Format Auditor information
+    const auditorFormatted = formatUserInfo(item.auditorId, users);
+    
     return {
       "ID": item.ID,
       "Function": item.Function,
@@ -408,9 +543,9 @@ const handleExport = () => {
       "Subcategory Description": item["Subcategory Description"],
       "Implementation Example": item["Implementation Example"],
       "In Scope? ": item["In Scope? "],
-      "Owner": item.ownerId || "",
-      "Stakeholders": item.stakeholderIds ? (Array.isArray(item.stakeholderIds) ? item.stakeholderIds.join(", ") : item.stakeholderIds) : "",
-      "Auditor": item.auditorId || "",
+      "Owner": ownerFormatted,
+      "Stakeholders": stakeholdersFormatted,
+      "Auditor": auditorFormatted,
       "NIST 800-53 Control Ref": item["Control Implementation Description"] || item["NIST 800-53 Control Ref"] || "",
       "Test Procedure(s)": item["Test Procedure(s)"] || "",
       "Observation Date": item["Observation Date"] || "",
