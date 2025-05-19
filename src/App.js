@@ -676,7 +676,7 @@ const handleExport = () => {
                 className="h-16 mr-4"
               />
               <div>
-                <h1 className="text-2xl font-bold">CSF Profile Assessment Database</h1>
+                <h1 className="text-2xl font-bold">CSF Profile Assessment Database v0.1-Beta</h1>
                 <p className="opacity-80">Manage assessment details, document observations and track progress</p>
               </div>
             </div>
