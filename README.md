@@ -23,6 +23,8 @@ The CSF Profile Assessment Tool is designed to help organizations implement and 
 
 This tool is based on the NIST Cybersecurity Framework (CSF), developed by the National Institute of Standards and Technology. The framework and implementation examples that make up the basis of this assessment are sourced from [NIST.gov](https://www.nist.gov/cyberframework). We acknowledge and appreciate NIST's work in creating this valuable resource for improving cybersecurity risk management.
 
+As a demonstration of how to conduct CSF profile assessment, fictional company "Alma Security" is used, inspired by Daniel Miessler's open source Telos project here: https://github.com/danielmiessler/Telos/blob/main/corporate_telos.md
+
 ## Welcome
 
 Welcome to the CSF Profile Assessment Tool! This application is designed to streamline your cybersecurity assessment process by providing a structured, user-friendly interface for working with the NIST Cybersecurity Framework. Whether you're conducting a full assessment, tracking remediation efforts, or building a target profile, this tool will help you manage the process efficiently.
