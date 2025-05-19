@@ -51,14 +51,14 @@ const Artifacts = ({ data }) => {
           description: 'Unauthorized BitTorrent Traffic', 
           link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
           linkedSubcategoryIds: ['2.1', '2.3'] 
-        }
+        },
         { 
           id: 3, 
-          name: 'SOC-Ticket-1004', 
-          description: 'Unauthorized BitTorrent Traffic', 
-          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
+          name: 'SOC-Ticket-1005', 
+          description: 'Malware Detected', 
+          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
           linkedSubcategoryIds: ['2.1', '2.3'] 
-        }
+        },
         { 
           id: 4, 
           name: 'Third Party Risk Management Policy', 
