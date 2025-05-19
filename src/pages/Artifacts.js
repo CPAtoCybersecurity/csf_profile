@@ -55,9 +55,9 @@ const Artifacts = ({ data }) => {
         { 
           id: 3, 
           name: 'SOC-Ticket-1005', 
-          description: 'DE.AE-08 Ex1', 
+          description: 'Account Lockout', 
           link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
-          linkedSubcategoryIds: ['2.1', '2.3'] 
+          linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
         },
         { 
           id: 4, 
