@@ -69,10 +69,12 @@ const Dashboard = ({ data }) => {
   // Colors for the charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
   const STATUS_COLORS = {
-    'Completed': '#16a34a', // green
+    'Complete': '#16a34a', // green
+    'Completed': '#16a34a', // green (for backward compatibility)
     'In Progress': '#2563eb', // blue
     'Not Started': '#6b7280', // gray
-    'Issues Found': '#dc2626' // red
+    'Submitted': '#f97316', // orange
+    'Issues Found': '#dc2626' // red (for backward compatibility)
   };
   
   if (!data || data.length === 0) {
@@ -133,8 +135,12 @@ const Dashboard = ({ data }) => {
                   fill="#8884d8"
                   dataKey="value"
                 >
-                  <Cell key="cell-yes" fill="#16a34a" /> {/* Green for Yes */}
-                  <Cell key="cell-no" fill="#dc2626" /> {/* Red for No */}
+                  {inScopeData.map((entry) => (
+                    <Cell 
+                      key={`cell-${entry.name}`} 
+                      fill={entry.name === "Yes" ? "#16a34a" : "#dc2626"} 
+                    />
+                  ))}
                 </Pie>
                 <Tooltip formatter={(value) => [`${value} items`, 'Count']} />
               </PieChart>
