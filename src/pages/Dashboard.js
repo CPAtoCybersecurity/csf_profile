@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { PieChart, Pie, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
+import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer } from 'recharts';
 
 const Dashboard = ({ data }) => {
   // Calculate status distribution for pie chart
@@ -26,44 +26,6 @@ const Dashboard = ({ data }) => {
     }, {});
     
     return Object.entries(inScopeCounts).map(([name, value]) => ({ name, value }));
-  }, [data]);
-  
-  // Calculate score data for bar chart
-  const scoreData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-    
-    // Group by function and calculate average scores
-    const functionScores = data.reduce((acc, item) => {
-      const func = item.Function || "Unknown";
-      
-      if (!acc[func]) {
-        acc[func] = {
-          function: func,
-          currentCount: 0,
-          currentSum: 0,
-          desiredCount: 0,
-          desiredSum: 0
-        };
-      }
-      
-      if (item["Current State Score"] !== null && item["Current State Score"] !== undefined) {
-        acc[func].currentSum += item["Current State Score"];
-        acc[func].currentCount++;
-      }
-      
-      if (item["Desired State Score"] !== null && item["Desired State Score"] !== undefined) {
-        acc[func].desiredSum += item["Desired State Score"];
-        acc[func].desiredCount++;
-      }
-      
-      return acc;
-    }, {});
-    
-    return Object.values(functionScores).map(item => ({
-      name: item.function,
-      current: item.currentCount > 0 ? (item.currentSum / item.currentCount).toFixed(1) : 0,
-      desired: item.desiredCount > 0 ? (item.desiredSum / item.desiredCount).toFixed(1) : 0
-    }));
   }, [data]);
   
   // Colors for the charts
@@ -144,33 +106,6 @@ const Dashboard = ({ data }) => {
                 </Pie>
                 <Tooltip formatter={(value) => [`${value} items`, 'Count']} />
               </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-        
-        {/* Score Comparison */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border md:col-span-2">
-          <h2 className="text-lg font-semibold mb-4">Average Scores by Function</h2>
-          <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={scoreData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 70 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="name" 
-                  angle={-45} 
-                  textAnchor="end" 
-                  height={70} 
-                  interval={0}
-                />
-                <YAxis domain={[0, 4]} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="current" name="Current State Score" fill="#2563eb" />
-                <Bar dataKey="desired" name="Desired State Score" fill="#16a34a" />
-              </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
