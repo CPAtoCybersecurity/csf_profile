@@ -12,7 +12,7 @@ The is an open source project, and improvement ideas to drive cyber risk reducti
 
 ![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
-Find in depth videos and guides for CSF profile assessments and this tool in Simply Cyber Academy: https://academy.simplycyber.io/p/accrp
+Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: https://academy.simplycyber.io/p/accrp
 
 ## Disclaimer
 
