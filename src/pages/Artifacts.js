@@ -43,19 +43,19 @@ const Artifacts = ({ data }) => {
           name: 'SOC-Ticket-1001', 
           description: 'Phishing Attack', 
           link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1001.md',
-          linkedSubcategoryIds: ['1.1', '1.2'] 
+          linkedSubcategoryIds: ['DE.AE-02 Ex1'] 
         },
         { 
           id: 2, 
           name: 'SOC-Ticket-1004', 
           description: 'Unauthorized BitTorrent Traffic', 
           link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
-          linkedSubcategoryIds: ['2.1', '2.3'] 
+          linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
         },
         { 
           id: 3, 
           name: 'SOC-Ticket-1005', 
-          description: 'Malware Detected', 
+          description: 'DE.AE-08 Ex1', 
           link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
           linkedSubcategoryIds: ['2.1', '2.3'] 
         },
@@ -64,7 +64,7 @@ const Artifacts = ({ data }) => {
           name: 'Third Party Risk Management Policy', 
           description: 'TPRM', 
           link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
-          linkedSubcategoryIds: ['2.1', '2.3'] 
+          linkedSubcategoryIds: ['DE.CM-06 Ex1'] 
         }
       ];
       setArtifacts(sampleArtifacts);
