@@ -20,9 +20,9 @@ const UserManagement = () => {
     } else {
       // Set some sample users if none exist
       const sampleUsers = [
-        { id: 1, name: 'John Doe', title: 'Security Analyst', email: 'john.doe@example.com' },
-        { id: 2, name: 'Jane Smith', title: 'Compliance Officer', email: 'jane.smith@example.com' },
-        { id: 3, name: 'Robert Johnson', title: 'IT Auditor', email: 'robert.johnson@example.com' }
+        { id: 1, name: 'John Doe', title: 'Accountant', email: 'john.doe@almasecurity.com' },
+        { id: 2, name: 'Jane Smith', title: 'IT Director', email: 'jane.doe@almasecuirty.com' },
+        { id: 3, name: 'Steve', title: 'GRC Analyst', email: 'steve@almasecurity.com' }
       ];
       setUsers(sampleUsers);
       localStorage.setItem('users', JSON.stringify(sampleUsers));
