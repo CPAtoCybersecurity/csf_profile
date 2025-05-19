@@ -33,8 +33,8 @@ Follow these steps to get the CSF Profile Assessment Tool up and running:
 
 1. **Clone the repository**
    ```
-   git clone <repository-url>
-   cd csf-audit-app
+   git clone https://github.com/CPAtoCybersecurity/csf_profile
+   cd csf_profile
    ```
 
 2. **Install dependencies**
