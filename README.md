@@ -1,4 +1,4 @@
-# Simply Cyber Academy - CSF Profile Assessment Tool - v0.1_Beta
+# Simply Cyber Academy - CSF Profile Assessment Database - v0.1_Beta
 
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 - Track and manage CSF outcomes
@@ -29,7 +29,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
 SOFTWARE.
 ```
-The CSF Profile Assessment Tool is intended for educational and informational purposes only. While efforts have been made to ensure accuracy and functionality, this tool does not guarantee compliance with any regulatory requirements or complete protection against cybersecurity threats. Users implement this software at their own risk.
+The CSF Profile Assessment Database is intended for educational and informational purposes only. While efforts have been made to ensure accuracy and functionality, this tool does not guarantee compliance with any regulatory requirements or complete protection against cybersecurity threats. Users implement this software at their own risk.
 
 The creator and contributors of this project cannot be held liable for any damages, data loss, or security incidents that may occur through the use of this tool. Organizations should verify all assessment findings independently and consult with qualified cybersecurity professionals when making security decisions.
 
@@ -43,7 +43,7 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 
 ## Installation and Setup
 
-Follow these steps to get the CSF Profile Assessment Tool up and running:
+Follow these steps to get the CSF Profile Assessment Database up and running:
 
 1. **Clone the repository**
    ```
