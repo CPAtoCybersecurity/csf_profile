@@ -40,16 +40,30 @@ const Artifacts = ({ data }) => {
       const sampleArtifacts = [
         { 
           id: 1, 
-          name: 'Security Policy Document', 
-          description: 'Organization-wide security policy document outlining security requirements and responsibilities', 
-          link: 'https://example.com/security-policy.pdf',
+          name: 'SOC-Ticket-1001', 
+          description: 'Phishing Attack', 
+          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1001.md',
           linkedSubcategoryIds: ['1.1', '1.2'] 
         },
         { 
           id: 2, 
-          name: 'Risk Assessment Report', 
-          description: 'Annual risk assessment report identifying key security risks and mitigation strategies', 
-          link: 'https://example.com/risk-assessment.pdf',
+          name: 'SOC-Ticket-1004', 
+          description: 'Unauthorized BitTorrent Traffic', 
+          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
+          linkedSubcategoryIds: ['2.1', '2.3'] 
+        }
+        { 
+          id: 3, 
+          name: 'SOC-Ticket-1004', 
+          description: 'Unauthorized BitTorrent Traffic', 
+          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
+          linkedSubcategoryIds: ['2.1', '2.3'] 
+        }
+        { 
+          id: 4, 
+          name: 'Third Party Risk Management Policy', 
+          description: 'TPRM', 
+          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
           linkedSubcategoryIds: ['2.1', '2.3'] 
         }
       ];
