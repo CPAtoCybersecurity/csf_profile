@@ -51,20 +51,46 @@ const App = () => {
             dynamicTyping: true,
             complete: (results) => {
               // Ensure every row has the expected fields
-              const processedData = results.data.map(row => ({
-                ...row,
-                "In Scope? ": row["In Scope? "] || "No",
-                "Observations": row["Observations"] || "",
-                "Current State Score": row["Current State Score"] !== null ? row["Current State Score"] : 0,
-                "Desired State Score": row["Desired State Score"] !== null ? row["Desired State Score"] : 0,
-                "Testing Status": row["Testing Status"] || "Not Started",
-                // Initialize user-related fields
-                "ownerId": row["ownerId"] || null,
-                "stakeholderIds": row["stakeholderIds"] || [],
-                "auditorId": row["auditorId"] || null,
-                // Initialize linked artifacts
-                "linkedArtifacts": row["linkedArtifacts"] || []
-              }));
+              const processedData = results.data.map(row => {
+                // Extract Category ID from Category field if available
+                const categoryIdMatch = row.Category && row.Category.match(/\(([^)]+)\)/);
+                const categoryId = categoryIdMatch ? categoryIdMatch[1] : "";
+                
+                // Handle renamed fields
+                const actualScore = row["Actual Score"] !== null ? row["Actual Score"] : 
+                                   (row["Current State Score"] !== null ? row["Current State Score"] : 0);
+                
+                const desiredTarget = row["Desired Target"] !== null ? row["Desired Target"] : 
+                                     (row["Desired State Score"] !== null ? row["Desired State Score"] : 0);
+                
+                const controlRef = row["NIST 800-53 Control Ref"] || row["Control Implementation Description"] || "";
+                
+                // Handle new fields
+                const minimumTarget = row["Minimum Target"] !== null ? row["Minimum Target"] : 0;
+                const gapToMinimum = minimumTarget - actualScore;
+                
+                return {
+                  ...row,
+                  "In Scope? ": row["In Scope? "] || "No",
+                  "Observations": row["Observations"] || "",
+                  "Current State Score": actualScore,
+                  "Actual Score": actualScore,
+                  "Minimum Target": minimumTarget,
+                  "Desired State Score": desiredTarget,
+                  "Desired Target": desiredTarget,
+                  "Gap to Minimum Target": gapToMinimum,
+                  "Testing Status": row["Testing Status"] || "Not Started",
+                  "Category ID": categoryId,
+                  // Initialize user-related fields
+                  "ownerId": row["ownerId"] || null,
+                  "stakeholderIds": row["stakeholderIds"] || [],
+                  "auditorId": row["auditorId"] || null,
+                  "Control Implementation Description": controlRef,
+                  "NIST 800-53 Control Ref": controlRef,
+                  // Initialize linked artifacts
+                  "linkedArtifacts": row["linkedArtifacts"] || []
+                };
+              });
               
               setData(processedData);
               
@@ -292,17 +318,35 @@ const handleImport = () => {
               stakeholderIds = stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
             }
             
+            // Handle renamed fields
+            const actualScore = row["Actual Score"] !== null ? row["Actual Score"] : 
+                               (row["Current State Score"] !== null ? row["Current State Score"] : 0);
+            
+            const desiredTarget = row["Desired Target"] !== null ? row["Desired Target"] : 
+                                 (row["Desired State Score"] !== null ? row["Desired State Score"] : 0);
+            
+            const controlRef = row["NIST 800-53 Control Ref"] || row["Control Implementation Description"] || "";
+            
+            // Handle new fields
+            const minimumTarget = row["Minimum Target"] !== null ? row["Minimum Target"] : 0;
+            
             return {
               ...row,
               "In Scope? ": row["In Scope? "] || row.Owner || "No",
               "Observations": row["Observations"] || "",
-              "Current State Score": row["Current State Score"] !== null ? row["Current State Score"] : 0,
-              "Desired State Score": row["Desired State Score"] !== null ? row["Desired State Score"] : 0,
+              "Current State Score": actualScore,
+              "Actual Score": actualScore,
+              "Minimum Target": minimumTarget,
+              "Desired State Score": desiredTarget,
+              "Desired Target": desiredTarget,
+              "Gap to Minimum Target": minimumTarget - actualScore,
               "Testing Status": row["Testing Status"] || "Not Started",
               // Map external field names to internal field names
               "ownerId": row.Owner || row.ownerId || null,
               "stakeholderIds": stakeholderIds,
               "auditorId": row.Auditor || row.auditorId || null,
+              "Control Implementation Description": controlRef,
+              "NIST 800-53 Control Ref": controlRef,
               "Observation Date": row["Observation Date"] || "",
               "Action Plan": row["Action Plan"] || "",
               // Initialize linked artifacts
@@ -343,29 +387,43 @@ const handleExport = () => {
   const dateStamp = `${year}-${month}-${day}`;
   
   // Map the data to match the expected CSV format
-  const exportData = data.map(item => ({
-    "ID": item.ID,
-    "Function": item.Function,
-    "Function Description": item["Function Description"],
-    "Category": item.Category,
-    "Category Description": item["Category Description"],
-    "Subcategory ID": item["Subcategory ID"],
-    "Subcategory Description": item["Subcategory Description"],
-    "Implementation Example": item["Implementation Example"],
-    "In Scope? ": item["In Scope? "],
-    "Owner": item.ownerId || "",
-    "Stakeholders": item.stakeholderIds ? (Array.isArray(item.stakeholderIds) ? item.stakeholderIds.join(", ") : item.stakeholderIds) : "",
-    "Auditor": item.auditorId || "",
-    "Control Implementation Description": item["Control Implementation Description"] || "",
-    "Test Procedure(s)": item["Test Procedure(s)"] || "",
-    "Observation Date": item["Observation Date"] || "",
-    "Observations": item["Observations"] || "",
-    "Current State Score": item["Current State Score"],
-    "Desired State Score": item["Desired State Score"],
-    "Testing Status": item["Testing Status"] || "",
-    "Action Plan": item["Action Plan"] || "",
-    "Linked Artifacts": item.linkedArtifacts ? (Array.isArray(item.linkedArtifacts) ? item.linkedArtifacts.join(", ") : item.linkedArtifacts) : ""
-  }));
+  const exportData = data.map(item => {
+    // Extract Category ID from Category field if available
+    const categoryIdMatch = item.Category && item.Category.match(/\(([^)]+)\)/);
+    const categoryId = categoryIdMatch ? categoryIdMatch[1] : "";
+    
+    // Calculate Gap to Minimum Target
+    const actualScore = item["Current State Score"] || item["Actual Score"] || 0;
+    const minimumTarget = item["Minimum Target"] || 0;
+    const gapToMinimum = minimumTarget - actualScore;
+    
+    return {
+      "ID": item.ID,
+      "Function": item.Function,
+      "Function Description": item["Function Description"],
+      "Category ID": categoryId,
+      "Category": item.Category,
+      "Category Description": item["Category Description"],
+      "Subcategory ID": item["Subcategory ID"],
+      "Subcategory Description": item["Subcategory Description"],
+      "Implementation Example": item["Implementation Example"],
+      "In Scope? ": item["In Scope? "],
+      "Owner": item.ownerId || "",
+      "Stakeholders": item.stakeholderIds ? (Array.isArray(item.stakeholderIds) ? item.stakeholderIds.join(", ") : item.stakeholderIds) : "",
+      "Auditor": item.auditorId || "",
+      "NIST 800-53 Control Ref": item["Control Implementation Description"] || item["NIST 800-53 Control Ref"] || "",
+      "Test Procedure(s)": item["Test Procedure(s)"] || "",
+      "Observation Date": item["Observation Date"] || "",
+      "Observations": item["Observations"] || "",
+      "Actual Score": item["Current State Score"] || item["Actual Score"] || 0,
+      "Minimum Target": item["Minimum Target"] || 0,
+      "Desired Target": item["Desired State Score"] || item["Desired Target"] || 0,
+      "Gap to Minimum Target": gapToMinimum,
+      "Testing Status": item["Testing Status"] || "",
+      "Action Plan": item["Action Plan"] || "",
+      "Linked Artifacts": item.linkedArtifacts ? (Array.isArray(item.linkedArtifacts) ? item.linkedArtifacts.join(", ") : item.linkedArtifacts) : ""
+    };
+  });
   
   const csv = Papa.unparse(exportData);
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -395,9 +453,9 @@ const handleExport = () => {
   };
   
   // Score color mapping
-  const getScoreColor = (current, desired) => {
-    if (current === desired) return 'text-green-600';
-    if (current > desired) return 'text-blue-600';
+  const getScoreColor = (actual, desired) => {
+    if (actual === desired) return 'text-green-600';
+    if (actual > desired) return 'text-blue-600';
     return 'text-red-600';
   };
   
