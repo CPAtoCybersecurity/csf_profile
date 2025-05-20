@@ -680,13 +680,15 @@ const handleImport = () => {
               // Process Linked Artifacts field
               let linkedArtifacts = [];
               
-              // Check for "Linked Artifacts" field in the CSV
-              if (row["Linked Artifacts"]) {
-                // Split by semicolons (;) to get individual artifact names
-                const artifactNames = row["Linked Artifacts"].split(';').map(name => name.trim()).filter(Boolean);
+              // Check for "Artifact Name" field in the CSV (primary field)
+              if (row["Artifact Name"]) {
+                console.log(`Found Artifact Name in row: ${row["Artifact Name"]}`);
+                // Split by commas to get individual artifact names
+                const artifactNames = row["Artifact Name"].split(',').map(name => name.trim()).filter(Boolean);
                 
                 // For each artifact name
                 artifactNames.forEach(artifactName => {
+                  console.log(`Processing artifact: ${artifactName}`);
                   // Add to linkedArtifacts array
                   linkedArtifacts.push(artifactName);
                   
@@ -694,21 +696,69 @@ const handleImport = () => {
                   const existingArtifact = existingArtifacts.find(a => a.name === artifactName);
                   
                   if (!existingArtifact) {
+                    console.log(`Artifact ${artifactName} not found in existing artifacts, creating new one`);
                     // Create a new artifact if it doesn't exist
                     const newArtifact = {
                       id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                      artifactId: `A${existingArtifacts.length + 1}`,
                       name: artifactName,
                       description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
                       link: row["Linked Artifact URL"] || '',
                       linkedSubcategoryIds: [row.ID] // Link to the current subcategory
                     };
                     
+                    console.log(`Created new artifact: ${JSON.stringify(newArtifact)}`);
+                    
                     // Add to existing artifacts
                     existingArtifacts.push(newArtifact);
                     newArtifacts.push(newArtifact);
                   } else {
+                    console.log(`Artifact ${artifactName} found in existing artifacts, checking if linked to subcategory ${row.ID}`);
                     // If the artifact exists but isn't linked to this subcategory, link it
                     if (!existingArtifact.linkedSubcategoryIds.includes(row.ID)) {
+                      console.log(`Linking artifact ${artifactName} to subcategory ${row.ID}`);
+                      existingArtifact.linkedSubcategoryIds.push(row.ID);
+                    }
+                  }
+                });
+              }
+              // Also check for "Linked Artifacts" field in the CSV (alternative field)
+              else if (row["Linked Artifacts"]) {
+                console.log(`Found Linked Artifacts in row: ${row["Linked Artifacts"]}`);
+                // Split by semicolons (;) to get individual artifact names
+                const artifactNames = row["Linked Artifacts"].split(';').map(name => name.trim()).filter(Boolean);
+                
+                // For each artifact name
+                artifactNames.forEach(artifactName => {
+                  console.log(`Processing artifact: ${artifactName}`);
+                  // Add to linkedArtifacts array
+                  linkedArtifacts.push(artifactName);
+                  
+                  // Check if this artifact already exists
+                  const existingArtifact = existingArtifacts.find(a => a.name === artifactName);
+                  
+                  if (!existingArtifact) {
+                    console.log(`Artifact ${artifactName} not found in existing artifacts, creating new one`);
+                    // Create a new artifact if it doesn't exist
+                    const newArtifact = {
+                      id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                      artifactId: `A${existingArtifacts.length + 1}`,
+                      name: artifactName,
+                      description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                      link: row["Linked Artifact URL"] || '',
+                      linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                    };
+                    
+                    console.log(`Created new artifact: ${JSON.stringify(newArtifact)}`);
+                    
+                    // Add to existing artifacts
+                    existingArtifacts.push(newArtifact);
+                    newArtifacts.push(newArtifact);
+                  } else {
+                    console.log(`Artifact ${artifactName} found in existing artifacts, checking if linked to subcategory ${row.ID}`);
+                    // If the artifact exists but isn't linked to this subcategory, link it
+                    if (!existingArtifact.linkedSubcategoryIds.includes(row.ID)) {
+                      console.log(`Linking artifact ${artifactName} to subcategory ${row.ID}`);
                       existingArtifact.linkedSubcategoryIds.push(row.ID);
                     }
                   }
