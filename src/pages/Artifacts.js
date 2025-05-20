@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FileArchive, Edit, Trash2, Save, X, Plus, Link as LinkIcon } from 'lucide-react';
+import { FileArchive, Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download } from 'lucide-react';
 import Papa from 'papaparse';
+import { extractArtifactsFromProfile, processImportedCSV } from '../updateArtifactLinks';
 
 const Artifacts = ({ data }) => {
   const [artifacts, setArtifacts] = useState([]);
@@ -32,7 +33,10 @@ const Artifacts = ({ data }) => {
     };
   }, []);
   
-  // Load artifacts from localStorage or CSV on component mount
+  // File input ref for CSV import
+  const fileInputRef = useRef(null);
+  
+  // Load artifacts from localStorage or profile data on component mount
   useEffect(() => {
     const storedArtifacts = localStorage.getItem('artifacts');
     const isFirstTimeDownload = !localStorage.getItem('hasDownloaded');
@@ -41,9 +45,9 @@ const Artifacts = ({ data }) => {
       setArtifacts(JSON.parse(storedArtifacts));
       console.log("Loaded artifacts from localStorage:", JSON.parse(storedArtifacts));
     } else {
-      console.log("First time download or no stored artifacts, loading from CSV");
-      // Load from CSV file for first-time download
-      fetch('/tblArtifacts_Demo.csv')
+      console.log("First time download or no stored artifacts, loading from profile data");
+      // Load from profile data for first-time download
+      fetch('/tblProfile_Demo.csv')
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -51,79 +55,22 @@ const Artifacts = ({ data }) => {
           return response.text();
         })
         .then(csvText => {
-          console.log("CSV text fetched successfully, parsing...");
+          console.log("Profile CSV text fetched successfully, parsing...");
           Papa.parse(csvText, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-              console.log("CSV parsing complete, results:", results.data);
-              const csvArtifacts = results.data.map((row, index) => {
-                // Load profile data to link artifacts with subcategories
-                const artifact = {
-                  id: index + 1,
-                  artifactId: row['Artifact ID'] || `A${index + 1}`,
-                  name: row['Artifact Name'] || '',
-                  description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                  link: row['Artifact Link'] || '',
-                  linkedSubcategoryIds: []
-                };
-                
-                console.log("Processed artifact:", artifact);
-                return artifact;
-              });
+              console.log("Profile CSV parsing complete, results:", results.data);
+              
+              // Extract artifacts from profile data
+              const extractedArtifacts = extractArtifactsFromProfile(results.data);
+              console.log("Extracted artifacts from profile data:", extractedArtifacts);
               
               // Set flag to indicate data has been downloaded
               localStorage.setItem('hasDownloaded', 'true');
               
-              setArtifacts(csvArtifacts);
-              localStorage.setItem('artifacts', JSON.stringify(csvArtifacts));
-              
-              // Now load profile data to establish relationships
-              fetch('/tblProfile_Demo.csv')
-                .then(response => response.text())
-                .then(profileCsvText => {
-                  Papa.parse(profileCsvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: (profileResults) => {
-                      console.log("Profile CSV parsing complete");
-                      
-                      // Create a map of artifact names to their IDs
-                      const artifactNameToId = {};
-                      csvArtifacts.forEach(artifact => {
-                        artifactNameToId[artifact.name] = artifact.id;
-                      });
-                      
-                      // Update artifacts with subcategory links
-                      const updatedArtifacts = [...csvArtifacts];
-                      
-                      profileResults.data.forEach(row => {
-                        if (row["Artifact Name"]) {
-                          const artifactNames = row["Artifact Name"].split(',').map(name => name.trim());
-                          
-                          artifactNames.forEach(artifactName => {
-                            const artifactId = artifactNameToId[artifactName];
-                            if (artifactId !== undefined) {
-                              const artifactIndex = updatedArtifacts.findIndex(a => a.id === artifactId);
-                              if (artifactIndex !== -1) {
-                                if (!updatedArtifacts[artifactIndex].linkedSubcategoryIds.includes(row.ID)) {
-                                  updatedArtifacts[artifactIndex].linkedSubcategoryIds.push(row.ID);
-                                }
-                              }
-                            }
-                          });
-                        }
-                      });
-                      
-                      console.log("Updated artifacts with subcategory links:", updatedArtifacts);
-                      setArtifacts(updatedArtifacts);
-                      localStorage.setItem('artifacts', JSON.stringify(updatedArtifacts));
-                    }
-                  });
-                })
-                .catch(error => {
-                  console.error("Error loading profile data:", error);
-                });
+              setArtifacts(extractedArtifacts);
+              localStorage.setItem('artifacts', JSON.stringify(extractedArtifacts));
             },
             error: (error) => {
               console.error('Error parsing CSV:', error);
@@ -144,22 +91,6 @@ const Artifacts = ({ data }) => {
                   description: 'Unauthorized BitTorrent Traffic', 
                   link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
                   linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
-                },
-                { 
-                  id: 3,
-                  artifactId: 'A3',
-                  name: 'SOC-Ticket-1005', 
-                  description: 'Account Lockout', 
-                  link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
-                  linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
-                },
-                { 
-                  id: 4,
-                  artifactId: 'A4',
-                  name: 'Third Party Risk Management Policy', 
-                  description: 'TPRM', 
-                  link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
-                  linkedSubcategoryIds: ['DE.CM-06 Ex1'] 
                 }
               ];
               setArtifacts(sampleArtifacts);
@@ -186,22 +117,6 @@ const Artifacts = ({ data }) => {
               description: 'Unauthorized BitTorrent Traffic', 
               link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
               linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
-            },
-            { 
-              id: 3,
-              artifactId: 'A3',
-              name: 'SOC-Ticket-1005', 
-              description: 'Account Lockout', 
-              link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
-              linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
-            },
-            { 
-              id: 4,
-              artifactId: 'A4',
-              name: 'Third Party Risk Management Policy', 
-              description: 'TPRM', 
-              link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
-              linkedSubcategoryIds: ['DE.CM-06 Ex1'] 
             }
           ];
           setArtifacts(sampleArtifacts);
@@ -209,6 +124,63 @@ const Artifacts = ({ data }) => {
         });
     }
   }, []);
+  
+  // Handle CSV import
+  const handleImportCSV = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const csvText = e.target.result;
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          console.log("Imported CSV parsing complete, results:", results.data);
+          
+          // Process imported CSV data
+          const updatedArtifacts = processImportedCSV(results.data);
+          console.log("Updated artifacts from imported CSV:", updatedArtifacts);
+          
+          setArtifacts(updatedArtifacts);
+        },
+        error: (error) => {
+          console.error('Error parsing imported CSV:', error);
+          alert('Error parsing the imported CSV file. Please check the format and try again.');
+        }
+      });
+    };
+    reader.readAsText(file);
+    
+    // Reset the file input
+    event.target.value = null;
+  };
+  
+  // Handle CSV export
+  const handleExportCSV = () => {
+    // Create CSV content
+    const csvData = artifacts.map(artifact => ({
+      'Artifact ID': artifact.artifactId,
+      'Name': artifact.name,
+      'Description': artifact.description,
+      'Link': artifact.link,
+      'Linked Subcategory IDs': artifact.linkedSubcategoryIds.join(', ')
+    }));
+    
+    // Convert to CSV
+    const csv = Papa.unparse(csvData);
+    
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'artifacts_export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   // Save artifacts to localStorage whenever they change
   useEffect(() => {
@@ -480,16 +452,41 @@ const Artifacts = ({ data }) => {
           <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-lg font-semibold">Artifacts List</h2>
-              <button
-                onClick={() => {
-                  resetForm();
-                  setSelectedArtifact(null);
-                }}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-              >
-                <Plus size={16} />
-                Add New Artifact
-              </button>
+              <div className="flex gap-2">
+                <input
+                  type="file"
+                  accept=".csv"
+                  ref={fileInputRef}
+                  onChange={handleImportCSV}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current.click()}
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+                  title="Import artifacts from CSV"
+                >
+                  <Upload size={16} />
+                  Import CSV
+                </button>
+                <button
+                  onClick={handleExportCSV}
+                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg"
+                  title="Export artifacts to CSV"
+                >
+                  <Download size={16} />
+                  Export CSV
+                </button>
+                <button
+                  onClick={() => {
+                    resetForm();
+                    setSelectedArtifact(null);
+                  }}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+                >
+                  <Plus size={16} />
+                  Add New Artifact
+                </button>
+              </div>
             </div>
             
             <table className="min-w-full divide-y divide-gray-200">

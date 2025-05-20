@@ -53,13 +53,23 @@ const UserSelector = ({
     }
   };
   
-  // Get user display info by ID (name and email)
+  // Get user display info by ID (email only)
   const getUserDisplayInfo = (userId) => {
     const user = users.find(u => u.id === userId);
     if (!user) return "Not assigned";
     
-    // Format as "Name <email>" if email exists, otherwise just name
-    return user.email ? `${user.name} <${user.email}>` : user.name;
+    // Fix email if it has duplicate domains
+    let email = user.email;
+    if (email && email.includes('@')) {
+      const parts = email.split('@');
+      if (parts.length > 2) {
+        // Keep only the first part and the last domain
+        email = parts[0] + '@' + parts[parts.length - 1];
+      }
+    }
+    
+    // Just return the email if it exists, otherwise just name
+    return email || user.name;
   };
   
   // Get user names for multiple selection

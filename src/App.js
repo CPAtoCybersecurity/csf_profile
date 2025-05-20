@@ -30,7 +30,44 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   
+  // Function to fix email addresses that might have duplicate domains
+  const fixEmailAddresses = () => {
+    // Get users from localStorage
+    const storedUsers = localStorage.getItem('users');
+    if (storedUsers) {
+      const users = JSON.parse(storedUsers);
+      let hasChanges = false;
+      
+      // Fix any email addresses with duplicate domains
+      const fixedUsers = users.map(user => {
+        if (user.email && user.email.includes('@')) {
+          // Check for duplicate domains like email@domain.com@domain.com
+          const parts = user.email.split('@');
+          if (parts.length > 2) {
+            // Keep only the first part and the last domain
+            const fixedEmail = parts[0] + '@' + parts[parts.length - 1];
+            console.log(`Fixed email: ${user.email} -> ${fixedEmail}`);
+            hasChanges = true;
+            return { ...user, email: fixedEmail };
+          }
+        }
+        return user;
+      });
+      
+      // Save fixed users back to localStorage if changes were made
+      if (hasChanges) {
+        console.log('Saving fixed user emails to localStorage');
+        localStorage.setItem('users', JSON.stringify(fixedUsers));
+        // Dispatch event to notify other components
+        window.dispatchEvent(new Event('userUpdate'));
+      }
+    }
+  };
+  
   useEffect(() => {
+    // Fix any email addresses with duplicate domains
+    fixEmailAddresses();
+    
     const loadData = async () => {
       try {
         // Check if data is already in localStorage
@@ -488,9 +525,20 @@ const parseUserInfo = (userString) => {
   // Check if the string has the format "Name <email>"
   const emailMatch = userString.match(/([^<]+)<([^>]+)>/);
   if (emailMatch) {
+    // Check if the email already contains @ symbol
+    const email = emailMatch[2].trim();
+    // If it's already an email address, use it as is
     return {
       name: emailMatch[1].trim(),
-      email: emailMatch[2].trim()
+      email: email
+    };
+  }
+  
+  // Check if the string itself is an email address
+  if (userString.includes('@')) {
+    return {
+      name: userString.split('@')[0].trim(),
+      email: userString.trim()
     };
   }
   
@@ -526,11 +574,23 @@ const findOrCreateUser = (userInfo, existingUsers) => {
   }
   
   // If no user found, create a new one
+  // Create a default email if none provided, but check if it already contains @ symbol
+  let email = userInfo.email;
+  if (!email) {
+    email = `${userInfo.name.replace(/\s+/g, '.').toLowerCase()}@almasecurity.com`;
+  } else if (email.includes('@')) {
+    // If email already contains @, use it as is
+    email = email;
+  } else {
+    // If email doesn't contain @, append @almasecurity.com
+    email = `${email}@almasecurity.com`;
+  }
+  
   const newUser = {
     id: Date.now() + Math.floor(Math.random() * 1000), // Generate a unique ID
     name: userInfo.name,
     title: "Imported User", // Default title
-    email: userInfo.email || `${userInfo.name.replace(/\s+/g, '.').toLowerCase()}@example.com` // Default email if none provided
+    email: email
   };
   
   // Add the new user to the existing users

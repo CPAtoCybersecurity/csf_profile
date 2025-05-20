@@ -1,5 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { UserPlus, Edit, Trash2, Save, X } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { UserPlus, Edit, Trash2, Save, X, Upload, Download } from 'lucide-react';
+import Papa from 'papaparse';
+
+// Helper function to create email addresses
+const createEmail = (name) => {
+  if (!name) return '';
+  
+  // Convert name to lowercase and replace spaces with dots
+  const formattedName = name.toLowerCase().replace(/\s+/g, '.');
+  
+  // Return the email with the almasecurity.com domain
+  return `${formattedName}@almasecurity.com`;
+};
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -12,22 +24,174 @@ const UserManagement = () => {
   const [editMode, setEditMode] = useState(false);
   const [errors, setErrors] = useState({});
   
-  // Load users from localStorage on component mount
+  // File input ref for CSV import
+  const fileInputRef = useRef(null);
+  
+  // Load users from localStorage or profile data on component mount
   useEffect(() => {
     const storedUsers = localStorage.getItem('users');
-    if (storedUsers) {
+    const isFirstTimeDownload = !localStorage.getItem('hasDownloaded');
+    
+    if (storedUsers && !isFirstTimeDownload) {
       setUsers(JSON.parse(storedUsers));
     } else {
-      // Set some sample users if none exist
-      const sampleUsers = [
-        { id: 1, name: 'John Doe', title: 'Accountant', email: 'john.doe@almasecurity.com' },
-        { id: 2, name: 'Jane Smith', title: 'IT Director', email: 'jane.doe@almasecuirty.com' },
-        { id: 3, name: 'Steve', title: 'GRC Analyst', email: 'steve@almasecurity.com' }
-      ];
-      setUsers(sampleUsers);
-      localStorage.setItem('users', JSON.stringify(sampleUsers));
+      console.log("First time download or no stored users, loading from profile data");
+      // Load from profile data for first-time download
+      fetch('/tblProfile_Demo.csv')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
+        .then(csvText => {
+          console.log("Profile CSV text fetched successfully, parsing...");
+          Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+              console.log("Profile CSV parsing complete, results:", results.data);
+              
+              // Extract unique users from profile data
+              const userMap = new Map();
+              
+              results.data.forEach(row => {
+                if (row["User"] && !userMap.has(row["User"])) {
+                  const user = {
+                    id: Date.now() + Math.floor(Math.random() * 1000) + userMap.size,
+                    name: row["User"],
+                    title: row["Title"] || "Employee",
+                    email: createEmail(row["User"])
+                  };
+                  userMap.set(row["User"], user);
+                }
+              });
+              
+              const extractedUsers = Array.from(userMap.values());
+              console.log("Extracted users from profile data:", extractedUsers);
+              
+              // If no users were found in the profile data, use sample users
+              if (extractedUsers.length === 0) {
+                const sampleUsers = [
+                  { id: 1, name: 'John Doe', title: 'Accountant', email: 'john.doe@almasecurity.com' },
+                  { id: 2, name: 'Jane Smith', title: 'IT Director', email: 'jane.smith@almasecurity.com' },
+                  { id: 3, name: 'Steve', title: 'GRC Analyst', email: 'steve@almasecurity.com' }
+                ];
+                setUsers(sampleUsers);
+                localStorage.setItem('users', JSON.stringify(sampleUsers));
+              } else {
+                setUsers(extractedUsers);
+                localStorage.setItem('users', JSON.stringify(extractedUsers));
+              }
+              
+              // Set flag to indicate data has been downloaded
+              localStorage.setItem('hasDownloaded', 'true');
+            },
+            error: (error) => {
+              console.error('Error parsing CSV:', error);
+              // Fallback to sample users if CSV loading fails
+              const sampleUsers = [
+                { id: 1, name: 'John Doe', title: 'Accountant', email: 'john.doe@almasecurity.com' },
+                { id: 2, name: 'Jane Smith', title: 'IT Director', email: 'jane.smith@almasecurity.com' },
+                { id: 3, name: 'Steve', title: 'GRC Analyst', email: 'steve@almasecurity.com' }
+              ];
+              setUsers(sampleUsers);
+              localStorage.setItem('users', JSON.stringify(sampleUsers));
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching CSV:', error);
+          // Fallback to sample users if CSV fetch fails
+          const sampleUsers = [
+            { id: 1, name: 'John Doe', title: 'Accountant', email: 'john.doe@almasecurity.com' },
+            { id: 2, name: 'Jane Smith', title: 'IT Director', email: 'jane.smith@almasecurity.com' },
+            { id: 3, name: 'Steve', title: 'GRC Analyst', email: 'steve@almasecurity.com' }
+          ];
+          setUsers(sampleUsers);
+          localStorage.setItem('users', JSON.stringify(sampleUsers));
+        });
     }
   }, []);
+  
+  // Handle CSV import
+  const handleImportCSV = (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const csvText = e.target.result;
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          console.log("Imported CSV parsing complete, results:", results.data);
+          
+          // Process imported CSV data
+          const userMap = new Map();
+          
+          // First add existing users to the map
+          users.forEach(user => {
+            userMap.set(user.name, user);
+          });
+          
+          // Then add or update users from the CSV
+          results.data.forEach(row => {
+            if (row["User"] && !userMap.has(row["User"])) {
+              const user = {
+                id: Date.now() + Math.floor(Math.random() * 1000) + userMap.size,
+                name: row["User"],
+                title: row["Title"] || "Employee",
+                email: row["Email"] || createEmail(row["User"])
+              };
+              userMap.set(row["User"], user);
+            }
+          });
+          
+          const updatedUsers = Array.from(userMap.values());
+          console.log("Updated users from imported CSV:", updatedUsers);
+          
+          setUsers(updatedUsers);
+          localStorage.setItem('users', JSON.stringify(updatedUsers));
+          
+          // Dispatch custom event to notify other components
+          window.dispatchEvent(new Event('userUpdate'));
+        },
+        error: (error) => {
+          console.error('Error parsing imported CSV:', error);
+          alert('Error parsing the imported CSV file. Please check the format and try again.');
+        }
+      });
+    };
+    reader.readAsText(file);
+    
+    // Reset the file input
+    event.target.value = null;
+  };
+  
+  // Handle CSV export
+  const handleExportCSV = () => {
+    // Create CSV content
+    const csvData = users.map(user => ({
+      'User': user.name,
+      'Title': user.title,
+      'Email': user.email
+    }));
+    
+    // Convert to CSV
+    const csv = Papa.unparse(csvData);
+    
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'users_export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   
   // Save users to localStorage whenever they change
   useEffect(() => {
@@ -221,12 +385,38 @@ const UserManagement = () => {
       
       {/* Users Table */}
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-lg font-semibold">Users List</h2>
+          <div className="flex gap-2">
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              onChange={handleImportCSV}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current.click()}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+              title="Import users from CSV"
+            >
+              <Upload size={16} />
+              Import CSV
+            </button>
+            <button
+              onClick={handleExportCSV}
+              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg"
+              title="Export users to CSV"
+            >
+              <Download size={16} />
+              Export CSV
+            </button>
+          </div>
+        </div>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -235,8 +425,6 @@ const UserManagement = () => {
               users.map((user) => (
                 <tr key={user.id}>
                   <td className="p-3 text-sm">{user.name}</td>
-                  <td className="p-3 text-sm">{user.title}</td>
-                  <td className="p-3 text-sm">{user.email}</td>
                   <td className="p-3 text-sm">
                     <div className="flex gap-2">
                       <button
