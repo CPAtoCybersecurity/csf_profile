@@ -8,12 +8,47 @@ export const extractArtifactsFromProfile = (profileData) => {
     return [];
   }
 
+  // Get existing main data from localStorage to preserve Owner and Stakeholders
+  const storedMainData = localStorage.getItem('mainData');
+  let mainData = storedMainData ? JSON.parse(storedMainData) : [];
+  
+  // Create a map of IDs to their Owner and Stakeholders for easy lookup
+  const userDataMap = new Map();
+  mainData.forEach(item => {
+    userDataMap.set(item.ID, {
+      ownerId: item.ownerId,
+      stakeholderIds: item.stakeholderIds
+    });
+  });
+
   const artifactMap = new Map();
   
   // Extract artifact names from profile data
   profileData.forEach(row => {
+    // Preserve Owner and Stakeholders data
+    if (row.ID) {
+      // Check if this ID already exists in mainData
+      const existingItemIndex = mainData.findIndex(item => item.ID === row.ID);
+      
+      if (existingItemIndex >= 0) {
+        // Update existing item
+        mainData[existingItemIndex] = {
+          ...mainData[existingItemIndex],
+          ownerId: row.ownerId || mainData[existingItemIndex].ownerId,
+          stakeholderIds: row.stakeholderIds || mainData[existingItemIndex].stakeholderIds
+        };
+      } else {
+        // This is a new row, add it to mainData
+        mainData.push({
+          ...row,
+          ownerId: row.ownerId || null,
+          stakeholderIds: row.stakeholderIds || []
+        });
+      }
+    }
+    
     if (row["Artifact Name"]) {
-      const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim());
+      const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim()).filter(Boolean);
       
       artifactNames.forEach(artifactName => {
         if (!artifactMap.has(artifactName)) {
@@ -39,6 +74,12 @@ export const extractArtifactsFromProfile = (profileData) => {
     }
   });
   
+  // Save updated mainData to localStorage
+  localStorage.setItem('mainData', JSON.stringify(mainData));
+  
+  // Dispatch event to notify other components about the update
+  window.dispatchEvent(new Event('mainDataUpdate'));
+  
   return Array.from(artifactMap.values());
 };
 
@@ -53,6 +94,19 @@ export const processImportedCSV = (csvData) => {
   const storedArtifacts = localStorage.getItem('artifacts');
   let existingArtifacts = storedArtifacts ? JSON.parse(storedArtifacts) : [];
   
+  // Get existing main data from localStorage to preserve Owner and Stakeholders
+  const storedMainData = localStorage.getItem('mainData');
+  let mainData = storedMainData ? JSON.parse(storedMainData) : [];
+  
+  // Create a map of IDs to their Owner and Stakeholders for easy lookup
+  const userDataMap = new Map();
+  mainData.forEach(item => {
+    userDataMap.set(item.ID, {
+      ownerId: item.ownerId,
+      stakeholderIds: item.stakeholderIds
+    });
+  });
+  
   // Create a map of artifact names to their objects for easy lookup
   const artifactMap = new Map();
   existingArtifacts.forEach(artifact => {
@@ -61,6 +115,28 @@ export const processImportedCSV = (csvData) => {
   
   // Process CSV data to update artifacts
   csvData.forEach(row => {
+    // Preserve Owner and Stakeholders data
+    if (row.ID) {
+      // Check if this ID already exists in mainData
+      const existingItemIndex = mainData.findIndex(item => item.ID === row.ID);
+      
+      if (existingItemIndex >= 0) {
+        // Update existing item
+        mainData[existingItemIndex] = {
+          ...mainData[existingItemIndex],
+          ownerId: row.ownerId || mainData[existingItemIndex].ownerId,
+          stakeholderIds: row.stakeholderIds || mainData[existingItemIndex].stakeholderIds
+        };
+      } else {
+        // This is a new row, add it to mainData
+        mainData.push({
+          ...row,
+          ownerId: row.ownerId || null,
+          stakeholderIds: row.stakeholderIds || []
+        });
+      }
+    }
+    
     // Check for "Artifact Name" field first (primary field)
     if (row["Artifact Name"]) {
       const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim()).filter(Boolean);
@@ -120,6 +196,12 @@ export const processImportedCSV = (csvData) => {
   
   // Save updated artifacts to localStorage
   localStorage.setItem('artifacts', JSON.stringify(updatedArtifacts));
+  
+  // Save updated mainData to localStorage
+  localStorage.setItem('mainData', JSON.stringify(mainData));
+  
+  // Dispatch event to notify other components about the update
+  window.dispatchEvent(new Event('mainDataUpdate'));
   
   return updatedArtifacts;
 };
