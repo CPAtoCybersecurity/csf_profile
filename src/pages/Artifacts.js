@@ -463,7 +463,7 @@ const Artifacts = ({ data }) => {
                 />
                 <button
                   onClick={() => fileInputRef.current.click()}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
                   title="Import artifacts from CSV"
                 >
                   <Upload size={16} />
@@ -471,7 +471,7 @@ const Artifacts = ({ data }) => {
                 </button>
                 <button
                   onClick={handleExportCSV}
-                  className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg"
+                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
                   title="Export artifacts to CSV"
                 >
                   <Download size={16} />
