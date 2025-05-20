@@ -417,6 +417,8 @@ const UserManagement = () => {
           <thead className="bg-gray-50">
             <tr>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
@@ -425,6 +427,8 @@ const UserManagement = () => {
               users.map((user) => (
                 <tr key={user.id}>
                   <td className="p-3 text-sm">{user.name}</td>
+                  <td className="p-3 text-sm">{user.title}</td>
+                  <td className="p-3 text-sm">{user.email}</td>
                   <td className="p-3 text-sm">
                     <div className="flex gap-2">
                       <button
