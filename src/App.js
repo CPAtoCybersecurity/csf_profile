@@ -196,7 +196,7 @@ const App = () => {
                                   artifactId: artifactFromCsv ? artifactFromCsv['Artifact ID'] : `A${existingArtifacts.length + 1}`,
                                   name: artifactName,
                                   description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                                  link: artifactFromCsv ? artifactFromCsv['Artifact Link'] : '',
+                                  link: artifactFromCsv ? artifactFromCsv['Artifact Link'] : (row["Linked Artifact URL"] || ''),
                                   linkedSubcategoryIds: [row.ID] // Link to the current subcategory
                                 };
                                 
@@ -217,7 +217,7 @@ const App = () => {
                                   artifactId: `A${existingArtifacts.length + 1}`,
                                   name: artifactName,
                                   description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                                  link: '',
+                                  link: row["Linked Artifact URL"] || '',
                                   linkedSubcategoryIds: [row.ID] // Link to the current subcategory
                                 };
                                 
@@ -240,7 +240,7 @@ const App = () => {
                               artifactId: `A${existingArtifacts.length + 1}`,
                               name: artifactName,
                               description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                              link: '',
+                              link: row["Linked Artifact URL"] || '',
                               linkedSubcategoryIds: [row.ID] // Link to the current subcategory
                             };
                             
@@ -699,7 +699,7 @@ const handleImport = () => {
                       id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
                       name: artifactName,
                       description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                      link: '',
+                      link: row["Linked Artifact URL"] || '',
                       linkedSubcategoryIds: [row.ID] // Link to the current subcategory
                     };
                     
@@ -871,7 +871,8 @@ const handleExport = () => {
       "Gap to Minimum Target": gapToMinimum,
       "Testing Status": item["Testing Status"] || "",
       "Action Plan": item["Action Plan"] || "",
-      "Linked Artifacts": item.linkedArtifacts ? (Array.isArray(item.linkedArtifacts) ? item.linkedArtifacts.join("; ") : item.linkedArtifacts) : ""
+      "Artifact Name": item.linkedArtifacts ? (Array.isArray(item.linkedArtifacts) ? item.linkedArtifacts.join("; ") : item.linkedArtifacts) : "",
+      "Linked Artifact URL": item["Linked Artifact URL"] || ""
     };
   });
   

@@ -165,6 +165,7 @@ const Artifacts = ({ data }) => {
       'Name': artifact.name,
       'Description': artifact.description,
       'Link': artifact.link,
+      'Linked Artifact URL': artifact.link,
       'Linked Subcategory IDs': artifact.linkedSubcategoryIds.join(', ')
     }));
     

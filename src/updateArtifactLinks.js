@@ -23,7 +23,7 @@ export const extractArtifactsFromProfile = (profileData) => {
             artifactId: `A${artifactMap.size + 1}`,
             name: artifactName,
             description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-            link: '',
+            link: row["Linked Artifact URL"] || '',
             linkedSubcategoryIds: [row.ID]
           };
           
@@ -72,7 +72,7 @@ export const processImportedCSV = (csvData) => {
             artifactId: `A${artifactMap.size + 1}`,
             name: artifactName,
             description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-            link: '',
+            link: row["Linked Artifact URL"] || '',
             linkedSubcategoryIds: [row.ID]
           };
           
