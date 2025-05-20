@@ -39,17 +39,27 @@ const Artifacts = ({ data }) => {
     
     if (storedArtifacts && !isFirstTimeDownload) {
       setArtifacts(JSON.parse(storedArtifacts));
+      console.log("Loaded artifacts from localStorage:", JSON.parse(storedArtifacts));
     } else {
+      console.log("First time download or no stored artifacts, loading from CSV");
       // Load from CSV file for first-time download
       fetch('/tblArtifacts_Demo.csv')
-        .then(response => response.text())
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.text();
+        })
         .then(csvText => {
+          console.log("CSV text fetched successfully, parsing...");
           Papa.parse(csvText, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
+              console.log("CSV parsing complete, results:", results.data);
               const csvArtifacts = results.data.map((row, index) => {
-                return {
+                // Load profile data to link artifacts with subcategories
+                const artifact = {
                   id: index + 1,
                   artifactId: row['Artifact ID'] || `A${index + 1}`,
                   name: row['Artifact Name'] || '',
@@ -57,6 +67,9 @@ const Artifacts = ({ data }) => {
                   link: row['Artifact Link'] || '',
                   linkedSubcategoryIds: []
                 };
+                
+                console.log("Processed artifact:", artifact);
+                return artifact;
               });
               
               // Set flag to indicate data has been downloaded
@@ -64,6 +77,53 @@ const Artifacts = ({ data }) => {
               
               setArtifacts(csvArtifacts);
               localStorage.setItem('artifacts', JSON.stringify(csvArtifacts));
+              
+              // Now load profile data to establish relationships
+              fetch('/tblProfile_Demo.csv')
+                .then(response => response.text())
+                .then(profileCsvText => {
+                  Papa.parse(profileCsvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (profileResults) => {
+                      console.log("Profile CSV parsing complete");
+                      
+                      // Create a map of artifact names to their IDs
+                      const artifactNameToId = {};
+                      csvArtifacts.forEach(artifact => {
+                        artifactNameToId[artifact.name] = artifact.id;
+                      });
+                      
+                      // Update artifacts with subcategory links
+                      const updatedArtifacts = [...csvArtifacts];
+                      
+                      profileResults.data.forEach(row => {
+                        if (row["Artifact Name"]) {
+                          const artifactNames = row["Artifact Name"].split(',').map(name => name.trim());
+                          
+                          artifactNames.forEach(artifactName => {
+                            const artifactId = artifactNameToId[artifactName];
+                            if (artifactId !== undefined) {
+                              const artifactIndex = updatedArtifacts.findIndex(a => a.id === artifactId);
+                              if (artifactIndex !== -1) {
+                                if (!updatedArtifacts[artifactIndex].linkedSubcategoryIds.includes(row.ID)) {
+                                  updatedArtifacts[artifactIndex].linkedSubcategoryIds.push(row.ID);
+                                }
+                              }
+                            }
+                          });
+                        }
+                      });
+                      
+                      console.log("Updated artifacts with subcategory links:", updatedArtifacts);
+                      setArtifacts(updatedArtifacts);
+                      localStorage.setItem('artifacts', JSON.stringify(updatedArtifacts));
+                    }
+                  });
+                })
+                .catch(error => {
+                  console.error("Error loading profile data:", error);
+                });
             },
             error: (error) => {
               console.error('Error parsing CSV:', error);

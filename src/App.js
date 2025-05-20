@@ -112,96 +112,121 @@ const App = () => {
                   }
                 }
                 
-                // Process Linked Artifacts field
-                let linkedArtifacts = [];
-                
-                // Check for "Linked Artifacts" field in the CSV
-                if (row["Linked Artifacts"]) {
-                  // Split by semicolons (;) to get individual artifact names
-                  const artifactNames = row["Linked Artifacts"].split(';').map(name => name.trim()).filter(Boolean);
+                  // Process Artifact Name field
+                  let linkedArtifacts = [];
                   
-                  // For each artifact name
-                  artifactNames.forEach(artifactName => {
-                    // Add to linkedArtifacts array
-                    linkedArtifacts.push(artifactName);
+                  // Check for "Artifact Name" field in the CSV
+                  if (row["Artifact Name"]) {
+                    console.log(`Found Artifact Name in row: ${row["Artifact Name"]}`);
+                    // Split by commas to get individual artifact names
+                    const artifactNames = row["Artifact Name"].split(',').map(name => name.trim()).filter(Boolean);
                     
-                    // Check if this artifact already exists
-                    const existingArtifact = existingArtifacts.find(a => a.name === artifactName);
-                    
-                    if (!existingArtifact) {
-                      // Create a new artifact if it doesn't exist
-                      // Try to find the artifact in tblArtifacts_Demo.csv
-                      fetch('/tblArtifacts_Demo.csv')
-                        .then(response => response.text())
-                        .then(csvText => {
-                          Papa.parse(csvText, {
-                            header: true,
-                            skipEmptyLines: true,
-                            complete: (results) => {
-                              const artifactFromCsv = results.data.find(a => a['Artifact Name'] === artifactName);
-                              
-                              const newArtifact = {
-                                id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
-                                artifactId: artifactFromCsv ? artifactFromCsv['Artifact ID'] : `A${existingArtifacts.length + 1}`,
-                                name: artifactName,
-                                description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                                link: artifactFromCsv ? artifactFromCsv['Artifact Link'] : '',
-                                linkedSubcategoryIds: [row.ID] // Link to the current subcategory
-                              };
-                              
-                              // Add to existing artifacts
-                              existingArtifacts.push(newArtifact);
-                              
-                              // Save updated artifacts to localStorage
-                              localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
-                            },
-                            error: (error) => {
-                              console.error('Error parsing CSV:', error);
-                              
-                              // Fallback if CSV parsing fails
-                              const newArtifact = {
-                                id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
-                                artifactId: `A${existingArtifacts.length + 1}`,
-                                name: artifactName,
-                                description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                                link: '',
-                                linkedSubcategoryIds: [row.ID] // Link to the current subcategory
-                              };
-                              
-                              // Add to existing artifacts
-                              existingArtifacts.push(newArtifact);
-                              
-                              // Save updated artifacts to localStorage
-                              localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+                    // For each artifact name
+                    artifactNames.forEach(artifactName => {
+                      console.log(`Processing artifact: ${artifactName}`);
+                      // Add to linkedArtifacts array
+                      linkedArtifacts.push(artifactName);
+                      
+                      // Check if this artifact already exists
+                      let existingArtifact = existingArtifacts.find(a => a.name === artifactName);
+                      
+                      if (!existingArtifact) {
+                        console.log(`Artifact ${artifactName} not found in existing artifacts, creating new one`);
+                        // Create a new artifact if it doesn't exist
+                        // Try to find the artifact in tblArtifacts_Demo.csv
+                        fetch('/tblArtifacts_Demo.csv')
+                          .then(response => {
+                            if (!response.ok) {
+                              throw new Error(`HTTP error! status: ${response.status}`);
                             }
+                            return response.text();
+                          })
+                          .then(csvText => {
+                            console.log("Artifacts CSV fetched successfully, parsing...");
+                            Papa.parse(csvText, {
+                              header: true,
+                              skipEmptyLines: true,
+                              complete: (results) => {
+                                console.log("Artifacts CSV parsed successfully:", results.data);
+                                const artifactFromCsv = results.data.find(a => a['Artifact Name'] === artifactName);
+                                
+                                if (artifactFromCsv) {
+                                  console.log(`Found artifact in CSV: ${JSON.stringify(artifactFromCsv)}`);
+                                }
+                                
+                                const newArtifact = {
+                                  id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                                  artifactId: artifactFromCsv ? artifactFromCsv['Artifact ID'] : `A${existingArtifacts.length + 1}`,
+                                  name: artifactName,
+                                  description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                                  link: artifactFromCsv ? artifactFromCsv['Artifact Link'] : '',
+                                  linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                                };
+                                
+                                console.log(`Created new artifact: ${JSON.stringify(newArtifact)}`);
+                                
+                                // Add to existing artifacts
+                                existingArtifacts.push(newArtifact);
+                                
+                                // Save updated artifacts to localStorage
+                                localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+                              },
+                              error: (error) => {
+                                console.error('Error parsing CSV:', error);
+                                
+                                // Fallback if CSV parsing fails
+                                const newArtifact = {
+                                  id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                                  artifactId: `A${existingArtifacts.length + 1}`,
+                                  name: artifactName,
+                                  description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                                  link: '',
+                                  linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                                };
+                                
+                                console.log(`Created fallback artifact: ${JSON.stringify(newArtifact)}`);
+                                
+                                // Add to existing artifacts
+                                existingArtifacts.push(newArtifact);
+                                
+                                // Save updated artifacts to localStorage
+                                localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+                              }
+                            });
+                          })
+                          .catch(error => {
+                            console.error('Error fetching CSV:', error);
+                            
+                            // Fallback if fetch fails
+                            const newArtifact = {
+                              id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                              artifactId: `A${existingArtifacts.length + 1}`,
+                              name: artifactName,
+                              description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                              link: '',
+                              linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                            };
+                            
+                            console.log(`Created error fallback artifact: ${JSON.stringify(newArtifact)}`);
+                            
+                            // Add to existing artifacts
+                            existingArtifacts.push(newArtifact);
+                            
+                            // Save updated artifacts to localStorage
+                            localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
                           });
-                        })
-                        .catch(error => {
-                          console.error('Error fetching CSV:', error);
-                          
-                          // Fallback if fetch fails
-                          const newArtifact = {
-                            id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
-                            artifactId: `A${existingArtifacts.length + 1}`,
-                            name: artifactName,
-                            description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                            link: '',
-                            linkedSubcategoryIds: [row.ID] // Link to the current subcategory
-                          };
-                          
-                          // Add to existing artifacts
-                          existingArtifacts.push(newArtifact);
+                      } else {
+                        console.log(`Artifact ${artifactName} found in existing artifacts, checking if linked to subcategory ${row.ID}`);
+                        // If the artifact exists but isn't linked to this subcategory, link it
+                        if (!existingArtifact.linkedSubcategoryIds.includes(row.ID)) {
+                          console.log(`Linking artifact ${artifactName} to subcategory ${row.ID}`);
+                          existingArtifact.linkedSubcategoryIds.push(row.ID);
                           
                           // Save updated artifacts to localStorage
                           localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
-                        });
-                    } else {
-                      // If the artifact exists but isn't linked to this subcategory, link it
-                      if (!existingArtifact.linkedSubcategoryIds.includes(row.ID)) {
-                        existingArtifact.linkedSubcategoryIds.push(row.ID);
+                        }
                       }
-                    }
-                  });
+                    });
                 } else if (row.linkedArtifacts) {
                   // If linkedArtifacts is already in the data, use it
                   if (Array.isArray(row.linkedArtifacts)) {
