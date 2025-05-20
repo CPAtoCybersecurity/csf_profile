@@ -130,16 +130,71 @@ const App = () => {
                     
                     if (!existingArtifact) {
                       // Create a new artifact if it doesn't exist
-                      const newArtifact = {
-                        id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
-                        name: artifactName,
-                        description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
-                        link: '',
-                        linkedSubcategoryIds: [row.ID] // Link to the current subcategory
-                      };
-                      
-                      // Add to existing artifacts
-                      existingArtifacts.push(newArtifact);
+                      // Try to find the artifact in tblArtifacts_Demo.csv
+                      fetch('/tblArtifacts_Demo.csv')
+                        .then(response => response.text())
+                        .then(csvText => {
+                          Papa.parse(csvText, {
+                            header: true,
+                            skipEmptyLines: true,
+                            complete: (results) => {
+                              const artifactFromCsv = results.data.find(a => a['Artifact Name'] === artifactName);
+                              
+                              const newArtifact = {
+                                id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                                artifactId: artifactFromCsv ? artifactFromCsv['Artifact ID'] : `A${existingArtifacts.length + 1}`,
+                                name: artifactName,
+                                description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                                link: artifactFromCsv ? artifactFromCsv['Artifact Link'] : '',
+                                linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                              };
+                              
+                              // Add to existing artifacts
+                              existingArtifacts.push(newArtifact);
+                              
+                              // Save updated artifacts to localStorage
+                              localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+                            },
+                            error: (error) => {
+                              console.error('Error parsing CSV:', error);
+                              
+                              // Fallback if CSV parsing fails
+                              const newArtifact = {
+                                id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                                artifactId: `A${existingArtifacts.length + 1}`,
+                                name: artifactName,
+                                description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                                link: '',
+                                linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                              };
+                              
+                              // Add to existing artifacts
+                              existingArtifacts.push(newArtifact);
+                              
+                              // Save updated artifacts to localStorage
+                              localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+                            }
+                          });
+                        })
+                        .catch(error => {
+                          console.error('Error fetching CSV:', error);
+                          
+                          // Fallback if fetch fails
+                          const newArtifact = {
+                            id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                            artifactId: `A${existingArtifacts.length + 1}`,
+                            name: artifactName,
+                            description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                            link: '',
+                            linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                          };
+                          
+                          // Add to existing artifacts
+                          existingArtifacts.push(newArtifact);
+                          
+                          // Save updated artifacts to localStorage
+                          localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+                        });
                     } else {
                       // If the artifact exists but isn't linked to this subcategory, link it
                       if (!existingArtifact.linkedSubcategoryIds.includes(row.ID)) {

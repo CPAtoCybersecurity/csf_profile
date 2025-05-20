@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FileArchive, Edit, Trash2, Save, X, Plus, Link as LinkIcon } from 'lucide-react';
+import Papa from 'papaparse';
 
 const Artifacts = ({ data }) => {
   const [artifacts, setArtifacts] = useState([]);
   const [formData, setFormData] = useState({
     id: null,
+    artifactId: '',
     name: '',
     description: '',
     link: '',
@@ -30,45 +32,121 @@ const Artifacts = ({ data }) => {
     };
   }, []);
   
-  // Load artifacts from localStorage on component mount
+  // Load artifacts from localStorage or CSV on component mount
   useEffect(() => {
     const storedArtifacts = localStorage.getItem('artifacts');
-    if (storedArtifacts) {
+    const isFirstTimeDownload = !localStorage.getItem('hasDownloaded');
+    
+    if (storedArtifacts && !isFirstTimeDownload) {
       setArtifacts(JSON.parse(storedArtifacts));
     } else {
-      // Set some sample artifacts if none exist
-      const sampleArtifacts = [
-        { 
-          id: 1, 
-          name: 'SOC-Ticket-1001', 
-          description: 'Phishing Attack', 
-          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1001.md',
-          linkedSubcategoryIds: ['DE.AE-02 Ex1'] 
-        },
-        { 
-          id: 2, 
-          name: 'SOC-Ticket-1004', 
-          description: 'Unauthorized BitTorrent Traffic', 
-          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
-          linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
-        },
-        { 
-          id: 3, 
-          name: 'SOC-Ticket-1005', 
-          description: 'Account Lockout', 
-          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
-          linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
-        },
-        { 
-          id: 4, 
-          name: 'Third Party Risk Management Policy', 
-          description: 'TPRM', 
-          link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
-          linkedSubcategoryIds: ['DE.CM-06 Ex1'] 
-        }
-      ];
-      setArtifacts(sampleArtifacts);
-      localStorage.setItem('artifacts', JSON.stringify(sampleArtifacts));
+      // Load from CSV file for first-time download
+      fetch('/tblArtifacts_Demo.csv')
+        .then(response => response.text())
+        .then(csvText => {
+          Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+              const csvArtifacts = results.data.map((row, index) => {
+                return {
+                  id: index + 1,
+                  artifactId: row['Artifact ID'] || `A${index + 1}`,
+                  name: row['Artifact Name'] || '',
+                  description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                  link: row['Artifact Link'] || '',
+                  linkedSubcategoryIds: []
+                };
+              });
+              
+              // Set flag to indicate data has been downloaded
+              localStorage.setItem('hasDownloaded', 'true');
+              
+              setArtifacts(csvArtifacts);
+              localStorage.setItem('artifacts', JSON.stringify(csvArtifacts));
+            },
+            error: (error) => {
+              console.error('Error parsing CSV:', error);
+              // Fallback to sample artifacts if CSV loading fails
+              const sampleArtifacts = [
+                { 
+                  id: 1,
+                  artifactId: 'A1',
+                  name: 'SOC-Ticket-1001', 
+                  description: 'Phishing Attack', 
+                  link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1001.md',
+                  linkedSubcategoryIds: ['DE.AE-02 Ex1'] 
+                },
+                { 
+                  id: 2,
+                  artifactId: 'A2',
+                  name: 'SOC-Ticket-1004', 
+                  description: 'Unauthorized BitTorrent Traffic', 
+                  link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
+                  linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
+                },
+                { 
+                  id: 3,
+                  artifactId: 'A3',
+                  name: 'SOC-Ticket-1005', 
+                  description: 'Account Lockout', 
+                  link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
+                  linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
+                },
+                { 
+                  id: 4,
+                  artifactId: 'A4',
+                  name: 'Third Party Risk Management Policy', 
+                  description: 'TPRM', 
+                  link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
+                  linkedSubcategoryIds: ['DE.CM-06 Ex1'] 
+                }
+              ];
+              setArtifacts(sampleArtifacts);
+              localStorage.setItem('artifacts', JSON.stringify(sampleArtifacts));
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching CSV:', error);
+          // Fallback to sample artifacts if CSV fetch fails
+          const sampleArtifacts = [
+            { 
+              id: 1,
+              artifactId: 'A1',
+              name: 'SOC-Ticket-1001', 
+              description: 'Phishing Attack', 
+              link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1001.md',
+              linkedSubcategoryIds: ['DE.AE-02 Ex1'] 
+            },
+            { 
+              id: 2,
+              artifactId: 'A2',
+              name: 'SOC-Ticket-1004', 
+              description: 'Unauthorized BitTorrent Traffic', 
+              link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
+              linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
+            },
+            { 
+              id: 3,
+              artifactId: 'A3',
+              name: 'SOC-Ticket-1005', 
+              description: 'Account Lockout', 
+              link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1005.md',
+              linkedSubcategoryIds: ['DE.AE-08 Ex1'] 
+            },
+            { 
+              id: 4,
+              artifactId: 'A4',
+              name: 'Third Party Risk Management Policy', 
+              description: 'TPRM', 
+              link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md',
+              linkedSubcategoryIds: ['DE.CM-06 Ex1'] 
+            }
+          ];
+          setArtifacts(sampleArtifacts);
+          localStorage.setItem('artifacts', JSON.stringify(sampleArtifacts));
+        });
     }
   }, []);
   
@@ -257,9 +335,11 @@ const Artifacts = ({ data }) => {
       );
     } else {
       // Add new artifact
+      const newId = Date.now(); // Simple way to generate unique IDs
       const newArtifact = {
         ...formData,
-        id: Date.now() // Simple way to generate unique IDs
+        id: newId,
+        artifactId: formData.artifactId || `A${artifacts.length + 1}` // Set default artifactId if not provided
       };
       updatedArtifacts = [...artifacts, newArtifact];
     }
@@ -313,6 +393,7 @@ const Artifacts = ({ data }) => {
   const resetForm = () => {
     setFormData({
       id: null,
+      artifactId: '',
       name: '',
       description: '',
       link: '',
@@ -354,6 +435,7 @@ const Artifacts = ({ data }) => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
@@ -369,6 +451,7 @@ const Artifacts = ({ data }) => {
                       className={`hover:bg-blue-50 cursor-pointer ${selectedArtifact?.id === artifact.id ? 'bg-blue-100' : ''}`}
                       onClick={() => handleViewDetails(artifact)}
                     >
+                      <td className="p-3 text-sm">{artifact.artifactId || `A${artifact.id}`}</td>
                       <td className="p-3 text-sm">{artifact.name}</td>
                       <td className="p-3 text-sm">
                         <div className="line-clamp-2">{artifact.description}</div>
@@ -445,6 +528,20 @@ const Artifacts = ({ data }) => {
             
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Artifact ID
+                  </label>
+                  <input
+                    type="text"
+                    name="artifactId"
+                    value={formData.artifactId}
+                    onChange={handleChange}
+                    className="w-full p-2 border rounded-lg"
+                    placeholder="Enter artifact ID (e.g., A1, A2)"
+                  />
+                </div>
+                
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Name
@@ -576,6 +673,11 @@ const Artifacts = ({ data }) => {
               <h2 className="text-lg font-semibold mb-4">Artifact Details</h2>
               
               <div className="space-y-3">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-500">Artifact ID</h3>
+                  <p>{selectedArtifact.artifactId || `A${selectedArtifact.id}`}</p>
+                </div>
+                
                 <div>
                   <h3 className="text-sm font-medium text-gray-500">Name</h3>
                   <p>{selectedArtifact.name}</p>
