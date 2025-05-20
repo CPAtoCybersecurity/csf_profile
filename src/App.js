@@ -36,14 +36,36 @@ const App = () => {
         // Check if data is already in localStorage
         const storedData = localStorage.getItem('mainData');
         
-        if (storedData) {
+        // Check for a flag indicating this is a first-time download
+        const isFirstTimeDownload = !localStorage.getItem('hasDownloaded');
+        
+        if (storedData && !isFirstTimeDownload) {
           // Use the data from localStorage
           setData(JSON.parse(storedData));
           setLoading(false);
         } else {
+          // If this is a first-time download, clear localStorage to ensure fresh data
+          if (isFirstTimeDownload) {
+            console.log('First-time download detected, clearing localStorage');
+            localStorage.clear();
+          }
           // Load data from CSV file
           const response = await fetch('/tblProfile_Demo.csv');
           const csvText = await response.text();
+          
+          // Get existing users from localStorage or initialize empty array
+          let existingUsers = [];
+          const storedUsers = localStorage.getItem('users');
+          if (storedUsers) {
+            existingUsers = JSON.parse(storedUsers);
+          }
+          
+          // Get existing artifacts from localStorage or initialize empty array
+          let existingArtifacts = [];
+          const storedArtifacts = localStorage.getItem('artifacts');
+          if (storedArtifacts) {
+            existingArtifacts = JSON.parse(storedArtifacts);
+          }
           
           Papa.parse(csvText, {
             header: true,
@@ -55,6 +77,85 @@ const App = () => {
                 // Extract Category ID from Category field if available
                 const categoryIdMatch = row.Category && row.Category.match(/\(([^)]+)\)/);
                 const categoryId = categoryIdMatch ? categoryIdMatch[1] : "";
+                
+                // Process Owner field
+                let ownerId = null;
+                if (row.Owner) {
+                  const ownerInfo = parseUserInfo(row.Owner);
+                  ownerId = findOrCreateUser(ownerInfo, existingUsers);
+                }
+                
+                // Process Auditor field
+                let auditorId = null;
+                if (row.Auditor) {
+                  const auditorInfo = parseUserInfo(row.Auditor);
+                  auditorId = findOrCreateUser(auditorInfo, existingUsers);
+                }
+                
+                // Process Stakeholders field
+                let stakeholderIds = [];
+                if (row.Stakeholders) {
+                  // Split by commas, but be careful not to split email addresses that might contain commas
+                  const stakeholderStrings = row.Stakeholders.split(/,(?![^<]*>)/).map(s => s.trim()).filter(Boolean);
+                  
+                  stakeholderIds = stakeholderStrings.map(stakeholderString => {
+                    const stakeholderInfo = parseUserInfo(stakeholderString);
+                    return findOrCreateUser(stakeholderInfo, existingUsers);
+                  }).filter(Boolean); // Remove null values
+                } else if (row.stakeholderIds) {
+                  // If stakeholderIds is already an array, use it
+                  if (Array.isArray(row.stakeholderIds)) {
+                    stakeholderIds = row.stakeholderIds;
+                  } else if (typeof row.stakeholderIds === 'string') {
+                    // If it's a string, split it
+                    stakeholderIds = row.stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
+                  }
+                }
+                
+                // Process Linked Artifacts field
+                let linkedArtifacts = [];
+                
+                // Check for "Linked Artifacts" field in the CSV
+                if (row["Linked Artifacts"]) {
+                  // Split by semicolons (;) to get individual artifact names
+                  const artifactNames = row["Linked Artifacts"].split(';').map(name => name.trim()).filter(Boolean);
+                  
+                  // For each artifact name
+                  artifactNames.forEach(artifactName => {
+                    // Add to linkedArtifacts array
+                    linkedArtifacts.push(artifactName);
+                    
+                    // Check if this artifact already exists
+                    const existingArtifact = existingArtifacts.find(a => a.name === artifactName);
+                    
+                    if (!existingArtifact) {
+                      // Create a new artifact if it doesn't exist
+                      const newArtifact = {
+                        id: Date.now() + Math.floor(Math.random() * 1000) + existingArtifacts.length,
+                        name: artifactName,
+                        description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+                        link: '',
+                        linkedSubcategoryIds: [row.ID] // Link to the current subcategory
+                      };
+                      
+                      // Add to existing artifacts
+                      existingArtifacts.push(newArtifact);
+                    } else {
+                      // If the artifact exists but isn't linked to this subcategory, link it
+                      if (!existingArtifact.linkedSubcategoryIds.includes(row.ID)) {
+                        existingArtifact.linkedSubcategoryIds.push(row.ID);
+                      }
+                    }
+                  });
+                } else if (row.linkedArtifacts) {
+                  // If linkedArtifacts is already in the data, use it
+                  if (Array.isArray(row.linkedArtifacts)) {
+                    linkedArtifacts = row.linkedArtifacts;
+                  } else if (typeof row.linkedArtifacts === 'string') {
+                    // If it's a string, split it
+                    linkedArtifacts = row.linkedArtifacts.split(/[,;]/).map(s => s.trim()).filter(Boolean);
+                  }
+                }
                 
                 // Handle renamed fields
                 const actualScore = row["Actual Score"] !== null ? row["Actual Score"] : 
@@ -81,21 +182,33 @@ const App = () => {
                   "Gap to Minimum Target": gapToMinimum,
                   "Testing Status": row["Testing Status"] || "Not Started",
                   "Category ID": categoryId,
-                  // Initialize user-related fields
-                  "ownerId": row["ownerId"] || null,
-                  "stakeholderIds": row["stakeholderIds"] || [],
-                  "auditorId": row["auditorId"] || null,
+                  "Test Procedure(s)": row["Test Procedure(s)"] || "",
+                  "Observation Date": row["Observation Date"] || "",
+                  "Action Plan": row["Action Plan"] || "",
+                  // User-related fields
+                  "ownerId": ownerId || row.ownerId || null,
+                  "stakeholderIds": stakeholderIds,
+                  "auditorId": auditorId || row.auditorId || null,
                   "Control Implementation Description": controlRef,
                   "NIST 800-53 Control Ref": controlRef,
-                  // Initialize linked artifacts
-                  "linkedArtifacts": row["linkedArtifacts"] || []
+                  // Linked artifacts
+                  "linkedArtifacts": linkedArtifacts
                 };
               });
+              
+              // Save updated artifacts to localStorage
+              localStorage.setItem('artifacts', JSON.stringify(existingArtifacts));
+              
+              // Save updated users to localStorage
+              localStorage.setItem('users', JSON.stringify(existingUsers));
               
               setData(processedData);
               
               // Save the processed data to localStorage
               localStorage.setItem('mainData', JSON.stringify(processedData));
+              
+              // Set flag to indicate data has been downloaded
+              localStorage.setItem('hasDownloaded', 'true');
               
               setLoading(false);
             },
@@ -521,6 +634,9 @@ const handleImport = () => {
           // Reset current item and page
           setCurrentItem(null);
           setCurrentPage(1);
+          
+          // Set flag to indicate data has been downloaded
+          localStorage.setItem('hasDownloaded', 'true');
           
           // Show success message
           alert('CSV data imported successfully!');
