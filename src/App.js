@@ -156,7 +156,7 @@ const App = () => {
                   if (row["Artifact Name"]) {
                     console.log(`Found Artifact Name in row: ${row["Artifact Name"]}`);
                     // Split by commas to get individual artifact names
-                    const artifactNames = row["Artifact Name"].split(',').map(name => name.trim()).filter(Boolean);
+                    const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim()).filter(Boolean);
                     
                     // For each artifact name
                     artifactNames.forEach(artifactName => {
@@ -684,7 +684,7 @@ const handleImport = () => {
               if (row["Artifact Name"]) {
                 console.log(`Found Artifact Name in row: ${row["Artifact Name"]}`);
                 // Split by commas to get individual artifact names
-                const artifactNames = row["Artifact Name"].split(',').map(name => name.trim()).filter(Boolean);
+                const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim()).filter(Boolean);
                 
                 // For each artifact name
                 artifactNames.forEach(artifactName => {

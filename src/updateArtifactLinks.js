@@ -13,7 +13,7 @@ export const extractArtifactsFromProfile = (profileData) => {
   // Extract artifact names from profile data
   profileData.forEach(row => {
     if (row["Artifact Name"]) {
-      const artifactNames = row["Artifact Name"].split(',').map(name => name.trim());
+      const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim());
       
       artifactNames.forEach(artifactName => {
         if (!artifactMap.has(artifactName)) {
@@ -61,7 +61,34 @@ export const processImportedCSV = (csvData) => {
   
   // Process CSV data to update artifacts
   csvData.forEach(row => {
-    if (row["Linked Artifacts"]) {
+    // Check for "Artifact Name" field first (primary field)
+    if (row["Artifact Name"]) {
+      const artifactNames = row["Artifact Name"].split(/[,;]/).map(name => name.trim()).filter(Boolean);
+      
+      artifactNames.forEach(artifactName => {
+        if (!artifactMap.has(artifactName)) {
+          // Create a new artifact
+          const newArtifact = {
+            id: Date.now() + Math.floor(Math.random() * 1000) + artifactMap.size,
+            artifactId: `A${artifactMap.size + 1}`,
+            name: artifactName,
+            description: `Imported from CSV on ${new Date().toLocaleDateString()}`,
+            link: row["Linked Artifact URL"] || '',
+            linkedSubcategoryIds: [row.ID]
+          };
+          
+          artifactMap.set(artifactName, newArtifact);
+        } else {
+          // Update existing artifact
+          const artifact = artifactMap.get(artifactName);
+          if (!artifact.linkedSubcategoryIds.includes(row.ID)) {
+            artifact.linkedSubcategoryIds.push(row.ID);
+          }
+        }
+      });
+    }
+    // Also check for "Linked Artifacts" field (alternative field)
+    else if (row["Linked Artifacts"]) {
       const artifactNames = row["Linked Artifacts"].split(';').map(name => name.trim()).filter(Boolean);
       
       artifactNames.forEach(artifactName => {
