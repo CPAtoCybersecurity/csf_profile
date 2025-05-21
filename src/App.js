@@ -794,7 +794,7 @@ const handleImport = () => {
                 "Minimum Target": minimumTarget,
                 "Desired State Score": desiredTarget,
                 "Desired Target": desiredTarget,
-                "Gap to Minimum Target": minimumTarget - actualScore,
+                // Omit "Gap to Minimum Target" as it will be calculated in Excel
                 "Testing Status": row["Testing Status"] || "Not Started",
                 // Map external field names to internal field names
                 "ownerId": ownerId || row.ownerId || null,
@@ -918,7 +918,7 @@ const handleExport = () => {
       "Actual Score": item["Current State Score"] || item["Actual Score"] || 0,
       "Minimum Target": item["Minimum Target"] || 0,
       "Desired Target": item["Desired State Score"] || item["Desired Target"] || 0,
-      "Gap to Minimum Target": gapToMinimum,
+      // "Gap to Minimum Target" field omitted as it will be calculated in Excel as a formula
       "Testing Status": item["Testing Status"] || "",
       "Action Plan": item["Action Plan"] || "",
       "Artifact Name": item.linkedArtifacts ? (Array.isArray(item.linkedArtifacts) ? item.linkedArtifacts.join("; ") : item.linkedArtifacts) : "",
