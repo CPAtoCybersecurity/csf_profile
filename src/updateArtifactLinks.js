@@ -8,11 +8,11 @@ export const extractArtifactsFromProfile = (profileData) => {
     return [];
   }
 
-  // Get existing main data from localStorage to preserve Owner and Stakeholders
+  // Get existing main data from localStorage to preserve Owner and Stakeholder(s)
   const storedMainData = localStorage.getItem('mainData');
   let mainData = storedMainData ? JSON.parse(storedMainData) : [];
   
-  // Create a map of IDs to their Owner and Stakeholders for easy lookup
+  // Create a map of IDs to their Owner and Stakeholder(s) for easy lookup
   const userDataMap = new Map();
   mainData.forEach(item => {
     userDataMap.set(item.ID, {
@@ -25,7 +25,7 @@ export const extractArtifactsFromProfile = (profileData) => {
   
   // Extract artifact names from profile data
   profileData.forEach(row => {
-    // Preserve Owner and Stakeholders data
+    // Preserve Owner and Stakeholder(s) data
     if (row.ID) {
       // Check if this ID already exists in mainData
       const existingItemIndex = mainData.findIndex(item => item.ID === row.ID);
@@ -94,11 +94,11 @@ export const processImportedCSV = (csvData) => {
   const storedArtifacts = localStorage.getItem('artifacts');
   let existingArtifacts = storedArtifacts ? JSON.parse(storedArtifacts) : [];
   
-  // Get existing main data from localStorage to preserve Owner and Stakeholders
+  // Get existing main data from localStorage to preserve Owner and Stakeholder(s)
   const storedMainData = localStorage.getItem('mainData');
   let mainData = storedMainData ? JSON.parse(storedMainData) : [];
   
-  // Create a map of IDs to their Owner and Stakeholders for easy lookup
+  // Create a map of IDs to their Owner and Stakeholder(s) for easy lookup
   const userDataMap = new Map();
   mainData.forEach(item => {
     userDataMap.set(item.ID, {
@@ -115,7 +115,7 @@ export const processImportedCSV = (csvData) => {
   
   // Process CSV data to update artifacts
   csvData.forEach(row => {
-    // Preserve Owner and Stakeholders data
+    // Preserve Owner and Stakeholder(s) data
     if (row.ID) {
       // Check if this ID already exists in mainData
       const existingItemIndex = mainData.findIndex(item => item.ID === row.ID);

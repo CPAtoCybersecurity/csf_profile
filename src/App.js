@@ -129,11 +129,11 @@ const App = () => {
                   auditorId = findOrCreateUser(auditorInfo, existingUsers);
                 }
                 
-                // Process Stakeholders field
+                // Process Stakeholder(s) field
                 let stakeholderIds = [];
-                if (row.Stakeholders) {
-                  // Split by commas, but be careful not to split email addresses that might contain commas
-                  const stakeholderStrings = row.Stakeholders.split(/,(?![^<]*>)/).map(s => s.trim()).filter(Boolean);
+                if (row["Stakeholder(s)"] || row.Stakeholders) { // Support both new and old field names
+                  // Split by semicolons
+                  const stakeholderStrings = (row["Stakeholder(s)"] || row.Stakeholders).split(/;/).map(s => s.trim()).filter(Boolean);
                   
                   stakeholderIds = stakeholderStrings.map(stakeholderString => {
                     const stakeholderInfo = parseUserInfo(stakeholderString);
@@ -145,7 +145,7 @@ const App = () => {
                     stakeholderIds = row.stakeholderIds;
                   } else if (typeof row.stakeholderIds === 'string') {
                     // If it's a string, split it
-                    stakeholderIds = row.stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
+                    stakeholderIds = row.stakeholderIds.split(';').map(s => s.trim()).filter(Boolean);
                   }
                 }
                 
@@ -657,11 +657,11 @@ const handleImport = () => {
                 auditorId = findOrCreateUser(auditorInfo, existingUsers);
               }
               
-              // Process Stakeholders field
+              // Process Stakeholder(s) field
               let stakeholderIds = [];
-              if (row.Stakeholders) {
-                // Split by commas, but be careful not to split email addresses that might contain commas
-                const stakeholderStrings = row.Stakeholders.split(/,(?![^<]*>)/).map(s => s.trim()).filter(Boolean);
+              if (row["Stakeholder(s)"] || row.Stakeholders) { // Support both new and old field names
+                // Split by semicolons
+                const stakeholderStrings = (row["Stakeholder(s)"] || row.Stakeholders).split(/;/).map(s => s.trim()).filter(Boolean);
                 
                 stakeholderIds = stakeholderStrings.map(stakeholderString => {
                   const stakeholderInfo = parseUserInfo(stakeholderString);
@@ -673,7 +673,7 @@ const handleImport = () => {
                   stakeholderIds = row.stakeholderIds;
                 } else if (typeof row.stakeholderIds === 'string') {
                   // If it's a string, split it
-                  stakeholderIds = row.stakeholderIds.split(',').map(s => s.trim()).filter(Boolean);
+                  stakeholderIds = row.stakeholderIds.split(';').map(s => s.trim()).filter(Boolean);
                 }
               }
               
@@ -885,13 +885,13 @@ const handleExport = () => {
     // Format Owner information
     const ownerFormatted = formatUserInfo(item.ownerId, users);
     
-    // Format Stakeholders information
+    // Format Stakeholder(s) information
     let stakeholdersFormatted = "";
     if (item.stakeholderIds && Array.isArray(item.stakeholderIds) && item.stakeholderIds.length > 0) {
       stakeholdersFormatted = item.stakeholderIds
         .map(id => formatUserInfo(id, users))
         .filter(Boolean)
-        .join(", ");
+        .join("; ");
     }
     
     // Format Auditor information
@@ -909,7 +909,7 @@ const handleExport = () => {
       "Implementation Example": item["Implementation Example"],
       "In Scope? ": item["In Scope? "],
       "Owner": ownerFormatted,
-      "Stakeholders": stakeholdersFormatted,
+      "Stakeholder(s)": stakeholdersFormatted,
       "Auditor": auditorFormatted,
       "NIST 800-53 Control Ref": item["Control Implementation Description"] || item["NIST 800-53 Control Ref"] || "",
       "Test Procedure(s)": item["Test Procedure(s)"] || "",

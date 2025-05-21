@@ -461,7 +461,7 @@ const Controls = ({
                   />
                   
                   <UserSelector
-                    label="Stakeholders"
+                    label="Stakeholder(s)"
                     selectedUsers={currentItem.stakeholderIds || []}
                     onChange={(userIds) => handleFieldChange("stakeholderIds", userIds)}
                     multiple={true}

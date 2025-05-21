@@ -39,7 +39,7 @@ const UserSelector = ({
   // Handle selecting a user
   const handleSelectUser = (user) => {
     if (multiple) {
-      // For multiple selection (like Stakeholders)
+      // For multiple selection (like Stakeholder(s))
       if (selectedUsers && selectedUsers.includes(user.id)) {
         // Remove user if already selected
         onChange(selectedUsers.filter(id => id !== user.id));
