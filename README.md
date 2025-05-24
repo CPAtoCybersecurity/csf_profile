@@ -100,7 +100,7 @@ The application includes several key sections:
 
 ## Scoring System
 
-The tool uses a scoring system from 0-10 to assess the current and desired state of each control:
+The tool uses a scoring system from 0-10 to assess the current and desired state of each control. It comes from the Mastering Cyber Resilience textbook by AKYLADE.
 
 - **0-1.9**: Insecurity - Organization rarely or never implements this control
 - **2.0-4.9**: Some Security - Organization sometimes implements this control, but unreliably
