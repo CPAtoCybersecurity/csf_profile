@@ -45,7 +45,8 @@ The security team tracks KPIs to measure progress, including time to detect (TTD
 
 Alma has approximately 300 employees organized into the following departments:
 
-- Engineering/R&D: 110
+- Leadership Team: 6
+- Engineering/R&D: 104
 - Sales & Marketing: 75
 - Customer Success: 35
 - Finance & Accounting: 20
