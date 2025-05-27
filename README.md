@@ -43,7 +43,6 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 
 ## Installation and Setup
 
-[![Video Title](https://img.youtube.com/vi/xWo9owjk75c/0.jpg)](www.youtube.com/watch?v=xWo9owjk75c)
 [![Video Title](https://img.youtube.com/vi/h206z7wIYqY/0.jpg)](https://youtu.be/h206z7wIYqY)
 
 Follow these steps to get the CSF Profile Assessment Database up and running:
