@@ -76,7 +76,7 @@ Use the provided Dockerfile to spin up your local instance.
 docker build -t csf_profile .
 
 # start the container 
-docker run -p 3000:3000 csf_profile -d
+docker run -p 3000:3000 -d csf_profile
 ```
 
 ## Features
