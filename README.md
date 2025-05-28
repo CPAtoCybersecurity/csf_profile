@@ -67,6 +67,18 @@ Follow these steps to get the CSF Profile Assessment Database up and running:
 4. **Access the application**
    Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
 
+-- OR -- 
+
+Use the provided Dockerfile to spin up your local instance.
+
+```
+# build the image 
+docker build -t csf_profile .
+
+# start the container 
+docker run -p 3000:3000 csf_profile -d
+```
+
 ## Features
 
 ### CSV Import and Export
