@@ -4,6 +4,8 @@ import { FileSearch, Calendar, User, CheckCircle, XCircle } from 'lucide-react';
 import useCSFStore from '../stores/csfStore';
 import useUIStore from '../stores/uiStore';
 import useUserStore from '../stores/userStore';
+import useSort from '../hooks/useSort';
+import SortableHeader from '../components/SortableHeader';
 
 const AssessmentObservations = () => {
   const data = useCSFStore((state) => state.data);
@@ -16,6 +18,9 @@ const AssessmentObservations = () => {
       item['Observations'] && item['Observations'].trim() !== ''
     );
   }, [data]);
+
+  // Sorting
+  const { sort, sortedData, handleSort } = useSort(observationItems);
 
   // Get user name by ID
   const getUserName = (userId) => {
@@ -72,17 +77,17 @@ const AssessmentObservations = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0">
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">In Scope</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="In Scope" sortKey="In Scope? " currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Status" sortKey="Testing Status" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Date" sortKey="Observation Date" currentSort={sort} onSort={handleSort} />
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auditor</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observations</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {observationItems.map((item) => (
+              {sortedData.map((item) => (
                 <tr
                   key={item.ID}
                   className="hover:bg-blue-50:bg-gray-800 cursor-pointer"

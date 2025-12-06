@@ -5,11 +5,13 @@ import {
   FileDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ReactMarkdown from 'react-markdown';
 
 // Components
 import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
 import DropdownPortal from '../components/DropdownPortal';
+import SortableHeader from '../components/SortableHeader';
 
 // Hooks and stores
 import { useCSFData } from '../hooks/useCSFData';
@@ -29,6 +31,7 @@ const Controls = () => {
     filterInScope,
     currentPage,
     itemsPerPage,
+    sort,
     functions,
     categoryIds,
     filteredData,
@@ -43,6 +46,7 @@ const Controls = () => {
     goToPrevPage,
     toggleFunction,
     toggleCategory,
+    handleSort,
   } = useFilters();
 
   const {
@@ -293,7 +297,7 @@ const Controls = () => {
           </button>
           {filteredData.length !== data.length && (
             <button
-              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg"
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-black py-2 px-4 rounded-lg"
               onClick={() => exportFilteredCSV(filteredData, 'CSF_Profile_Filtered')}
               title={`Export ${filteredData.length} filtered items`}
             >
@@ -323,13 +327,13 @@ const Controls = () => {
                     checked={selectedItemIds.length > 0 && currentItems.every(i => selectedItemIds.includes(i.ID))}
                   />
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Function/Category</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <SortableHeader label="Function/Category" sortKey="Function" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Implementation Example</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">In Scope</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <SortableHeader label="In Scope" sortKey="In Scope? " currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Score" sortKey="Current State Score" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Status" sortKey="Testing Status" currentSort={sort} onSort={handleSort} />
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -514,9 +518,11 @@ const Controls = () => {
                           placeholder="Describe how this control is implemented..."
                         />
                       ) : (
-                        <p className="mt-1 whitespace-pre-wrap">
-                          {currentItem['Implementation Description'] || 'No implementation description'}
-                        </p>
+                        <div className="mt-1 prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {currentItem['Implementation Description'] || 'No implementation description'}
+                          </ReactMarkdown>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -639,9 +645,11 @@ const Controls = () => {
                           placeholder="Document audit observations here..."
                         />
                       ) : (
-                        <p className="mt-1 whitespace-pre-wrap">
-                          {currentItem['Observations'] || 'No observations documented'}
-                        </p>
+                        <div className="mt-1 prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {currentItem['Observations'] || 'No observations documented'}
+                          </ReactMarkdown>
+                        </div>
                       )}
                     </div>
 
@@ -715,9 +723,11 @@ const Controls = () => {
                           placeholder="Document action plan details here..."
                         />
                       ) : (
-                        <p className="mt-1 whitespace-pre-wrap">
-                          {currentItem['Action Plan'] || 'No action plan documented'}
-                        </p>
+                        <div className="mt-1 prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {currentItem['Action Plan'] || 'No action plan documented'}
+                          </ReactMarkdown>
+                        </div>
                       )}
                     </div>
 

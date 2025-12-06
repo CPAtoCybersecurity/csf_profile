@@ -4,6 +4,8 @@ import { ClipboardList, Calendar, User, AlertCircle } from 'lucide-react';
 import useCSFStore from '../stores/csfStore';
 import useUIStore from '../stores/uiStore';
 import useUserStore from '../stores/userStore';
+import useSort from '../hooks/useSort';
+import SortableHeader from '../components/SortableHeader';
 
 const RemediationPlans = () => {
   const data = useCSFStore((state) => state.data);
@@ -18,6 +20,9 @@ const RemediationPlans = () => {
       item['Remediation Due Date']
     );
   }, [data]);
+
+  // Sorting
+  const { sort, sortedData, handleSort } = useSort(remediationItems);
 
   // Get user name by ID
   const getUserName = (userId) => {
@@ -77,15 +82,15 @@ const RemediationPlans = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50 sticky top-0">
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+                <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
+                <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                <SortableHeader label="Due Date" sortKey="Remediation Due Date" currentSort={sort} onSort={handleSort} />
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action Plan</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {remediationItems.map((item) => (
+              {sortedData.map((item) => (
                 <tr
                   key={item.ID}
                   className="hover:bg-blue-50:bg-gray-800 cursor-pointer"

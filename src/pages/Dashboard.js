@@ -1,24 +1,33 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { Filter } from 'lucide-react';
 import useCSFStore from '../stores/csfStore';
 
 const Dashboard = () => {
   const data = useCSFStore((state) => state.data);
+  const [filterInScope, setFilterInScope] = useState(''); // '', 'Yes', or 'No'
+
+  // Filter data based on In Scope selection
+  const filteredData = useMemo(() => {
+    if (!data || data.length === 0) return [];
+    if (filterInScope === '') return data;
+    return data.filter(item => item['In Scope? '] === filterInScope);
+  }, [data, filterInScope]);
 
   // Calculate status distribution for pie chart
   const statusData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!filteredData || filteredData.length === 0) return [];
 
-    const statusCounts = data.reduce((acc, item) => {
+    const statusCounts = filteredData.reduce((acc, item) => {
       const status = item['Testing Status'] || 'Not Started';
       acc[status] = (acc[status] || 0) + 1;
       return acc;
     }, {});
 
     return Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
-  }, [data]);
+  }, [filteredData]);
 
-  // Calculate in scope distribution for pie chart
+  // Calculate in scope distribution for pie chart (always uses full data)
   const inScopeData = useMemo(() => {
     if (!data || data.length === 0) return [];
 
@@ -33,10 +42,11 @@ const Dashboard = () => {
 
   // Calculate score gap by function
   const functionScoreData = useMemo(() => {
-    if (!data || data.length === 0) return [];
+    if (!filteredData || filteredData.length === 0) return [];
 
-    const inScopeItems = data.filter(item => item['In Scope? '] === 'Yes');
-    const functionGroups = inScopeItems.reduce((acc, item) => {
+    // When filter is applied, use filtered data; otherwise use in-scope items
+    const itemsToUse = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
+    const functionGroups = itemsToUse.reduce((acc, item) => {
       const func = item.Function || 'Unknown';
       if (!acc[func]) {
         acc[func] = { total: 0, current: 0, desired: 0 };
@@ -54,7 +64,7 @@ const Dashboard = () => {
       desired: +(stats.desired / stats.total).toFixed(1),
       gap: +((stats.desired - stats.current) / stats.total).toFixed(1),
     }));
-  }, [data]);
+  }, [filteredData, filterInScope]);
 
   // Colors for the charts
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
@@ -69,9 +79,9 @@ const Dashboard = () => {
 
   // Summary stats
   const summaryStats = useMemo(() => {
-    if (!data || data.length === 0) return null;
+    if (!filteredData || filteredData.length === 0) return null;
 
-    const inScopeItems = data.filter(item => item['In Scope? '] === 'Yes');
+    const inScopeItems = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
     const completedItems = inScopeItems.filter(item =>
       item['Testing Status'] === 'Complete' || item['Testing Status'] === 'Completed'
     );
@@ -85,7 +95,7 @@ const Dashboard = () => {
       : 0;
 
     return {
-      total: data.length,
+      total: filteredData.length,
       inScope: inScopeItems.length,
       completed: completedItems.length,
       completionRate: inScopeItems.length > 0 ? (completedItems.length / inScopeItems.length * 100).toFixed(1) : 0,
@@ -93,7 +103,7 @@ const Dashboard = () => {
       avgDesired: avgDesired.toFixed(1),
       avgGap: (avgDesired - avgCurrent).toFixed(1),
     };
-  }, [data]);
+  }, [filteredData, filterInScope]);
 
   if (!data || data.length === 0) {
     return (
@@ -105,7 +115,22 @@ const Dashboard = () => {
 
   return (
     <div className="p-4 bg-white min-h-full">
-      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <Filter size={16} className="text-gray-500" />
+          <span className="text-sm text-gray-600">In Scope:</span>
+          <select
+            value={filterInScope}
+            onChange={(e) => setFilterInScope(e.target.value)}
+            className="p-2 border rounded-lg bg-white"
+          >
+            <option value="">All</option>
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+          </select>
+        </div>
+      </div>
 
       {/* Summary Cards */}
       {summaryStats && (
