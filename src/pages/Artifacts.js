@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download } from 'lucide-react';
 import Papa from 'papaparse';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
 import useArtifactStore from '../stores/artifactStore';
+import useSort from '../hooks/useSort';
+import SortableHeader from '../components/SortableHeader';
 import { extractArtifactsFromProfile, processImportedCSV } from '../updateArtifactLinks';
 
 const Artifacts = () => {
@@ -27,6 +29,9 @@ const Artifacts = () => {
   const [selectedArtifact, setSelectedArtifact] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Sorting
+  const { sort, sortedData, handleSort } = useSort(artifacts);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -223,14 +228,14 @@ const Artifacts = () => {
 
   return (
     <div className="p-4 bg-white min-h-full">
-      <h1 className="text-2xl font-bold mb-4">Audit Artifacts</h1>
+      <h1 className="text-2xl font-bold mb-4">Evidence</h1>
 
       <div className="flex flex-col gap-6">
         {/* Artifacts List */}
         <div className="w-full">
           <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold">Artifacts List</h2>
+              <h2 className="text-lg font-semibold">Evidence List</h2>
               <div className="flex gap-2">
                 <input
                   type="file"
@@ -271,17 +276,17 @@ const Artifacts = () => {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <SortableHeader label="ID" sortKey="artifactId" currentSort={sort} onSort={handleSort} />
+                  <SortableHeader label="Name" sortKey="name" currentSort={sort} onSort={handleSort} />
+                  <SortableHeader label="Description" sortKey="description" currentSort={sort} onSort={handleSort} />
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Linked Subcategories</th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {artifacts.length > 0 ? (
-                  artifacts.map((artifact) => (
+                {sortedData.length > 0 ? (
+                  sortedData.map((artifact) => (
                     <tr
                       key={artifact.id}
                       className={`hover:bg-blue-50:bg-gray-700 cursor-pointer ${selectedArtifact?.id === artifact.id ? 'bg-blue-100' : ''}`}

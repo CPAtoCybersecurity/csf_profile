@@ -27,6 +27,10 @@ const useUIStore = create(
       currentPage: 1,
       itemsPerPage: 10,
 
+      // Sorting
+      sortKey: null,
+      sortDirection: null,
+
       // Actions - Selection
       setCurrentItemId: (id) => set({ currentItemId: id, editMode: false }),
       setEditMode: (editMode) => set({ editMode }),
@@ -71,6 +75,9 @@ const useUIStore = create(
       setCurrentPage: (page) => set({ currentPage: page }),
       setItemsPerPage: (count) => set({ itemsPerPage: count, currentPage: 1 }),
 
+      // Actions - Sorting
+      setSort: (key, direction) => set({ sortKey: key, sortDirection: direction }),
+
       // Reset filters
       resetFilters: () => set({
         searchTerm: '',
@@ -78,6 +85,8 @@ const useUIStore = create(
         filterCategories: [],
         filterInScope: '',
         currentPage: 1,
+        sortKey: null,
+        sortDirection: null,
       }),
     }),
     {

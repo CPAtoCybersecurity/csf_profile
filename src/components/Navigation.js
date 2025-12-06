@@ -49,6 +49,20 @@ const Navigation = () => {
       </NavLink>
 
       <NavLink
+        to="/artifacts"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-blue-800 text-white'
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <FileArchive size={18} />
+        <span>Evidence</span>
+      </NavLink>
+
+      <NavLink
         to="/remediation"
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
@@ -77,25 +91,11 @@ const Navigation = () => {
       </NavLink>
 
       <NavLink
-        to="/artifacts" 
-        className={({ isActive }) => 
+        to="/users"
+        className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive 
-              ? 'bg-blue-800 text-white' 
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <FileArchive size={18} />
-        <span>Evidence</span>
-      </NavLink>
-      
-      <NavLink 
-        to="/users" 
-        className={({ isActive }) => 
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive 
-              ? 'bg-blue-800 text-white' 
+            isActive
+              ? 'bg-blue-800 text-white'
               : 'text-white hover:bg-blue-800'
           }`
         }

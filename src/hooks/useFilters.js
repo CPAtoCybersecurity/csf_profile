@@ -12,12 +12,15 @@ export function useFilters() {
     filterInScope,
     currentPage,
     itemsPerPage,
+    sortKey,
+    sortDirection,
     setSearchTerm,
     setFilterFunctions,
     setFilterCategories,
     setFilterInScope,
     setCurrentPage,
     setItemsPerPage,
+    setSort,
     resetFilters,
   } = useUIStore();
 
@@ -36,7 +39,7 @@ export function useFilters() {
 
   // Filtered data
   const filteredData = useMemo(() => {
-    return data.filter(item => {
+    let result = data.filter(item => {
       // Search term filter
       const matchesSearch =
         searchTerm === '' ||
@@ -61,7 +64,51 @@ export function useFilters() {
 
       return matchesSearch && matchesFunction && matchesCategory && matchesInScope;
     });
-  }, [data, searchTerm, filterFunctions, filterCategories, filterInScope]);
+
+    // Apply sorting if sortKey is set
+    if (sortKey && sortDirection) {
+      result = [...result].sort((a, b) => {
+        let aVal = a[sortKey];
+        let bVal = b[sortKey];
+
+        // Handle null/undefined values
+        if (aVal == null && bVal == null) return 0;
+        if (aVal == null) return sortDirection === 'asc' ? 1 : -1;
+        if (bVal == null) return sortDirection === 'asc' ? -1 : 1;
+
+        // Handle numbers
+        if (typeof aVal === 'number' && typeof bVal === 'number') {
+          return sortDirection === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+
+        // Handle dates
+        if (sortKey.toLowerCase().includes('date')) {
+          const aDate = new Date(aVal);
+          const bDate = new Date(bVal);
+          if (!isNaN(aDate) && !isNaN(bDate)) {
+            return sortDirection === 'asc' ? aDate - bDate : bDate - aDate;
+          }
+        }
+
+        // Handle strings
+        const aStr = String(aVal).toLowerCase();
+        const bStr = String(bVal).toLowerCase();
+
+        if (sortDirection === 'asc') {
+          return aStr.localeCompare(bStr);
+        } else {
+          return bStr.localeCompare(aStr);
+        }
+      });
+    }
+
+    return result;
+  }, [data, searchTerm, filterFunctions, filterCategories, filterInScope, sortKey, sortDirection]);
+
+  // Sort handler for SortableHeader component
+  const handleSort = useCallback((key, direction) => {
+    setSort(key, direction);
+  }, [setSort]);
 
   // Paginated data
   const totalPages = useMemo(() => {
@@ -139,6 +186,9 @@ export function useFilters() {
     currentPage,
     itemsPerPage,
 
+    // Sort state
+    sort: { key: sortKey, direction: sortDirection },
+
     // Computed data
     functions,
     categoryIds,
@@ -155,6 +205,9 @@ export function useFilters() {
     resetFilters,
     toggleFunction,
     toggleCategory,
+
+    // Sorting
+    handleSort,
 
     // Pagination
     goToPage,
