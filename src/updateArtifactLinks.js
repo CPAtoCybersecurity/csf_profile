@@ -1,5 +1,4 @@
 // This script provides utility functions for artifact management
-import Papa from 'papaparse';
 
 // Extract artifacts from profile data
 export const extractArtifactsFromProfile = (profileData) => {
