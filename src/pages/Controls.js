@@ -486,7 +486,7 @@ const Controls = () => {
                 </div>
 
                 <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm border dark:border-gray-600">
-                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Control Information</h3>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Requirements</h3>
                   <div className="mt-2 space-y-2">
                     <div>
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Function:</span>
@@ -504,11 +504,26 @@ const Controls = () => {
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Implementation Examples:</span>
                       <p className="dark:text-white">{currentItem['Implementation Example']}</p>
                     </div>
+                    <div>
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Implementation Description:</span>
+                      {editMode ? (
+                        <textarea
+                          value={currentItem['Implementation Description'] || ''}
+                          onChange={(e) => handleFieldChange('Implementation Description', e.target.value)}
+                          className="mt-1 w-full p-2 border dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded h-24"
+                          placeholder="Describe how this control is implemented..."
+                        />
+                      ) : (
+                        <p className="mt-1 whitespace-pre-wrap dark:text-white">
+                          {currentItem['Implementation Description'] || 'No implementation description'}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
 
                 <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm border dark:border-gray-600">
-                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Audit Information</h3>
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Assessment Observations</h3>
                   <div className="mt-2 space-y-4">
                     <div className="flex items-center">
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-32">In Scope:</span>
@@ -653,6 +668,19 @@ const Controls = () => {
                       </div>
                     </div>
 
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-700 p-4 rounded-lg shadow-sm border dark:border-gray-600">
+                  <h3 className="font-medium text-gray-700 dark:text-gray-300">Remediation Plan</h3>
+                  <div className="mt-2 space-y-4">
+                    <UserSelector
+                      label="Owner"
+                      selectedUsers={currentItem.remediationOwnerId}
+                      onChange={(userId) => handleFieldChange('remediationOwnerId', userId)}
+                      disabled={!editMode}
+                    />
+
                     <div>
                       <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Action Plan:</span>
                       {editMode ? (
@@ -666,6 +694,20 @@ const Controls = () => {
                         <p className="mt-1 whitespace-pre-wrap dark:text-white">
                           {currentItem['Action Plan'] || 'No action plan documented'}
                         </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Due Date:</span>
+                      {editMode ? (
+                        <input
+                          type="date"
+                          value={currentItem['Remediation Due Date'] || ''}
+                          onChange={(e) => handleFieldChange('Remediation Due Date', e.target.value)}
+                          className="mt-1 w-full p-2 border dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded"
+                        />
+                      ) : (
+                        <p className="mt-1 dark:text-white">{currentItem['Remediation Due Date'] || 'No due date set'}</p>
                       )}
                     </div>
                   </div>
