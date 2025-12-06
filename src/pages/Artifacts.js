@@ -222,15 +222,15 @@ const Artifacts = () => {
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-900 min-h-full">
-      <h1 className="text-2xl font-bold mb-4 dark:text-white">Audit Artifacts</h1>
+    <div className="p-4 bg-white min-h-full">
+      <h1 className="text-2xl font-bold mb-4">Audit Artifacts</h1>
 
       <div className="flex flex-col gap-6">
         {/* Artifacts List */}
         <div className="w-full">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-              <h2 className="text-lg font-semibold dark:text-white">Artifacts List</h2>
+          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div className="flex justify-between items-center p-4 border-b">
+              <h2 className="text-lg font-semibold">Artifacts List</h2>
               <div className="flex gap-2">
                 <input
                   type="file"
@@ -268,28 +268,28 @@ const Artifacts = () => {
               </div>
             </div>
 
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">ID</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Description</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Link</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Linked Subcategories</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Linked Subcategories</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="bg-white divide-y divide-gray-200">
                 {artifacts.length > 0 ? (
                   artifacts.map((artifact) => (
                     <tr
                       key={artifact.id}
-                      className={`hover:bg-blue-50 dark:hover:bg-gray-700 cursor-pointer ${selectedArtifact?.id === artifact.id ? 'bg-blue-100 dark:bg-gray-600' : ''}`}
+                      className={`hover:bg-blue-50:bg-gray-700 cursor-pointer ${selectedArtifact?.id === artifact.id ? 'bg-blue-100' : ''}`}
                       onClick={() => handleViewDetails(artifact)}
                     >
-                      <td className="p-3 text-sm dark:text-white">{artifact.artifactId || `A${artifact.id}`}</td>
-                      <td className="p-3 text-sm dark:text-white">{artifact.name}</td>
-                      <td className="p-3 text-sm dark:text-white">
+                      <td className="p-3 text-sm">{artifact.artifactId || `A${artifact.id}`}</td>
+                      <td className="p-3 text-sm">{artifact.name}</td>
+                      <td className="p-3 text-sm">
                         <div className="line-clamp-2">{artifact.description}</div>
                       </td>
                       <td className="p-3 text-sm">
@@ -298,20 +298,20 @@ const Artifacts = () => {
                             href={artifact.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                            className="text-blue-600 hover:text-blue-800:text-blue-300 flex items-center gap-1"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <LinkIcon size={14} />
                             Link
                           </a>
                         ) : (
-                          <span className="text-gray-400 dark:text-gray-500">No link</span>
+                          <span className="text-gray-400">No link</span>
                         )}
                       </td>
                       <td className="p-3 text-sm">
                         <div className="flex flex-wrap gap-1">
                           {artifact.linkedSubcategoryIds.map(id => (
-                            <span key={id} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
+                            <span key={id} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                               {id}
                             </span>
                           ))}
@@ -324,7 +324,7 @@ const Artifacts = () => {
                               e.stopPropagation();
                               handleEdit(artifact);
                             }}
-                            className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="p-1 text-blue-600 hover:text-blue-800:text-blue-300"
                             title="Edit"
                           >
                             <Edit size={16} />
@@ -334,7 +334,7 @@ const Artifacts = () => {
                               e.stopPropagation();
                               handleDelete(artifact.id);
                             }}
-                            className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            className="p-1 text-red-600 hover:text-red-800:text-red-300"
                             title="Delete"
                           >
                             <Trash2 size={16} />
@@ -345,7 +345,7 @@ const Artifacts = () => {
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="p-3 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <td colSpan="6" className="p-3 text-center text-sm text-gray-500">
                       No artifacts found. Add a new artifact to get started.
                     </td>
                   </tr>
@@ -357,15 +357,15 @@ const Artifacts = () => {
 
         {/* Artifact Form */}
         <div className="w-full">
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700">
-            <h2 className="text-lg font-semibold mb-4 dark:text-white">
+          <div className="bg-white p-4 rounded-lg shadow-sm border">
+            <h2 className="text-lg font-semibold mb-4">
               {editMode ? 'Edit Artifact' : 'Add New Artifact'}
             </h2>
 
             <form onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Artifact ID
                   </label>
                   <input
@@ -373,13 +373,13 @@ const Artifacts = () => {
                     name="artifactId"
                     value={formData.artifactId}
                     onChange={handleChange}
-                    className="w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    className="w-full p-2 border rounded-lg"
                     placeholder="Enter artifact ID (e.g., A1, A2)"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Name
                   </label>
                   <input
@@ -387,32 +387,32 @@ const Artifacts = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.name ? 'border-red-500' : ''}`}
+                    className={`w-full p-2 border rounded-lg ${errors.name ? 'border-red-500' : ''}`}
                     placeholder="Enter artifact name"
                   />
                   {errors.name && (
-                    <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errors.name}</p>
+                    <p className="text-red-600 text-xs mt-1">{errors.name}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Description
                   </label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    className={`w-full p-2 border rounded-lg h-24 dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.description ? 'border-red-500' : ''}`}
+                    className={`w-full p-2 border rounded-lg h-24 ${errors.description ? 'border-red-500' : ''}`}
                     placeholder="Enter artifact description"
                   />
                   {errors.description && (
-                    <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errors.description}</p>
+                    <p className="text-red-600 text-xs mt-1">{errors.description}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Link
                   </label>
                   <input
@@ -420,50 +420,50 @@ const Artifacts = () => {
                     name="link"
                     value={formData.link}
                     onChange={handleChange}
-                    className={`w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.link ? 'border-red-500' : ''}`}
+                    className={`w-full p-2 border rounded-lg ${errors.link ? 'border-red-500' : ''}`}
                     placeholder="Enter artifact link"
                   />
                   {errors.link && (
-                    <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errors.link}</p>
+                    <p className="text-red-600 text-xs mt-1">{errors.link}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
                     Linked Subcategory IDs
                   </label>
                   <div className="relative" ref={dropdownRef}>
                     <div
-                      className="w-full p-2 border rounded-lg flex items-center flex-wrap gap-1 min-h-[42px] cursor-pointer dark:bg-gray-700 dark:border-gray-600"
+                      className="w-full p-2 border rounded-lg flex items-center flex-wrap gap-1 min-h-[42px] cursor-pointer"
                       onClick={() => setDropdownOpen(prevState => !prevState)}
                     >
                       {formData.linkedSubcategoryIds.length > 0 ? (
                         formData.linkedSubcategoryIds.map(id => (
-                          <span key={id} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs flex items-center gap-1">
+                          <span key={id} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1">
                             {id}
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleSubcategoryIdChange(id);
                               }}
-                              className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-100"
+                              className="text-blue-600 hover:text-blue-800:text-blue-100"
                             >
                               <X size={12} />
                             </button>
                           </span>
                         ))
                       ) : (
-                        <span className="text-gray-400 dark:text-gray-500">Select subcategory IDs</span>
+                        <span className="text-gray-400">Select subcategory IDs</span>
                       )}
                     </div>
 
                     {dropdownOpen && (
-                      <div className="absolute z-10 mt-1 w-full bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg max-h-40 overflow-y-auto">
+                      <div className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-40 overflow-y-auto">
                         {subcategoryIds.length > 0 ? (
                           subcategoryIds.map(id => (
                             <div
                               key={id}
-                              className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer dark:text-white ${formData.linkedSubcategoryIds.includes(id) ? 'bg-blue-50 dark:bg-blue-900/50' : ''}`}
+                              className={`p-2 hover:bg-gray-100:bg-gray-600 cursor-pointer ${formData.linkedSubcategoryIds.includes(id) ? 'bg-blue-50' : ''}`}
                               onClick={() => {
                                 handleSubcategoryIdChange(id);
                               }}
@@ -472,7 +472,7 @@ const Artifacts = () => {
                             </div>
                           ))
                         ) : (
-                          <p className="p-2 text-gray-500 dark:text-gray-400 text-sm">No subcategory IDs available</p>
+                          <p className="p-2 text-gray-500 text-sm">No subcategory IDs available</p>
                         )}
                       </div>
                     )}
@@ -493,7 +493,7 @@ const Artifacts = () => {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="flex items-center gap-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-white py-2 px-4 rounded-lg"
+                    className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300:bg-gray-500 text-gray-700 py-2 px-4 rounded-lg"
                   >
                     <X size={16} />
                     Cancel
@@ -505,53 +505,53 @@ const Artifacts = () => {
 
           {/* Artifact Details */}
           {selectedArtifact && !editMode && (
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700 mt-4">
-              <h2 className="text-lg font-semibold mb-4 dark:text-white">Artifact Details</h2>
+            <div className="bg-white p-4 rounded-lg shadow-sm border mt-4">
+              <h2 className="text-lg font-semibold mb-4">Artifact Details</h2>
 
               <div className="space-y-3">
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Artifact ID</h3>
-                  <p className="dark:text-white">{selectedArtifact.artifactId || `A${selectedArtifact.id}`}</p>
+                  <h3 className="text-sm font-medium text-gray-500">Artifact ID</h3>
+                  <p className="">{selectedArtifact.artifactId || `A${selectedArtifact.id}`}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Name</h3>
-                  <p className="dark:text-white">{selectedArtifact.name}</p>
+                  <h3 className="text-sm font-medium text-gray-500">Name</h3>
+                  <p className="">{selectedArtifact.name}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Description</h3>
-                  <p className="whitespace-pre-wrap dark:text-white">{selectedArtifact.description}</p>
+                  <h3 className="text-sm font-medium text-gray-500">Description</h3>
+                  <p className="whitespace-pre-wrap">{selectedArtifact.description}</p>
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Link</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Link</h3>
                   {selectedArtifact.link ? (
                     <a
                       href={selectedArtifact.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1"
+                      className="text-blue-600 hover:text-blue-800:text-blue-300 flex items-center gap-1"
                     >
                       <LinkIcon size={14} />
                       {selectedArtifact.link}
                     </a>
                   ) : (
-                    <p className="text-gray-400 dark:text-gray-500">No link provided</p>
+                    <p className="text-gray-400">No link provided</p>
                   )}
                 </div>
 
                 <div>
-                  <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400">Linked Subcategory IDs</h3>
+                  <h3 className="text-sm font-medium text-gray-500">Linked Subcategory IDs</h3>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {selectedArtifact.linkedSubcategoryIds.length > 0 ? (
                       selectedArtifact.linkedSubcategoryIds.map(id => (
-                        <span key={id} className="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs">
+                        <span key={id} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
                           {id}
                         </span>
                       ))
                     ) : (
-                      <p className="text-gray-400 dark:text-gray-500">No subcategories linked</p>
+                      <p className="text-gray-400">No subcategories linked</p>
                     )}
                   </div>
                 </div>

@@ -171,19 +171,19 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-900 min-h-full">
-      <h1 className="text-2xl font-bold mb-4 dark:text-white">User Management</h1>
+    <div className="p-4 bg-white min-h-full">
+      <h1 className="text-2xl font-bold mb-4">User Management</h1>
 
       {/* User Form */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700 mb-6">
-        <h2 className="text-lg font-semibold mb-4 dark:text-white">
+      <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
+        <h2 className="text-lg font-semibold mb-4">
           {editMode ? 'Edit User' : 'Add New User'}
         </h2>
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Name
               </label>
               <input
@@ -191,16 +191,16 @@ const UserManagement = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.name ? 'border-red-500' : ''}`}
+                className={`w-full p-2 border rounded-lg ${errors.name ? 'border-red-500' : ''}`}
                 placeholder="Enter full name"
               />
               {errors.name && (
-                <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errors.name}</p>
+                <p className="text-red-600 text-xs mt-1">{errors.name}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Title
               </label>
               <input
@@ -208,16 +208,16 @@ const UserManagement = () => {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className={`w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.title ? 'border-red-500' : ''}`}
+                className={`w-full p-2 border rounded-lg ${errors.title ? 'border-red-500' : ''}`}
                 placeholder="Enter job title"
               />
               {errors.title && (
-                <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errors.title}</p>
+                <p className="text-red-600 text-xs mt-1">{errors.title}</p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Email
               </label>
               <input
@@ -225,11 +225,11 @@ const UserManagement = () => {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full p-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white ${errors.email ? 'border-red-500' : ''}`}
+                className={`w-full p-2 border rounded-lg ${errors.email ? 'border-red-500' : ''}`}
                 placeholder="Enter email address"
               />
               {errors.email && (
-                <p className="text-red-600 dark:text-red-400 text-xs mt-1">{errors.email}</p>
+                <p className="text-red-600 text-xs mt-1">{errors.email}</p>
               )}
             </div>
           </div>
@@ -247,7 +247,7 @@ const UserManagement = () => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex items-center gap-2 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 text-gray-700 dark:text-white py-2 px-4 rounded-lg"
+                className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300:bg-gray-500 text-gray-700 py-2 px-4 rounded-lg"
               >
                 <X size={16} />
                 Cancel
@@ -258,9 +258,9 @@ const UserManagement = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b dark:border-gray-700">
-          <h2 className="text-lg font-semibold dark:text-white">Users List</h2>
+      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+        <div className="flex justify-between items-center p-4 border-b">
+          <h2 className="text-lg font-semibold">Users List</h2>
           <div className="flex gap-2">
             <input
               type="file"
@@ -287,34 +287,34 @@ const UserManagement = () => {
             </button>
           </div>
         </div>
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-700">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
             <tr>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Name</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Title</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Email</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          <tbody className="bg-white divide-y divide-gray-200">
             {users.length > 0 ? (
               users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td className="p-3 text-sm dark:text-white">{user.name}</td>
-                  <td className="p-3 text-sm dark:text-white">{user.title}</td>
-                  <td className="p-3 text-sm dark:text-white">{user.email}</td>
+                <tr key={user.id} className="hover:bg-gray-50:bg-gray-700">
+                  <td className="p-3 text-sm">{user.name}</td>
+                  <td className="p-3 text-sm">{user.title}</td>
+                  <td className="p-3 text-sm">{user.email}</td>
                   <td className="p-3 text-sm">
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        className="p-1 text-blue-600 hover:text-blue-800:text-blue-300"
                         title="Edit"
                       >
                         <Edit size={16} />
                       </button>
                       <button
                         onClick={() => handleDelete(user.id)}
-                        className="p-1 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                        className="p-1 text-red-600 hover:text-red-800:text-red-300"
                         title="Delete"
                       >
                         <Trash2 size={16} />
@@ -325,7 +325,7 @@ const UserManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="4" className="p-3 text-center text-sm text-gray-500 dark:text-gray-400">
+                <td colSpan="4" className="p-3 text-center text-sm text-gray-500">
                   No users found. Add a new user to get started.
                 </td>
               </tr>

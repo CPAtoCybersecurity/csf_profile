@@ -20,8 +20,8 @@ export function UndoRedoButtons() {
         disabled={!canUndo}
         className={`p-2 rounded transition-colors ${
           canUndo
-            ? 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+            ? 'hover:bg-gray-200:bg-gray-700 text-gray-700'
+            : 'text-gray-400 cursor-not-allowed'
         }`}
         title="Undo (Ctrl+Z)"
       >
@@ -32,8 +32,8 @@ export function UndoRedoButtons() {
         disabled={!canRedo}
         className={`p-2 rounded transition-colors ${
           canRedo
-            ? 'hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-            : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+            ? 'hover:bg-gray-200:bg-gray-700 text-gray-700'
+            : 'text-gray-400 cursor-not-allowed'
         }`}
         title="Redo (Ctrl+Shift+Z)"
       >

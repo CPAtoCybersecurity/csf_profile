@@ -15,7 +15,7 @@ export function AutoSaveIndicator() {
 
   if (isSaving) {
     return (
-      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 text-sm">
+      <div className="flex items-center gap-2 text-blue-600 text-sm">
         <Loader size={14} className="animate-spin" />
         <span>Saving...</span>
       </div>
@@ -24,7 +24,7 @@ export function AutoSaveIndicator() {
 
   if (hasUnsavedChanges) {
     return (
-      <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm">
+      <div className="flex items-center gap-2 text-amber-600 text-sm">
         <CloudOff size={14} />
         <span>Unsaved changes</span>
       </div>
@@ -33,7 +33,7 @@ export function AutoSaveIndicator() {
 
   if (lastSaved) {
     return (
-      <div className="flex items-center gap-2 text-green-600 dark:text-green-400 text-sm">
+      <div className="flex items-center gap-2 text-green-600 text-sm">
         <Cloud size={14} />
         <span>Saved at {formatTime(lastSaved)}</span>
       </div>
