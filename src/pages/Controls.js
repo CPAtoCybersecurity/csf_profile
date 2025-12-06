@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import {
   Search, Filter, Edit, Save, CheckCircle, XCircle,
   AlertTriangle, Download, Upload, X, ChevronLeft,
-  FileText, FileDown
+  FileDown
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -18,17 +18,9 @@ import useUIStore from '../stores/uiStore';
 import useCSFStore from '../stores/csfStore';
 import useUserStore from '../stores/userStore';
 
-// Utils
-import {
-  generateExecutiveSummaryPDF,
-  generateRemediationPriorityPDF,
-  generateFilteredReportPDF
-} from '../utils/pdfExport';
-
 const Controls = () => {
   const { loading, error, importCSV, exportCSV, exportFilteredCSV, toggleInScope, updateItem } = useCSFData();
   const data = useCSFStore((state) => state.data);
-  const users = useUserStore((state) => state.users);
 
   const {
     searchTerm,
@@ -299,34 +291,6 @@ const Controls = () => {
             <Download size={16} />
             Export CSV
           </button>
-          <div className="relative group">
-            <button
-              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg"
-            >
-              <FileText size={16} />
-              PDF Reports
-            </button>
-            <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg hidden group-hover:block z-[60]">
-              <button
-                onClick={() => generateExecutiveSummaryPDF(data, users)}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white text-sm"
-              >
-                Executive Summary
-              </button>
-              <button
-                onClick={() => generateRemediationPriorityPDF(data, users)}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white text-sm"
-              >
-                Remediation Priority
-              </button>
-              <button
-                onClick={() => generateFilteredReportPDF(filteredData, users, `Filtered: ${filteredData.length} items`)}
-                className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white text-sm"
-              >
-                Current Filter View
-              </button>
-            </div>
-          </div>
           {filteredData.length !== data.length && (
             <button
               className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg"
