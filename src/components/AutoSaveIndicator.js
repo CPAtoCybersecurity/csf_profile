@@ -3,11 +3,10 @@ import { Cloud, CloudOff, Loader } from 'lucide-react';
 import useCSFStore from '../stores/csfStore';
 
 export function AutoSaveIndicator() {
-  const { hasUnsavedChanges, isSaving, lastSaved } = useCSFStore((state) => ({
-    hasUnsavedChanges: state.hasUnsavedChanges,
-    isSaving: state.isSaving,
-    lastSaved: state.lastSaved,
-  }));
+  // Select each value individually to avoid creating new object references
+  const hasUnsavedChanges = useCSFStore((state) => state.hasUnsavedChanges);
+  const isSaving = useCSFStore((state) => state.isSaving);
+  const lastSaved = useCSFStore((state) => state.lastSaved);
 
   const formatTime = (date) => {
     if (!date) return '';

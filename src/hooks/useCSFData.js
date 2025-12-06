@@ -9,32 +9,32 @@ import toast from 'react-hot-toast';
 const AUTO_SAVE_DELAY = 2000; // 2 seconds
 
 export function useCSFData() {
-  const {
-    data,
-    loading,
-    error,
-    hasDownloaded,
-    hasUnsavedChanges,
-    lastSaved,
-    isSaving,
-    setData,
-    setLoading,
-    setError,
-    updateItem,
-    bulkUpdateItems,
-    toggleInScope,
-    bulkSetInScope,
-    clearAllScope,
-    markSaved,
-    setIsSaving,
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-  } = useCSFStore();
+  // Select individual values from CSF store to avoid infinite re-renders
+  const data = useCSFStore((state) => state.data);
+  const loading = useCSFStore((state) => state.loading);
+  const error = useCSFStore((state) => state.error);
+  const hasUnsavedChanges = useCSFStore((state) => state.hasUnsavedChanges);
+  const lastSaved = useCSFStore((state) => state.lastSaved);
+  const isSaving = useCSFStore((state) => state.isSaving);
+  const updateItem = useCSFStore((state) => state.updateItem);
+  const bulkUpdateItems = useCSFStore((state) => state.bulkUpdateItems);
+  const toggleInScope = useCSFStore((state) => state.toggleInScope);
+  const bulkSetInScope = useCSFStore((state) => state.bulkSetInScope);
+  const clearAllScope = useCSFStore((state) => state.clearAllScope);
+  const markSaved = useCSFStore((state) => state.markSaved);
+  const setIsSaving = useCSFStore((state) => state.setIsSaving);
+  const undo = useCSFStore((state) => state.undo);
+  const redo = useCSFStore((state) => state.redo);
+  const historyIndex = useCSFStore((state) => state.historyIndex);
+  const historyLength = useCSFStore((state) => state.history.length);
 
-  const userStore = useUserStore();
   const autoSaveTimerRef = useRef(null);
+  const dataLengthRef = useRef(data.length);
+
+  // Update ref when data changes
+  useEffect(() => {
+    dataLengthRef.current = data.length;
+  }, [data.length]);
 
   // Auto-save effect
   useEffect(() => {
@@ -61,18 +61,22 @@ export function useCSFData() {
         clearTimeout(autoSaveTimerRef.current);
       }
     };
-  }, [hasUnsavedChanges, data, setIsSaving, markSaved]);
+  }, [hasUnsavedChanges, data.length, setIsSaving, markSaved]);
 
-  // Load initial data
+  // Load initial data - use refs to avoid dependency changes
   const loadData = useCallback(async () => {
-    if (hasDownloaded && data.length > 0) {
-      setLoading(false);
+    // Access current values via store directly to avoid stale closures
+    const currentState = useCSFStore.getState();
+    const currentUserState = useUserStore.getState();
+
+    if (currentState.hasDownloaded && currentState.data.length > 0) {
+      currentState.setLoading(false);
       return;
     }
 
     try {
-      setLoading(true);
-      setError(null);
+      currentState.setLoading(true);
+      currentState.setError(null);
 
       const response = await fetch('/tblProfile_Demo.csv');
       const csvText = await response.text();
@@ -82,29 +86,29 @@ export function useCSFData() {
         skipEmptyLines: true,
         dynamicTyping: true,
         complete: (results) => {
-          const users = [...userStore.users];
-          const processedData = processCSVData(results.data, users);
+          const usersList = [...currentUserState.users];
+          const processedData = processCSVData(results.data, usersList);
 
           // Update user store with any new users
-          userStore.setUsers(users);
+          currentUserState.setUsers(usersList);
 
-          setData(processedData);
-          setLoading(false);
+          currentState.setData(processedData);
+          currentState.setLoading(false);
           useCSFStore.setState({ hasDownloaded: true });
           toast.success('Data loaded successfully');
         },
         error: (parseError) => {
-          setError(`Error parsing CSV: ${parseError.message}`);
-          setLoading(false);
+          currentState.setError(`Error parsing CSV: ${parseError.message}`);
+          currentState.setLoading(false);
           toast.error(`Error parsing CSV: ${parseError.message}`);
         }
       });
     } catch (err) {
-      setError(`Error loading file: ${err.message}`);
-      setLoading(false);
+      useCSFStore.getState().setError(`Error loading file: ${err.message}`);
+      useCSFStore.getState().setLoading(false);
       toast.error(`Error loading file: ${err.message}`);
     }
-  }, [hasDownloaded, data.length, setLoading, setError, setData, userStore]);
+  }, []); // Empty deps - uses store.getState() for current values
 
   // Import CSV
   const importCSV = useCallback(() => {
@@ -145,11 +149,12 @@ export function useCSFData() {
               );
             }
 
-            const users = [...userStore.users];
-            const processedData = processCSVData(validation.data, users);
+            const currentUserState = useUserStore.getState();
+            const usersList = [...currentUserState.users];
+            const processedData = processCSVData(validation.data, usersList);
 
-            userStore.setUsers(users);
-            setData(processedData);
+            currentUserState.setUsers(usersList);
+            useCSFStore.getState().setData(processedData);
 
             toast.success('CSV imported successfully!');
           },
@@ -163,17 +168,24 @@ export function useCSFData() {
     });
 
     fileInput.click();
-  }, [setData, userStore]);
+  }, []); // Empty deps - uses store.getState() for current values
 
   // Export CSV (all data)
   const exportCSV = useCallback(() => {
-    exportDataAsCSV(data, userStore.users, 'CSF_Profile');
-  }, [data, userStore.users]);
+    const currentData = useCSFStore.getState().data;
+    const currentUsers = useUserStore.getState().users;
+    exportDataAsCSV(currentData, currentUsers, 'CSF_Profile');
+  }, []); // Empty deps - uses store.getState() for current values
 
   // Export filtered data
   const exportFilteredCSV = useCallback((filteredData, filename = 'CSF_Profile_Filtered') => {
-    exportDataAsCSV(filteredData, userStore.users, filename);
-  }, [userStore.users]);
+    const currentUsers = useUserStore.getState().users;
+    exportDataAsCSV(filteredData, currentUsers, filename);
+  }, []); // Empty deps - uses store.getState() for current values
+
+  // Compute canUndo/canRedo from primitive values
+  const canUndo = historyIndex > 0;
+  const canRedo = historyIndex < historyLength - 1;
 
   return {
     data,
@@ -193,8 +205,8 @@ export function useCSFData() {
     exportFilteredCSV,
     undo,
     redo,
-    canUndo: canUndo(),
-    canRedo: canRedo(),
+    canUndo,
+    canRedo,
   };
 }
 

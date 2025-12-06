@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import {
   Search, Filter, Edit, Save, CheckCircle, XCircle,
   AlertTriangle, Download, Upload, X, ChevronLeft,
@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 // Components
 import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
+import DropdownPortal from '../components/DropdownPortal';
 
 // Hooks and stores
 import { useCSFData } from '../hooks/useCSFData';
@@ -70,14 +71,20 @@ const Controls = () => {
     isItemSelected,
   } = useUIStore();
 
+  // Refs for dropdown triggers (needed for portal positioning)
+  const functionTriggerRef = useRef(null);
+  const categoryTriggerRef = useRef(null);
+  const inScopeTriggerRef = useRef(null);
+
   // Get current item from data
   const currentItem = data.find(item => item.ID === currentItemId);
 
   // Handlers
   const handleSelectItem = useCallback((item) => {
     setCurrentItemId(item.ID);
+    setDetailPanelOpen(true);  // Explicitly open detail panel (fixes Safari)
     setEditMode(false);
-  }, [setCurrentItemId, setEditMode]);
+  }, [setCurrentItemId, setDetailPanelOpen, setEditMode]);
 
   const handleFieldChange = useCallback((field, value) => {
     if (currentItemId) {
@@ -141,7 +148,7 @@ const Controls = () => {
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="bg-gray-100 dark:bg-gray-800 p-4 flex flex-wrap items-center gap-4 border-b dark:border-gray-700">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 flex flex-wrap items-center gap-4 border-b dark:border-gray-700 relative z-50">
         {/* Search */}
         <div className="relative w-32">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -158,116 +165,121 @@ const Controls = () => {
 
         {/* Function filter */}
         <div className="flex-grow max-w-xs">
-          <div className="relative">
-            <div
-              className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 cursor-pointer flex items-center justify-between"
-              onClick={() => setFunctionDropdownOpen(!functionDropdownOpen)}
-            >
-              <span className="dark:text-white">
-                {filterFunctions.length === 0 ? 'All Functions' : `${filterFunctions.length} selected`}
-              </span>
-              <Filter size={16} className="text-gray-500" />
-            </div>
-            {functionDropdownOpen && (
-              <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-                <div className="p-2">
-                  <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
-                    <input
-                      type="checkbox"
-                      className="mr-2"
-                      checked={filterFunctions.length === 0}
-                      onChange={() => setFilterFunctions([])}
-                    />
-                    <span className="dark:text-white">All Functions</span>
-                  </label>
-                  {functions.map((func) => (
-                    <label key={func} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
-                      <input
-                        type="checkbox"
-                        className="mr-2"
-                        checked={filterFunctions.includes(func)}
-                        onChange={() => toggleFunction(func)}
-                      />
-                      <span className="dark:text-white">{func}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div
+            ref={functionTriggerRef}
+            className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 cursor-pointer flex items-center justify-between"
+            onClick={() => setFunctionDropdownOpen(!functionDropdownOpen)}
+          >
+            <span className="dark:text-white">
+              {filterFunctions.length === 0 ? 'All Functions' : `${filterFunctions.length} selected`}
+            </span>
+            <Filter size={16} className="text-gray-500" />
           </div>
+          <DropdownPortal
+            isOpen={functionDropdownOpen}
+            onClose={() => setFunctionDropdownOpen(false)}
+            triggerRef={functionTriggerRef}
+            className="max-h-60 overflow-auto"
+          >
+            <div className="p-2">
+              <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                <input
+                  type="checkbox"
+                  className="mr-2"
+                  checked={filterFunctions.length === 0}
+                  onChange={() => setFilterFunctions([])}
+                />
+                <span className="dark:text-white">All Functions</span>
+              </label>
+              {functions.map((func) => (
+                <label key={func} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={filterFunctions.includes(func)}
+                    onChange={() => toggleFunction(func)}
+                  />
+                  <span className="dark:text-white">{func}</span>
+                </label>
+              ))}
+            </div>
+          </DropdownPortal>
         </div>
 
         {/* Category ID filter */}
         <div className="flex-grow max-w-xs">
-          <div className="relative">
-            <div
-              className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 cursor-pointer flex items-center justify-between"
-              onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-            >
-              <span className="dark:text-white">
-                {filterCategories.length === 0 ? 'All Category IDs' : `${filterCategories.length} selected`}
-              </span>
-              <Filter size={16} className="text-gray-500" />
-            </div>
-            {categoryDropdownOpen && (
-              <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
-                <div className="p-2">
-                  <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
-                    <input
-                      type="checkbox"
-                      className="mr-2"
-                      checked={filterCategories.length === 0}
-                      onChange={() => setFilterCategories([])}
-                    />
-                    <span className="dark:text-white">All Category IDs</span>
-                  </label>
-                  {categoryIds.map((categoryId) => (
-                    <label key={categoryId} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
-                      <input
-                        type="checkbox"
-                        className="mr-2"
-                        checked={filterCategories.includes(categoryId)}
-                        onChange={() => toggleCategory(categoryId)}
-                      />
-                      <span className="dark:text-white">{categoryId}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div
+            ref={categoryTriggerRef}
+            className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 cursor-pointer flex items-center justify-between"
+            onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+          >
+            <span className="dark:text-white">
+              {filterCategories.length === 0 ? 'All Category IDs' : `${filterCategories.length} selected`}
+            </span>
+            <Filter size={16} className="text-gray-500" />
           </div>
+          <DropdownPortal
+            isOpen={categoryDropdownOpen}
+            onClose={() => setCategoryDropdownOpen(false)}
+            triggerRef={categoryTriggerRef}
+            className="max-h-60 overflow-auto"
+          >
+            <div className="p-2">
+              <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                <input
+                  type="checkbox"
+                  className="mr-2"
+                  checked={filterCategories.length === 0}
+                  onChange={() => setFilterCategories([])}
+                />
+                <span className="dark:text-white">All Category IDs</span>
+              </label>
+              {categoryIds.map((categoryId) => (
+                <label key={categoryId} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                  <input
+                    type="checkbox"
+                    className="mr-2"
+                    checked={filterCategories.includes(categoryId)}
+                    onChange={() => toggleCategory(categoryId)}
+                  />
+                  <span className="dark:text-white">{categoryId}</span>
+                </label>
+              ))}
+            </div>
+          </DropdownPortal>
         </div>
 
         {/* In Scope filter */}
         <div className="flex-grow max-w-xs">
-          <div className="relative">
-            <div
-              className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 cursor-pointer flex items-center justify-between"
-              onClick={() => setInScopeDropdownOpen(!inScopeDropdownOpen)}
-            >
-              <span className="dark:text-white">
-                {filterInScope === '' ? 'All In Scope' : `In Scope: ${filterInScope}`}
-              </span>
-              <Filter size={16} className="text-gray-500" />
-            </div>
-            {inScopeDropdownOpen && (
-              <div className="absolute z-50 mt-1 w-full bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg overflow-auto">
-                <div className="p-2">
-                  {['', 'Yes', 'No'].map((value) => (
-                    <label key={value} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
-                      <input
-                        type="radio"
-                        className="mr-2"
-                        checked={filterInScope === value}
-                        onChange={() => setFilterInScope(value)}
-                      />
-                      <span className="dark:text-white">{value || 'All'}</span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            )}
+          <div
+            ref={inScopeTriggerRef}
+            className="w-full p-2 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600 cursor-pointer flex items-center justify-between"
+            onClick={() => setInScopeDropdownOpen(!inScopeDropdownOpen)}
+          >
+            <span className="dark:text-white">
+              {filterInScope === '' ? 'All In Scope' : `In Scope: ${filterInScope}`}
+            </span>
+            <Filter size={16} className="text-gray-500" />
           </div>
+          <DropdownPortal
+            isOpen={inScopeDropdownOpen}
+            onClose={() => setInScopeDropdownOpen(false)}
+            triggerRef={inScopeTriggerRef}
+          >
+            <div className="p-2">
+              {['', 'Yes', 'No'].map((value) => (
+                <label key={value} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-600 rounded">
+                  <input
+                    type="radio"
+                    className="mr-2"
+                    checked={filterInScope === value}
+                    onChange={() => setFilterInScope(value)}
+                  />
+                  <span className="dark:text-white">{value || 'All'}</span>
+                </label>
+              ))}
+            </div>
+          </DropdownPortal>
         </div>
 
         {/* Import/Export buttons */}
@@ -294,7 +306,7 @@ const Controls = () => {
               <FileText size={16} />
               PDF Reports
             </button>
-            <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg hidden group-hover:block z-50">
+            <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg hidden group-hover:block z-[60]">
               <button
                 onClick={() => generateExecutiveSummaryPDF(data, users)}
                 className="w-full px-4 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-white text-sm"
@@ -328,7 +340,7 @@ const Controls = () => {
         </div>
       </div>
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0 relative z-0">
         {/* Data table */}
         <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto ${detailPanelOpen ? 'border-r dark:border-gray-700' : ''} transition-all duration-300`}>
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -475,18 +487,18 @@ const Controls = () => {
 
         {/* Detail panel */}
         {detailPanelOpen && (
-          <div className="w-1/3 overflow-auto p-4 bg-gray-50 dark:bg-gray-800 relative">
-            <button
-              onClick={() => setDetailPanelOpen(false)}
-              className="absolute top-2 right-2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400"
-              title="Close details panel"
-            >
-              <X size={18} />
-            </button>
+          <div className="w-1/3 overflow-auto p-4 bg-gray-50 dark:bg-gray-800">
             {currentItem ? (
-              <div className="space-y-6 mt-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold dark:text-white">{currentItem.ID}</h2>
+              <div className="space-y-6">
+                <div className="flex items-center justify-between gap-2">
+                  <h2 className="text-xl font-bold dark:text-white flex-1">{currentItem.ID}</h2>
+                  <button
+                    onClick={() => setDetailPanelOpen(false)}
+                    className="p-1.5 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-500 hover:text-gray-700 dark:text-gray-400 flex-shrink-0"
+                    title="Close details panel"
+                  >
+                    <X size={18} />
+                  </button>
                   {editMode ? (
                     <button
                       className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-md"
