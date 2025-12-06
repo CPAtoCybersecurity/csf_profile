@@ -1,0 +1,9 @@
+﻿Score,Description,Evaluation Criteria,How Secure (Resilient)?
+0-1.9,Insecurity,Our organization rarely or never does this,Not Enough
+2.0-4.9,Some Security,"Our organization sometimes does this, but unreliably. Rework is common.",Not Enough
+5.0-5.9,Minmially Acceptable Security,"Our organization does this consistently, with some minor flaws from time-to-time",Just Right
+6.1-6.9,Optimized Security,"Our organization does this consistently, with great effectiveness and high quality",Just Right
+7.0-7.9,Fully Optimized Security,"Our organization does this consistently, with fully optimized effectiveness and quality",Just Right
+8.1-10.0,Too Much Security (Waste),Our organization does this at excessive financial cost. People can't easily get their work done,Too Much
+UKN,Unknown,I'm not sure if our organization does this or not,
+N/A,Not Applicable,This is not applicable to us,
