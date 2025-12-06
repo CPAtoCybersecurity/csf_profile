@@ -29,16 +29,17 @@ import useUserStore from './stores/userStore';
 const AppContent = () => {
   const { loadData, clearAllScope } = useCSFData();
   const darkMode = useUIStore((state) => state.darkMode);
-  const fixEmailAddresses = useUserStore((state) => state.fixEmailAddresses);
 
   // Initialize keyboard navigation
   useKeyboardNavigation();
 
-  // Load data on mount
+  // Load data on mount - run once
   useEffect(() => {
-    fixEmailAddresses();
+    // Fix email addresses using store directly
+    useUserStore.getState().fixEmailAddresses();
     loadData();
-  }, [loadData, fixEmailAddresses]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Run only once on mount
 
   return (
     <div className={`flex flex-col h-screen ${darkMode ? 'dark' : ''}`}>
