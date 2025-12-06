@@ -1,16 +1,30 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Award, FileArchive } from 'lucide-react';
+import { LayoutDashboard, Users, FileText, Award, FileArchive, ClipboardList, FileSearch } from 'lucide-react';
 
 const Navigation = () => {
   return (
     <nav className="flex items-center gap-4">
-      <NavLink 
-        to="/" 
-        className={({ isActive }) => 
+      <NavLink
+        to="/dashboard"
+        className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive 
-              ? 'bg-blue-800 text-white' 
+            isActive
+              ? 'bg-blue-800 text-white'
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <LayoutDashboard size={18} />
+        <span>Dashboard</span>
+      </NavLink>
+
+      <NavLink
+        to="/"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-blue-800 text-white'
               : 'text-white hover:bg-blue-800'
           }`
         }
@@ -20,35 +34,49 @@ const Navigation = () => {
         <span>Requirements</span>
       </NavLink>
       
-      <NavLink 
-        to="/dashboard" 
-        className={({ isActive }) => 
+      <NavLink
+        to="/observations"
+        className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive 
-              ? 'bg-blue-800 text-white' 
+            isActive
+              ? 'bg-blue-800 text-white'
               : 'text-white hover:bg-blue-800'
           }`
         }
       >
-        <LayoutDashboard size={18} />
-        <span>Dashboard</span>
+        <FileSearch size={18} />
+        <span>Observations</span>
       </NavLink>
-      
-      <NavLink 
-        to="/scoring" 
-        className={({ isActive }) => 
+
+      <NavLink
+        to="/remediation"
+        className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive 
-              ? 'bg-blue-800 text-white' 
+            isActive
+              ? 'bg-blue-800 text-white'
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <ClipboardList size={18} />
+        <span>Remediation</span>
+      </NavLink>
+
+      <NavLink
+        to="/scoring"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-blue-800 text-white'
               : 'text-white hover:bg-blue-800'
           }`
         }
       >
         <Award size={18} />
-        <span>Scoring</span>
+        <span>Reference</span>
       </NavLink>
-      
-      <NavLink 
+
+      <NavLink
         to="/artifacts" 
         className={({ isActive }) => 
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
@@ -59,7 +87,7 @@ const Navigation = () => {
         }
       >
         <FileArchive size={18} />
-        <span>Artifacts</span>
+        <span>Evidence</span>
       </NavLink>
       
       <NavLink 

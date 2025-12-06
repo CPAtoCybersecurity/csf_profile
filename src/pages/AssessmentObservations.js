@@ -1,0 +1,139 @@
+import React, { useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FileSearch, Calendar, User, CheckCircle, XCircle } from 'lucide-react';
+import useCSFStore from '../stores/csfStore';
+import useUIStore from '../stores/uiStore';
+import useUserStore from '../stores/userStore';
+
+const AssessmentObservations = () => {
+  const data = useCSFStore((state) => state.data);
+  const users = useUserStore((state) => state.users);
+  const navigate = useNavigate();
+
+  // Filter items that have observations
+  const observationItems = useMemo(() => {
+    return data.filter(item =>
+      item['Observations'] && item['Observations'].trim() !== ''
+    );
+  }, [data]);
+
+  // Get user name by ID
+  const getUserName = (userId) => {
+    if (!userId) return 'Not assigned';
+    const user = users.find(u => u.id === userId);
+    return user ? user.name : 'Unknown';
+  };
+
+  // Status color mapping
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'Complete':
+      case 'Completed':
+        return 'text-green-600 bg-green-100';
+      case 'In Progress':
+        return 'text-blue-600 bg-blue-100';
+      case 'Not Started':
+        return 'text-gray-500 bg-gray-100';
+      case 'Submitted':
+        return 'text-orange-600 bg-orange-100';
+      default:
+        return 'text-gray-500 bg-gray-100';
+    }
+  };
+
+  const handleRowClick = (item) => {
+    // Navigate to Requirements page and select this item
+    useUIStore.getState().setCurrentItemId(item.ID);
+    navigate('/');
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="bg-gray-100 p-4 border-b">
+        <div className="flex items-center gap-3">
+          <FileSearch size={24} className="text-blue-600" />
+          <div>
+            <h1 className="text-xl font-bold">Assessment Observations</h1>
+            <p className="text-sm text-gray-600">
+              {observationItems.length} item{observationItems.length !== 1 ? 's' : ''} with documented observations
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto">
+        {observationItems.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <FileSearch size={48} className="mb-4 opacity-50" />
+            <p className="text-lg">No observations documented</p>
+            <p className="text-sm mt-2">Document observations in the Requirements tab</p>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50 sticky top-0">
+              <tr>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subcategory</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">In Scope</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auditor</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observations</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {observationItems.map((item) => (
+                <tr
+                  key={item.ID}
+                  className="hover:bg-blue-50:bg-gray-800 cursor-pointer"
+                  onClick={() => handleRowClick(item)}
+                >
+                  <td className="p-3 text-sm font-medium">{item.ID}</td>
+                  <td className="p-3 text-sm">
+                    <div className="font-medium">{item['Subcategory ID']}</div>
+                    <div className="text-xs text-gray-500 line-clamp-1">{item['Subcategory Description']}</div>
+                  </td>
+                  <td className="p-3 text-sm">
+                    <div className={`rounded-full flex items-center justify-center w-6 h-6 ${
+                      item['In Scope? '] === 'Yes' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                    }`}>
+                      {item['In Scope? '] === 'Yes' ? <CheckCircle size={16} /> : <XCircle size={16} />}
+                    </div>
+                  </td>
+                  <td className="p-3 text-sm">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item['Testing Status'])}`}>
+                      {item['Testing Status'] || 'Not Started'}
+                    </span>
+                  </td>
+                  <td className="p-3 text-sm">
+                    {item['Observation Date'] ? (
+                      <div className="flex items-center gap-2">
+                        <Calendar size={14} className="text-gray-400" />
+                        <span>{item['Observation Date']}</span>
+                      </div>
+                    ) : (
+                      <span className="text-gray-400">No date</span>
+                    )}
+                  </td>
+                  <td className="p-3 text-sm">
+                    <div className="flex items-center gap-2">
+                      <User size={14} className="text-gray-400" />
+                      <span className="">{getUserName(item.auditorId)}</span>
+                    </div>
+                  </td>
+                  <td className="p-3 text-sm">
+                    <div className="line-clamp-2 max-w-md">
+                      {item['Observations']}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default AssessmentObservations;

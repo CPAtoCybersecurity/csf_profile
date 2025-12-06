@@ -4,10 +4,6 @@ import { persist } from 'zustand/middleware';
 const useUIStore = create(
   persist(
     (set, get) => ({
-      // Theme
-      darkMode: false,
-      toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
-
       // Current selection
       currentItemId: null,
       selectedItemIds: [], // For bulk selection
@@ -87,7 +83,6 @@ const useUIStore = create(
     {
       name: 'csf-ui-storage',
       partialize: (state) => ({
-        darkMode: state.darkMode,
         itemsPerPage: state.itemsPerPage,
         detailPanelOpen: state.detailPanelOpen,
       }),

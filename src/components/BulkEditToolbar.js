@@ -77,12 +77,12 @@ export function BulkEditToolbar() {
           </button>
 
           {showStatusMenu && (
-            <div className="absolute bottom-full left-0 mb-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-1 min-w-40">
+            <div className="absolute bottom-full left-0 mb-2 bg-white rounded-lg shadow-lg py-1 min-w-40">
               {['Not Started', 'In Progress', 'Submitted', 'Complete'].map((status) => (
                 <button
                   key={status}
                   onClick={() => handleSetStatus(status)}
-                  className="w-full px-4 py-2 text-left text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+                  className="w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100:bg-gray-700 text-sm"
                 >
                   {status}
                 </button>

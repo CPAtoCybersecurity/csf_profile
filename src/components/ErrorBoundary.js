@@ -30,30 +30,30 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 p-4">
-          <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+        <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
+          <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-6">
             <div className="flex items-center justify-center text-red-500 mb-4">
               <AlertTriangle size={48} />
             </div>
 
-            <h1 className="text-xl font-bold text-center text-gray-900 dark:text-white mb-2">
+            <h1 className="text-xl font-bold text-center text-gray-900 mb-2">
               Something went wrong
             </h1>
 
-            <p className="text-gray-600 dark:text-gray-300 text-center mb-4">
+            <p className="text-gray-600 text-center mb-4">
               The application encountered an unexpected error.
             </p>
 
             {this.state.error && (
-              <details className="mb-4 p-3 bg-gray-100 dark:bg-gray-700 rounded text-sm">
-                <summary className="cursor-pointer text-gray-700 dark:text-gray-300 font-medium">
+              <details className="mb-4 p-3 bg-gray-100 rounded text-sm">
+                <summary className="cursor-pointer text-gray-700 font-medium">
                   Error Details
                 </summary>
-                <pre className="mt-2 text-red-600 dark:text-red-400 whitespace-pre-wrap overflow-auto max-h-40">
+                <pre className="mt-2 text-red-600 whitespace-pre-wrap overflow-auto max-h-40">
                   {this.state.error.toString()}
                 </pre>
                 {this.state.errorInfo && (
-                  <pre className="mt-2 text-gray-500 dark:text-gray-400 whitespace-pre-wrap overflow-auto max-h-40 text-xs">
+                  <pre className="mt-2 text-gray-500 whitespace-pre-wrap overflow-auto max-h-40 text-xs">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}
@@ -71,13 +71,13 @@ class ErrorBoundary extends React.Component {
 
               <button
                 onClick={this.handleClearStorage}
-                className="flex items-center justify-center gap-2 w-full py-2 px-4 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg transition-colors"
+                className="flex items-center justify-center gap-2 w-full py-2 px-4 bg-gray-200 hover:bg-gray-300:bg-gray-600 text-gray-700 rounded-lg transition-colors"
               >
                 Reset Application Data
               </button>
             </div>
 
-            <p className="mt-4 text-xs text-gray-500 dark:text-gray-400 text-center">
+            <p className="mt-4 text-xs text-gray-500 text-center">
               If this problem persists, try resetting the application data or contact support.
             </p>
           </div>

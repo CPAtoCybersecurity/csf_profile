@@ -1,11 +1,9 @@
 import React, { useMemo } from 'react';
 import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import useCSFStore from '../stores/csfStore';
-import useUIStore from '../stores/uiStore';
 
 const Dashboard = () => {
   const data = useCSFStore((state) => state.data);
-  const darkMode = useUIStore((state) => state.darkMode);
 
   // Calculate status distribution for pie chart
   const statusData = useMemo(() => {
@@ -100,53 +98,53 @@ const Dashboard = () => {
   if (!data || data.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-xl font-semibold dark:text-white">No data available for dashboard</div>
+        <div className="text-xl font-semibold">No data available for dashboard</div>
       </div>
     );
   }
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-900 min-h-full">
-      <h1 className="text-2xl font-bold mb-4 dark:text-white">Dashboard</h1>
+    <div className="p-4 bg-white min-h-full">
+      <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
 
       {/* Summary Cards */}
       {summaryStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-          <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-700 dark:text-blue-300">{summaryStats.total}</div>
-            <div className="text-sm text-blue-600 dark:text-blue-400">Total Controls</div>
+          <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-blue-700">{summaryStats.total}</div>
+            <div className="text-sm text-blue-600">Total Controls</div>
           </div>
-          <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700 dark:text-green-300">{summaryStats.inScope}</div>
-            <div className="text-sm text-green-600 dark:text-green-400">In Scope</div>
+          <div className="bg-green-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-green-700">{summaryStats.inScope}</div>
+            <div className="text-sm text-green-600">In Scope</div>
           </div>
-          <div className="bg-purple-50 dark:bg-purple-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-purple-700 dark:text-purple-300">{summaryStats.completed}</div>
-            <div className="text-sm text-purple-600 dark:text-purple-400">Completed</div>
+          <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-purple-700">{summaryStats.completed}</div>
+            <div className="text-sm text-purple-600">Completed</div>
           </div>
-          <div className="bg-amber-50 dark:bg-amber-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-amber-700 dark:text-amber-300">{summaryStats.completionRate}%</div>
-            <div className="text-sm text-amber-600 dark:text-amber-400">Completion Rate</div>
+          <div className="bg-amber-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-amber-700">{summaryStats.completionRate}%</div>
+            <div className="text-sm text-amber-600">Completion Rate</div>
           </div>
-          <div className="bg-cyan-50 dark:bg-cyan-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-cyan-700 dark:text-cyan-300">{summaryStats.avgCurrent}</div>
-            <div className="text-sm text-cyan-600 dark:text-cyan-400">Avg Current</div>
+          <div className="bg-cyan-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-cyan-700">{summaryStats.avgCurrent}</div>
+            <div className="text-sm text-cyan-600">Avg Current</div>
           </div>
-          <div className="bg-indigo-50 dark:bg-indigo-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-indigo-700 dark:text-indigo-300">{summaryStats.avgDesired}</div>
-            <div className="text-sm text-indigo-600 dark:text-indigo-400">Avg Desired</div>
+          <div className="bg-indigo-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-indigo-700">{summaryStats.avgDesired}</div>
+            <div className="text-sm text-indigo-600">Avg Desired</div>
           </div>
-          <div className="bg-red-50 dark:bg-red-900 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-red-700 dark:text-red-300">{summaryStats.avgGap}</div>
-            <div className="text-sm text-red-600 dark:text-red-400">Avg Gap</div>
+          <div className="bg-red-50 p-4 rounded-lg">
+            <div className="text-2xl font-bold text-red-700">{summaryStats.avgGap}</div>
+            <div className="text-sm text-red-600">Avg Gap</div>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         {/* Status Distribution */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">Testing Status Distribution</h2>
+        <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-semibold mb-4">Testing Status Distribution</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -175,8 +173,8 @@ const Dashboard = () => {
         </div>
 
         {/* In Scope Distribution */}
-        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700">
-          <h2 className="text-lg font-semibold mb-4 dark:text-white">In Scope Distribution</h2>
+        <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <h2 className="text-lg font-semibold mb-4">In Scope Distribution</h2>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -206,25 +204,25 @@ const Dashboard = () => {
       </div>
 
       {/* Score by Function */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border dark:border-gray-700">
-        <h2 className="text-lg font-semibold mb-4 dark:text-white">Average Scores by Function (In Scope Only)</h2>
+      <div className="bg-white p-4 rounded-lg shadow-sm border">
+        <h2 className="text-lg font-semibold mb-4">Average Scores by Function (In Scope Only)</h2>
         <div className="h-80">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={functionScoreData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke={darkMode ? '#374151' : '#e5e7eb'} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis
                 dataKey="name"
-                tick={{ fill: darkMode ? '#9ca3af' : '#374151' }}
+                tick={{ fill: '#374151' }}
               />
               <YAxis
                 domain={[0, 10]}
-                tick={{ fill: darkMode ? '#9ca3af' : '#374151' }}
+                tick={{ fill: '#374151' }}
               />
               <Tooltip
                 contentStyle={{
-                  backgroundColor: darkMode ? '#1f2937' : '#fff',
-                  borderColor: darkMode ? '#374151' : '#e5e7eb',
-                  color: darkMode ? '#fff' : '#000'
+                  backgroundColor: '#fff',
+                  borderColor: '#e5e7eb',
+                  color: '#000'
                 }}
                 labelFormatter={(label, payload) => payload[0]?.payload?.fullName || label}
               />

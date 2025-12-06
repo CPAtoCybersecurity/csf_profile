@@ -75,20 +75,20 @@ const UserSelector = ({
 
   return (
     <div className="flex items-center user-selector">
-      <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-32">{label}:</span>
+      <span className="text-sm font-medium text-gray-500 min-w-32">{label}:</span>
 
       {disabled ? (
-        <span className="ml-2 dark:text-white">
+        <span className="ml-2">
           {multiple ? getSelectedUserDisplayInfo() : getUserDisplayInfo(selectedUsers)}
         </span>
       ) : (
         <div className="relative ml-2">
           <div
-            className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer bg-white dark:bg-gray-700 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
+            className="flex items-center gap-2 p-2 border rounded-lg cursor-pointer bg-white hover:bg-gray-50:bg-gray-600"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           >
-            <Users size={16} className="text-gray-500 dark:text-gray-400" />
-            <span className="text-sm dark:text-white">
+            <Users size={16} className="text-gray-500" />
+            <span className="text-sm">
               {multiple
                 ? (selectedUsers && selectedUsers.length > 0
                     ? `${selectedUsers.length} selected`
@@ -100,43 +100,43 @@ const UserSelector = ({
           </div>
 
           {dropdownOpen && (
-            <div className="absolute z-[9999] mt-1 w-64 bg-white dark:bg-gray-700 border dark:border-gray-600 rounded-lg shadow-lg max-h-60 overflow-auto">
+            <div className="absolute z-[9999] mt-1 w-64 bg-white border rounded-lg shadow-lg max-h-60 overflow-auto">
               <div className="p-2">
                 {users.length > 0 ? (
                   <>
                     {multiple && (
                       <button
-                        className="w-full p-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded flex items-center justify-between dark:text-white"
+                        className="w-full p-2 text-left text-sm hover:bg-gray-100:bg-gray-600 rounded flex items-center justify-between"
                         onClick={() => onChange([])}
                       >
                         <span>Clear selection</span>
-                        <X size={16} className="text-gray-500 dark:text-gray-400" />
+                        <X size={16} className="text-gray-500" />
                       </button>
                     )}
 
                     {!multiple && (
                       <button
-                        className="w-full p-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded flex items-center justify-between dark:text-white"
+                        className="w-full p-2 text-left text-sm hover:bg-gray-100:bg-gray-600 rounded flex items-center justify-between"
                         onClick={() => onChange(null)}
                       >
                         <span>None</span>
-                        <X size={16} className="text-gray-500 dark:text-gray-400" />
+                        <X size={16} className="text-gray-500" />
                       </button>
                     )}
 
-                    <div className="my-1 border-t border-gray-200 dark:border-gray-600"></div>
+                    <div className="my-1 border-t border-gray-200"></div>
 
                     {users.map(user => (
                       <button
                         key={user.id}
-                        className="w-full p-2 text-left text-sm hover:bg-gray-100 dark:hover:bg-gray-600 rounded flex items-center justify-between"
+                        className="w-full p-2 text-left text-sm hover:bg-gray-100:bg-gray-600 rounded flex items-center justify-between"
                         onClick={() => handleSelectUser(user)}
                       >
                         <div>
-                          <div className="dark:text-white">{user.name}</div>
-                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                          <div className="">{user.name}</div>
+                          <div className="text-xs text-gray-500">
                             {user.email && (
-                              <span className="text-blue-600 dark:text-blue-400">{user.email}</span>
+                              <span className="text-blue-600">{user.email}</span>
                             )}
                             {user.email && user.title && <span className="mx-1">•</span>}
                             {user.title && <span>{user.title}</span>}
@@ -154,7 +154,7 @@ const UserSelector = ({
                     ))}
                   </>
                 ) : (
-                  <div className="p-2 text-sm text-gray-500 dark:text-gray-400">
+                  <div className="p-2 text-sm text-gray-500">
                     No users available. Add users in the User Management page.
                   </div>
                 )}
