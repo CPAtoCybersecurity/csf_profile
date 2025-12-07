@@ -1,7 +1,5 @@
 # Simply Cyber Academy - CSF Profile Assessment Database v1.0
 
-![As Seen on NIST](public/as_seen_on_nist.jpeg)
-
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 - Track and manage CSF outcomes
 - Assign ownership and stakeholders to controls
@@ -17,6 +15,8 @@ The is an open source project, and improvement ideas to drive cyber risk reducti
 Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: https://academy.simplycyber.io/p/accrp
 
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
+
+![As Seen on NIST](public/as_seen_on_nist.jpeg)
 
 ## Disclaimer
 
