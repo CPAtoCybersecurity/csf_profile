@@ -295,3 +295,17 @@ code {
 
 /* Shadow */
 .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
+
+/* Pivot table colors */
+.bg-purple-50 { background-color: #faf5ff; }
+.bg-amber-50 { background-color: #fffbeb; }
+.bg-cyan-50 { background-color: #ecfeff; }
+.bg-indigo-50 { background-color: #eef2ff; }
+.text-purple-700 { color: #7e22ce; }
+.text-amber-700 { color: #b45309; }
+.text-amber-600 { color: #d97706; }
+.text-cyan-700 { color: #0e7490; }
+.text-indigo-700 { color: #4338ca; }
+.border-gray-200 { border-color: #e5e7eb; }
+.border-collapse { border-collapse: collapse; }
+.max-h-60 { max-height: 15rem; }
