@@ -169,6 +169,9 @@ const useCSFStore = create(
           observations: '',
           observationDate: '',
           testingStatus: 'Not Started',
+          examine: false,
+          interview: false,
+          test: false,
         };
       },
 
@@ -187,6 +190,9 @@ const useCSFStore = create(
             observations: '',
             observationDate: '',
             testingStatus: 'Not Started',
+            examine: false,
+            interview: false,
+            test: false,
           };
 
           return {

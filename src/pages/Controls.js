@@ -658,24 +658,27 @@ const Controls = () => {
                     <div>
                       <span className="text-sm font-medium text-gray-500">Assessment Method(s):</span>
                       <div className="mt-1 flex gap-4">
-                        {['Examine', 'Interview', 'Test'].map((method) => (
-                          <label key={method} className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              checked={(currentItem.assessmentMethods || []).includes(method)}
-                              onChange={(e) => {
-                                const currentMethods = currentItem.assessmentMethods || [];
-                                const newMethods = e.target.checked
-                                  ? [...currentMethods, method]
-                                  : currentMethods.filter(m => m !== method);
-                                handleFieldChange('assessmentMethods', newMethods);
-                              }}
-                              disabled={!editMode}
-                              className="rounded"
-                            />
-                            <span className="text-sm">{method}</span>
-                          </label>
-                        ))}
+                        {['Examine', 'Interview', 'Test'].map((method) => {
+                          const quarterData = getQuarterData(currentItem.ID, selectedQuarter) || {};
+                          const methodKey = method.toLowerCase();
+                          const isChecked = quarterData[methodKey] === true;
+                          return (
+                            <label key={method} className="flex items-center gap-2">
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  updateQuarterData(currentItem.ID, selectedQuarter, {
+                                    [methodKey]: e.target.checked
+                                  });
+                                }}
+                                disabled={!editMode}
+                                className="rounded"
+                              />
+                              <span className="text-sm">{method}</span>
+                            </label>
+                          );
+                        })}
                       </div>
                     </div>
 
