@@ -1,10 +1,21 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
+// Default users for new installations
+const DEFAULT_USERS = [
+  { id: 1, name: 'Gerry', title: 'CISO', email: 'gerry@almasecurity.com' },
+  { id: 2, name: 'Steve', title: 'GRC Manager', email: 'steve@almasecurity.com' },
+  { id: 3, name: 'Jane', title: 'Product Engineer', email: 'jane@almasecurity.com' },
+  { id: 4, name: 'John', title: 'Financial Systems Analyst', email: 'john@almasecurity.com' },
+  { id: 5, name: 'Chris.Magann', title: 'Security Engineer', email: 'chris.magann@almasecurity.com' },
+  { id: 6, name: 'Nadia.Khan', title: 'Site Reliability Engineer', email: 'nadia.khan@almasecurity.com' },
+  { id: 7, name: 'Tigan.Wang', title: 'Vulnerability Manager', email: 'tigan.wang@almasecurity.com' },
+];
+
 const useUserStore = create(
   persist(
     (set, get) => ({
-      users: [],
+      users: DEFAULT_USERS,
 
       // Add a single user
       addUser: (user) => {

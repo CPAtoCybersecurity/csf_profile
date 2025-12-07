@@ -87,7 +87,8 @@ const ScoringLegend = () => {
 
   return (
     <div className="p-4 bg-white min-h-full">
-      <h1 className="text-2xl font-bold mb-4">Scoring Legend</h1>
+      <h1 className="text-2xl font-bold mb-2">Scoring Legend</h1>
+      <p className="text-sm text-gray-600 mb-4 italic">Scoring Legend from Mastering Cyber Resilience by AKYLADE</p>
 
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
