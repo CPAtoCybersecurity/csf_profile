@@ -1,7 +1,15 @@
 import React, { useMemo, useState } from 'react';
-import { PieChart, Pie, Tooltip, Legend, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Filter } from 'lucide-react';
 import useCSFStore from '../stores/csfStore';
+
+// Format number to always show one decimal place
+const formatScore = (value) => {
+  if (value === null || value === undefined) return null;
+  return Number(value).toFixed(1);
+};
+
+// Define the order of functions for the pivot table
+const FUNCTION_ORDER = ['Govern', 'Identify', 'Protect', 'Detect', 'Respond', 'Recover'];
 
 const Dashboard = () => {
   const data = useCSFStore((state) => state.data);
@@ -14,95 +22,63 @@ const Dashboard = () => {
     return data.filter(item => item['In Scope? '] === filterInScope);
   }, [data, filterInScope]);
 
-  // Calculate status distribution for pie chart
-  const statusData = useMemo(() => {
-    if (!filteredData || filteredData.length === 0) return [];
-
-    const statusCounts = filteredData.reduce((acc, item) => {
-      const status = item['Testing Status'] || 'Not Started';
-      acc[status] = (acc[status] || 0) + 1;
-      return acc;
-    }, {});
-
-    return Object.entries(statusCounts).map(([name, value]) => ({ name, value }));
-  }, [filteredData]);
-
-  // Calculate in scope distribution for pie chart (always uses full data)
-  const inScopeData = useMemo(() => {
-    if (!data || data.length === 0) return [];
-
-    const inScopeCounts = data.reduce((acc, item) => {
-      const inScope = item['In Scope? '] || 'No';
-      acc[inScope] = (acc[inScope] || 0) + 1;
-      return acc;
-    }, {});
-
-    return Object.entries(inScopeCounts).map(([name, value]) => ({ name, value }));
-  }, [data]);
-
-  // Calculate score gap by function
-  const functionScoreData = useMemo(() => {
+  // Calculate pivot table data: Score by Function by Quarter (with actual and target)
+  const pivotTableData = useMemo(() => {
     if (!filteredData || filteredData.length === 0) return [];
 
     // When filter is applied, use filtered data; otherwise use in-scope items
     const itemsToUse = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
+
+    // Group by function and calculate average scores per quarter
     const functionGroups = itemsToUse.reduce((acc, item) => {
       const func = item.Function || 'Unknown';
       if (!acc[func]) {
-        acc[func] = { total: 0, current: 0, desired: 0 };
+        acc[func] = {
+          name: func,
+          Q1: { actualTotal: 0, targetTotal: 0, count: 0 },
+          Q2: { actualTotal: 0, targetTotal: 0, count: 0 },
+          Q3: { actualTotal: 0, targetTotal: 0, count: 0 },
+          Q4: { actualTotal: 0, targetTotal: 0, count: 0 },
+        };
       }
-      acc[func].total++;
-      acc[func].current += item['Current State Score'] || 0;
-      acc[func].desired += item['Desired State Score'] || 0;
+
+      // Get quarterly scores
+      const quarters = item.quarters || {};
+      ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+        if (quarters[q]) {
+          if (quarters[q].actualScore !== undefined || quarters[q].targetScore !== undefined) {
+            acc[func][q].actualTotal += quarters[q].actualScore || 0;
+            acc[func][q].targetTotal += quarters[q].targetScore || 0;
+            acc[func][q].count++;
+          }
+        }
+      });
+
       return acc;
     }, {});
 
-    return Object.entries(functionGroups).map(([name, stats]) => ({
-      name: name.substring(0, 10),
-      fullName: name,
-      current: +(stats.current / stats.total).toFixed(1),
-      desired: +(stats.desired / stats.total).toFixed(1),
-      gap: +((stats.desired - stats.current) / stats.total).toFixed(1),
+    // Convert to array and calculate averages
+    const results = Object.values(functionGroups).map(group => ({
+      name: group.name,
+      Q1Actual: group.Q1.count > 0 ? +(group.Q1.actualTotal / group.Q1.count).toFixed(1) : null,
+      Q1Target: group.Q1.count > 0 ? +(group.Q1.targetTotal / group.Q1.count).toFixed(1) : null,
+      Q2Actual: group.Q2.count > 0 ? +(group.Q2.actualTotal / group.Q2.count).toFixed(1) : null,
+      Q2Target: group.Q2.count > 0 ? +(group.Q2.targetTotal / group.Q2.count).toFixed(1) : null,
+      Q3Actual: group.Q3.count > 0 ? +(group.Q3.actualTotal / group.Q3.count).toFixed(1) : null,
+      Q3Target: group.Q3.count > 0 ? +(group.Q3.targetTotal / group.Q3.count).toFixed(1) : null,
+      Q4Actual: group.Q4.count > 0 ? +(group.Q4.actualTotal / group.Q4.count).toFixed(1) : null,
+      Q4Target: group.Q4.count > 0 ? +(group.Q4.targetTotal / group.Q4.count).toFixed(1) : null,
     }));
-  }, [filteredData, filterInScope]);
 
-  // Colors for the charts
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
-  const STATUS_COLORS = {
-    'Complete': '#16a34a',
-    'Completed': '#16a34a',
-    'In Progress': '#2563eb',
-    'Not Started': '#6b7280',
-    'Submitted': '#f97316',
-    'Issues Found': '#dc2626'
-  };
-
-  // Summary stats
-  const summaryStats = useMemo(() => {
-    if (!filteredData || filteredData.length === 0) return null;
-
-    const inScopeItems = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
-    const completedItems = inScopeItems.filter(item =>
-      item['Testing Status'] === 'Complete' || item['Testing Status'] === 'Completed'
-    );
-
-    const avgCurrent = inScopeItems.length > 0
-      ? inScopeItems.reduce((sum, item) => sum + (item['Current State Score'] || 0), 0) / inScopeItems.length
-      : 0;
-
-    const avgDesired = inScopeItems.length > 0
-      ? inScopeItems.reduce((sum, item) => sum + (item['Desired State Score'] || 0), 0) / inScopeItems.length
-      : 0;
-
-    return {
-      total: filteredData.length,
-      inScope: inScopeItems.length,
-      completed: completedItems.length,
-      completionRate: inScopeItems.length > 0 ? (completedItems.length / inScopeItems.length * 100).toFixed(1) : 0,
-      avgCurrent: avgCurrent.toFixed(1),
-      avgDesired: avgDesired.toFixed(1),
-      avgGap: (avgDesired - avgCurrent).toFixed(1),
-    };
+    // Sort by the defined function order
+    return results.sort((a, b) => {
+      const indexA = FUNCTION_ORDER.indexOf(a.name);
+      const indexB = FUNCTION_ORDER.indexOf(b.name);
+      // Put unknown functions at the end
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
   }, [filteredData, filterInScope]);
 
   if (!data || data.length === 0) {
@@ -132,130 +108,112 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      {summaryStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-6">
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-blue-700">{summaryStats.total}</div>
-            <div className="text-sm text-blue-600">Total Controls</div>
-          </div>
-          <div className="bg-green-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-green-700">{summaryStats.inScope}</div>
-            <div className="text-sm text-green-600">In Scope</div>
-          </div>
-          <div className="bg-purple-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-purple-700">{summaryStats.completed}</div>
-            <div className="text-sm text-purple-600">Completed</div>
-          </div>
-          <div className="bg-amber-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-amber-700">{summaryStats.completionRate}%</div>
-            <div className="text-sm text-amber-600">Completion Rate</div>
-          </div>
-          <div className="bg-cyan-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-cyan-700">{summaryStats.avgCurrent}</div>
-            <div className="text-sm text-cyan-600">Avg Current</div>
-          </div>
-          <div className="bg-indigo-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-indigo-700">{summaryStats.avgDesired}</div>
-            <div className="text-sm text-indigo-600">Avg Desired</div>
-          </div>
-          <div className="bg-red-50 p-4 rounded-lg">
-            <div className="text-2xl font-bold text-red-700">{summaryStats.avgGap}</div>
-            <div className="text-sm text-red-600">Avg Gap</div>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        {/* Status Distribution */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <h2 className="text-lg font-semibold mb-4">Testing Status Distribution</h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={statusData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ name, percent, value }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {statusData.map((entry, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={STATUS_COLORS[entry.name] || COLORS[index % COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [`${value} items`, 'Count']} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* In Scope Distribution */}
-        <div className="bg-white p-4 rounded-lg shadow-sm border">
-          <h2 className="text-lg font-semibold mb-4">In Scope Distribution</h2>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={inScopeData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={true}
-                  label={({ name, percent, value }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {inScopeData.map((entry) => (
-                    <Cell
-                      key={`cell-${entry.name}`}
-                      fill={entry.name === 'Yes' ? '#16a34a' : '#dc2626'}
-                    />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [`${value} items`, 'Count']} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Score by Function */}
+      {/* Pivot Table: Score by Function by Quarter */}
       <div className="bg-white p-4 rounded-lg shadow-sm border">
-        <h2 className="text-lg font-semibold mb-4">Average Scores by Function (In Scope Only)</h2>
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={functionScoreData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-              <XAxis
-                dataKey="name"
-                tick={{ fill: '#374151' }}
-              />
-              <YAxis
-                domain={[0, 10]}
-                tick={{ fill: '#374151' }}
-              />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: '#fff',
-                  borderColor: '#e5e7eb',
-                  color: '#000'
-                }}
-                labelFormatter={(label, payload) => payload[0]?.payload?.fullName || label}
-              />
-              <Legend />
-              <Bar dataKey="current" name="Current Score" fill="#2563eb" />
-              <Bar dataKey="desired" name="Desired Score" fill="#16a34a" />
-            </BarChart>
-          </ResponsiveContainer>
+        <h2 className="text-lg font-semibold mb-4">Average Scores by Function by Quarter (In Scope Only)</h2>
+        <div className="overflow-auto">
+          <table className="min-w-full border-collapse">
+            <thead>
+              <tr className="bg-gray-50">
+                <th rowSpan={2} className="border border-gray-200 px-4 py-3 text-left font-semibold text-gray-700 align-bottom">Function</th>
+                <th colSpan={2} className="border border-gray-200 px-3 py-2 text-center font-semibold text-gray-700">Q1</th>
+                <th colSpan={2} className="border border-gray-200 px-3 py-2 text-center font-semibold text-gray-700">Q2</th>
+                <th colSpan={2} className="border border-gray-200 px-3 py-2 text-center font-semibold text-gray-700">Q3</th>
+                <th colSpan={2} className="border border-gray-200 px-3 py-2 text-center font-semibold text-gray-700">Q4</th>
+              </tr>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Actual</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Target</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Actual</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Target</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Actual</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Target</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Actual</th>
+                <th className="border border-gray-200 px-3 py-2 text-center text-xs font-medium text-gray-600">Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pivotTableData.map((row, index) => (
+                <tr key={row.name} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <td className="border border-gray-200 px-4 py-3 font-medium text-gray-900">{row.name}</td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q1Actual !== null ? (
+                      <span className={`font-semibold ${row.Q1Actual >= row.Q1Target ? 'text-green-600' : row.Q1Actual >= row.Q1Target * 0.7 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {formatScore(row.Q1Actual)}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q1Target !== null ? (
+                      <span className="text-gray-700">{formatScore(row.Q1Target)}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q2Actual !== null ? (
+                      <span className={`font-semibold ${row.Q2Actual >= row.Q2Target ? 'text-green-600' : row.Q2Actual >= row.Q2Target * 0.7 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {formatScore(row.Q2Actual)}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q2Target !== null ? (
+                      <span className="text-gray-700">{formatScore(row.Q2Target)}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q3Actual !== null ? (
+                      <span className={`font-semibold ${row.Q3Actual >= row.Q3Target ? 'text-green-600' : row.Q3Actual >= row.Q3Target * 0.7 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {formatScore(row.Q3Actual)}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q3Target !== null ? (
+                      <span className="text-gray-700">{formatScore(row.Q3Target)}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q4Actual !== null ? (
+                      <span className={`font-semibold ${row.Q4Actual >= row.Q4Target ? 'text-green-600' : row.Q4Actual >= row.Q4Target * 0.7 ? 'text-amber-600' : 'text-red-600'}`}>
+                        {formatScore(row.Q4Actual)}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="border border-gray-200 px-3 py-3 text-center">
+                    {row.Q4Target !== null ? (
+                      <span className="text-gray-700">{formatScore(row.Q4Target)}</span>
+                    ) : (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+              {pivotTableData.length === 0 && (
+                <tr>
+                  <td colSpan={9} className="border border-gray-200 px-4 py-8 text-center text-gray-500">
+                    No data available. Select items as "In Scope" and add quarterly scores to see the pivot table.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="mt-3 text-xs text-gray-500">
+          Actual score colors: <span className="text-green-600 font-semibold">Green (meets target)</span>, <span className="text-amber-600 font-semibold">Amber (70%+ of target)</span>, <span className="text-red-600 font-semibold">Red (&lt;70% of target)</span>
         </div>
       </div>
     </div>
