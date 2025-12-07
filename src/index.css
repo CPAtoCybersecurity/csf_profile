@@ -309,3 +309,9 @@ code {
 .border-gray-200 { border-color: #e5e7eb; }
 .border-collapse { border-collapse: collapse; }
 .max-h-60 { max-height: 15rem; }
+
+/* Font style */
+.italic { font-style: italic; }
+
+/* Scoring legend colors */
+.bg-yellow-100 { background-color: #fef9c3; }

@@ -87,8 +87,7 @@ const ScoringLegend = () => {
 
   return (
     <div className="p-4 bg-white min-h-full">
-      <h1 className="text-2xl font-bold mb-2">Scoring Legend</h1>
-      <p className="text-sm text-gray-600 mb-4 italic">Scoring Legend from Mastering Cyber Resilience by AKYLADE</p>
+      <h1 className="text-2xl font-bold mb-4">Scoring Legend</h1>
 
       <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
         <table className="min-w-full divide-y divide-gray-200">
@@ -143,7 +142,9 @@ const ScoringLegend = () => {
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold mb-4 mt-8">NIST SP 800-53A Assessment Methods</h1>
+      <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Mastering Cyber Resilience by AKYLADE</p>
+
+      <h1 className="text-2xl font-bold mb-4 mt-4">NIST SP 800-53A Assessment Methods</h1>
       <div className="bg-white p-4 rounded-lg shadow-sm border">
         <p className="text-sm text-gray-700 mb-4">
           The following assessment methods are used to determine the extent to which security controls are implemented correctly, operating as intended, and producing the desired outcome.
