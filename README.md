@@ -16,6 +16,8 @@ Find in depth videos for CSF profile assessments and this tool in Simply Cyber A
 
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
 
+**[View Explainer Slides](public/screenshots/CSF-Profile-Assessment-Explainer-Slides.pdf)** - Learn how CSF Profile assessments work
+
 <img src="public/as_seen_on_nist.jpeg" alt="As Seen on NIST" width="340">
 
 ## Disclaimer
