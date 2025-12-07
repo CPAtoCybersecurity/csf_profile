@@ -267,6 +267,12 @@ function processCSVData(rawData, existingUsers) {
     // Build quarters object from imported CSV columns (Q1, Q2, Q3, Q4)
     const quarters = {};
 
+    // Helper to parse Yes/No boolean fields
+    const parseYesNo = (value) => {
+      if (value === true || value === 'Yes' || value === 'yes' || value === 'YES') return true;
+      return false;
+    };
+
     // Q1 data
     if (row['Q1 Actual Score'] !== undefined && row['Q1 Actual Score'] !== '') {
       quarters.Q1 = {
@@ -275,6 +281,9 @@ function processCSVData(rawData, existingUsers) {
         observations: sanitizeInput(row['Q1 Observations'] || ''),
         observationDate: row['Q1 Observation Date'] || '',
         testingStatus: row['Q1 Testing Status'] || 'Not Started',
+        examine: parseYesNo(row['Q1 Examine']),
+        interview: parseYesNo(row['Q1 Interview']),
+        test: parseYesNo(row['Q1 Test']),
       };
     }
 
@@ -286,6 +295,9 @@ function processCSVData(rawData, existingUsers) {
         observations: sanitizeInput(row['Q2 Observations'] || ''),
         observationDate: row['Q2 Observation Date'] || '',
         testingStatus: row['Q2 Testing Status'] || 'Not Started',
+        examine: parseYesNo(row['Q2 Examine']),
+        interview: parseYesNo(row['Q2 Interview']),
+        test: parseYesNo(row['Q2 Test']),
       };
     }
 
@@ -297,6 +309,9 @@ function processCSVData(rawData, existingUsers) {
         observations: sanitizeInput(row['Q3 Observations'] || ''),
         observationDate: row['Q3 Observation Date'] || '',
         testingStatus: row['Q3 Testing Status'] || 'Not Started',
+        examine: parseYesNo(row['Q3 Examine']),
+        interview: parseYesNo(row['Q3 Interview']),
+        test: parseYesNo(row['Q3 Test']),
       };
     }
 
@@ -308,7 +323,17 @@ function processCSVData(rawData, existingUsers) {
         observations: sanitizeInput(row['Q4 Observations'] || ''),
         observationDate: row['Q4 Observation Date'] || '',
         testingStatus: row['Q4 Testing Status'] || 'Not Started',
+        examine: parseYesNo(row['Q4 Examine']),
+        interview: parseYesNo(row['Q4 Interview']),
+        test: parseYesNo(row['Q4 Test']),
       };
+    }
+
+    // Process Remediation Owner (separate from assessment Owner)
+    let remediationOwnerId = null;
+    if (row['Remediation Owner']) {
+      const remOwnerInfo = parseUserInfo(row['Remediation Owner']);
+      remediationOwnerId = findOrCreateUser(remOwnerInfo, existingUsers);
     }
 
     return {
@@ -331,8 +356,11 @@ function processCSVData(rawData, existingUsers) {
       'auditorId': auditorId,
       'Control Implementation Description': controlRef,
       'NIST 800-53 Control Ref': controlRef,
+      'Implementation Description': row['Implementation Description'] || controlRef || '',
       'linkedArtifacts': linkedArtifacts,
       'quarters': Object.keys(quarters).length > 0 ? quarters : undefined,
+      'remediationOwnerId': remediationOwnerId,
+      'Remediation Due Date': row['Remediation Due Date'] || row['Due Date'] || '',
     };
   });
 }
@@ -363,6 +391,7 @@ function exportDataAsCSV(data, users, filenamePrefix) {
       'Subcategory ID': item['Subcategory ID'],
       'Subcategory Description': item['Subcategory Description'],
       'Implementation Example': item['Implementation Example'],
+      'Implementation Description': item['Implementation Description'] || item['Control Implementation Description'] || '',
       'In Scope? ': item['In Scope? '],
       'Owner': formatUserInfo(item.ownerId, users),
       'Stakeholder(s)': formatMultipleUsers(item.stakeholderIds, users),
@@ -375,24 +404,39 @@ function exportDataAsCSV(data, users, filenamePrefix) {
       'Q1 Observations': q1.observations || '',
       'Q1 Observation Date': q1.observationDate || '',
       'Q1 Testing Status': q1.testingStatus || '',
+      'Q1 Examine': q1.examine ? 'Yes' : 'No',
+      'Q1 Interview': q1.interview ? 'Yes' : 'No',
+      'Q1 Test': q1.test ? 'Yes' : 'No',
       // Q2 (Second Quarter)
       'Q2 Actual Score': q2.actualScore ?? '',
       'Q2 Target Score': q2.targetScore ?? '',
       'Q2 Observations': q2.observations || '',
       'Q2 Observation Date': q2.observationDate || '',
       'Q2 Testing Status': q2.testingStatus || '',
+      'Q2 Examine': q2.examine ? 'Yes' : 'No',
+      'Q2 Interview': q2.interview ? 'Yes' : 'No',
+      'Q2 Test': q2.test ? 'Yes' : 'No',
       // Q3 (Third Quarter)
       'Q3 Actual Score': q3.actualScore ?? '',
       'Q3 Target Score': q3.targetScore ?? '',
       'Q3 Observations': q3.observations || '',
       'Q3 Observation Date': q3.observationDate || '',
       'Q3 Testing Status': q3.testingStatus || '',
+      'Q3 Examine': q3.examine ? 'Yes' : 'No',
+      'Q3 Interview': q3.interview ? 'Yes' : 'No',
+      'Q3 Test': q3.test ? 'Yes' : 'No',
       // Q4 (Fourth Quarter)
       'Q4 Actual Score': q4.actualScore ?? '',
       'Q4 Target Score': q4.targetScore ?? '',
       'Q4 Observations': q4.observations || '',
       'Q4 Observation Date': q4.observationDate || '',
       'Q4 Testing Status': q4.testingStatus || '',
+      'Q4 Examine': q4.examine ? 'Yes' : 'No',
+      'Q4 Interview': q4.interview ? 'Yes' : 'No',
+      'Q4 Test': q4.test ? 'Yes' : 'No',
+      // Remediation fields
+      'Remediation Owner': formatUserInfo(item.remediationOwnerId, users),
+      'Remediation Due Date': item['Remediation Due Date'] || '',
       // Other fields
       'Minimum Target': item['Minimum Target'] || 0,
       'Action Plan': item['Action Plan'] || '',
