@@ -741,15 +741,15 @@ const Dashboard = () => {
           {/* Pie Chart */}
           <div className="flex-shrink-0">
             {statusChartData.length > 0 ? (
-              <ResponsiveContainer width={350} height={350}>
-                <PieChart>
+              <ResponsiveContainer width={520} height={400}>
+                <PieChart margin={{ left: 100, right: 80 }}>
                   <Pie
                     data={statusChartData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
+                    labelLine={true}
                     label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                    outerRadius={120}
+                    outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
                   >
@@ -764,8 +764,8 @@ const Dashboard = () => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="flex items-center justify-center w-80 h-80 text-gray-500">
-                No data available for Q{statusChartQuarter}.
+              <div className="flex items-center justify-center" style={{ width: 520, height: 400 }}>
+                <span className="text-gray-500">No data available for Q{statusChartQuarter}.</span>
               </div>
             )}
           </div>
