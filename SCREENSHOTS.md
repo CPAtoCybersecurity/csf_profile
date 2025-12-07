@@ -4,7 +4,7 @@
 
 The Scoring Legend provides guidance for evaluating security controls using the scoring system from Mastering Cyber Resilience by AKYLADE. Color-coded rows indicate security posture: yellow for "Some Security," green for "Just Right," and red for insufficient or excessive security.
 
-![Scoring Legend](public/screenshots/scoring-legend.png)
+![Scoring Legend](public/screenshots/references.png)
 
 ---
 
