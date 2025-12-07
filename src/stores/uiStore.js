@@ -16,7 +16,7 @@ const useUIStore = create(
       searchTerm: '',
       filterFunctions: [],
       filterCategories: [],
-      filterInScope: '',
+      filterInScope: 'Yes',
 
       // Dropdown states
       functionDropdownOpen: false,
