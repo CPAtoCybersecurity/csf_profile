@@ -55,7 +55,37 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 ### Installation:
 [![Video Title](https://img.youtube.com/vi/h206z7wIYqY/0.jpg)](https://youtu.be/h206z7wIYqY)
 
-Follow these steps to get the CSF Profile Assessment Database up and running:
+### Prerequisites by Operating System
+
+#### macOS
+
+macOS typically comes with Git pre-installed. You only need to install Node.js:
+
+1. Download and install Node.js from [nodejs.org](https://nodejs.org/) (LTS version recommended)
+2. Verify installation by opening Terminal and running:
+   ```
+   node --version
+   npm --version
+   ```
+
+#### Windows
+
+1. **Install Git first**: Download and install Git from [git-scm.com](https://git-scm.com/download/win)
+   - During installation, you can accept the default options
+2. **Install Node.js**: Download the MSI installer from [nodejs.org](https://nodejs.org/) (LTS version recommended)
+   - Run the MSI installer and follow the prompts
+3. **Open PowerShell** to run the installation commands below
+   - Press `Win + X` and select "Windows PowerShell" or search for "PowerShell" in the Start menu
+
+#### Kali Linux / Debian-based Linux
+
+1. Update your package manager and install Node.js:
+   ```bash
+   sudo apt update
+   sudo apt install nodejs npm git
+   ```
+
+### Installation Steps
 
 1. **Clone the repository**
    ```
@@ -75,6 +105,28 @@ Follow these steps to get the CSF Profile Assessment Database up and running:
 
 4. **Access the application**
    Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
+
+### Troubleshooting (Kali Linux)
+
+If you encounter issues with `react-scripts` not installing correctly on Kali Linux:
+
+1. **Delete node_modules and reinstall:**
+   ```bash
+   cd csf_profile
+   rm -rf node_modules
+   rm package-lock.json
+   npm install
+   ```
+
+2. **If issues persist**, try installing with the `--legacy-peer-deps` flag:
+   ```bash
+   npm install --legacy-peer-deps
+   ```
+
+3. **Verify react-scripts is installed:**
+   ```bash
+   ls node_modules/.bin/ | grep react-scripts
+   ```
 
 ## Features
 
