@@ -2,6 +2,9 @@ import { useMemo, useCallback } from 'react';
 import useUIStore from '../stores/uiStore';
 import useCSFStore from '../stores/csfStore';
 
+// Define consistent function order (must match data format)
+const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'RESPOND (RS)', 'DETECT (DE)', 'RECOVER (RC)'];
+
 export function useFilters() {
   const data = useCSFStore((state) => state.data);
 
@@ -24,9 +27,16 @@ export function useFilters() {
     resetFilters,
   } = useUIStore();
 
-  // Get unique functions for filter dropdown
+  // Get unique functions for filter dropdown (sorted by FUNCTION_ORDER)
   const functions = useMemo(() => {
-    return [...new Set(data.map(item => item.Function))].filter(Boolean).sort();
+    const uniqueFunctions = [...new Set(data.map(item => item.Function))].filter(Boolean);
+    return uniqueFunctions.sort((a, b) => {
+      const indexA = FUNCTION_ORDER.indexOf(a);
+      const indexB = FUNCTION_ORDER.indexOf(b);
+      if (indexA === -1) return 1;
+      if (indexB === -1) return -1;
+      return indexA - indexB;
+    });
   }, [data]);
 
   // Get unique category IDs for filter dropdown
