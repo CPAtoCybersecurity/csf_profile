@@ -16,7 +16,7 @@ Find in depth videos for CSF profile assessments and this tool in Simply Cyber A
 
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
 
-![As Seen on NIST](public/as_seen_on_nist.jpeg)
+<img src="public/as_seen_on_nist.jpeg" alt="As Seen on NIST" width="340">
 
 ## Disclaimer
 
