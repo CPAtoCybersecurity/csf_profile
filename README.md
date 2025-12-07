@@ -111,3 +111,4 @@ The tool uses a scoring system from 0-10 to assess the current and desired state
 - **6.1-6.9**: Optimized Security - Organization consistently implements this control with great effectiveness
 - **7.0-7.9**: Fully Optimized Security - Organization implements this control with fully optimized effectiveness
 - **8.1-10.0**: Too Much Security - Organization implements this control at excessive financial cost
+
