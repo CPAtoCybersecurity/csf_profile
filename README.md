@@ -16,6 +16,8 @@ The is an open source project, and improvement ideas to drive cyber risk reducti
 
 Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: https://academy.simplycyber.io/p/accrp
 
+**[View Screenshots](SCREENSHOTS.md)** - See the application in action
+
 ## Disclaimer
 
 This software is provided under the MIT License. https://github.com/CPAtoCybersecurity/csf_profile/blob/main/LICENSE
