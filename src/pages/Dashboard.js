@@ -12,6 +12,12 @@ import {
   PieChart,
   Pie,
   Cell,
+  ComposedChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  ReferenceLine,
 } from 'recharts';
 import useCSFStore from '../stores/csfStore';
 
@@ -51,6 +57,7 @@ const Dashboard = () => {
   const [filterInScope, setFilterInScope] = useState(''); // '', 'Yes', or 'No'
   const [selectedQuarter, setSelectedQuarter] = useState(1); // 1-4 for Q1-Q4
   const [statusChartQuarter, setStatusChartQuarter] = useState(1); // 1-4 for Q1-Q4
+  const [functionBarChartQuarter, setFunctionBarChartQuarter] = useState(1); // 1-4 for Q1-Q4
 
   // Filter data based on In Scope selection
   const filteredData = useMemo(() => {
@@ -117,6 +124,34 @@ const Dashboard = () => {
       return indexA - indexB;
     });
   }, [filteredData, filterInScope]);
+
+  // Calculate bar chart data for functions (Actual + Gap to Target)
+  const functionBarChartData = useMemo(() => {
+    if (!pivotTableData || pivotTableData.length === 0) return { data: [], maxTarget: 5 };
+
+    const quarterKey = `Q${functionBarChartQuarter}`;
+    const actualKey = `${quarterKey}Actual`;
+    const targetKey = `${quarterKey}Target`;
+
+    // Find the maximum target value for the reference line
+    let maxTarget = 0;
+    const chartData = pivotTableData.map(row => {
+      const actual = row[actualKey] || 0;
+      const target = row[targetKey] || 0;
+      const gap = Math.max(0, target - actual); // Gap is only positive (how much we're behind)
+
+      if (target > maxTarget) maxTarget = target;
+
+      return {
+        name: row.name,
+        actual: actual,
+        gap: gap,
+        target: target,
+      };
+    });
+
+    return { data: chartData, maxTarget: maxTarget || 5 };
+  }, [pivotTableData, functionBarChartQuarter]);
 
   // Calculate subcategory (Category ID) data for the selected quarter
   const subcategoryData = useMemo(() => {
@@ -283,9 +318,11 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Pivot Table: Score by Function by Quarter */}
-      <div className="bg-white p-4 rounded-lg shadow-sm border mb-6">
-        <h2 className="text-lg font-semibold mb-4">Average Scores by Function by Quarter (In Scope Only)</h2>
+      {/* Pivot Table and Bar Chart Side by Side */}
+      <div className="flex gap-4 mb-6">
+        {/* Pivot Table: Score by Function by Quarter */}
+        <div className="bg-white p-3 rounded-lg shadow-sm border flex-shrink-0">
+          <h2 className="text-base font-semibold mb-3">Function Scores by Quarter (In Scope Only)</h2>
         <div className="overflow-auto">
           <table className="min-w-full border-collapse">
             <thead>
@@ -436,8 +473,100 @@ const Dashboard = () => {
             </tbody>
           </table>
         </div>
-        <div className="mt-3 text-xs text-gray-500">
-          Actual score colors: <span className="text-green-600 font-semibold">Green (meets target)</span>, <span className="text-amber-600 font-semibold">Amber (70%+ of target)</span>, <span className="text-red-600 font-semibold">Red (&lt;70% of target)</span>
+          <div className="mt-3 text-xs text-gray-500">
+            Actual score colors: <span className="text-green-600 font-semibold">Green (meets target)</span>, <span className="text-amber-600 font-semibold">Amber (70%+ of target)</span>, <span className="text-red-600 font-semibold">Red (&lt;70% of target)</span>
+          </div>
+        </div>
+
+        {/* Function Bar Chart */}
+        <div className="bg-white p-3 rounded-lg shadow-sm border flex-1">
+          <div className="flex items-center justify-between mb-2">
+            <h2 className="text-base font-semibold">Function Actual vs Target</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Quarter:</span>
+              <select
+                value={functionBarChartQuarter}
+                onChange={(e) => setFunctionBarChartQuarter(Number(e.target.value))}
+                className="p-1.5 text-sm border rounded bg-white"
+              >
+                <option value={1}>Q1</option>
+                <option value={2}>Q2</option>
+                <option value={3}>Q3</option>
+                <option value={4}>Q4</option>
+              </select>
+            </div>
+          </div>
+
+          {functionBarChartData.data.length > 0 ? (
+            <ResponsiveContainer width="100%" height={320}>
+              <ComposedChart
+                data={functionBarChartData.data}
+                margin={{ top: 15, right: 30, left: 10, bottom: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="name"
+                  tick={{ fontSize: 12, fill: '#374151' }}
+                  tickLine={false}
+                  interval={0}
+                />
+                <YAxis
+                  domain={[0, 10]}
+                  tick={{ fontSize: 11 }}
+                  tickLine={false}
+                  axisLine={false}
+                  width={30}
+                />
+                <Tooltip
+                  formatter={(value, name) => [
+                    formatScore(value),
+                    name === 'actual' ? 'Actual Score' : name === 'gap' ? 'Gap to Target' : name
+                  ]}
+                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: 12 }}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: 12 }}
+                  formatter={(value) => (
+                    <span style={{ color: '#374151', fontSize: 12 }}>
+                      {value === 'actual' ? 'Actual Score' : value === 'gap' ? 'Gap to Target' : value}
+                    </span>
+                  )}
+                />
+                <Bar
+                  dataKey="actual"
+                  stackId="a"
+                  fill="#60a5fa"
+                  radius={[0, 0, 0, 0]}
+                  name="actual"
+                  barSize={80}
+                />
+                <Bar
+                  dataKey="gap"
+                  stackId="a"
+                  fill="#f9a8d4"
+                  radius={[4, 4, 0, 0]}
+                  name="gap"
+                  barSize={80}
+                />
+                <ReferenceLine
+                  y={functionBarChartData.maxTarget}
+                  stroke="#1e40af"
+                  strokeDasharray="5 5"
+                  strokeWidth={2}
+                  label={{
+                    value: `Target (${formatScore(functionBarChartData.maxTarget)})`,
+                    position: 'insideTopRight',
+                    fill: '#1e40af',
+                    fontSize: 11,
+                  }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-64 text-gray-500 text-sm">
+              No data for Q{functionBarChartQuarter}.
+            </div>
+          )}
         </div>
       </div>
 
