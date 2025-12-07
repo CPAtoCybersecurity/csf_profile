@@ -49,7 +49,10 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 
 ## Installation and Setup
 
+### Walkthrough:
 [![CSF Profile Assessment Tool Demo](https://img.youtube.com/vi/xWo9owjk75c/0.jpg)](https://youtu.be/xWo9owjk75c)
+
+### Installation:
 [![Video Title](https://img.youtube.com/vi/h206z7wIYqY/0.jpg)](https://youtu.be/h206z7wIYqY)
 
 Follow these steps to get the CSF Profile Assessment Database up and running:
