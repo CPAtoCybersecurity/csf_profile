@@ -177,12 +177,6 @@ export function useCSFData() {
     exportDataAsCSV(currentData, currentUsers, 'CSF_Profile');
   }, []); // Empty deps - uses store.getState() for current values
 
-  // Export filtered data
-  const exportFilteredCSV = useCallback((filteredData, filename = 'CSF_Profile_Filtered') => {
-    const currentUsers = useUserStore.getState().users;
-    exportDataAsCSV(filteredData, currentUsers, filename);
-  }, []); // Empty deps - uses store.getState() for current values
-
   // Compute canUndo/canRedo from primitive values
   const canUndo = historyIndex > 0;
   const canRedo = historyIndex < historyLength - 1;
@@ -202,7 +196,6 @@ export function useCSFData() {
     clearAllScope,
     importCSV,
     exportCSV,
-    exportFilteredCSV,
     undo,
     redo,
     canUndo,

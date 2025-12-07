@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FileSearch, Calendar, User, CheckCircle, XCircle } from 'lucide-react';
 import useCSFStore from '../stores/csfStore';
@@ -11,13 +11,28 @@ const AssessmentObservations = () => {
   const data = useCSFStore((state) => state.data);
   const users = useUserStore((state) => state.users);
   const navigate = useNavigate();
+  const [selectedQuarter, setSelectedQuarter] = useState(1);
 
-  // Filter items that have observations
+  // Helper to get quarterly observations
+  const getQuarterObservations = (item, quarter) => {
+    const quarters = item.quarters || {};
+    const qData = quarters[`Q${quarter}`] || {};
+    return qData.observations || '';
+  };
+
+  // Helper to get quarterly data
+  const getQuarterData = (item, quarter) => {
+    const quarters = item.quarters || {};
+    return quarters[`Q${quarter}`] || {};
+  };
+
+  // Filter items that have observations for the selected quarter
   const observationItems = useMemo(() => {
-    return data.filter(item =>
-      item['Observations'] && item['Observations'].trim() !== ''
-    );
-  }, [data]);
+    return data.filter(item => {
+      const obs = getQuarterObservations(item, selectedQuarter);
+      return obs && obs.trim() !== '';
+    });
+  }, [data, selectedQuarter]);
 
   // Sorting
   const { sort, sortedData, handleSort } = useSort(observationItems);
@@ -55,13 +70,28 @@ const AssessmentObservations = () => {
   return (
     <div className="flex flex-col h-full">
       <div className="bg-gray-100 p-4 border-b">
-        <div className="flex items-center gap-3">
-          <FileSearch size={24} className="text-blue-600" />
-          <div>
-            <h1 className="text-xl font-bold">Assessment Observations</h1>
-            <p className="text-sm text-gray-600">
-              {observationItems.length} item{observationItems.length !== 1 ? 's' : ''} with documented observations
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FileSearch size={24} className="text-blue-600" />
+            <div>
+              <h1 className="text-xl font-bold">Assessment Observations</h1>
+              <p className="text-sm text-gray-600">
+                {observationItems.length} item{observationItems.length !== 1 ? 's' : ''} with documented observations for Q{selectedQuarter}
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600">Quarter:</span>
+            <select
+              value={selectedQuarter}
+              onChange={(e) => setSelectedQuarter(Number(e.target.value))}
+              className="p-2 border rounded-lg bg-white"
+            >
+              <option value={1}>Q1</option>
+              <option value={2}>Q2</option>
+              <option value={3}>Q3</option>
+              <option value={4}>Q4</option>
+            </select>
           </div>
         </div>
       </div>
@@ -87,52 +117,55 @@ const AssessmentObservations = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {sortedData.map((item) => (
-                <tr
-                  key={item.ID}
-                  className="hover:bg-blue-50:bg-gray-800 cursor-pointer"
-                  onClick={() => handleRowClick(item)}
-                >
-                  <td className="p-3 text-sm font-medium">{item.ID}</td>
-                  <td className="p-3 text-sm">
-                    <div className="font-medium">{item['Subcategory ID']}</div>
-                    <div className="text-xs text-gray-500 line-clamp-1">{item['Subcategory Description']}</div>
-                  </td>
-                  <td className="p-3 text-sm">
-                    <div className={`rounded-full flex items-center justify-center w-6 h-6 ${
-                      item['In Scope? '] === 'Yes' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-                    }`}>
-                      {item['In Scope? '] === 'Yes' ? <CheckCircle size={16} /> : <XCircle size={16} />}
-                    </div>
-                  </td>
-                  <td className="p-3 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item['Testing Status'])}`}>
-                      {item['Testing Status'] || 'Not Started'}
-                    </span>
-                  </td>
-                  <td className="p-3 text-sm">
-                    {item['Observation Date'] ? (
-                      <div className="flex items-center gap-2">
-                        <Calendar size={14} className="text-gray-400" />
-                        <span>{item['Observation Date']}</span>
+              {sortedData.map((item) => {
+                const qData = getQuarterData(item, selectedQuarter);
+                return (
+                  <tr
+                    key={item.ID}
+                    className="hover:bg-blue-50 cursor-pointer"
+                    onClick={() => handleRowClick(item)}
+                  >
+                    <td className="p-3 text-sm font-medium">{item.ID}</td>
+                    <td className="p-3 text-sm">
+                      <div className="font-medium">{item['Subcategory ID']}</div>
+                      <div className="text-xs text-gray-500 line-clamp-1">{item['Subcategory Description']}</div>
+                    </td>
+                    <td className="p-3 text-sm">
+                      <div className={`rounded-full flex items-center justify-center w-6 h-6 ${
+                        item['In Scope? '] === 'Yes' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
+                      }`}>
+                        {item['In Scope? '] === 'Yes' ? <CheckCircle size={16} /> : <XCircle size={16} />}
                       </div>
-                    ) : (
-                      <span className="text-gray-400">No date</span>
-                    )}
-                  </td>
-                  <td className="p-3 text-sm">
-                    <div className="flex items-center gap-2">
-                      <User size={14} className="text-gray-400" />
-                      <span className="">{getUserName(item.auditorId)}</span>
-                    </div>
-                  </td>
-                  <td className="p-3 text-sm">
-                    <div className="line-clamp-2 max-w-md">
-                      {item['Observations']}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="p-3 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(qData.testingStatus)}`}>
+                        {qData.testingStatus || 'Not Started'}
+                      </span>
+                    </td>
+                    <td className="p-3 text-sm">
+                      {qData.observationDate ? (
+                        <div className="flex items-center gap-2">
+                          <Calendar size={14} className="text-gray-400" />
+                          <span>{qData.observationDate}</span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">No date</span>
+                      )}
+                    </td>
+                    <td className="p-3 text-sm">
+                      <div className="flex items-center gap-2">
+                        <User size={14} className="text-gray-400" />
+                        <span className="">{getUserName(item.auditorId)}</span>
+                      </div>
+                    </td>
+                    <td className="p-3 text-sm">
+                      <div className="line-clamp-2 max-w-md">
+                        {qData.observations}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}

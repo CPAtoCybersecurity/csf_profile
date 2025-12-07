@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import {
   Search, Filter, Edit, Save, CheckCircle, XCircle,
   AlertTriangle, Download, Upload, X, ChevronLeft,
-  FileDown, Calendar
+  Calendar
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
@@ -21,7 +21,7 @@ import useCSFStore from '../stores/csfStore';
 import useUserStore from '../stores/userStore';
 
 const Controls = () => {
-  const { loading, error, importCSV, exportCSV, exportFilteredCSV, toggleInScope, updateItem } = useCSFData();
+  const { loading, error, importCSV, exportCSV, toggleInScope, updateItem } = useCSFData();
   const data = useCSFStore((state) => state.data);
 
   const {
@@ -300,16 +300,6 @@ const Controls = () => {
             <Download size={16} />
             Export CSV
           </button>
-          {filteredData.length !== data.length && (
-            <button
-              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-black py-2 px-4 rounded-lg"
-              onClick={() => exportFilteredCSV(filteredData, 'CSF_Profile_Filtered')}
-              title={`Export ${filteredData.length} filtered items`}
-            >
-              <FileDown size={16} />
-              Export Filtered ({filteredData.length})
-            </button>
-          )}
         </div>
       </div>
 
