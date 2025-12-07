@@ -337,8 +337,12 @@ const Controls = () => {
                 <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Implementation Example</th>
                 <SortableHeader label="In Scope" sortKey="In Scope? " currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="Score" sortKey="Current State Score" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="Status" sortKey="Testing Status" currentSort={sort} onSort={handleSort} />
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Score <span className="text-blue-600">(Q{selectedQuarter})</span>
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Status <span className="text-blue-600">(Q{selectedQuarter})</span>
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -380,14 +384,24 @@ const Controls = () => {
                     </button>
                   </td>
                   <td className="p-3 text-sm">
-                    <div className={getScoreColor(item['Current State Score'], item['Desired State Score'])}>
-                      {item['Current State Score'] ?? 0}/{item['Desired State Score'] ?? 0}
-                    </div>
+                    {(() => {
+                      const qData = getQuarterData(item.ID, selectedQuarter) || { actualScore: 0, targetScore: 0 };
+                      return (
+                        <div className={getScoreColor(qData.actualScore, qData.targetScore)}>
+                          {qData.actualScore ?? 0}/{qData.targetScore ?? 0}
+                        </div>
+                      );
+                    })()}
                   </td>
                   <td className="p-3 text-sm">
-                    <div className={getStatusColor(item['Testing Status'])}>
-                      {item['Testing Status']}
-                    </div>
+                    {(() => {
+                      const qData = getQuarterData(item.ID, selectedQuarter) || { testingStatus: 'Not Started' };
+                      return (
+                        <div className={getStatusColor(qData.testingStatus)}>
+                          {qData.testingStatus || 'Not Started'}
+                        </div>
+                      );
+                    })()}
                   </td>
                 </tr>
               ))}
