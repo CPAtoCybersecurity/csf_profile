@@ -264,6 +264,53 @@ function processCSVData(rawData, existingUsers) {
     const minimumTarget = row['Minimum Target'] ?? 0;
     const controlRef = row['NIST 800-53 Control Ref'] || row['Control Implementation Description'] || '';
 
+    // Build quarters object from imported CSV columns (Q1, Q2, Q3, Q4)
+    const quarters = {};
+
+    // Q1 data
+    if (row['Q1 Actual Score'] !== undefined && row['Q1 Actual Score'] !== '') {
+      quarters.Q1 = {
+        actualScore: Number(row['Q1 Actual Score']) || 0,
+        targetScore: Number(row['Q1 Target Score']) || 0,
+        observations: sanitizeInput(row['Q1 Observations'] || ''),
+        observationDate: row['Q1 Observation Date'] || '',
+        testingStatus: row['Q1 Testing Status'] || 'Not Started',
+      };
+    }
+
+    // Q2 data
+    if (row['Q2 Actual Score'] !== undefined && row['Q2 Actual Score'] !== '') {
+      quarters.Q2 = {
+        actualScore: Number(row['Q2 Actual Score']) || 0,
+        targetScore: Number(row['Q2 Target Score']) || 0,
+        observations: sanitizeInput(row['Q2 Observations'] || ''),
+        observationDate: row['Q2 Observation Date'] || '',
+        testingStatus: row['Q2 Testing Status'] || 'Not Started',
+      };
+    }
+
+    // Q3 data
+    if (row['Q3 Actual Score'] !== undefined && row['Q3 Actual Score'] !== '') {
+      quarters.Q3 = {
+        actualScore: Number(row['Q3 Actual Score']) || 0,
+        targetScore: Number(row['Q3 Target Score']) || 0,
+        observations: sanitizeInput(row['Q3 Observations'] || ''),
+        observationDate: row['Q3 Observation Date'] || '',
+        testingStatus: row['Q3 Testing Status'] || 'Not Started',
+      };
+    }
+
+    // Q4 data
+    if (row['Q4 Actual Score'] !== undefined && row['Q4 Actual Score'] !== '') {
+      quarters.Q4 = {
+        actualScore: Number(row['Q4 Actual Score']) || 0,
+        targetScore: Number(row['Q4 Target Score']) || 0,
+        observations: sanitizeInput(row['Q4 Observations'] || ''),
+        observationDate: row['Q4 Observation Date'] || '',
+        testingStatus: row['Q4 Testing Status'] || 'Not Started',
+      };
+    }
+
     return {
       ...row,
       'In Scope? ': row['In Scope? '] || 'No',
@@ -285,6 +332,7 @@ function processCSVData(rawData, existingUsers) {
       'Control Implementation Description': controlRef,
       'NIST 800-53 Control Ref': controlRef,
       'linkedArtifacts': linkedArtifacts,
+      'quarters': Object.keys(quarters).length > 0 ? quarters : undefined,
     };
   });
 }
@@ -297,6 +345,13 @@ function exportDataAsCSV(data, users, filenamePrefix) {
   const exportData = data.map(item => {
     const categoryIdMatch = item.Category && item.Category.match(/\(([^)]+)\)/);
     const categoryId = categoryIdMatch ? categoryIdMatch[1] : '';
+
+    // Get quarterly data (Q1, Q2, Q3, Q4)
+    const quarters = item.quarters || {};
+    const q1 = quarters.Q1 || {};
+    const q2 = quarters.Q2 || {};
+    const q3 = quarters.Q3 || {};
+    const q4 = quarters.Q4 || {};
 
     return {
       'ID': item.ID,
@@ -314,12 +369,32 @@ function exportDataAsCSV(data, users, filenamePrefix) {
       'Auditor': formatUserInfo(item.auditorId, users),
       'NIST 800-53 Control Ref': item['Control Implementation Description'] || item['NIST 800-53 Control Ref'] || '',
       'Test Procedure(s)': item['Test Procedure(s)'] || '',
-      'Observation Date': item['Observation Date'] || '',
-      'Observations': item['Observations'] || '',
-      'Actual Score': item['Current State Score'] || item['Actual Score'] || 0,
+      // Q1 (First Quarter)
+      'Q1 Actual Score': q1.actualScore ?? '',
+      'Q1 Target Score': q1.targetScore ?? '',
+      'Q1 Observations': q1.observations || '',
+      'Q1 Observation Date': q1.observationDate || '',
+      'Q1 Testing Status': q1.testingStatus || '',
+      // Q2 (Second Quarter)
+      'Q2 Actual Score': q2.actualScore ?? '',
+      'Q2 Target Score': q2.targetScore ?? '',
+      'Q2 Observations': q2.observations || '',
+      'Q2 Observation Date': q2.observationDate || '',
+      'Q2 Testing Status': q2.testingStatus || '',
+      // Q3 (Third Quarter)
+      'Q3 Actual Score': q3.actualScore ?? '',
+      'Q3 Target Score': q3.targetScore ?? '',
+      'Q3 Observations': q3.observations || '',
+      'Q3 Observation Date': q3.observationDate || '',
+      'Q3 Testing Status': q3.testingStatus || '',
+      // Q4 (Fourth Quarter)
+      'Q4 Actual Score': q4.actualScore ?? '',
+      'Q4 Target Score': q4.targetScore ?? '',
+      'Q4 Observations': q4.observations || '',
+      'Q4 Observation Date': q4.observationDate || '',
+      'Q4 Testing Status': q4.testingStatus || '',
+      // Other fields
       'Minimum Target': item['Minimum Target'] || 0,
-      'Desired Target': item['Desired State Score'] || item['Desired Target'] || 0,
-      'Testing Status': item['Testing Status'] || '',
       'Action Plan': item['Action Plan'] || '',
       'Artifact Name': Array.isArray(item.linkedArtifacts)
         ? item.linkedArtifacts.join('; ')

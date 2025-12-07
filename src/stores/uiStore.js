@@ -31,6 +31,9 @@ const useUIStore = create(
       sortKey: null,
       sortDirection: null,
 
+      // Quarter selection (1 = Q1, 2 = Q2, 3 = Q3, 4 = Q4)
+      selectedQuarter: 1,
+
       // Actions - Selection
       setCurrentItemId: (id) => set({ currentItemId: id, editMode: false }),
       setEditMode: (editMode) => set({ editMode }),
@@ -77,6 +80,9 @@ const useUIStore = create(
 
       // Actions - Sorting
       setSort: (key, direction) => set({ sortKey: key, sortDirection: direction }),
+
+      // Actions - Quarter selection
+      setSelectedQuarter: (quarter) => set({ selectedQuarter: quarter }),
 
       // Reset filters
       resetFilters: () => set({

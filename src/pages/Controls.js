@@ -2,7 +2,7 @@ import React, { useCallback, useRef } from 'react';
 import {
   Search, Filter, Edit, Save, CheckCircle, XCircle,
   AlertTriangle, Download, Upload, X, ChevronLeft,
-  FileDown
+  FileDown, Calendar
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
@@ -65,7 +65,12 @@ const Controls = () => {
     selectedItemIds,
     toggleItemSelection,
     isItemSelected,
+    selectedQuarter,
+    setSelectedQuarter,
   } = useUIStore();
+
+  const getQuarterData = useCSFStore((state) => state.getQuarterData);
+  const updateQuarterData = useCSFStore((state) => state.updateQuarterData);
 
   // Refs for dropdown triggers (needed for portal positioning)
   const functionTriggerRef = useRef(null);
@@ -529,7 +534,28 @@ const Controls = () => {
                 </div>
 
                 <div className="bg-white p-4 rounded-lg shadow-sm border">
-                  <h3 className="font-medium text-gray-700">Assessment Observations</h3>
+                  <div className="flex items-center justify-between mb-2">
+                    <h3 className="font-medium text-gray-700">Assessment Observations</h3>
+                    <div className="flex items-center gap-1">
+                      <Calendar size={14} className="text-gray-400" />
+                      <div className="flex rounded-md overflow-hidden border">
+                        {[1, 2, 3, 4].map((quarterNum) => (
+                          <button
+                            key={quarterNum}
+                            onClick={() => setSelectedQuarter(quarterNum)}
+                            className={`px-3 py-1 text-xs font-medium transition-colors ${
+                              selectedQuarter === quarterNum
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                            } ${quarterNum > 1 ? 'border-l' : ''}`}
+                          >
+                            Q{quarterNum}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="mt-2 space-y-4">
                     <div className="flex items-center">
                       <span className="text-sm font-medium text-gray-500 min-w-32">In Scope:</span>
@@ -581,8 +607,8 @@ const Controls = () => {
                       <span className="text-sm font-medium text-gray-500">Testing Status:</span>
                       {editMode ? (
                         <select
-                          value={currentItem['Testing Status']}
-                          onChange={(e) => handleFieldChange('Testing Status', e.target.value)}
+                          value={getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'}
+                          onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { testingStatus: e.target.value })}
                           className="mt-1 w-full p-2 border rounded"
                         >
                           <option value="Not Started">Not Started</option>
@@ -591,8 +617,10 @@ const Controls = () => {
                           <option value="Complete">Complete</option>
                         </select>
                       ) : (
-                        <div className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(currentItem['Testing Status'])}`}>
-                          {currentItem['Testing Status']}
+                        <div className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(
+                          getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'
+                        )}`}>
+                          {getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'}
                         </div>
                       )}
                     </div>
@@ -602,12 +630,14 @@ const Controls = () => {
                       {editMode ? (
                         <input
                           type="date"
-                          value={currentItem['Observation Date'] || ''}
-                          onChange={(e) => handleFieldChange('Observation Date', e.target.value)}
+                          value={getQuarterData(currentItem.ID, selectedQuarter)?.observationDate || ''}
+                          onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { observationDate: e.target.value })}
                           className="mt-1 w-full p-2 border rounded"
                         />
                       ) : (
-                        <p className="mt-1">{currentItem['Observation Date'] || 'No date recorded'}</p>
+                        <p className="mt-1">
+                          {getQuarterData(currentItem.ID, selectedQuarter)?.observationDate || 'No date recorded'}
+                        </p>
                       )}
                     </div>
 
@@ -639,15 +669,15 @@ const Controls = () => {
                       <span className="text-sm font-medium text-gray-500">Observations:</span>
                       {editMode ? (
                         <textarea
-                          value={currentItem['Observations'] || ''}
-                          onChange={(e) => handleFieldChange('Observations', e.target.value)}
+                          value={getQuarterData(currentItem.ID, selectedQuarter)?.observations || ''}
+                          onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { observations: e.target.value })}
                           className="mt-1 w-full p-2 border rounded h-32"
                           placeholder="Document audit observations here..."
                         />
                       ) : (
                         <div className="mt-1 prose prose-sm max-w-none">
                           <ReactMarkdown>
-                            {currentItem['Observations'] || 'No observations documented'}
+                            {getQuarterData(currentItem.ID, selectedQuarter)?.observations || 'No observations documented'}
                           </ReactMarkdown>
                         </div>
                       )}
@@ -662,39 +692,39 @@ const Controls = () => {
 
                     <div className="flex gap-4">
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-gray-500">Current Score:</span>
+                        <span className="text-sm font-medium text-gray-500">Actual Score:</span>
                         {editMode ? (
                           <select
-                            value={currentItem['Current State Score'] || 0}
-                            onChange={(e) => handleFieldChange('Current State Score', Number(e.target.value))}
+                            value={getQuarterData(currentItem.ID, selectedQuarter)?.actualScore || 0}
+                            onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { actualScore: Number(e.target.value) })}
                             className="mt-1 w-full p-2 border rounded text-sm"
                           >
-                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                            {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map((score) => (
                               <option key={score} value={score}>{score}</option>
                             ))}
                           </select>
                         ) : (
                           <div className="mt-1 text-lg font-bold">
-                            {currentItem['Current State Score'] || 0}
+                            {getQuarterData(currentItem.ID, selectedQuarter)?.actualScore ?? 0}
                           </div>
                         )}
                       </div>
 
                       <div className="flex-1">
-                        <span className="text-sm font-medium text-gray-500">Desired Score:</span>
+                        <span className="text-sm font-medium text-gray-500">Target Score:</span>
                         {editMode ? (
                           <select
-                            value={currentItem['Desired State Score'] || 0}
-                            onChange={(e) => handleFieldChange('Desired State Score', Number(e.target.value))}
+                            value={getQuarterData(currentItem.ID, selectedQuarter)?.targetScore || 0}
+                            onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { targetScore: Number(e.target.value) })}
                             className="mt-1 w-full p-2 border rounded text-sm"
                           >
-                            {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
+                            {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map((score) => (
                               <option key={score} value={score}>{score}</option>
                             ))}
                           </select>
                         ) : (
                           <div className="mt-1 text-lg font-bold">
-                            {currentItem['Desired State Score'] || 0}
+                            {getQuarterData(currentItem.ID, selectedQuarter)?.targetScore ?? 0}
                           </div>
                         )}
                       </div>

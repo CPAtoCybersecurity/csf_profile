@@ -154,6 +154,57 @@ const useCSFStore = create(
         get().setData(updatedData);
       },
 
+      // Get quarterly data for an item (1 = Q1, 2 = Q2, 3 = Q3, 4 = Q4)
+      getQuarterData: (itemId, quarterNum) => {
+        const state = get();
+        const item = state.data.find(i => i.ID === itemId);
+        if (!item) return null;
+
+        const quarterKey = `Q${quarterNum}`;
+        const quarters = item.quarters || {};
+
+        return quarters[quarterKey] || {
+          actualScore: 0,
+          targetScore: 0,
+          observations: '',
+          observationDate: '',
+          testingStatus: 'Not Started',
+        };
+      },
+
+      // Update quarterly data for an item
+      updateQuarterData: (itemId, quarterNum, updates) => {
+        const state = get();
+        const quarterKey = `Q${quarterNum}`;
+
+        const updatedData = state.data.map(item => {
+          if (item.ID !== itemId) return item;
+
+          const quarters = item.quarters || {};
+          const currentQuarterData = quarters[quarterKey] || {
+            actualScore: 0,
+            targetScore: 0,
+            observations: '',
+            observationDate: '',
+            testingStatus: 'Not Started',
+          };
+
+          return {
+            ...item,
+            quarters: {
+              ...quarters,
+              [quarterKey]: {
+                ...currentQuarterData,
+                ...updates,
+                observations: updates.observations ? sanitizeInput(updates.observations) : currentQuarterData.observations,
+              },
+            },
+          };
+        });
+
+        get().setData(updatedData);
+      },
+
       // Load initial data from CSV
       loadInitialData: async (userStore) => {
         try {
