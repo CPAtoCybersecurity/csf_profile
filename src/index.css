@@ -1,3 +1,46 @@
+/* CSS Variables for theming */
+:root {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+  --bg-header: #1d4ed8;
+  --bg-nav-active: #1e40af;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+  --text-faint: #9ca3af;
+  --border-color: #e5e7eb;
+  --border-dark: #d1d5db;
+  --ring-color: #3b82f6;
+  --prose-color: #374151;
+  --prose-code-bg: #f3f4f6;
+  --prose-pre-bg: #1f2937;
+  --prose-pre-text: #f9fafb;
+  --prose-blockquote-border: #d1d5db;
+  --prose-blockquote-text: #6b7280;
+}
+
+.dark {
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+  --bg-header: #1e3a5f;
+  --bg-nav-active: #1e40af;
+  --text-primary: #f9fafb;
+  --text-secondary: #e5e7eb;
+  --text-muted: #9ca3af;
+  --text-faint: #6b7280;
+  --border-color: #374151;
+  --border-dark: #4b5563;
+  --ring-color: #60a5fa;
+  --prose-color: #e5e7eb;
+  --prose-code-bg: #374151;
+  --prose-pre-bg: #0f172a;
+  --prose-pre-text: #f9fafb;
+  --prose-blockquote-border: #4b5563;
+  --prose-blockquote-text: #9ca3af;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -6,6 +49,9 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100vh;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #root {
@@ -315,3 +361,72 @@ code {
 
 /* Scoring legend colors */
 .bg-yellow-100 { background-color: #fef9c3; }
+
+/* Dark mode overrides */
+.dark .bg-white { background-color: var(--bg-primary); }
+.dark .bg-gray-50 { background-color: var(--bg-secondary); }
+.dark .bg-gray-100 { background-color: var(--bg-tertiary); }
+.dark .bg-gray-200 { background-color: #4b5563; }
+.dark .bg-blue-700 { background-color: var(--bg-header); }
+.dark .bg-blue-800 { background-color: var(--bg-nav-active); }
+.dark .text-gray-400 { color: var(--text-faint); }
+.dark .text-gray-500 { color: var(--text-muted); }
+.dark .text-gray-700 { color: var(--text-secondary); }
+.dark .text-gray-900 { color: var(--text-primary); }
+.dark .border { border-color: var(--border-color); }
+.dark .border-r { border-right-color: var(--border-color); }
+.dark .border-t { border-top-color: var(--border-color); }
+.dark .border-b { border-bottom-color: var(--border-color); }
+.dark .border-gray-200 { border-color: var(--border-color); }
+.dark .border-gray-300 { border-color: var(--border-dark); }
+.dark .divide-y > * + * { border-top-color: var(--border-color); }
+.dark .hover\:bg-gray-50:hover { background-color: var(--bg-secondary); }
+.dark .hover\:bg-blue-50:hover { background-color: #1e3a5f; }
+.dark .hover\:bg-red-50:hover { background-color: #450a0a; }
+.dark .focus\:ring-2:focus { box-shadow: 0 0 0 2px var(--ring-color); }
+
+/* Dark mode prose */
+.dark .prose { color: var(--prose-color); }
+.dark .prose code { background-color: var(--prose-code-bg); }
+.dark .prose pre { background-color: var(--prose-pre-bg); color: var(--prose-pre-text); }
+.dark .prose blockquote { border-left-color: var(--prose-blockquote-border); color: var(--prose-blockquote-text); }
+.dark .prose a { color: #60a5fa; }
+.dark .prose a:hover { color: #93c5fd; }
+
+/* Dark mode info boxes */
+.dark .bg-blue-50 { background-color: #1e3a5f; }
+.dark .bg-blue-100 { background-color: #1e40af; }
+.dark .bg-green-100 { background-color: #14532d; }
+.dark .bg-red-100 { background-color: #450a0a; }
+.dark .bg-red-50 { background-color: #450a0a; }
+.dark .bg-yellow-100 { background-color: #713f12; }
+.dark .bg-purple-50 { background-color: #3b0764; }
+.dark .bg-amber-50 { background-color: #451a03; }
+.dark .bg-cyan-50 { background-color: #083344; }
+.dark .bg-indigo-50 { background-color: #1e1b4b; }
+
+/* Dark mode input styling */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: var(--text-faint);
+}
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: var(--ring-color);
+  outline: none;
+  box-shadow: 0 0 0 2px var(--ring-color);
+}
+
+/* Dark mode table styling */
+.dark table { background-color: var(--bg-primary); }
+.dark th { background-color: var(--bg-secondary); color: var(--text-primary); }
+.dark td { border-color: var(--border-color); }
+.dark tr:hover { background-color: var(--bg-secondary); }
