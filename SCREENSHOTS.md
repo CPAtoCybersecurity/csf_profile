@@ -8,7 +8,7 @@ The Dashboard provides visual analytics including:
 - **CSF Subcategories** - Radar chart and detailed subcategory breakdown
 
 ![Dashboard](public/screenshots/Dashboard.png)
-
+![Dashboard](public/screenshots/Darkmode_Dashboard.png)
 ---
 
 ## Requirements & Implementation Descriptions
@@ -19,7 +19,7 @@ The Requirements page is the primary interface for managing CSF assessment data.
 - Import/Export CSV functionality
 - Detailed side panel for viewing and editing individual items
 
-![Requirements Overview](public/screenshots/Requirements.png)
+![Requirements Overview](public/screenshots/Darkmode_Requirements.png)
 
 ---
 
@@ -48,7 +48,7 @@ The Evidence page manages audit artifacts that support assessment findings. Feat
 - Linked Subcategory IDs for "test once, assure many" efficiency
 - Import/Export functionality
 
-![Evidence](public/screenshots/Evidence.png)
+![Evidence](public/screenshots/Darkmode_Artifacts.png)
 
 ---
 
