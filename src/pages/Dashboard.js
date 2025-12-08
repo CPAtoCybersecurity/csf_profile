@@ -29,7 +29,7 @@ const formatScore = (value) => {
 };
 
 // Define the order of functions for the pivot table (must match exact data format)
-const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'RESPOND (RS)', 'DETECT (DE)', 'RECOVER (RC)'];
+const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'DETECT (DE)', 'RESPOND (RS)', 'RECOVER (RC)'];
 
 // Define the order of category IDs for the subcategory table
 const CATEGORY_ORDER = [
