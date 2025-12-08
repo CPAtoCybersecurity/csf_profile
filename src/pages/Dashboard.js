@@ -20,6 +20,7 @@ import {
   ReferenceLine,
 } from 'recharts';
 import useCSFStore from '../stores/csfStore';
+import useUIStore from '../stores/uiStore';
 
 // Format number to always show one decimal place
 const formatScore = (value) => {
@@ -54,10 +55,20 @@ const STATUS_ORDER = ['Not Started', 'In Progress', 'Pending Review', 'Completed
 
 const Dashboard = () => {
   const data = useCSFStore((state) => state.data);
+  const darkMode = useUIStore((state) => state.darkMode);
   const [filterInScope, setFilterInScope] = useState(''); // '', 'Yes', or 'No'
   const [selectedQuarter, setSelectedQuarter] = useState(1); // 1-4 for Q1-Q4
   const [statusChartQuarter, setStatusChartQuarter] = useState(1); // 1-4 for Q1-Q4
   const [functionBarChartQuarter, setFunctionBarChartQuarter] = useState(1); // 1-4 for Q1-Q4
+
+  // Chart colors based on theme
+  const chartColors = {
+    text: darkMode ? '#e5e7eb' : '#374151',
+    textMuted: darkMode ? '#9ca3af' : '#6b7280',
+    grid: darkMode ? '#374151' : '#e5e7eb',
+    background: darkMode ? '#1f2937' : '#ffffff',
+    border: darkMode ? '#374151' : '#e5e7eb',
+  };
 
   // Filter data based on In Scope selection
   const filteredData = useMemo(() => {
@@ -503,16 +514,16 @@ const Dashboard = () => {
                 data={functionBarChartData.data}
                 margin={{ top: 15, right: 30, left: 10, bottom: 10 }}
               >
-                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartColors.grid} />
                 <XAxis
                   dataKey="name"
-                  tick={{ fontSize: 12, fill: '#374151' }}
+                  tick={{ fontSize: 12, fill: chartColors.text }}
                   tickLine={false}
                   interval={0}
                 />
                 <YAxis
                   domain={[0, 10]}
-                  tick={{ fontSize: 11 }}
+                  tick={{ fontSize: 11, fill: chartColors.text }}
                   tickLine={false}
                   axisLine={false}
                   width={30}
@@ -522,12 +533,12 @@ const Dashboard = () => {
                     formatScore(value),
                     name === 'actual' ? 'Actual Score' : name === 'gap' ? 'Gap to Target' : name
                   ]}
-                  contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: 12 }}
+                  contentStyle={{ backgroundColor: chartColors.background, border: `1px solid ${chartColors.border}`, borderRadius: 6, fontSize: 12, color: chartColors.text }}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: 12 }}
                   formatter={(value) => (
-                    <span style={{ color: '#374151', fontSize: 12 }}>
+                    <span style={{ color: chartColors.text, fontSize: 12 }}>
                       {value === 'actual' ? 'Actual Score' : value === 'gap' ? 'Gap to Target' : value}
                     </span>
                   )}
@@ -671,15 +682,15 @@ const Dashboard = () => {
             {radarChartData.length > 0 ? (
               <ResponsiveContainer width="100%" height={500}>
                 <RadarChart data={radarChartData} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
-                  <PolarGrid gridType="polygon" />
+                  <PolarGrid gridType="polygon" stroke={chartColors.grid} />
                   <PolarAngleAxis
                     dataKey="category"
-                    tick={{ fontSize: 10, fill: '#374151' }}
+                    tick={{ fontSize: 10, fill: chartColors.text }}
                   />
                   <PolarRadiusAxis
                     angle={90}
                     domain={[0, 10]}
-                    tick={{ fontSize: 10 }}
+                    tick={{ fontSize: 10, fill: chartColors.text }}
                     tickCount={6}
                   />
                   <Radar
@@ -701,11 +712,11 @@ const Dashboard = () => {
                   />
                   <Legend
                     wrapperStyle={{ paddingTop: 20 }}
-                    formatter={(value) => <span style={{ color: '#374151', fontSize: 12 }}>{value}</span>}
+                    formatter={(value) => <span style={{ color: chartColors.text, fontSize: 12 }}>{value}</span>}
                   />
                   <Tooltip
                     formatter={(value) => formatScore(value)}
-                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: chartColors.background, border: `1px solid ${chartColors.border}`, borderRadius: 8, color: chartColors.text }}
                   />
                 </RadarChart>
               </ResponsiveContainer>
@@ -747,8 +758,12 @@ const Dashboard = () => {
                     data={statusChartData}
                     cx="50%"
                     cy="50%"
-                    labelLine={true}
-                    label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                    labelLine={{ stroke: chartColors.textMuted }}
+                    label={({ name, percent, x, y }) => (
+                      <text x={x} y={y} fill={chartColors.text} textAnchor="middle" dominantBaseline="middle" fontSize={12}>
+                        {`${name} (${(percent * 100).toFixed(0)}%)`}
+                      </text>
+                    )}
                     outerRadius={100}
                     fill="#8884d8"
                     dataKey="value"
@@ -759,7 +774,7 @@ const Dashboard = () => {
                   </Pie>
                   <Tooltip
                     formatter={(value, name) => [`${value} items (${((value / statusTotal) * 100).toFixed(1)}%)`, name]}
-                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', borderRadius: 8 }}
+                    contentStyle={{ backgroundColor: chartColors.background, border: `1px solid ${chartColors.border}`, borderRadius: 8, color: chartColors.text }}
                   />
                 </PieChart>
               </ResponsiveContainer>

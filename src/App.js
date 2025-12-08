@@ -8,6 +8,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AutoSaveIndicator from './components/AutoSaveIndicator';
 import BulkEditToolbar from './components/BulkEditToolbar';
 import UndoRedoButtons from './components/UndoRedoButtons';
+import ThemeToggle from './components/ThemeToggle';
 
 // Pages
 import Controls from './pages/Controls';
@@ -41,7 +42,7 @@ const AppContent = () => {
 
   return (
     <div className="flex flex-col h-screen">
-      <div className="flex flex-col h-full bg-white text-gray-900">
+      <div className="flex flex-col h-full bg-white text-gray-700">
         {/* Header */}
         <header className="bg-blue-700 text-white p-4">
           <div className="flex justify-between items-center">
@@ -58,6 +59,7 @@ const AppContent = () => {
             <div className="flex items-center gap-4">
               <AutoSaveIndicator />
               <UndoRedoButtons />
+              <ThemeToggle />
               <Navigation />
               <button
                 onClick={clearAllScope}
