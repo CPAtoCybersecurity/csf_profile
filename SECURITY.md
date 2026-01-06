@@ -12,7 +12,7 @@ Please **DO NOT** report security vulnerabilities through public GitHub issues.
 
 ### Preferred Reporting Method
 
-Send security reports directly to: **[info@cpatocybersecurity.com]**
+Send security reports directly to: **info@cpatocybersecurity.com**
 
 ### What to Include
 
