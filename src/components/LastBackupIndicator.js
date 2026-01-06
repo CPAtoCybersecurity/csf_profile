@@ -21,7 +21,16 @@ const LastBackupIndicator = ({ onExportClick }) => {
     // Update every minute
     const interval = setInterval(updateDisplay, 60000);
 
-    return () => clearInterval(interval);
+    // Listen for export events to update immediately
+    const handleExportCompleted = () => {
+      updateDisplay();
+    };
+    window.addEventListener('csfExportCompleted', handleExportCompleted);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('csfExportCompleted', handleExportCompleted);
+    };
   }, []);
 
   const updateDisplay = () => {

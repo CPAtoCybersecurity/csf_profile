@@ -23,6 +23,8 @@ export const getLastExportDate = () => {
  */
 export const updateLastExportDate = () => {
   localStorage.setItem(STORAGE_KEYS.LAST_EXPORT, new Date().toISOString());
+  // Dispatch custom event to notify components of export
+  window.dispatchEvent(new CustomEvent('csfExportCompleted'));
 };
 
 /**
