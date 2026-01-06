@@ -662,6 +662,44 @@ const useControlsStore = create(
         document.body.removeChild(link);
       },
 
+      // Export controls to JSON
+      exportControlsJSON: (userStore) => {
+        const users = userStore?.getState?.()?.users || [];
+        const getUserName = (userId) => {
+          const user = users.find(u => u.id === userId);
+          return user ? user.name : userId || '';
+        };
+
+        const jsonData = {
+          exportDate: new Date().toISOString(),
+          dataType: 'Controls',
+          controls: get().controls.map(c => ({
+            controlId: c.controlId,
+            implementationDescription: c.implementationDescription,
+            ownerId: c.ownerId || null,
+            ownerName: getUserName(c.ownerId),
+            stakeholderIds: c.stakeholderIds || [],
+            stakeholderNames: (c.stakeholderIds || []).map(id => getUserName(id)),
+            linkedRequirementIds: c.linkedRequirementIds || [],
+            createdDate: c.createdDate,
+            lastModified: c.lastModified
+          }))
+        };
+
+        const jsonString = JSON.stringify(jsonData, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `controls_${date}.json`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
       // Generate next control ID
       getNextControlId: () => {
         const controls = get().controls;

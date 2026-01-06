@@ -22,6 +22,11 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useControlsStore from '../stores/controlsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
+import useUserStore from '../stores/userStore';
+import useArtifactStore from '../stores/artifactStore';
+
+// Utils
+import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
 
 const Settings = () => {
   const frameworks = useFrameworksStore((state) => state.frameworks);
@@ -45,6 +50,32 @@ const Settings = () => {
   const fileInputRef = useRef(null);
   const newFrameworkFileInputRef = useRef(null);
   const [importFrameworkId, setImportFrameworkId] = useState(null);
+
+  // Export handlers
+  const handleExportCompleteDatabase = useCallback(() => {
+    try {
+      exportCompleteDatabase({
+        controlsStore: useControlsStore,
+        assessmentsStore: useAssessmentsStore,
+        requirementsStore: useRequirementsStore,
+        frameworksStore: useFrameworksStore,
+        artifactStore: useArtifactStore,
+        userStore: useUserStore
+      });
+      toast.success('Complete database exported as JSON');
+    } catch (err) {
+      toast.error(`Export failed: ${err.message}`);
+    }
+  }, []);
+
+  const handleExportAssessments = useCallback(() => {
+    try {
+      exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore);
+      toast.success('Assessments exported as JSON');
+    } catch (err) {
+      toast.error(`Export failed: ${err.message}`);
+    }
+  }, []);
 
   // Get requirement count for each framework
   const getFrameworkStats = useCallback((frameworkId) => {
@@ -349,6 +380,38 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             <p className="text-xs text-blue-600 mt-2">
               All frameworks map to CSF Functions (Govern, Identify, Protect, Detect, Respond, Recover).
               The FRAMEWORK column should match a framework ID (e.g., nist-csf-2.0, soc2-2017, iso27001-2022).
+            </p>
+          </div>
+
+          {/* Data Export */}
+          <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-green-800">Data Export</h3>
+                <p className="text-sm text-green-700 mt-1">Export your assessment data in JSON format for backup, integration, or analysis</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <button
+                className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                onClick={handleExportCompleteDatabase}
+              >
+                <Download size={16} />
+                Export Complete Database
+              </button>
+              <button
+                className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                onClick={handleExportAssessments}
+              >
+                <Download size={16} />
+                Export Assessments Only
+              </button>
+            </div>
+            <p className="text-xs text-green-600 mt-3">
+              <strong>Complete Database:</strong> Exports all controls, assessments, requirements, frameworks, artifacts, and user data in a single JSON file (csf_assessment_YYYY-MM-DD.json)
+            </p>
+            <p className="text-xs text-green-600 mt-2">
+              <strong>Assessments Only:</strong> Exports assessment observations and scores with enhanced readability (assessments_YYYY-MM-DD.json)
             </p>
           </div>
 
