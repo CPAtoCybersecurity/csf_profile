@@ -1,0 +1,153 @@
+ID,Assessment,Scope Type,Auditor,Test Procedure(s),Q1 Actual Score,Q1 Target Score,Q1 Observations,Q1 Observation Date,Q1 Testing Status,Q1 Examine,Q1 Interview,Q1 Test,Q2 Actual Score,Q2 Target Score,Q2 Observations,Q2 Observation Date,Q2 Testing Status,Q2 Examine,Q2 Interview,Q2 Test,Q3 Actual Score,Q3 Target Score,Q3 Observations,Q3 Observation Date,Q3 Testing Status,Q3 Examine,Q3 Interview,Q3 Test,Q4 Actual Score,Q4 Target Score,Q4 Observations,Q4 Observation Date,Q4 Testing Status,Q4 Examine,Q4 Interview,Q4 Test,Linked Artifacts,Remediation Owner,Action Plan,Remediation Due Date
+GV.SC-04 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review supplier inventory in ServiceNow
+2. Verify criticality ratings against documented criteria
+3. Interview procurement team on tiering process
+4. Sample quarterly review documentation",7,7,Supplier inventory maintained with appropriate criticality ratings. Quarterly reviews documented with CISO and Procurement sign-off.,2025-01-10,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Third Party Risk Management Policy,,,
+GV.OC-01 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review mission documentation on website
+2. Examine Board briefing materials
+3. Interview CISO on mission alignment
+4. Verify security investment ties to mission objectives",8,8,Mission clearly documented and communicated. Security investments explicitly tied to mission objectives including Apple Passkey partnership.,2025-01-10,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Security Governance Charter; Board Briefing Materials,,,
+GV.RR-02 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review Information Security Policy
+2. Examine RACI matrix
+3. Verify reporting structure
+4. Interview security team leads",7,7,Roles documented in policy and RACI. Clear reporting structure with CISO to CEO and quarterly Board reporting.,2025-01-11,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Information Security Policy; RACI Matrix,,,
+GV.OC-02 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review stakeholder identification process
+2. Examine Board meeting minutes
+3. Review customer trust survey results
+4. Verify security service catalog",7,7,Stakeholder expectations captured through multiple channels. Public trust rebuilding program in place following 2022 events.,2025-01-11,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Security Service Catalog,,,
+GV.OV-01 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review KPI definitions and targets
+2. Examine quarterly KPI reports
+3. Verify Board review of KPI trends
+4. Assess investment decision linkage to KPIs",8,8,"Five KPIs tracked quarterly with automated dashboards. TTD, TTI, TTR-CJC, TTR-C, and Public Trust Score all monitored.",2025-01-12,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,KPI Dashboard; Board Reports,,,
+GV.RM-01 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review risk management objectives
+2. Verify Board approval documentation
+3. Examine automated dashboards
+4. Assess alignment with company goals",7,8,Risk objectives established with Board approval. TTD target <4 min by Jan 2025 not yet met (currently 9 hours). ASM vendor selection in progress.,2025-01-12,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Risk Register; Board Approval Documentation,,,
+GV.RR-01 Ex4,2025 Alma Security CSF,controls,Steve,"1. Review Security Governance Charter
+2. Verify CISO reporting structure
+3. Examine coordination meeting records
+4. Assess hiring strategy progress",6,7,Charter establishes authority. Hiring strategy STS1 in progress but 50% understaffing risk (R1) not yet resolved.,2025-01-13,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Security Governance Charter,,,
+GV.SC-01 Ex3,2025 Alma Security CSF,controls,Steve,"1. Review SCRM program documentation
+2. Examine vendor management policy
+3. Verify ServiceNow workflows
+4. Assess Apple Passkey vendor requirements",7,7,SCRM program well documented with ServiceNow integration. Apple Passkey audit planned for Feb 2025.,2025-01-13,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Vendor Management Policy; SCRM Strategy,,,
+GV.SC-02 Ex7,2025 Alma Security CSF,controls,Steve,"1. Review RACI for SCRM roles
+2. Verify procurement training records
+3. Examine supplier contract templates
+4. Assess RFP security clauses",7,7,SCRM roles defined and communicated. Procurement staff SCRM certified. RFP templates include mandatory security clauses.,2025-01-14,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,RACI Matrix; RFP Templates,,,
+GV.SC-06 Ex3,2025 Alma Security CSF,controls,Steve,"1. Review ServiceNow onboarding workflows
+2. Verify security questionnaire process
+3. Examine sample vendor assessments
+4. Assess remediation tracking for Apple Passkey vendor",7,7,Due diligence performed through ServiceNow workflows. Assessments completed before contract execution.,2025-01-14,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Vendor Assessment Template,,,
+GV.SC-10 Ex3,2025 Alma Security CSF,controls,Steve,"1. Review offboarding checklist
+2. Verify access termination timeframes
+3. Sample audit of terminated vendors
+4. Examine audit trail documentation",7,7,Comprehensive offboarding checklist in place. Access termination automated within 24 hours. Sample audits verified compliance.,2025-01-15,Complete,Yes,No,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Vendor Offboarding Checklist,,,
+GV.SC-09 Ex5,2025 Alma Security CSF,controls,Steve,"1. Review hardware change verification procedures
+2. Examine AWS Config rules
+3. Verify infrastructure-as-code baselines
+4. Assess lifecycle monitoring",6,7,Supply chain security integrated into ERM. Hardware changes verified through automation where possible. Some manual processes remain.,2025-01-15,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Change Management Policy,,,
+ID.RA-07 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review change management policy
+2. Examine ServiceNow change records
+3. Sample audit change compliance
+4. Verify crown jewel additional review process",6,7,Change management policy in place with ServiceNow tracking. Current compliance at 85% - improvement needed.,2025-01-16,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Change Management Policy,,,
+PR.AT-01 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review training program documentation
+2. Verify Workday training records
+3. Examine phishing simulation results
+4. Assess new hire onboarding process",7,7,Quarterly training delivered through Workday. Phishing simulations measure effectiveness. New hire training mandatory.,2025-01-16,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Security Awareness Program,,,
+PR.IR-02 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review data center environmental controls
+2. Verify AWS multi-AZ deployment
+3. Examine threat assessments
+4. Test response procedures",7,7,Redwood City DC has appropriate controls. AWS multi-AZ provides cloud resilience. Response procedures documented and tested.,2025-01-17,Complete,Yes,No,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Environmental Threat Assessment,,,
+RS.MI-02 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review eradication playbooks
+2. Examine incident response project status
+3. Verify escalation paths
+4. Test sample eradication scenarios",7,7,Eradication playbooks with decision trees in place. IR Enhancement project ($150K) delivering improvements.,2025-01-17,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Incident Response Playbooks,,,
+DE.AE-02 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review CloudTrail and GuardDuty configuration
+2. Examine detection rule tuning
+3. Verify TTD metrics
+4. Assess 24/7 monitoring gaps",5,7,CloudTrail and GuardDuty in use. TTD currently 9 hours - below target of <4 minutes. 24/7 monitoring gaps exist.,2025-01-18,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,SIEM Configuration,Chris.Magann,Implement 24/7 monitoring coverage through IR Enhancement project,2025-06-30
+DE.AE-06 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review alert routing configuration
+2. Examine SOC procedures
+3. Verify on-call rotation
+4. Assess alert triage effectiveness",5,7,"Alerts routed via Slack with severity prioritization. Business hours coverage adequate, but 24/7 coverage not yet achieved.",2025-01-18,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,SOC Procedures,Nadia.Khan,Expand to 24/7 coverage via STS1 hiring,2025-08-31
+DE.CM-01 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review network monitoring tools
+2. Verify CloudTrail and VPC Flow Logs
+3. Assess ASM vendor selection progress
+4. Examine SOC dashboards",6,7,"Network monitoring via CloudTrail, VPC Flow Logs, DNS logging. ASM vendor selection will provide external perimeter monitoring.",2025-01-19,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Network Monitoring Architecture,,,
+ID.RA-01 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review vulnerability scanning configuration
+2. Examine weekly vulnerability reports
+3. Verify TTR-C metrics
+4. Assess prioritization process",6,7,Automated scanning covers crown jewel systems. TTR-C at 11 days. CVSS-based prioritization in place.,2025-01-19,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Vulnerability Management Program,,,
+PR.DS-01 Ex4,2025 Alma Security CSF,controls,Steve,"1. Review encryption policy
+2. Verify S3 bucket encryption
+3. Examine SentinelOne removable media controls
+4. Assess Data Encryption Upgrade project",7,7,AES-256 encryption required. S3 bucket encryption enforced. Data Encryption Upgrade project ($95K) enhancing coverage.,2025-01-20,Complete,Yes,No,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Encryption Policy,,,
+PR.IR-03 Ex3,2025 Alma Security CSF,controls,Steve,"1. Review AWS multi-AZ configuration
+2. Examine Kubernetes redundancy
+3. Verify failover testing records
+4. Assess DR plan development",6,7,Multi-AZ and Kubernetes redundancy in place. DR plan development continues via Cloud Security Optimization project.,2025-01-20,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,DR Plan,,,
+PR.PS-01 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review hardened baselines documentation
+2. Verify AWS Config compliance
+3. Examine deviation alerting
+4. Assess legacy Windows 2012 upgrade plan",6,7,95% of systems on hardened baselines. Legacy Windows 2012 fileserver upgrade planned for Q3.,2025-01-21,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Hardening Standards,Chris.Magann,Upgrade legacy Windows 2012 fileserver,2025-09-30
+PR.PS-05 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review SentinelOne application control
+2. Verify app control policy
+3. Examine Kubernetes node restrictions
+4. Assess shared SSH key remediation",5,7,SentinelOne app control on workstations. Shared SSH key on Kubernetes nodes identified for Q3 remediation.,2025-01-21,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Application Control Policy,Tigan.Wang,Remediate shared developer SSH key,2025-09-30
+RC.RP-03 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review backup checksum process
+2. Verify monthly integrity validation
+3. Examine quarterly restore testing
+4. Assess S3 Bucket Security project",7,7,Automated checksums for S3 backups. Monthly integrity validation and quarterly restore testing in place.,2025-01-22,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Backup Procedures,,,
+RS.MI-01 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review automated containment capabilities
+2. Examine SentinelOne quarantine logs
+3. Verify GuardDuty auto-remediation
+4. Test manual containment procedures",7,7,Automated containment via SentinelOne and GuardDuty. Manual playbooks for complex incidents.,2025-01-22,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Containment Playbooks,,,
+DE.AE-03 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review CloudTrail aggregation
+2. Examine GuardDuty correlation
+3. Verify custom correlation scripts
+4. Assess multi-account centralization",6,7,Event correlation via CloudTrail and GuardDuty. Custom scripts for cross-source analysis. Enhancements planned.,2025-01-23,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Event Correlation Architecture,,,
+DE.CM-03 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review CloudTrail IAM logging
+2. Examine SSO authentication logs
+3. Verify failed authentication alerting
+4. Assess SOC dashboard progress",6,7,Personnel monitoring via CloudTrail and SSO logs. SOC dashboards 60% complete for consolidated visibility.,2025-01-23,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,IAM Monitoring Configuration,,,
+DE.CM-09 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review O365 ATP configuration
+2. Examine Slack monitoring
+3. Verify system monitoring policy
+4. Assess data leak detection capabilities",6,7,O365 ATP covers email and web. Slack monitoring in place. DLP capabilities being evaluated for expansion.,2025-01-24,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,System Monitoring Policy,,,
+ID.AM-02 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review AWS asset tracking
+2. Examine discovery scan results
+3. Verify container and VM monitoring
+4. Assess ASM vendor alignment",6,7,Software inventory at 85% coverage via AWS tools. ASM vendor selection will achieve comprehensive coverage.,2025-01-24,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Asset Inventory,,,
+ID.AM-07 Ex3,2025 Alma Security CSF,controls,Steve,"1. Review data classification schema
+2. Examine tagging implementation
+3. Verify data scanning tool deployment
+4. Assess biometric data handling",6,7,Tiered classification schema in place. Biometric data highest sensitivity per SG1. Data scanning tool scheduling underway.,2025-01-25,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Data Classification Policy,,,
+ID.IM-01 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review quarterly self-assessments
+2. Examine threat-informed risk assessments
+3. Verify KPI-driven gap analysis
+4. Assess investment decision process",7,7,Quarterly self-assessments of critical services. TTD/TTR trends inform investment decisions.,2025-01-25,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Self-Assessment Reports,,,
+RS.MA-03 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review priority matrix documentation
+2. Examine sample incident tickets
+3. Verify SOC Manager validation
+4. Assess prioritization consistency",7,7,"Priority matrix based on scope, business impact, and time-criticality. ServiceNow tickets capture justification.",2025-01-26,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Incident Priority Matrix,,,
+DE.AE-02 Ex3,2025 Alma Security CSF,controls,Steve,"1. Review manual log review cadence
+2. Examine review documentation
+3. Verify finding templates
+4. Assess automation gap tracking",6,7,Manual review for systems without automated monitoring. Documented process with finding templates. Automation gaps tracked.,2025-01-26,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Log Review Procedures,,,
+DE.AE-08 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review incident declaration criteria
+2. Examine sample declarations
+3. Verify SOC Manager authority
+4. Assess lessons learned integration",7,7,Documented criteria with severity thresholds. SOC Manager authority established. Lessons learned feed improvement.,2025-01-27,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Incident Declaration Criteria,,,
+ID.RA-08 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review disclosure policy and SLAs
+2. Verify external intake process
+3. Examine supplier vulnerability sharing
+4. Sample disclosure handling",7,7,Disclosure policy with SLAs in place. External intake via security@almasecurity.com. Sample disclosures show SLA compliance.,2025-01-27,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Vulnerability Disclosure Policy,,,
+PR.AA-02 Ex2,2025 Alma Security CSF,controls,Steve,"1. Review no shared accounts policy
+2. Verify SSO credential uniqueness
+3. Examine privileged access reviews
+4. Assess shared SSH key remediation plan",6,7,No shared accounts policy enforced via SSO. Quarterly privileged access reviews. Shared developer SSH key identified for remediation.,2025-01-28,Complete,Yes,Yes,Yes,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Information Security Policy,Gerry,Remediate shared developer SSH key in Q3,2025-09-30
+PR.DS-10 Ex1,2025 Alma Security CSF,controls,Steve,"1. Review memory handling procedures
+2. Verify data retention limits
+3. Examine source code reviews
+4. Assess biometric data handling scrutiny",7,7,Data-in-use protection documented. Source code reviews for crown jewels. Biometric data receives enhanced scrutiny per SG1.,2025-01-28,Complete,Yes,Yes,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,0,0,,,Not Started,No,No,No,Data Handling Procedures,,,

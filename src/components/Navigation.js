@@ -1,10 +1,19 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Award, FileArchive, ClipboardList, FileSearch } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Award,
+  FileArchive,
+  ClipboardList,
+  Shield,
+  Settings
+} from 'lucide-react';
 
 const Navigation = () => {
   return (
-    <nav className="flex items-center gap-4">
+    <nav className="flex items-center gap-2">
       <NavLink
         to="/dashboard"
         className={({ isActive }) =>
@@ -33,9 +42,9 @@ const Navigation = () => {
         <FileText size={18} />
         <span>Requirements</span>
       </NavLink>
-      
+
       <NavLink
-        to="/observations"
+        to="/controls"
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
@@ -44,8 +53,22 @@ const Navigation = () => {
           }`
         }
       >
-        <FileSearch size={18} />
-        <span>Observations</span>
+        <Shield size={18} />
+        <span>Controls</span>
+      </NavLink>
+
+      <NavLink
+        to="/assessments"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-blue-800 text-white'
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <ClipboardList size={18} />
+        <span>Assessments</span>
       </NavLink>
 
       <NavLink
@@ -60,20 +83,6 @@ const Navigation = () => {
       >
         <FileArchive size={18} />
         <span>Evidence</span>
-      </NavLink>
-
-      <NavLink
-        to="/remediation"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <ClipboardList size={18} />
-        <span>Remediation</span>
       </NavLink>
 
       <NavLink
@@ -101,7 +110,21 @@ const Navigation = () => {
         }
       >
         <Users size={18} />
-        <span>User Management</span>
+        <span>Users</span>
+      </NavLink>
+
+      <NavLink
+        to="/settings"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-blue-800 text-white'
+              : 'text-white hover:bg-blue-800'
+          }`
+        }
+      >
+        <Settings size={18} />
+        <span>Settings</span>
       </NavLink>
     </nav>
   );
