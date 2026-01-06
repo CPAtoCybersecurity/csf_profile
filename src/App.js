@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
@@ -8,6 +8,9 @@ import ErrorBoundary from './components/ErrorBoundary';
 import AutoSaveIndicator from './components/AutoSaveIndicator';
 import UndoRedoButtons from './components/UndoRedoButtons';
 import ThemeToggle from './components/ThemeToggle';
+import FirstVisitWarning from './components/FirstVisitWarning';
+import BackupReminder from './components/BackupReminder';
+import LastBackupIndicator from './components/LastBackupIndicator';
 
 // Pages - New Architecture
 import Requirements from './pages/Requirements';
@@ -26,8 +29,14 @@ import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 import useUserStore from './stores/userStore';
 import useRequirementsStore from './stores/requirementsStore';
 
+// Utils
+import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
+
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
+  const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
+  const [showBackupReminder, setShowBackupReminder] = useState(false);
+  const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
 
   // Initialize keyboard navigation
   useKeyboardNavigation();
@@ -40,8 +49,45 @@ const AppContent = () => {
     loadRequirements();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
+  
+  // Check for backup reminder on mount and periodically
+  useEffect(() => {
+    const checkBackupReminder = () => {
+      if (shouldShowBackupReminder()) {
+        setShowBackupReminder(true);
+        updateLastReminderDate();
+      }
+    };
+    
+    // Check on mount after a delay (let user settle in)
+    const initialTimeout = setTimeout(checkBackupReminder, 30000); // 30 seconds
+    
+    // Check periodically (every hour)
+    const interval = setInterval(checkBackupReminder, 3600000); // 1 hour
+    
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, []);
+  
+  const handleExportFromReminder = () => {
+    setShowBackupReminder(false);
+    exportRequirementsCSV();
+    setLastBackupTrigger(Date.now()); // Trigger re-render of indicator
+  };
+  
+  const handleExportFromIndicator = () => {
+    exportRequirementsCSV();
+    setLastBackupTrigger(Date.now()); // Trigger re-render of indicator
+  };
+  
+  const handleCloseReminder = () => {
+    setShowBackupReminder(false);
+  };
 
   return (
+    <React.Fragment>
     <div className="flex flex-col h-screen">
       <div className="flex flex-col h-full bg-white text-gray-700">
         {/* Header */}
@@ -58,6 +104,7 @@ const AppContent = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <LastBackupIndicator onExportClick={handleExportFromIndicator} key={lastBackupTrigger} />
               <AutoSaveIndicator />
               <UndoRedoButtons />
               <ThemeToggle />
@@ -81,6 +128,18 @@ const AppContent = () => {
         </main>
       </div>
     </div>
+    
+    {/* First Visit Warning Modal - Rendered outside main container */}
+    <FirstVisitWarning />
+    
+    {/* Backup Reminder Notification - Rendered outside main container */}
+    {showBackupReminder && (
+      <BackupReminder 
+        onClose={handleCloseReminder}
+        onExport={handleExportFromReminder}
+      />
+    )}
+    </React.Fragment>
   );
 };
 

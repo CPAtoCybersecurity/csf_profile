@@ -19,8 +19,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
@@ -33,8 +33,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
         end
@@ -48,8 +48,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
@@ -62,8 +62,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
@@ -76,8 +76,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
@@ -90,8 +90,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
@@ -104,8 +104,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
@@ -118,8 +118,8 @@ const Navigation = () => {
         className={({ isActive }) =>
           `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
             isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
+              ? 'bg-blue-800 dark:bg-blue-900 text-white border border-blue-600 dark:border-blue-800'
+              : 'text-white hover:bg-blue-800 dark:hover:bg-blue-900'
           }`
         }
       >
