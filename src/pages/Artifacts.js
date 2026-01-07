@@ -112,6 +112,10 @@ const Artifacts = () => {
     link.click();
     document.body.removeChild(link);
     toast.success('Artifacts exported to CSV');
+    
+    // Track export for backup reminder system
+    const { updateLastExportDate } = require('../utils/backupTracking');
+    updateLastExportDate();
   };
 
   // Extract all subcategory IDs from the data

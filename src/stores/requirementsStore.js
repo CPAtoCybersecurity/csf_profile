@@ -224,6 +224,10 @@ const useRequirementsStore = create(
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Track export for backup reminder system
+        const { updateLastExportDate } = require('../utils/backupTracking');
+        updateLastExportDate();
       }
     }),
     {
