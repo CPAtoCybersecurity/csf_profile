@@ -451,6 +451,10 @@ function exportDataAsCSV(data, users, filenamePrefix) {
   URL.revokeObjectURL(url);
 
   toast.success(`Exported ${data.length} items to CSV`);
+  
+  // Track export for backup reminder system
+  const { updateLastExportDate } = require('../utils/backupTracking');
+  updateLastExportDate();
 }
 
 export default useCSFData;
