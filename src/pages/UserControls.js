@@ -28,6 +28,7 @@ const UserControls = () => {
   const unlinkRequirement = useControlsStore((state) => state.unlinkRequirement);
   const getNextControlId = useControlsStore((state) => state.getNextControlId);
   const exportControlsCSV = useControlsStore((state) => state.exportControlsCSV);
+  const exportControlsJSON = useControlsStore((state) => state.exportControlsJSON);
   const importControlsCSV = useControlsStore((state) => state.importControlsCSV);
 
   const requirements = useRequirementsStore((state) => state.requirements);
@@ -259,6 +260,11 @@ const UserControls = () => {
     toast.success('Controls exported');
   }, [exportControlsCSV]);
 
+  const handleExportJSON = useCallback(() => {
+    exportControlsJSON(useUserStore);
+    toast.success('Controls exported as JSON');
+  }, [exportControlsJSON]);
+
   const handleImportClick = useCallback(() => {
     fileInputRef.current?.click();
   }, []);
@@ -453,9 +459,18 @@ const UserControls = () => {
           <button
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
             onClick={handleExport}
+            title="Export controls as CSV"
           >
             <Download size={16} />
-            Export
+            Export CSV
+          </button>
+          <button
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+            onClick={handleExportJSON}
+            title="Export controls as JSON"
+          >
+            <Download size={16} />
+            Export JSON
           </button>
           <button
             className="flex items-center gap-2 py-2 px-4 rounded-lg"
