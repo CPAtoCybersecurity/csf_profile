@@ -697,6 +697,7 @@ const useControlsStore = create(
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
+        URL.revokeObjectURL(url)
         document.body.removeChild(link);
       },
 

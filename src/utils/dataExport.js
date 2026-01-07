@@ -89,6 +89,7 @@ export const exportAssessmentsJSON = (assessmentsStore, controlsStore, userStore
   };
 
   const assessments = assessmentsStore?.getState?.()?.assessments || [];
+  const date = new Date().toISOString().split('T')[0];
   
   const jsonData = {
     exportDate: new Date().toISOString(),
@@ -107,17 +108,5 @@ export const exportAssessmentsJSON = (assessmentsStore, controlsStore, userStore
     }))
   };
 
-  const jsonString = JSON.stringify(jsonData, null, 2);
-  const blob = new Blob([jsonString], { type: 'application/json;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  const date = new Date().toISOString().split('T')[0];
-
-  link.setAttribute('href', url);
-  link.setAttribute('download', `assessments_${date}.json`);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+  downloadJSON(jsonData, `assessments_${date}.json`);
 };
