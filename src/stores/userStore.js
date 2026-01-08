@@ -132,6 +132,37 @@ const useUserStore = create(
     }),
     {
       name: 'csf-users-storage',
+      version: 2,
+      migrate: (persistedState, version) => {
+        // Version 2: Ensure default users have stable IDs
+        // This fixes issues where users were created with random IDs during CSV import
+        if (version < 2 && persistedState?.users) {
+          const defaultUsersByEmail = new Map(
+            DEFAULT_USERS.map(u => [u.email.toLowerCase(), u])
+          );
+
+          // Update existing users to have correct IDs if they match default users
+          const updatedUsers = persistedState.users.map(user => {
+            const defaultUser = defaultUsersByEmail.get(user.email?.toLowerCase());
+            if (defaultUser && user.id !== defaultUser.id) {
+              // Found a default user with wrong ID - keep the default ID
+              return { ...user, id: defaultUser.id };
+            }
+            return user;
+          });
+
+          // Add any missing default users
+          const existingEmails = new Set(updatedUsers.map(u => u.email?.toLowerCase()));
+          DEFAULT_USERS.forEach(defaultUser => {
+            if (!existingEmails.has(defaultUser.email.toLowerCase())) {
+              updatedUsers.push(defaultUser);
+            }
+          });
+
+          return { users: updatedUsers };
+        }
+        return persistedState || { users: DEFAULT_USERS };
+      },
     }
   )
 );
