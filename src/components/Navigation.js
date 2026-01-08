@@ -8,7 +8,8 @@ import {
   FileArchive,
   ClipboardList,
   Shield,
-  Settings
+  Settings,
+  Bot
 } from 'lucide-react';
 
 const Navigation = () => {
@@ -111,6 +112,20 @@ const Navigation = () => {
       >
         <Users size={18} />
         <span>Users</span>
+      </NavLink>
+
+      <NavLink
+        to="/ai-assistant"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-green-700 dark:bg-green-800 text-white border border-green-500 dark:border-green-700'
+              : 'text-white hover:bg-green-700 dark:hover:bg-green-800'
+          }`
+        }
+      >
+        <Bot size={18} />
+        <span>AI Assistant</span>
       </NavLink>
 
       <NavLink

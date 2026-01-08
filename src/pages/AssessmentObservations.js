@@ -37,11 +37,12 @@ const AssessmentObservations = () => {
   // Sorting
   const { sort, sortedData, handleSort } = useSort(observationItems);
 
-  // Get user name by ID
+  // Get user name by ID - returns "name <email>" format for display
   const getUserName = (userId) => {
     if (!userId) return 'Not assigned';
     const user = users.find(u => u.id === userId);
-    return user ? user.name : 'Unknown';
+    if (!user) return 'Unknown';
+    return user.email ? `${user.name} <${user.email}>` : user.name;
   };
 
   // Status color mapping

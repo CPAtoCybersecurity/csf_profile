@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput } from '../utils/sanitize';
+import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
 
 // Default assessment for new installations
 // References control IDs from DEFAULT_CONTROLS in controlsStore.js
 // User ID 2 = Steve (Auditor) from default users
+// Quarterly observation data imported from defaultAssessmentsData.js (extracted from CSV)
 const DEFAULT_ASSESSMENTS = [
   {
     id: 'ASM-default-2025-alma',
@@ -24,464 +26,7 @@ const DEFAULT_ASSESSMENTS = [
       'ID.AM-07 Ex3', 'ID.IM-01 Ex1', 'RS.MA-03 Ex2', 'DE.AE-02 Ex3', 'DE.AE-08 Ex1',
       'ID.RA-08 Ex1', 'PR.AA-02 Ex2', 'PR.DS-10 Ex1'
     ],
-    observations: {
-      'GV.SC-04 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review supplier inventory in ServiceNow\n2. Verify criticality ratings against documented criteria\n3. Interview procurement team on tiering process\n4. Sample quarterly review documentation',
-        linkedArtifacts: ['Third Party Risk Management Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Supplier inventory maintained with appropriate criticality ratings. Quarterly reviews documented with CISO and Procurement sign-off.', observationDate: '2025-01-10', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.OC-01 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review mission documentation on website\n2. Examine Board briefing materials\n3. Interview CISO on mission alignment\n4. Verify security investment ties to mission objectives',
-        linkedArtifacts: ['Security Governance Charter', 'Board Briefing Materials'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 8, targetScore: 8, observations: 'Mission clearly documented and communicated. Security investments explicitly tied to mission objectives including Apple Passkey partnership.', observationDate: '2025-01-10', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.RR-02 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review Information Security Policy\n2. Examine RACI matrix\n3. Verify reporting structure\n4. Interview security team leads',
-        linkedArtifacts: ['Information Security Policy', 'RACI Matrix'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Roles documented in policy and RACI. Clear reporting structure with CISO to CEO and quarterly Board reporting.', observationDate: '2025-01-11', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.OC-02 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review stakeholder identification process\n2. Examine Board meeting minutes\n3. Review customer trust survey results\n4. Verify security service catalog',
-        linkedArtifacts: ['Security Service Catalog'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Stakeholder expectations captured through multiple channels. Public trust rebuilding program in place following 2022 events.', observationDate: '2025-01-11', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.OV-01 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review KPI definitions and targets\n2. Examine quarterly KPI reports\n3. Verify Board review of KPI trends\n4. Assess investment decision linkage to KPIs',
-        linkedArtifacts: ['KPI Dashboard', 'Board Reports'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 8, targetScore: 8, observations: 'Five KPIs tracked quarterly with automated dashboards. TTD, TTI, TTR-CJC, TTR-C, and Public Trust Score all monitored.', observationDate: '2025-01-12', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.RM-01 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review risk management objectives\n2. Verify Board approval documentation\n3. Examine automated dashboards\n4. Assess alignment with company goals',
-        linkedArtifacts: ['Risk Register', 'Board Approval Documentation'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 8, observations: 'Risk objectives established with Board approval. TTD target <4 min by Jan 2025 not yet met (currently 9 hours). ASM vendor selection in progress.', observationDate: '2025-01-12', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.RR-01 Ex4': {
-        auditorId: 2,
-        testProcedures: '1. Review Security Governance Charter\n2. Verify CISO reporting structure\n3. Examine coordination meeting records\n4. Assess hiring strategy progress',
-        linkedArtifacts: ['Security Governance Charter'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Charter establishes authority. Hiring strategy STS1 in progress but 50% understaffing risk (R1) not yet resolved.', observationDate: '2025-01-13', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.SC-01 Ex3': {
-        auditorId: 2,
-        testProcedures: '1. Review SCRM program documentation\n2. Examine vendor management policy\n3. Verify ServiceNow workflows\n4. Assess Apple Passkey vendor requirements',
-        linkedArtifacts: ['Vendor Management Policy', 'SCRM Strategy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'SCRM program well documented with ServiceNow integration. Apple Passkey audit planned for Feb 2025.', observationDate: '2025-01-13', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.SC-02 Ex7': {
-        auditorId: 2,
-        testProcedures: '1. Review RACI for SCRM roles\n2. Verify procurement training records\n3. Examine supplier contract templates\n4. Assess RFP security clauses',
-        linkedArtifacts: ['RACI Matrix', 'RFP Templates'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'SCRM roles defined and communicated. Procurement staff SCRM certified. RFP templates include mandatory security clauses.', observationDate: '2025-01-14', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.SC-06 Ex3': {
-        auditorId: 2,
-        testProcedures: '1. Review ServiceNow onboarding workflows\n2. Verify security questionnaire process\n3. Examine sample vendor assessments\n4. Assess remediation tracking for Apple Passkey vendor',
-        linkedArtifacts: ['Vendor Assessment Template'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Due diligence performed through ServiceNow workflows. Assessments completed before contract execution.', observationDate: '2025-01-14', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.SC-10 Ex3': {
-        auditorId: 2,
-        testProcedures: '1. Review offboarding checklist\n2. Verify access termination timeframes\n3. Sample audit of terminated vendors\n4. Examine audit trail documentation',
-        linkedArtifacts: ['Vendor Offboarding Checklist'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Comprehensive offboarding checklist in place. Access termination automated within 24 hours. Sample audits verified compliance.', observationDate: '2025-01-15', testingStatus: 'Complete', examine: true, interview: false, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'GV.SC-09 Ex5': {
-        auditorId: 2,
-        testProcedures: '1. Review hardware change verification procedures\n2. Examine AWS Config rules\n3. Verify infrastructure-as-code baselines\n4. Assess lifecycle monitoring',
-        linkedArtifacts: ['Change Management Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Supply chain security integrated into ERM. Hardware changes verified through automation where possible. Some manual processes remain.', observationDate: '2025-01-15', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'ID.RA-07 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review change management policy\n2. Examine ServiceNow change records\n3. Sample audit change compliance\n4. Verify crown jewel additional review process',
-        linkedArtifacts: ['Change Management Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Change management policy in place with ServiceNow tracking. Current compliance at 85% - improvement needed.', observationDate: '2025-01-16', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.AT-01 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review training program documentation\n2. Verify Workday training records\n3. Examine phishing simulation results\n4. Assess new hire onboarding process',
-        linkedArtifacts: ['Security Awareness Program'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Quarterly training delivered through Workday. Phishing simulations measure effectiveness. New hire training mandatory.', observationDate: '2025-01-16', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.IR-02 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review data center environmental controls\n2. Verify AWS multi-AZ deployment\n3. Examine threat assessments\n4. Test response procedures',
-        linkedArtifacts: ['Environmental Threat Assessment'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Redwood City DC has appropriate controls. AWS multi-AZ provides cloud resilience. Response procedures documented and tested.', observationDate: '2025-01-17', testingStatus: 'Complete', examine: true, interview: false, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'RS.MI-02 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review eradication playbooks\n2. Examine incident response project status\n3. Verify escalation paths\n4. Test sample eradication scenarios',
-        linkedArtifacts: ['Incident Response Playbooks'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Eradication playbooks with decision trees in place. IR Enhancement project ($150K) delivering improvements.', observationDate: '2025-01-17', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.AE-02 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review CloudTrail and GuardDuty configuration\n2. Examine detection rule tuning\n3. Verify TTD metrics\n4. Assess 24/7 monitoring gaps',
-        linkedArtifacts: ['SIEM Configuration'],
-        remediation: { ownerId: 5, actionPlan: 'Implement 24/7 monitoring coverage through IR Enhancement project', dueDate: '2025-06-30' },
-        quarters: {
-          Q1: { actualScore: 5, targetScore: 7, observations: 'CloudTrail and GuardDuty in use. TTD currently 9 hours - below target of <4 minutes. 24/7 monitoring gaps exist.', observationDate: '2025-01-18', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.AE-06 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review alert routing configuration\n2. Examine SOC procedures\n3. Verify on-call rotation\n4. Assess alert triage effectiveness',
-        linkedArtifacts: ['SOC Procedures'],
-        remediation: { ownerId: 6, actionPlan: 'Expand to 24/7 coverage via STS1 hiring', dueDate: '2025-08-31' },
-        quarters: {
-          Q1: { actualScore: 5, targetScore: 7, observations: 'Alerts routed via Slack with severity prioritization. Business hours coverage adequate, but 24/7 coverage not yet achieved.', observationDate: '2025-01-18', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.CM-01 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review network monitoring tools\n2. Verify CloudTrail and VPC Flow Logs\n3. Assess ASM vendor selection progress\n4. Examine SOC dashboards',
-        linkedArtifacts: ['Network Monitoring Architecture'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Network monitoring via CloudTrail, VPC Flow Logs, DNS logging. ASM vendor selection will provide external perimeter monitoring.', observationDate: '2025-01-19', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'ID.RA-01 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review vulnerability scanning configuration\n2. Examine weekly vulnerability reports\n3. Verify TTR-C metrics\n4. Assess prioritization process',
-        linkedArtifacts: ['Vulnerability Management Program'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Automated scanning covers crown jewel systems. TTR-C at 11 days. CVSS-based prioritization in place.', observationDate: '2025-01-19', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.DS-01 Ex4': {
-        auditorId: 2,
-        testProcedures: '1. Review encryption policy\n2. Verify S3 bucket encryption\n3. Examine SentinelOne removable media controls\n4. Assess Data Encryption Upgrade project',
-        linkedArtifacts: ['Encryption Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'AES-256 encryption required. S3 bucket encryption enforced. Data Encryption Upgrade project ($95K) enhancing coverage.', observationDate: '2025-01-20', testingStatus: 'Complete', examine: true, interview: false, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.IR-03 Ex3': {
-        auditorId: 2,
-        testProcedures: '1. Review AWS multi-AZ configuration\n2. Examine Kubernetes redundancy\n3. Verify failover testing records\n4. Assess DR plan development',
-        linkedArtifacts: ['DR Plan'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Multi-AZ and Kubernetes redundancy in place. DR plan development continues via Cloud Security Optimization project.', observationDate: '2025-01-20', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.PS-01 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review hardened baselines documentation\n2. Verify AWS Config compliance\n3. Examine deviation alerting\n4. Assess legacy Windows 2012 upgrade plan',
-        linkedArtifacts: ['Hardening Standards'],
-        remediation: { ownerId: 5, actionPlan: 'Upgrade legacy Windows 2012 fileserver', dueDate: '2025-09-30' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: '95% of systems on hardened baselines. Legacy Windows 2012 fileserver upgrade planned for Q3.', observationDate: '2025-01-21', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.PS-05 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review SentinelOne application control\n2. Verify app control policy\n3. Examine Kubernetes node restrictions\n4. Assess shared SSH key remediation',
-        linkedArtifacts: ['Application Control Policy'],
-        remediation: { ownerId: 7, actionPlan: 'Remediate shared developer SSH key', dueDate: '2025-09-30' },
-        quarters: {
-          Q1: { actualScore: 5, targetScore: 7, observations: 'SentinelOne app control on workstations. Shared SSH key on Kubernetes nodes identified for Q3 remediation.', observationDate: '2025-01-21', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'RC.RP-03 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review backup checksum process\n2. Verify monthly integrity validation\n3. Examine quarterly restore testing\n4. Assess S3 Bucket Security project',
-        linkedArtifacts: ['Backup Procedures'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Automated checksums for S3 backups. Monthly integrity validation and quarterly restore testing in place.', observationDate: '2025-01-22', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'RS.MI-01 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review automated containment capabilities\n2. Examine SentinelOne quarantine logs\n3. Verify GuardDuty auto-remediation\n4. Test manual containment procedures',
-        linkedArtifacts: ['Containment Playbooks'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Automated containment via SentinelOne and GuardDuty. Manual playbooks for complex incidents.', observationDate: '2025-01-22', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.AE-03 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review CloudTrail aggregation\n2. Examine GuardDuty correlation\n3. Verify custom correlation scripts\n4. Assess multi-account centralization',
-        linkedArtifacts: ['Event Correlation Architecture'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Event correlation via CloudTrail and GuardDuty. Custom scripts for cross-source analysis. Enhancements planned.', observationDate: '2025-01-23', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.CM-03 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review CloudTrail IAM logging\n2. Examine SSO authentication logs\n3. Verify failed authentication alerting\n4. Assess SOC dashboard progress',
-        linkedArtifacts: ['IAM Monitoring Configuration'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Personnel monitoring via CloudTrail and SSO logs. SOC dashboards 60% complete for consolidated visibility.', observationDate: '2025-01-23', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.CM-09 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review O365 ATP configuration\n2. Examine Slack monitoring\n3. Verify system monitoring policy\n4. Assess data leak detection capabilities',
-        linkedArtifacts: ['System Monitoring Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'O365 ATP covers email and web. Slack monitoring in place. DLP capabilities being evaluated for expansion.', observationDate: '2025-01-24', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'ID.AM-02 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review AWS asset tracking\n2. Examine discovery scan results\n3. Verify container and VM monitoring\n4. Assess ASM vendor alignment',
-        linkedArtifacts: ['Asset Inventory'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Software inventory at 85% coverage via AWS tools. ASM vendor selection will achieve comprehensive coverage.', observationDate: '2025-01-24', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'ID.AM-07 Ex3': {
-        auditorId: 2,
-        testProcedures: '1. Review data classification schema\n2. Examine tagging implementation\n3. Verify data scanning tool deployment\n4. Assess biometric data handling',
-        linkedArtifacts: ['Data Classification Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Tiered classification schema in place. Biometric data highest sensitivity per SG1. Data scanning tool scheduling underway.', observationDate: '2025-01-25', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'ID.IM-01 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review quarterly self-assessments\n2. Examine threat-informed risk assessments\n3. Verify KPI-driven gap analysis\n4. Assess investment decision process',
-        linkedArtifacts: ['Self-Assessment Reports'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Quarterly self-assessments of critical services. TTD/TTR trends inform investment decisions.', observationDate: '2025-01-25', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'RS.MA-03 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review priority matrix documentation\n2. Examine sample incident tickets\n3. Verify SOC Manager validation\n4. Assess prioritization consistency',
-        linkedArtifacts: ['Incident Priority Matrix'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Priority matrix based on scope, business impact, and time-criticality. ServiceNow tickets capture justification.', observationDate: '2025-01-26', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.AE-02 Ex3': {
-        auditorId: 2,
-        testProcedures: '1. Review manual log review cadence\n2. Examine review documentation\n3. Verify finding templates\n4. Assess automation gap tracking',
-        linkedArtifacts: ['Log Review Procedures'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'Manual review for systems without automated monitoring. Documented process with finding templates. Automation gaps tracked.', observationDate: '2025-01-26', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'DE.AE-08 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review incident declaration criteria\n2. Examine sample declarations\n3. Verify SOC Manager authority\n4. Assess lessons learned integration',
-        linkedArtifacts: ['Incident Declaration Criteria'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Documented criteria with severity thresholds. SOC Manager authority established. Lessons learned feed improvement.', observationDate: '2025-01-27', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'ID.RA-08 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review disclosure policy and SLAs\n2. Verify external intake process\n3. Examine supplier vulnerability sharing\n4. Sample disclosure handling',
-        linkedArtifacts: ['Vulnerability Disclosure Policy'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Disclosure policy with SLAs in place. External intake via security@almasecurity.com. Sample disclosures show SLA compliance.', observationDate: '2025-01-27', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.AA-02 Ex2': {
-        auditorId: 2,
-        testProcedures: '1. Review no shared accounts policy\n2. Verify SSO credential uniqueness\n3. Examine privileged access reviews\n4. Assess shared SSH key remediation plan',
-        linkedArtifacts: ['Information Security Policy'],
-        remediation: { ownerId: 1, actionPlan: 'Remediate shared developer SSH key in Q3', dueDate: '2025-09-30' },
-        quarters: {
-          Q1: { actualScore: 6, targetScore: 7, observations: 'No shared accounts policy enforced via SSO. Quarterly privileged access reviews. Shared developer SSH key identified for remediation.', observationDate: '2025-01-28', testingStatus: 'Complete', examine: true, interview: true, test: true },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      },
-      'PR.DS-10 Ex1': {
-        auditorId: 2,
-        testProcedures: '1. Review memory handling procedures\n2. Verify data retention limits\n3. Examine source code reviews\n4. Assess biometric data handling scrutiny',
-        linkedArtifacts: ['Data Handling Procedures'],
-        remediation: { ownerId: null, actionPlan: '', dueDate: '' },
-        quarters: {
-          Q1: { actualScore: 7, targetScore: 7, observations: 'Data-in-use protection documented. Source code reviews for crown jewels. Biometric data receives enhanced scrutiny per SG1.', observationDate: '2025-01-28', testingStatus: 'Complete', examine: true, interview: true, test: false },
-          Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
-          Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
-        }
-      }
-    }
+    observations: UPDATED_OBSERVATIONS
   }
 ];
 
@@ -870,7 +415,8 @@ const useAssessmentsStore = create(
         const users = userStore?.getState?.()?.users || [];
         const getUserName = (userId) => {
           const user = users.find(u => u.id === userId);
-          return user ? user.name : userId || '';
+          if (!user) return userId || '';
+          return user.email ? `${user.name} <${user.email}>` : user.name;
         };
 
         const getItemName = (itemId) => {
@@ -1156,7 +702,8 @@ const useAssessmentsStore = create(
         const users = userStore?.getState?.()?.users || [];
         const getUserName = (userId) => {
           const user = users.find(u => u.id === userId);
-          return user ? user.name : userId || '';
+          if (!user) return userId || '';
+          return user.email ? `${user.name} <${user.email}>` : user.name;
         };
 
         const csvData = [];
@@ -1225,7 +772,7 @@ const useAssessmentsStore = create(
     }),
     {
       name: 'csf-assessments-storage',
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -1262,6 +809,24 @@ const useAssessmentsStore = create(
           }
           // New user or empty state - use defaults
           return { assessments: DEFAULT_ASSESSMENTS, currentAssessmentId: null };
+        }
+        // Version 3: Update default assessment with corrected CSV data (Q1-Q4 scores)
+        if (version < 3) {
+          const assessments = persistedState?.assessments || [];
+          const updatedAssessments = assessments.map(assessment => {
+            // Only update the default Alma Security assessment
+            if (assessment.id === 'ASM-default-2025-alma') {
+              return {
+                ...assessment,
+                observations: UPDATED_OBSERVATIONS
+              };
+            }
+            return assessment;
+          });
+          return {
+            ...persistedState,
+            assessments: updatedAssessments
+          };
         }
         return persistedState;
       },
