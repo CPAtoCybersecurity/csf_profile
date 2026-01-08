@@ -716,13 +716,42 @@ const useControlsStore = create(
     }),
     {
       name: 'csf-controls-storage',
-      version: 1,
+      version: 3,
       migrate: (persistedState, version) => {
-        // Version 1: Added default controls for new installations
-        // Existing users with data keep their controls, new users get defaults
-        if (version === 0 && persistedState?.controls?.length > 0) {
-          // Existing user with data - keep their controls
-          return persistedState;
+        // Version 3: Force update controls with correct stable owner IDs (1-7)
+        // Previous versions may have had random user IDs that don't match userStore
+        if (version < 3 && persistedState?.controls?.length > 0) {
+          // Create a map of default controls for quick lookup
+          const defaultControlsMap = new Map(
+            DEFAULT_CONTROLS.map(c => [c.controlId, c])
+          );
+
+          // Stable user IDs from DEFAULT_USERS
+          const stableUserIds = new Set([1, 2, 3, 4, 5, 6, 7]);
+
+          // Update existing controls with proper owner IDs from defaults
+          const updatedControls = persistedState.controls.map(control => {
+            const defaultControl = defaultControlsMap.get(control.controlId);
+            if (defaultControl) {
+              // Check if current ownerId is a valid stable ID
+              const hasValidOwner = control.ownerId && stableUserIds.has(control.ownerId);
+              const hasValidStakeholders = control.stakeholderIds?.length > 0 &&
+                control.stakeholderIds.every(id => stableUserIds.has(id));
+
+              return {
+                ...control,
+                // Use default owner if current is invalid
+                ownerId: hasValidOwner ? control.ownerId : defaultControl.ownerId,
+                // Use default stakeholders if current are invalid
+                stakeholderIds: hasValidStakeholders
+                  ? control.stakeholderIds
+                  : defaultControl.stakeholderIds
+              };
+            }
+            return control;
+          });
+
+          return { controls: updatedControls };
         }
         // New user or empty state - use defaults
         return { controls: DEFAULT_CONTROLS };

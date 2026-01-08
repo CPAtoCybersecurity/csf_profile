@@ -251,6 +251,19 @@ const useCSFStore = create(
     }),
     {
       name: 'csf-data-storage',
+      version: 2,
+      migrate: (persistedState, version) => {
+        // Version 2: Force re-download of CSV to get proper owner assignments
+        // Reset hasDownloaded to trigger fresh load with owner processing
+        if (version < 2) {
+          return {
+            ...persistedState,
+            hasDownloaded: false,
+            data: [],
+          };
+        }
+        return persistedState;
+      },
       partialize: (state) => ({
         data: state.data,
         hasDownloaded: state.hasDownloaded,
