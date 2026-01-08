@@ -21,6 +21,7 @@ import UserManagement from './pages/UserManagement';
 import ScoringLegend from './pages/ScoringLegend';
 import Artifacts from './pages/Artifacts';
 import Settings from './pages/Settings';
+import AIAssistant from './pages/AIAssistant';
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -124,6 +125,7 @@ const AppContent = () => {
             <Route path="/artifacts" element={<Artifacts />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/ai-assistant" element={<AIAssistant />} />
           </Routes>
         </main>
       </div>

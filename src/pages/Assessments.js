@@ -1,7 +1,8 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
-  Search, Filter, Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
-  Download, Upload, ClipboardList, Calendar, FileSearch, ChevronRight, Copy
+  Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
+  Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
+  FileUp, FileText, Loader2, Bot, Sparkles
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
@@ -10,7 +11,6 @@ import ReactMarkdown from 'react-markdown';
 import FrameworkBadge from '../components/FrameworkBadge';
 import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
-import DropdownPortal from '../components/DropdownPortal';
 import SortableHeader from '../components/SortableHeader';
 
 // Stores
@@ -19,6 +19,28 @@ import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
+import useAIStore from '../stores/aiStore';
+
+// Helper function to format test procedures for display
+const formatTestProcedures = (text) => {
+  if (!text) return '';
+
+  let formatted = text;
+
+  // Add newlines before numbered steps (1., 2., 3., etc.)
+  formatted = formatted.replace(/(\s)(\d+)\.\s+/g, '\n\n**$2.** ');
+
+  // Add newlines before lettered sub-items (a., b., c., etc.)
+  formatted = formatted.replace(/(\s)([a-z])\.\s+/g, '\n   - **$2.** ');
+
+  // Add newlines before dash bullet points that follow text
+  formatted = formatted.replace(/\s+-\s+/g, '\n   - ');
+
+  // Clean up any excessive newlines at the start
+  formatted = formatted.replace(/^\n+/, '');
+
+  return formatted;
+};
 
 const Assessments = () => {
   // Store state
@@ -26,7 +48,6 @@ const Assessments = () => {
   const currentAssessmentId = useAssessmentsStore((state) => state.currentAssessmentId);
   const setCurrentAssessmentId = useAssessmentsStore((state) => state.setCurrentAssessmentId);
   const createAssessment = useAssessmentsStore((state) => state.createAssessment);
-  const updateAssessment = useAssessmentsStore((state) => state.updateAssessment);
   const deleteAssessment = useAssessmentsStore((state) => state.deleteAssessment);
   const getObservation = useAssessmentsStore((state) => state.getObservation);
   const updateObservation = useAssessmentsStore((state) => state.updateObservation);
@@ -49,23 +70,40 @@ const Assessments = () => {
   const frameworks = useFrameworksStore((state) => state.frameworks);
   const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
 
-  const users = useUserStore((state) => state.users);
+  // AI Store for test procedure generation
+  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeApiKey, checkOllama } = useAIStore();
 
   // Local state
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
-  const [searchTerm, setSearchTerm] = useState('');
   const [editMode, setEditMode] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState('Q1'); // Q1, Q2, Q3, Q4
 
-  // New assessment modal state
+  // New assessment wizard state
   const [showNewModal, setShowNewModal] = useState(false);
+  const [wizardStep, setWizardStep] = useState(1); // 1: Basic + Scope, 2: Test Procedures, 3: Evidence Upload
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
     scopeType: 'controls',
     frameworkFilter: ''
   });
+  const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
+  const [scopeFilterText, setScopeFilterText] = useState('');
+  const [generateTestProcedures, setGenerateTestProcedures] = useState(false);
+  const [isGeneratingProcedures, setIsGeneratingProcedures] = useState(false);
+  const [generatedProcedures, setGeneratedProcedures] = useState({});
+  const [uploadedEvidence, setUploadedEvidence] = useState([]);
+  const [evidenceNotes, setEvidenceNotes] = useState('');
+  const [isAnalyzingEvidence, setIsAnalyzingEvidence] = useState(false);
+  const [evidenceAnalysis, setEvidenceAnalysis] = useState(null);
+
+  // Check Ollama status on mount
+  React.useEffect(() => {
+    if (llmProvider === 'ollama') {
+      checkOllama();
+    }
+  }, [llmProvider, checkOllama]);
 
   // Scope picker state
   const [scopePickerSearch, setScopePickerSearch] = useState('');
@@ -171,12 +209,6 @@ const Assessments = () => {
   }, [currentAssessmentId, selectedItemId, getObservation, currentAssessment]);
 
   // Helper functions
-  const getUserName = useCallback((userId) => {
-    if (!userId) return 'Unassigned';
-    const user = users.find(u => u.id === userId);
-    return user ? user.name : 'Unknown';
-  }, [users]);
-
   const getStatusColor = useCallback((status) => {
     switch (status) {
       case 'Complete': return 'text-green-600 bg-green-100';
@@ -188,6 +220,198 @@ const Assessments = () => {
 
   const enabledFrameworks = useMemo(() => getEnabledFrameworks(), [frameworks]);
 
+  // Get items available for scope selection in wizard
+  const wizardScopeItems = useMemo(() => {
+    let items = [];
+    if (newAssessment.scopeType === 'controls') {
+      items = controls.map(c => ({
+        id: c.controlId,
+        label: c.controlId,
+        description: c.implementationDescription || '',
+        category: c.subcategoryId || '',
+        type: 'control'
+      }));
+    } else {
+      let reqs = requirements;
+      if (newAssessment.frameworkFilter) {
+        reqs = reqs.filter(r => r.frameworkId === newAssessment.frameworkFilter);
+      }
+      items = reqs.map(r => ({
+        id: r.id,
+        label: r.subcategoryId || r.id,
+        description: r.implementationExample || r.category || '',
+        category: r.function || '',
+        type: 'requirement'
+      }));
+    }
+
+    // Apply filter
+    if (scopeFilterText) {
+      const search = scopeFilterText.toLowerCase();
+      items = items.filter(item =>
+        item.id.toLowerCase().includes(search) ||
+        item.label.toLowerCase().includes(search) ||
+        item.description.toLowerCase().includes(search) ||
+        item.category.toLowerCase().includes(search)
+      );
+    }
+
+    return items;
+  }, [newAssessment.scopeType, newAssessment.frameworkFilter, controls, requirements, scopeFilterText]);
+
+  // Wizard helper: check if AI is ready
+  const isAIReady = llmProvider === 'ollama'
+    ? ollamaStatus.available && ollamaStatus.hasModel
+    : !!claudeApiKey;
+
+  // Generate test procedures for selected scope items
+  const handleGenerateTestProcedures = useCallback(async () => {
+    if (selectedScopeItems.size === 0) {
+      toast.error('Please select items in scope first');
+      return;
+    }
+
+    setIsGeneratingProcedures(true);
+    const procedures = { ...generatedProcedures };
+
+    // Get selected items (limit to first 10 for performance)
+    const selectedIds = Array.from(selectedScopeItems).slice(0, 10);
+
+    for (const itemId of selectedIds) {
+      // Skip if already generated
+      if (procedures[itemId]) continue;
+
+      let description = '';
+      if (newAssessment.scopeType === 'controls') {
+        const ctrl = controls.find(c => c.controlId === itemId);
+        description = ctrl?.implementationDescription || '';
+      } else {
+        const req = requirements.find(r => r.id === itemId);
+        description = req?.implementationExample || req?.category || '';
+      }
+
+      const prompt = `Generate test procedures for this NIST CSF 2.0 control assessment:
+
+Control ID: ${itemId}
+Description: ${description}
+
+Provide 3-5 specific test procedures an auditor should follow. Include:
+- What to examine (documents, configurations, etc.)
+- Who to interview
+- What tests to perform
+
+Format as a numbered list. Be specific and actionable.`;
+
+      try {
+        let response;
+        if (llmProvider === 'ollama') {
+          response = await generateWithOllama(prompt, 500);
+        } else {
+          response = await generateWithClaude(prompt, 500);
+        }
+        procedures[itemId] = response;
+      } catch (error) {
+        procedures[itemId] = `Error generating: ${error.message}`;
+      }
+    }
+
+    setGeneratedProcedures(procedures);
+    setIsGeneratingProcedures(false);
+    toast.success(`Generated procedures for ${Object.keys(procedures).length} items`);
+  }, [selectedScopeItems, generatedProcedures, newAssessment.scopeType, controls, requirements, llmProvider, generateWithOllama, generateWithClaude]);
+
+  // Extract text from uploaded file
+  const extractTextFromFile = async (file) => {
+    if (file.type === 'text/plain' || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
+      return await file.text();
+    }
+    return `[Content from ${file.name} - PDF/DOCX extraction requires additional setup. Please use TXT or MD files.]`;
+  };
+
+  // Handle evidence file upload
+  const handleEvidenceUpload = useCallback(async (files) => {
+    const newDocs = [];
+    for (const file of files) {
+      const text = await extractTextFromFile(file);
+      newDocs.push({
+        id: Date.now() + Math.random(),
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        text: text,
+        status: 'ready'
+      });
+    }
+    setUploadedEvidence(prev => [...prev, ...newDocs]);
+  }, []);
+
+  // Analyze evidence documents
+  const handleAnalyzeEvidence = useCallback(async () => {
+    if (uploadedEvidence.length === 0 && !evidenceNotes.trim()) {
+      toast.error('Please upload documents or add notes first.');
+      return;
+    }
+
+    setIsAnalyzingEvidence(true);
+    setEvidenceAnalysis(null);
+
+    const allText = uploadedEvidence.map(d =>
+      `=== ${d.name} ===\n${d.text}`
+    ).join('\n\n') + (evidenceNotes ? `\n\n=== User Notes ===\n${evidenceNotes}` : '');
+
+    const prompt = `Analyze these organizational documents to pre-populate a NIST CSF 2.0 assessment.
+
+DOCUMENTS PROVIDED:
+${allText.substring(0, 8000)}
+
+Identify evidence for CSF 2.0 controls. Respond in JSON format:
+{
+  "findings": [
+    {"controlId": "GV.PO-01", "score": "yes", "confidence": 0.85, "evidence": "Brief description", "quote": "Relevant quote"}
+  ],
+  "coverage": {"GOVERN": 45, "IDENTIFY": 30, "PROTECT": 60, "DETECT": 20, "RESPOND": 55, "RECOVER": 15},
+  "gaps": ["Major gaps identified"],
+  "recommendations": ["Key recommendations"]
+}
+
+Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intentions), "no" (none found).`;
+
+    try {
+      let response;
+      if (llmProvider === 'ollama') {
+        response = await generateWithOllama(prompt, 3000);
+      } else {
+        response = await generateWithClaude(prompt, 3000);
+      }
+
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        setEvidenceAnalysis(JSON.parse(jsonMatch[0]));
+      } else {
+        setEvidenceAnalysis({ raw: response, error: 'Could not parse JSON' });
+      }
+    } catch (error) {
+      setEvidenceAnalysis({ error: error.message });
+    }
+
+    setIsAnalyzingEvidence(false);
+  }, [uploadedEvidence, evidenceNotes, llmProvider, generateWithOllama, generateWithClaude]);
+
+  // Reset wizard state
+  const resetWizard = useCallback(() => {
+    setWizardStep(1);
+    setNewAssessment({ name: '', description: '', scopeType: 'controls', frameworkFilter: '' });
+    setSelectedScopeItems(new Set());
+    setScopeFilterText('');
+    setGenerateTestProcedures(false);
+    setIsGeneratingProcedures(false);
+    setGeneratedProcedures({});
+    setUploadedEvidence([]);
+    setEvidenceNotes('');
+    setIsAnalyzingEvidence(false);
+    setEvidenceAnalysis(null);
+  }, []);
+
   // Handlers
   const handleCreateAssessment = useCallback(() => {
     if (!newAssessment.name) {
@@ -195,12 +419,42 @@ const Assessments = () => {
       return;
     }
 
+    if (selectedScopeItems.size === 0) {
+      toast.error('Please select at least one item for the assessment scope');
+      return;
+    }
+
     const created = createAssessment(newAssessment);
+
+    // Add selected items to scope
+    for (const itemId of selectedScopeItems) {
+      addToScope(created.id, itemId);
+
+      // Apply generated test procedure if available
+      if (generatedProcedures[itemId]) {
+        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
+      }
+    }
+
+    // Apply evidence analysis findings (for items already in scope)
+    if (evidenceAnalysis?.findings) {
+      for (const finding of evidenceAnalysis.findings) {
+        if (selectedScopeItems.has(finding.controlId)) {
+          const existingObs = getObservation(created.id, finding.controlId);
+          const existingProcedures = existingObs?.testProcedures || '';
+          updateObservation(created.id, finding.controlId, {
+            testProcedures: existingProcedures + `\n\nEvidence: ${finding.evidence}\nQuote: "${finding.quote}"`,
+          });
+        }
+      }
+    }
+
     setShowNewModal(false);
-    setNewAssessment({ name: '', description: '', scopeType: 'controls', frameworkFilter: '' });
+    resetWizard();
+    setCurrentAssessmentId(created.id);
     setView('scope');
-    toast.success(`Assessment "${created.name}" created`);
-  }, [newAssessment, createAssessment]);
+    toast.success(`Assessment "${created.name}" created with ${selectedScopeItems.size} items`);
+  }, [newAssessment, createAssessment, selectedScopeItems, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
 
   const handleSelectAssessment = useCallback((assessment) => {
     setCurrentAssessmentId(assessment.id);
@@ -829,8 +1083,8 @@ const Assessments = () => {
                         placeholder="Document test procedures..."
                       />
                     ) : (
-                      <div className="mt-1 prose prose-sm max-w-none">
-                        <ReactMarkdown>{currentObservation.testProcedures || 'No test procedures defined'}</ReactMarkdown>
+                      <div className="mt-1 prose prose-sm max-w-none bg-gray-50 p-4 rounded-lg border">
+                        <ReactMarkdown>{formatTestProcedures(currentObservation.testProcedures) || 'No test procedures defined'}</ReactMarkdown>
                       </div>
                     )}
                   </div>
@@ -1038,112 +1292,510 @@ const Assessments = () => {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Assessment views */}
       {view === 'list' && renderListView()}
       {view === 'scope' && currentAssessment && renderScopeView()}
       {view === 'assess' && currentAssessment && renderAssessView()}
 
-      {/* New Assessment Modal */}
+      {/* New Assessment Wizard Modal */}
       {showNewModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
-            <div className="p-4 border-b flex items-center justify-between">
-              <h3 className="text-lg font-bold">New Assessment</h3>
-              <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={() => setShowNewModal(false)}
-              >
-                <X size={20} />
-              </button>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            {/* Header with step indicator */}
+            <div className="p-4 border-b">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold">New Assessment</h3>
+                <button
+                  className="text-gray-500 hover:text-gray-700"
+                  onClick={() => { setShowNewModal(false); resetWizard(); }}
+                >
+                  <X size={20} />
+                </button>
+              </div>
+
+              {/* Step indicator */}
+              <div className="flex items-center justify-center gap-2">
+                {[
+                  { num: 1, label: 'Scope' },
+                  { num: 2, label: 'Test Procedures' },
+                  { num: 3, label: 'Evidence' }
+                ].map((step, idx) => (
+                  <React.Fragment key={step.num}>
+                    <div className={`flex items-center gap-2 ${wizardStep === step.num ? 'text-blue-600' : wizardStep > step.num ? 'text-green-600' : 'text-gray-400'}`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 ${
+                        wizardStep === step.num ? 'border-blue-600 bg-blue-50' :
+                        wizardStep > step.num ? 'border-green-600 bg-green-50' : 'border-gray-300'
+                      }`}>
+                        {wizardStep > step.num ? <CheckCircle size={16} /> : step.num}
+                      </div>
+                      <span className="text-sm font-medium hidden sm:inline">{step.label}</span>
+                    </div>
+                    {idx < 2 && <div className={`w-8 h-0.5 ${wizardStep > step.num ? 'bg-green-600' : 'bg-gray-300'}`} />}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
 
-            <div className="p-4 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Assessment Name *</label>
-                <input
-                  type="text"
-                  className="mt-1 w-full p-2 border rounded"
-                  placeholder="e.g., Q1 2025 Security Assessment"
-                  value={newAssessment.name}
-                  onChange={(e) => setNewAssessment(prev => ({ ...prev, name: e.target.value }))}
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  className="mt-1 w-full p-2 border rounded h-20"
-                  placeholder="Optional description..."
-                  value={newAssessment.description}
-                  onChange={(e) => setNewAssessment(prev => ({ ...prev, description: e.target.value }))}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Scope Type</label>
-                <div className="mt-2 space-y-2">
-                  <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+            {/* Step content */}
+            <div className="flex-1 overflow-auto p-4">
+              {/* Step 1: Basic Info + Scope */}
+              {wizardStep === 1 && (
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Assessment Name *</label>
                     <input
-                      type="radio"
-                      name="scopeType"
-                      value="controls"
-                      checked={newAssessment.scopeType === 'controls'}
-                      onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                      type="text"
+                      className="mt-1 w-full p-2 border rounded"
+                      placeholder="e.g., Q1 2026 Security Assessment"
+                      value={newAssessment.name}
+                      onChange={(e) => setNewAssessment(prev => ({ ...prev, name: e.target.value }))}
+                      autoFocus
                     />
-                    <div>
-                      <span className="font-medium">By Controls</span>
-                      {controls.length > 0 && (
-                        <span className="text-green-600 ml-2">(Recommended - {controls.length} available)</span>
-                      )}
-                      <p className="text-xs text-gray-500">Assess your organization's defined controls</p>
-                    </div>
-                  </label>
-                  <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      name="scopeType"
-                      value="requirements"
-                      checked={newAssessment.scopeType === 'requirements'}
-                      onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Description</label>
+                    <textarea
+                      className="mt-1 w-full p-2 border rounded h-20"
+                      placeholder="Optional description..."
+                      value={newAssessment.description}
+                      onChange={(e) => setNewAssessment(prev => ({ ...prev, description: e.target.value }))}
                     />
-                    <div>
-                      <span className="font-medium">By Requirements</span>
-                      <p className="text-xs text-gray-500">Assess directly against framework requirements</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Scope Type</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="radio"
+                          name="scopeType"
+                          value="controls"
+                          checked={newAssessment.scopeType === 'controls'}
+                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                        />
+                        <div>
+                          <span className="font-medium">By Controls</span>
+                          {controls.length > 0 && (
+                            <span className="text-green-600 ml-2">(Recommended - {controls.length} available)</span>
+                          )}
+                          <p className="text-xs text-gray-500">Assess your organization's defined controls</p>
+                        </div>
+                      </label>
+                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="radio"
+                          name="scopeType"
+                          value="requirements"
+                          checked={newAssessment.scopeType === 'requirements'}
+                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                        />
+                        <div>
+                          <span className="font-medium">By Requirements</span>
+                          <p className="text-xs text-gray-500">Assess directly against framework requirements</p>
+                        </div>
+                      </label>
                     </div>
-                  </label>
+                  </div>
+
+                  {newAssessment.scopeType === 'requirements' && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Framework Filter</label>
+                      <select
+                        className="mt-1 w-full p-2 border rounded"
+                        value={newAssessment.frameworkFilter}
+                        onChange={(e) => {
+                          setNewAssessment(prev => ({ ...prev, frameworkFilter: e.target.value }));
+                          setSelectedScopeItems(new Set()); // Reset selection when framework changes
+                        }}
+                      >
+                        <option value="">All Frameworks</option>
+                        {enabledFrameworks.map(fw => (
+                          <option key={fw.id} value={fw.id}>{fw.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Scope Item Selection */}
+                  {(newAssessment.scopeType === 'controls' || newAssessment.frameworkFilter) && (
+                    <div className="border rounded-lg overflow-hidden">
+                      <div className="bg-gray-50 p-3 border-b">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-gray-700">
+                            Select {newAssessment.scopeType === 'controls' ? 'Controls' : 'Requirements'} in Scope
+                          </h4>
+                          <span className="text-sm text-blue-600 font-medium">
+                            {selectedScopeItems.size} selected
+                          </span>
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            className="flex-1 p-2 border rounded text-sm"
+                            placeholder="Filter by ID, description..."
+                            value={scopeFilterText}
+                            onChange={(e) => setScopeFilterText(e.target.value)}
+                          />
+                          <button
+                            type="button"
+                            className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200"
+                            onClick={() => {
+                              const allIds = new Set(wizardScopeItems.map(item => item.id));
+                              setSelectedScopeItems(allIds);
+                            }}
+                          >
+                            Select All
+                          </button>
+                          <button
+                            type="button"
+                            className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                            onClick={() => setSelectedScopeItems(new Set())}
+                          >
+                            Clear
+                          </button>
+                        </div>
+                      </div>
+                      <div className="max-h-64 overflow-y-auto">
+                        {wizardScopeItems.length === 0 ? (
+                          <div className="p-4 text-center text-gray-500 text-sm">
+                            No items available. {newAssessment.scopeType === 'controls' ? 'Add controls in the Controls tab.' : 'Select a framework above.'}
+                          </div>
+                        ) : (
+                          <div className="divide-y">
+                            {wizardScopeItems.slice(0, 100).map(item => (
+                              <label
+                                key={item.id}
+                                className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 ${
+                                  selectedScopeItems.has(item.id) ? 'bg-blue-50' : ''
+                                }`}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedScopeItems.has(item.id)}
+                                  onChange={(e) => {
+                                    const newSet = new Set(selectedScopeItems);
+                                    if (e.target.checked) {
+                                      newSet.add(item.id);
+                                    } else {
+                                      newSet.delete(item.id);
+                                    }
+                                    setSelectedScopeItems(newSet);
+                                  }}
+                                  className="mt-1 rounded"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-medium text-sm">{item.label}</span>
+                                    {item.category && (
+                                      <span className="text-xs px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded">
+                                        {item.category}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {item.description && (
+                                    <p className="text-xs text-gray-500 mt-0.5 line-clamp-2">{item.description}</p>
+                                  )}
+                                </div>
+                              </label>
+                            ))}
+                            {wizardScopeItems.length > 100 && (
+                              <div className="p-3 text-center text-gray-500 text-xs">
+                                Showing first 100 of {wizardScopeItems.length} items. Use filter to narrow down.
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
-              {newAssessment.scopeType === 'requirements' && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Framework Filter (Optional)</label>
-                  <select
-                    className="mt-1 w-full p-2 border rounded"
-                    value={newAssessment.frameworkFilter}
-                    onChange={(e) => setNewAssessment(prev => ({ ...prev, frameworkFilter: e.target.value }))}
+              {/* Step 2: Test Procedure Generation */}
+              {wizardStep === 2 && (
+                <div className="space-y-4">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Bot size={24} className="text-purple-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-purple-900">AI-Generated Test Procedures</h4>
+                        <p className="text-sm text-purple-700 mt-1">
+                          Optionally generate test procedures for your selected scope using AI.
+                          You can refine these after the assessment is created.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded text-xs ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                        {llmProvider === 'ollama' ? 'Ollama' : 'Claude'}
+                      </span>
+                      {isAIReady ? (
+                        <span className="text-green-600 text-sm flex items-center gap-1">
+                          <CheckCircle size={14} /> Ready
+                        </span>
+                      ) : (
+                        <span className="text-red-600 text-sm flex items-center gap-1">
+                          <XCircle size={14} /> Not Ready
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-sm text-blue-600 font-medium">
+                      {selectedScopeItems.size} items selected
+                    </p>
+                  </div>
+
+                  <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input
+                      type="checkbox"
+                      checked={generateTestProcedures}
+                      onChange={(e) => setGenerateTestProcedures(e.target.checked)}
+                      className="w-5 h-5 rounded"
+                      disabled={!isAIReady || selectedScopeItems.size === 0}
+                    />
+                    <div>
+                      <span className="font-medium">Generate test procedures</span>
+                      <p className="text-sm text-gray-500">
+                        AI will create test procedures for {Math.min(selectedScopeItems.size, 10)} of {selectedScopeItems.size} selected items
+                      </p>
+                    </div>
+                  </label>
+
+                  {generateTestProcedures && (
+                    <button
+                      onClick={handleGenerateTestProcedures}
+                      disabled={isGeneratingProcedures || !isAIReady}
+                      className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+                    >
+                      {isGeneratingProcedures ? (
+                        <>
+                          <Loader2 className="animate-spin" size={18} />
+                          Generating Procedures...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={18} />
+                          Generate Now
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {Object.keys(generatedProcedures).length > 0 && (
+                    <div className="space-y-2">
+                      <h4 className="font-medium text-gray-700">Generated Procedures ({Object.keys(generatedProcedures).length})</h4>
+                      <div className="max-h-48 overflow-y-auto space-y-2">
+                        {Object.entries(generatedProcedures).map(([id, proc]) => (
+                          <div key={id} className="p-3 bg-gray-50 rounded border">
+                            <p className="font-medium text-sm">{id}</p>
+                            <p className="text-xs text-gray-600 mt-1 line-clamp-2">{proc}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Step 3: Evidence Upload */}
+              {wizardStep === 3 && (
+                <div className="space-y-4">
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <FileUp size={24} className="text-orange-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-orange-900">Evidence Upload (Optional)</h4>
+                        <p className="text-sm text-orange-700 mt-1">
+                          Upload documents to give your assessment a head start. AI will analyze them to identify existing controls and evidence.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-1 rounded text-xs ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                        {llmProvider === 'ollama' ? 'Ollama' : 'Claude'}
+                      </span>
+                      {isAIReady ? (
+                        <span className="text-green-600 text-sm flex items-center gap-1">
+                          <CheckCircle size={14} /> Ready
+                        </span>
+                      ) : (
+                        <span className="text-red-600 text-sm flex items-center gap-1">
+                          <XCircle size={14} /> Not Ready
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* File drop zone */}
+                  <div
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-orange-400 transition-colors"
+                    onClick={() => document.getElementById('wizardFileInput')?.click()}
+                    onDragOver={(e) => e.preventDefault()}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      handleEvidenceUpload(Array.from(e.dataTransfer.files));
+                    }}
                   >
-                    <option value="">All Frameworks</option>
-                    {enabledFrameworks.map(fw => (
-                      <option key={fw.id} value={fw.id}>{fw.name}</option>
-                    ))}
-                  </select>
+                    <input
+                      id="wizardFileInput"
+                      type="file"
+                      multiple
+                      hidden
+                      accept=".txt,.md,.pdf,.docx"
+                      onChange={(e) => handleEvidenceUpload(Array.from(e.target.files))}
+                    />
+                    <Upload size={32} className="mx-auto mb-2 text-gray-400" />
+                    <p className="text-gray-600">Drop files here or click to upload</p>
+                    <p className="text-xs text-gray-400 mt-1">TXT, MD supported (PDF/DOCX coming soon)</p>
+                  </div>
+
+                  {/* Uploaded files list */}
+                  {uploadedEvidence.length > 0 && (
+                    <div className="space-y-2">
+                      {uploadedEvidence.map(doc => (
+                        <div key={doc.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <div className="flex items-center gap-2">
+                            <FileText size={16} className="text-gray-400" />
+                            <span className="text-sm">{doc.name}</span>
+                            <span className="text-xs text-gray-400">({(doc.size / 1024).toFixed(1)} KB)</span>
+                          </div>
+                          <button
+                            onClick={() => setUploadedEvidence(prev => prev.filter(d => d.id !== doc.id))}
+                            className="text-red-500 hover:text-red-700 p-1"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Notes */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
+                    <textarea
+                      value={evidenceNotes}
+                      onChange={e => setEvidenceNotes(e.target.value)}
+                      placeholder="Add context about your security program..."
+                      className="w-full h-24 px-3 py-2 border rounded-lg text-sm resize-none"
+                    />
+                  </div>
+
+                  {/* Analyze button */}
+                  {(uploadedEvidence.length > 0 || evidenceNotes.trim()) && (
+                    <button
+                      onClick={handleAnalyzeEvidence}
+                      disabled={isAnalyzingEvidence || !isAIReady}
+                      className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+                    >
+                      {isAnalyzingEvidence ? (
+                        <>
+                          <Loader2 className="animate-spin" size={18} />
+                          Analyzing Evidence...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={18} />
+                          Analyze Evidence
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Analysis results */}
+                  {evidenceAnalysis && !evidenceAnalysis.error && (
+                    <div className="space-y-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <h4 className="font-medium text-green-900 flex items-center gap-2">
+                        <CheckCircle size={16} />
+                        Analysis Complete
+                      </h4>
+                      {evidenceAnalysis.findings && (
+                        <p className="text-sm text-green-700">
+                          Found evidence for {evidenceAnalysis.findings.length} controls
+                        </p>
+                      )}
+                      {evidenceAnalysis.gaps && evidenceAnalysis.gaps.length > 0 && (
+                        <div>
+                          <p className="text-xs font-medium text-gray-700">Gaps identified:</p>
+                          <ul className="text-xs text-gray-600 list-disc list-inside">
+                            {evidenceAnalysis.gaps.slice(0, 3).map((gap, i) => (
+                              <li key={i}>{gap}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {evidenceAnalysis?.error && (
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                      <p className="text-red-700 text-sm">{evidenceAnalysis.error}</p>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
 
-            <div className="p-4 border-t flex justify-end gap-2">
+            {/* Footer navigation */}
+            <div className="p-4 border-t flex justify-between">
               <button
                 className="px-4 py-2 text-gray-600 hover:text-gray-800"
-                onClick={() => setShowNewModal(false)}
+                onClick={() => {
+                  if (wizardStep === 1) {
+                    setShowNewModal(false);
+                    resetWizard();
+                  } else {
+                    setWizardStep(prev => prev - 1);
+                  }
+                }}
               >
-                Cancel
+                {wizardStep === 1 ? 'Cancel' : 'Back'}
               </button>
-              <button
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
-                onClick={handleCreateAssessment}
-              >
-                Create Assessment
-              </button>
+
+              <div className="flex gap-2">
+                {wizardStep < 3 && (
+                  <button
+                    className="px-4 py-2 text-gray-500 hover:text-gray-700"
+                    onClick={() => setWizardStep(prev => prev + 1)}
+                  >
+                    Skip
+                  </button>
+                )}
+                {wizardStep < 3 ? (
+                  <button
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:bg-gray-300"
+                    onClick={() => {
+                      if (wizardStep === 1) {
+                        if (!newAssessment.name) {
+                          toast.error('Assessment name is required');
+                          return;
+                        }
+                        if (selectedScopeItems.size === 0) {
+                          toast.error('Please select at least one item for the assessment scope');
+                          return;
+                        }
+                      }
+                      setWizardStep(prev => prev + 1);
+                    }}
+                  >
+                    Next
+                  </button>
+                ) : (
+                  <button
+                    className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center gap-2"
+                    onClick={handleCreateAssessment}
+                  >
+                    <CheckCircle size={16} />
+                    Create Assessment
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
