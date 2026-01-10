@@ -137,9 +137,10 @@ This application supports fetching control documentation from **Confluence Cloud
 Set the following environment variables in your backend `.env` file:
 
 ```env
-CONFLUENCE_BASE_URL=https://your-company.atlassian.net/wiki
+CONFLUENCE_BASE_URL=https://your-company.atlassian.net
 CONFLUENCE_EMAIL=your-email@example.com
 CONFLUENCE_API_TOKEN=your-api-token
+```
 
 ## Features
 
