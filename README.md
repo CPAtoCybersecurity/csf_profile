@@ -1,3 +1,6 @@
+> **You are viewing the `feature/api-integration` branch (Pre-Alpha)**
+> This branch contains experimental Atlassian API integration. For the stable version, see the [main branch](https://github.com/CPAtoCybersecurity/csf_profile).
+
 # Simply Cyber Academy - CSF Profile Assessment Database v2.1
 
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
