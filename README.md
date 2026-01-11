@@ -138,13 +138,15 @@ File-based exports for users without backend infrastructure:
 - **JSON Export**: Import into Jira via Jira Importers plugin, or use with other tools
 - **No backend required** - runs entirely in the browser
 
-### Advanced Path (feature/api-integration Branch)
+### Advanced Path (feature/api-integration Branch) - *Pre-Alpha*
+> **Status**: In active development. Not recommended for production use.
+
 Real-time API integration for teams with infrastructure support:
 - **Jira Cloud API**: Create issues directly from assessment findings
 - **Confluence Cloud API**: Link control documentation and sync content
 - **Requires backend service** for OAuth/token handling
 
-See the [feature/api-integration branch](https://github.com/CPAtoCybersecurity/csf_profile/tree/feature/api-integration) for setup instructions.
+See the [feature/api-integration branch](https://github.com/CPAtoCybersecurity/csf_profile/tree/feature/api-integration) for development progress.
 
 ## Contributors
 
