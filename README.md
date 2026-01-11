@@ -128,6 +128,28 @@ If you encounter issues with `react-scripts` not installing correctly on Kali Li
    ls node_modules/.bin/ | grep react-scripts
    ```
 
+## Integration Options
+
+This project supports two paths depending on your infrastructure needs:
+
+### Standard Path (Main Branch)
+File-based exports for users without backend infrastructure:
+- **CSV Export**: Import into Excel, Google Sheets, or any spreadsheet tool
+- **JSON Export**: Import into Jira via Jira Importers plugin, or use with other tools
+- **No backend required** - runs entirely in the browser
+
+### Advanced Path (feature/api-integration Branch)
+Real-time API integration for teams with infrastructure support:
+- **Jira Cloud API**: Create issues directly from assessment findings
+- **Confluence Cloud API**: Link control documentation and sync content
+- **Requires backend service** for OAuth/token handling
+
+See the [feature/api-integration branch](https://github.com/CPAtoCybersecurity/csf_profile/tree/feature/api-integration) for setup instructions.
+
+## Contributors
+
+Thank you to our amazing contributors! See [CONTRIBUTORS.md](CONTRIBUTORS.md) for the full list.
+
 ## Features
 
 ### CSV Import and Export
