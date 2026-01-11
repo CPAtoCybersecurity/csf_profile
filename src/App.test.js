@@ -13,9 +13,15 @@ jest.mock('react-markdown', () => {
 const mockCSVData = `ID,Function,Category,Category ID,Subcategory ID,Subcategory Description,In Scope? ,Current State Score,Desired State Score,Minimum Target,Testing Status,Owner,Auditor,Stakeholder(s),Evidence,Observation,Recommendation,Action Plan,Linked Artifact Name,Linked Artifact URL
 GV.OC-01 Ex1,Govern,Organizational Context,GV.OC,GV.OC-01 Ex1,Test Description,Yes,5,7,6,Not Started,,,,,,,,,`;
 
+// Store original environment
+const originalEnv = process.env;
+
 beforeEach(() => {
   // Clear localStorage before each test
   localStorage.clear();
+
+  // Reset process.env to original state
+  process.env = { ...originalEnv };
 
   // Mock fetch
   global.fetch = jest.fn((url) => {
@@ -31,10 +37,77 @@ beforeEach(() => {
 
 afterEach(() => {
   jest.clearAllMocks();
+  // Restore original environment
+  process.env = originalEnv;
 });
 
 describe('App Component', () => {
+  describe('Environment Variable Validation Integration', () => {
+    test('displays error page when environment variables are missing', async () => {
+      // Ensure environment variables are NOT set
+      delete process.env.REACT_APP_JIRA_INSTANCE_URL;
+      delete process.env.REACT_APP_JIRA_API_TOKEN;
+      delete process.env.REACT_APP_CONFLUENCE_INSTANCE_URL;
+      delete process.env.REACT_APP_CONFLUENCE_API_TOKEN;
+
+      // Suppress console.error for this test since we expect an error
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Should show the error page with "Configuration Required"
+      expect(screen.getByText('Configuration Required')).toBeInTheDocument();
+
+      // Should show the help text for environment variables
+      expect(screen.getByText(/The application needs API credentials to connect with JIRA and Confluence/i)).toBeInTheDocument();
+
+      // Should show the "How to Fix This" section
+      expect(screen.getByText(/How to Fix This/i)).toBeInTheDocument();
+
+      // Should show instructions about .env file and the copy command
+      expect(screen.getAllByText(/\.env\.example/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/cp .env.example .env/i)).toBeInTheDocument();
+
+      // Should NOT show the normal app navigation
+      expect(screen.queryByText(/CSF Profile Assessment/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Dashboard/i)).not.toBeInTheDocument();
+
+      consoleErrorSpy.mockRestore();
+    });
+
+    test('displays normal app when all environment variables are set', async () => {
+      // Set all required environment variables
+      process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
+      process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
+      process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
+      process.env.REACT_APP_CONFLUENCE_API_TOKEN = 'test-confluence-token-456';
+
+      await act(async () => {
+        render(<App />);
+      });
+
+      // Should show normal app header
+      expect(screen.getByText(/CSF Profile Assessment/i)).toBeInTheDocument();
+
+      // Should show navigation links
+      expect(screen.getAllByText(/Requirements/i).length).toBeGreaterThan(0);
+      expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
+
+      // Should NOT show the error page
+      expect(screen.queryByText('Configuration Required')).not.toBeInTheDocument();
+      expect(screen.queryByText(/How to Fix This/i)).not.toBeInTheDocument();
+    });
+  });
+
   test('renders CSF Profile Assessment header', async () => {
+    // Set environment variables for this test
+    process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
+    process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
+    process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
+    process.env.REACT_APP_CONFLUENCE_API_TOKEN = 'test-confluence-token-456';
+
     await act(async () => {
       render(<App />);
     });
@@ -44,6 +117,12 @@ describe('App Component', () => {
   });
 
   test('renders navigation links', async () => {
+    // Set environment variables for this test
+    process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
+    process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
+    process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
+    process.env.REACT_APP_CONFLUENCE_API_TOKEN = 'test-confluence-token-456';
+
     await act(async () => {
       render(<App />);
     });

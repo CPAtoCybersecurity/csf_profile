@@ -109,6 +109,65 @@ macOS typically comes with Git pre-installed. You only need to install Node.js:
 4. **Access the application**
    Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
 
+### Environment Variables Configuration (Optional)
+
+The application supports integration with JIRA and Confluence for enhanced tracking capabilities. To enable these integrations, you'll need to configure environment variables with your API credentials.
+
+#### Setting Up Environment Variables
+
+1. **Copy the example file:**
+   ```bash
+   cp .env.example .env
+   ```
+
+2. **Edit the `.env` file** and add your credentials:
+   - `REACT_APP_JIRA_INSTANCE_URL` - Your JIRA instance URL (e.g., https://your-domain.atlassian.net)
+   - `REACT_APP_JIRA_API_TOKEN` - Your JIRA API token
+   - `REACT_APP_CONFLUENCE_INSTANCE_URL` - Your Confluence URL (e.g., https://your-domain.atlassian.net/wiki)
+   - `REACT_APP_CONFLUENCE_API_TOKEN` - Your Confluence API token
+
+3. **Generate API tokens** at: https://id.atlassian.com/manage-profile/security/api-tokens
+
+#### Windows-Specific Instructions
+
+For local development on Windows, you can set environment variables using PowerShell or Command Prompt:
+
+**Using PowerShell:**
+```powershell
+# Set environment variables for current session
+$env:REACT_APP_JIRA_INSTANCE_URL="https://your-domain.atlassian.net"
+$env:REACT_APP_JIRA_API_TOKEN="your-jira-token"
+$env:REACT_APP_CONFLUENCE_INSTANCE_URL="https://your-domain.atlassian.net/wiki"
+$env:REACT_APP_CONFLUENCE_API_TOKEN="your-confluence-token"
+
+# Then start the app
+npm start
+```
+
+**Using Command Prompt:**
+```cmd
+set REACT_APP_JIRA_INSTANCE_URL=https://your-domain.atlassian.net
+set REACT_APP_JIRA_API_TOKEN=your-jira-token
+set REACT_APP_CONFLUENCE_INSTANCE_URL=https://your-domain.atlassian.net/wiki
+set REACT_APP_CONFLUENCE_API_TOKEN=your-confluence-token
+npm start
+```
+
+**Recommended: Using a `.env` file (All platforms)**
+
+The easiest approach for all platforms is to use a `.env` file in the project root:
+
+1. Copy `.env.example` to `.env`
+2. Edit `.env` and fill in your values
+3. The `.env` file is automatically excluded from version control
+4. Run `npm start` as normal
+
+**Important Security Notes:**
+- Never commit your `.env` file to version control
+- Never share your API tokens publicly
+- Rotate tokens periodically for security
+- The `.env` file is already listed in `.gitignore` to prevent accidental commits
+
 ### Troubleshooting (Kali Linux)
 
 If you encounter issues with `react-scripts` not installing correctly on Kali Linux:
