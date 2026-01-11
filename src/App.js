@@ -32,6 +32,7 @@ import useRequirementsStore from './stores/requirementsStore';
 
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
+import { checkEnvironmentVariables } from './utils/envValidation';
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
@@ -44,6 +45,8 @@ const AppContent = () => {
 
   // Load data on mount - run once
   useEffect(() => {
+    // Validate environment variables for JIRA/Confluence integration
+    checkEnvironmentVariables();
     // Fix email addresses using store directly
     useUserStore.getState().fixEmailAddresses();
     // Load requirements data
