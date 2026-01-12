@@ -1,4 +1,4 @@
-# Simply Cyber Academy - CSF Profile Assessment Database v2.1
+# Simply Cyber Academy - CSF Profile Assessment Database v2.2
 
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 

@@ -9,7 +9,8 @@ import {
   ClipboardList,
   Shield,
   Settings,
-  Bot
+  Bot,
+  AlertTriangle
 } from 'lucide-react';
 
 const Navigation = () => {
@@ -83,7 +84,21 @@ const Navigation = () => {
         }
       >
         <FileArchive size={18} />
-        <span>Evidence</span>
+        <span>Artifacts</span>
+      </NavLink>
+
+      <NavLink
+        to="/findings"
+        className={({ isActive }) =>
+          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+            isActive
+              ? 'bg-amber-700 dark:bg-amber-800 text-white border border-amber-500 dark:border-amber-700'
+              : 'text-white hover:bg-amber-700 dark:hover:bg-amber-800'
+          }`
+        }
+      >
+        <AlertTriangle size={18} />
+        <span>Findings</span>
       </NavLink>
 
       <NavLink

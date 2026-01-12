@@ -22,6 +22,7 @@ import ScoringLegend from './pages/ScoringLegend';
 import Artifacts from './pages/Artifacts';
 import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
+import Findings from './pages/Findings';
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -104,7 +105,7 @@ const AppContent = () => {
                 className="h-16 mr-4"
               />
               <div>
-                <h1 className="text-2xl font-bold">CSF Profile Assessment Database v2.1</h1>
+                <h1 className="text-2xl font-bold">CSF Profile Assessment Database v2.2</h1>
               </div>
             </div>
             <div className="flex items-center gap-4">
@@ -126,6 +127,7 @@ const AppContent = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/scoring" element={<ScoringLegend />} />
             <Route path="/artifacts" element={<Artifacts />} />
+            <Route path="/findings" element={<Findings />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />

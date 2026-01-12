@@ -98,6 +98,22 @@ const useRequirementsStore = create(
         return reqs;
       },
 
+      // Update a requirement
+      updateRequirement: (requirementId, updates) => {
+        set((state) => ({
+          requirements: state.requirements.map(r =>
+            r.id === requirementId ? { ...r, ...updates } : r
+          )
+        }));
+      },
+
+      // Delete a requirement
+      deleteRequirement: (requirementId) => {
+        set((state) => ({
+          requirements: state.requirements.filter(r => r.id !== requirementId)
+        }));
+      },
+
       // Count requirements by framework
       getRequirementCount: (frameworkId) => {
         return get().requirements.filter(r => r.frameworkId === frameworkId).length;
@@ -115,17 +131,20 @@ const useRequirementsStore = create(
                 const rowFramework = row.FRAMEWORK || row.Framework || row.framework || frameworkId;
 
                 return {
-                  id: row.ID || row.id || `${rowFramework}-${index}`,
+                  id: row['Requirement ID'] || row.ID || row.id || `${rowFramework}-${index}`,
                   frameworkId: rowFramework,
                   function: row['CSF FUNCTION'] || row['CSF Function'] || row.Function || row.function || row.level1 || '',
-                  category: row.CATEGORY || row.Category || row.category || row.level2 || '',
+                  category: row['Category Name'] || row.CATEGORY || row.Category || row.category || row.level2 || '',
                   subcategoryId: row['SUBCATEGORY ID'] || row['Subcategory ID'] || row.subcategoryId || row.Subcategory || row.level3 || '',
                   subcategoryDescription: row['SUBCATEGORY DESCRIPTION'] || row['Subcategory Description'] || row.subcategoryDescription || '',
                   implementationExample: row['IMPLEMENTATION EXAMPLE'] || row['Implementation Example'] || row.implementationExample || row.level4 || '',
-                  inScope: false,
+                  inScope: (row['In Scope'] || row['In Scope?'] || 'No').toLowerCase() === 'yes',
                   // Additional metadata
-                  functionDescription: row['Function Description'] || row.functionDescription || '',
-                  categoryDescription: row['Category Description'] || row.categoryDescription || ''
+                  functionDescription: row['CSF Function Description'] || row['Function Description'] || row.functionDescription || '',
+                  categoryDescription: row['Category Description'] || row.categoryDescription || '',
+                  // Confluence fields
+                  controlOwner: row['Control Owner'] || row.controlOwner || '',
+                  stakeholders: row['Stakeholders'] || row.stakeholders || ''
                 };
               });
 
@@ -202,12 +221,15 @@ const useRequirementsStore = create(
         }
 
         const csvData = reqs.map(r => ({
+          'Requirement ID': r.id,
           'Framework': r.frameworkId,
-          'Function': r.function,
-          'Category': r.category,
-          'Subcategory': r.subcategoryId,
-          'ID': r.id,
+          'CSF Function': r.function,
+          'Category Name': r.category,
+          'Subcategory ID': r.subcategoryId,
+          'Subcategory Description': r.subcategoryDescription || '',
           'Implementation Example': r.implementationExample,
+          'Control Owner': r.controlOwner || '',
+          'Stakeholders': r.stakeholders || '',
           'In Scope': r.inScope ? 'Yes' : 'No'
         }));
 

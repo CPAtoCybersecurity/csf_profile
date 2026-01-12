@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
-  FileUp, FileText, Loader2, Bot, Sparkles
+  FileUp, FileText, Loader2, Bot, Sparkles, User, Settings
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
@@ -85,7 +85,7 @@ const Assessments = () => {
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
-    scopeType: 'controls',
+    scopeType: 'requirements',
     frameworkFilter: ''
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
@@ -211,10 +211,10 @@ const Assessments = () => {
   // Helper functions
   const getStatusColor = useCallback((status) => {
     switch (status) {
-      case 'Complete': return 'text-green-600 bg-green-100';
-      case 'In Progress': return 'text-blue-600 bg-blue-100';
-      case 'Submitted': return 'text-orange-600 bg-orange-100';
-      default: return 'text-gray-500 bg-gray-100';
+      case 'Complete': return 'text-green-600 bg-green-100 dark:bg-green-600 dark:text-white';
+      case 'In Progress': return 'text-blue-600 bg-blue-100 dark:bg-blue-600 dark:text-white';
+      case 'Submitted': return 'text-orange-600 bg-orange-100 dark:bg-orange-600 dark:text-white';
+      default: return 'text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
     }
   }, []);
 
@@ -400,7 +400,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'controls', frameworkFilter: '' });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements', frameworkFilter: '' });
     setSelectedScopeItems(new Set());
     setScopeFilterText('');
     setGenerateTestProcedures(false);
@@ -639,17 +639,17 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Render assessment list view
   const renderListView = () => (
     <div className="flex flex-col h-full">
-      <div className="bg-gray-100 p-4 border-b flex items-center justify-between">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 border-b dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <ClipboardList size={24} className="text-blue-600" />
           <div>
-            <h1 className="text-xl font-bold">Assessments</h1>
-            <p className="text-sm text-gray-600">{assessments.length} assessment(s)</p>
+            <h1 className="text-xl font-bold dark:text-white">Control Evaluations</h1>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{assessments.length} evaluation(s)</p>
           </div>
         </div>
         <div className="flex gap-2">
           <button
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
             onClick={() => setShowNewModal(true)}
           >
             <Plus size={16} />
@@ -663,7 +663,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             style={{ display: 'none' }}
           />
           <button
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
             onClick={handleImportClick}
             title="Import assessments from CSV"
           >
@@ -763,18 +763,18 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Render scope definition view
   const renderScopeView = () => (
     <div className="flex flex-col h-full">
-      <div className="bg-gray-100 p-4 border-b">
+      <div className="bg-gray-100 dark:bg-gray-800 p-4 border-b dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
-              className="p-2 hover:bg-gray-200 rounded"
+              className="p-2 hover:bg-gray-200 dark:hover:bg-gray-700 rounded"
               onClick={() => setView('list')}
             >
-              <ChevronRight size={20} className="rotate-180" />
+              <ChevronRight size={20} className="rotate-180 dark:text-gray-300" />
             </button>
             <div>
-              <h1 className="text-xl font-bold">{currentAssessment?.name}</h1>
-              <p className="text-sm text-gray-600">
+              <h1 className="text-xl font-bold dark:text-white">{currentAssessment?.name}</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
                 Define scope - {currentAssessment?.scopeType === 'controls' ? 'Select Controls' : 'Select Requirements'}
               </p>
             </div>
@@ -805,14 +805,14 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             <span className="text-gray-600">Progress:</span>
             <span className="px-2 py-1 bg-gray-200 rounded">{progress.total} scoped</span>
             <span className="px-2 py-1 bg-green-100 text-green-700 rounded">{progress.completed} complete</span>
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">{progress.inProgress} in progress</span>
+            <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white rounded">{progress.inProgress} in progress</span>
           </div>
         )}
       </div>
 
-      <div className="flex flex-1 min-h-0">
+      <div className="grid grid-cols-2 flex-1 min-h-0 overflow-hidden">
         {/* Scoped items */}
-        <div className="w-1/2 border-r overflow-auto">
+        <div className="border-r overflow-auto">
           <div className="p-3 bg-gray-50 border-b sticky top-0">
             <h3 className="font-medium">Scoped Items ({scopedItems.length})</h3>
           </div>
@@ -870,7 +870,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
         </div>
 
         {/* Available items */}
-        <div className="w-1/2 overflow-auto flex flex-col">
+        <div className="overflow-auto flex flex-col">
           <div className="p-3 bg-gray-50 border-b sticky top-0 z-10">
             <h3 className="font-medium mb-2">Available Items ({availableItems.length})</h3>
             <input
@@ -959,148 +959,258 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     </div>
   );
 
-  // Render assessment view
+  // Get status badge style (Jira-style)
+  const getJiraStatusStyle = (status) => {
+    switch (status) {
+      case 'Complete':
+        return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+      case 'In Progress':
+        return 'bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white';
+      case 'Submitted':
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+      default:
+        return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+    }
+  };
+
+  // Get score badge style
+  const getScoreBadgeStyle = (score) => {
+    if (!score || score === 0) return 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300';
+    if (score >= 8) return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+    if (score >= 5) return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+    return 'bg-red-100 text-red-700 dark:bg-red-600 dark:text-white';
+  };
+
+  // Render assessment view - Jira-style: full table, then two-column detail on click
   const renderAssessView = () => {
     const currentItem = scopedItems.find(i => i.itemId === selectedItemId);
+    const currentIndex = scopedItems.findIndex(i => i.itemId === selectedItemId);
 
-    return (
-      <div className="flex flex-col h-full">
-        <div className="bg-gray-100 p-4 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+    // If an item is selected, show the two-column detail view
+    if (selectedItemId && currentObservation && currentItem) {
+      return (
+        <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+          {/* Detail Header - Jira style with back button */}
+          <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-4 py-2">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
               <button
-                className="p-2 hover:bg-gray-200 rounded"
-                onClick={() => setView('scope')}
+                className="hover:text-gray-700 dark:hover:text-gray-200 flex items-center gap-1"
+                onClick={() => setSelectedItemId(null)}
               >
-                <ChevronRight size={20} className="rotate-180" />
+                <ChevronRight size={16} className="rotate-180" />
+                Back
               </button>
+              <span>/</span>
+              <span className="text-blue-600 dark:text-blue-400 font-medium">EVAL-{String(currentIndex + 1).padStart(2, '0')}</span>
+              <span className="flex items-center gap-1">
+                <button
+                  onClick={() => {
+                    const prevIndex = currentIndex - 1;
+                    if (prevIndex >= 0) setSelectedItemId(scopedItems[prevIndex].itemId);
+                  }}
+                  disabled={currentIndex === 0}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30"
+                >
+                  <ChevronRight size={14} className="rotate-180" />
+                </button>
+                <button
+                  onClick={() => {
+                    const nextIndex = currentIndex + 1;
+                    if (nextIndex < scopedItems.length) setSelectedItemId(scopedItems[nextIndex].itemId);
+                  }}
+                  disabled={currentIndex === scopedItems.length - 1}
+                  className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30"
+                >
+                  <ChevronRight size={14} />
+                </button>
+              </span>
+            </div>
+          </div>
+
+          {/* Title bar with subcategory ID and status */}
+          <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-6 py-4">
+            <div className="flex items-start justify-between">
               <div>
-                <h1 className="text-xl font-bold">{currentAssessment?.name}</h1>
-                <p className="text-sm text-gray-600">Control Evaluations</p>
+                <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  {currentItem.type === 'control' ? currentItem.controlId : currentItem.subcategoryId || currentItem.id}
+                </h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">+</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">...</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                {editMode ? (
+                  <select
+                    value={currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started'}
+                    onChange={(e) => handleQuarterlyChange('testingStatus', e.target.value)}
+                    className="px-3 py-1.5 rounded text-sm font-medium border cursor-pointer bg-blue-600 text-white border-blue-600"
+                  >
+                    <option value="Not Started">Not Started</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Submitted">Submitted</option>
+                    <option value="Complete">Complete</option>
+                  </select>
+                ) : (
+                  <span className={`inline-flex items-center px-3 py-1.5 rounded text-sm font-medium ${getJiraStatusStyle(currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started')}`}>
+                    {currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started'}
+                    <ChevronRight size={14} className="ml-1 rotate-90" />
+                  </span>
+                )}
+                {editMode ? (
+                  <button
+                    className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded text-sm"
+                    onClick={() => setEditMode(false)}
+                  >
+                    <Save size={14} />
+                    Done
+                  </button>
+                ) : (
+                  <button
+                    className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 py-1.5 px-3 rounded text-sm border dark:border-gray-600"
+                    onClick={() => setEditMode(true)}
+                  >
+                    <Edit size={14} />
+                    Edit
+                  </button>
+                )}
               </div>
             </div>
-            <button
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
-              onClick={handleExport}
-            >
-              <Download size={16} />
-              Export
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-1 min-h-0">
-          {/* Item list */}
-          <div className="w-64 min-w-64 border-r overflow-auto flex-shrink-0">
-            {scopedItems.map(item => {
-              const obs = currentAssessment?.observations?.[item.itemId];
-              return (
-                <div
-                  key={item.itemId}
-                  className={`p-3 border-b cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
-                    selectedItemId === item.itemId ? 'bg-blue-100 dark:bg-gray-600' : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedItemId(item.itemId);
-                    setEditMode(false);
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium whitespace-nowrap text-sm">
-                      {item.type === 'control' ? item.controlId : item.subcategoryId || item.id}
-                    </span>
-                    {obs?.testingStatus && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(obs.testingStatus)}`}>
-                        {obs.testingStatus}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
           </div>
 
-          {/* Observation detail */}
-          <div className="flex-1 overflow-auto p-4">
-            {currentObservation && currentItem ? (
+          {/* Two-column layout like Jira - 50/50 split */}
+          <div className="grid grid-cols-2 flex-1 min-h-0 overflow-hidden">
+            {/* Left column - Key details (50%) */}
+            <div className="overflow-auto p-6 border-r dark:border-gray-700">
               <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold">
-                      {currentItem.type === 'control' ? currentItem.controlId : currentItem.subcategoryId || currentItem.id}
-                    </h2>
-                    {currentItem.type === 'requirement' && (
-                      <FrameworkBadge frameworkId={currentItem.frameworkId} />
-                    )}
+                {/* Key details section */}
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+                    <ChevronRight size={16} className="rotate-90" />
+                    Key details
+                  </h3>
+
+                  {/* Description */}
+                  <div className="mb-4">
+                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Description</label>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {currentItem.type === 'control'
+                        ? currentItem.implementationDescription || 'Add a description...'
+                        : currentItem.implementationExample || currentItem.category || 'Add a description...'}
+                    </p>
                   </div>
-                  {editMode ? (
-                    <button
-                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-md"
-                      onClick={() => setEditMode(false)}
-                    >
-                      <Save size={16} />
-                      Done
-                    </button>
-                  ) : (
-                    <button
-                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md"
-                      onClick={() => setEditMode(true)}
-                    >
-                      <Edit size={16} />
-                      Edit
-                    </button>
-                  )}
-                </div>
 
-                {/* Item description */}
-                <div className="bg-gray-50 p-3 rounded border">
-                  <p className="text-sm text-gray-600">
-                    {currentItem.type === 'control'
-                      ? currentItem.implementationDescription
-                      : currentItem.implementationExample || currentItem.category}
-                  </p>
-                </div>
-
-                {/* Assessment fields - Per-item info */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  <h3 className="font-medium text-gray-700 border-b pb-2">Assessment Information</h3>
-
-                  <UserSelector
-                    label="Auditor"
-                    selectedUsers={currentObservation.auditorId}
-                    onChange={(userId) => handleObservationChange('auditorId', userId)}
-                    disabled={!editMode}
-                  />
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Test Procedure(s)</label>
+                  {/* Test Procedures */}
+                  <div className="mb-4">
+                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Test Procedures</label>
                     {editMode ? (
                       <textarea
                         value={currentObservation.testProcedures || ''}
                         onChange={(e) => handleObservationChange('testProcedures', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded h-20"
+                        className="w-full p-3 text-sm border dark:border-gray-600 rounded-lg h-32 bg-white dark:bg-gray-700 dark:text-white"
                         placeholder="Document test procedures..."
                       />
                     ) : (
-                      <div className="mt-1 prose prose-sm max-w-none bg-gray-50 p-4 rounded-lg border">
+                      <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
                         <ReactMarkdown>{formatTestProcedures(currentObservation.testProcedures) || 'No test procedures defined'}</ReactMarkdown>
                       </div>
                     )}
                   </div>
 
-                  <ArtifactSelector
-                    label="Linked Artifacts"
-                    selectedArtifacts={currentObservation.linkedArtifacts || []}
-                    onChange={(artifacts) => handleObservationChange('linkedArtifacts', artifacts)}
-                    disabled={!editMode}
-                  />
+                  {/* Artifacts */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-sm text-gray-500 dark:text-gray-400">Artifacts</label>
+                      {!editMode && <span className="text-sm text-blue-600 dark:text-blue-400 cursor-pointer">Add URL</span>}
+                    </div>
+                    <ArtifactSelector
+                      selectedArtifacts={currentObservation.linkedArtifacts || []}
+                      onChange={(artifacts) => handleObservationChange('linkedArtifacts', artifacts)}
+                      disabled={!editMode}
+                    />
+                  </div>
+
+                  {/* Findings */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-sm text-gray-500 dark:text-gray-400">Findings</label>
+                      {!editMode && <span className="text-sm text-blue-600 dark:text-blue-400 cursor-pointer">Add finding</span>}
+                    </div>
+                    {currentObservation.linkedFindings && currentObservation.linkedFindings.length > 0 ? (
+                      <div className="space-y-1">
+                        {currentObservation.linkedFindings.map((findingId, idx) => (
+                          <div key={idx} className="flex items-center gap-2 text-sm">
+                            <span className="text-orange-600 dark:text-orange-400">⚠</span>
+                            <span className="text-gray-700 dark:text-gray-300">{findingId}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-400 dark:text-gray-500">No findings linked</p>
+                    )}
+                  </div>
+
+                  {/* Linked work items placeholder */}
+                  <div className="mb-4">
+                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Linked work items</label>
+                    <p className="text-sm text-gray-400 dark:text-gray-500">Add linked work item</p>
+                  </div>
                 </div>
 
-                {/* Quarterly Evaluations */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="font-medium text-gray-700">Quarterly Evaluations</h3>
+              </div>
+            </div>
+
+            {/* Right column - Details panel (50%) */}
+            <div className="overflow-auto bg-gray-50 dark:bg-gray-800/50">
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                    <ChevronRight size={16} className="rotate-90" />
+                    Details
+                  </h3>
+                  <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <Settings size={14} />
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {/* Assignee */}
+                  <div className="flex items-start justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Assignee</span>
+                    <div className="text-right">
+                      <UserSelector
+                        selectedUsers={currentObservation.auditorId}
+                        onChange={(userId) => handleObservationChange('auditorId', userId)}
+                        disabled={!editMode}
+                      />
+                      {!currentObservation.auditorId && (
+                        <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Assign to me</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Assessment Methods */}
+                  <div className="flex items-start justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Assessment Methods</span>
+                    <div className="flex gap-3">
+                      {['examine', 'interview', 'test'].map((method) => (
+                        <label key={method} className="flex items-center gap-1.5 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={currentObservation.quarters?.[selectedQuarter]?.[method] || false}
+                            onChange={(e) => handleQuarterlyChange(method, e.target.checked)}
+                            disabled={!editMode}
+                            className="w-3.5 h-3.5 rounded border-gray-300 dark:border-gray-600 text-blue-600"
+                          />
+                          <span className="text-xs text-gray-600 dark:text-gray-400 capitalize">{method}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quarter selector */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Quarter</span>
                     <div className="flex gap-1">
                       {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => {
                         const qData = currentObservation.quarters?.[q] || {};
@@ -1109,12 +1219,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           <button
                             key={q}
                             onClick={() => setSelectedQuarter(q)}
-                            className={`px-3 py-1 text-sm font-medium rounded-t transition-colors ${
+                            className={`px-2 py-0.5 text-xs font-medium rounded transition-colors ${
                               selectedQuarter === q
-                                ? 'bg-blue-600 text-white'
+                                ? 'bg-blue-600 dark:bg-blue-500 text-white'
                                 : hasData
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                ? 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white'
+                                : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
                             }`}
                           >
                             {q}
@@ -1124,166 +1234,305 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     </div>
                   </div>
 
-                  {(() => {
-                    const quarterData = currentObservation.quarters?.[selectedQuarter] || {};
-                    return (
-                      <div className="space-y-4">
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Testing Status</label>
-                            {editMode ? (
-                              <select
-                                value={quarterData.testingStatus || 'Not Started'}
-                                onChange={(e) => handleQuarterlyChange('testingStatus', e.target.value)}
-                                className="mt-1 w-full p-2 border rounded"
-                              >
-                                <option value="Not Started">Not Started</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Submitted">Submitted</option>
-                                <option value="Complete">Complete</option>
-                              </select>
-                            ) : (
-                              <p className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(quarterData.testingStatus || 'Not Started')}`}>
-                                {quarterData.testingStatus || 'Not Started'}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Evaluation Date</label>
-                            {editMode ? (
-                              <input
-                                type="date"
-                                value={quarterData.observationDate || ''}
-                                onChange={(e) => handleQuarterlyChange('observationDate', e.target.value)}
-                                className="mt-1 w-full p-2 border rounded"
-                              />
-                            ) : (
-                              <p className="mt-1">{quarterData.observationDate || 'Not set'}</p>
-                            )}
-                          </div>
-                        </div>
+                  {/* Q Target Score */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Target Score</span>
+                    {editMode ? (
+                      <select
+                        value={currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
+                        onChange={(e) => handleQuarterlyChange('targetScore', Number(e.target.value))}
+                        className="w-16 p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      >
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
+                      </span>
+                    )}
+                  </div>
 
-                        <div>
-                          <label className="text-sm font-medium text-gray-500">Assessment Method(s)</label>
-                          <div className="mt-1 flex gap-4">
-                            {['examine', 'interview', 'test'].map((method) => (
-                              <label key={method} className="flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={quarterData[method] || false}
-                                  onChange={(e) => handleQuarterlyChange(method, e.target.checked)}
-                                  disabled={!editMode}
-                                  className="rounded"
-                                />
-                                <span className="text-sm capitalize">{method}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
+                  {/* Q Actual Score */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Actual Score</span>
+                    {editMode ? (
+                      <select
+                        value={currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
+                        onChange={(e) => handleQuarterlyChange('actualScore', Number(e.target.value))}
+                        className="w-16 p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      >
+                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(s => (
+                          <option key={s} value={s}>{s}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span className={`px-2 py-0.5 rounded text-sm font-bold ${getScoreBadgeStyle(currentObservation.quarters?.[selectedQuarter]?.actualScore)}`}>
+                        {currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
+                      </span>
+                    )}
+                  </div>
 
-                        <div>
-                          <label className="text-sm font-medium text-gray-500">{selectedQuarter} Evaluation Notes</label>
-                          {editMode ? (
-                            <textarea
-                              value={quarterData.observations || ''}
-                              onChange={(e) => handleQuarterlyChange('observations', e.target.value)}
-                              className="mt-1 w-full p-2 border rounded h-32"
-                              placeholder={`Document ${selectedQuarter} observations...`}
-                            />
-                          ) : (
-                            <div className="mt-1 prose prose-sm max-w-none">
-                              <ReactMarkdown>{quarterData.observations || 'No observations'}</ReactMarkdown>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Actual Score</label>
-                            {editMode ? (
-                              <select
-                                value={quarterData.actualScore || 0}
-                                onChange={(e) => handleQuarterlyChange('actualScore', Number(e.target.value))}
-                                className="mt-1 w-full p-2 border rounded"
-                              >
-                                {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map(s => (
-                                  <option key={s} value={s}>{s}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <p className="mt-1 text-lg font-bold">{quarterData.actualScore || 0}</p>
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Target Score</label>
-                            {editMode ? (
-                              <select
-                                value={quarterData.targetScore || 0}
-                                onChange={(e) => handleQuarterlyChange('targetScore', Number(e.target.value))}
-                                className="mt-1 w-full p-2 border rounded"
-                              >
-                                {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map(s => (
-                                  <option key={s} value={s}>{s}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <p className="mt-1 text-lg font-bold">{quarterData.targetScore || 0}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                {/* Remediation Plan */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  <h3 className="font-medium text-gray-700 border-b pb-2">Remediation Plan</h3>
-
-                  <UserSelector
-                    label="Remediation Owner"
-                    selectedUsers={currentObservation.remediation?.ownerId}
-                    onChange={(userId) => handleRemediationChange('ownerId', userId)}
-                    disabled={!editMode}
-                  />
-
+                  {/* Q Observations */}
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Action Plan</label>
+                    <span className="text-sm text-gray-500 dark:text-gray-400 block mb-2">{selectedQuarter} Observations</span>
                     {editMode ? (
                       <textarea
-                        value={currentObservation.remediation?.actionPlan || ''}
-                        onChange={(e) => handleRemediationChange('actionPlan', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded h-24"
-                        placeholder="Document remediation actions..."
+                        value={currentObservation.quarters?.[selectedQuarter]?.observations || ''}
+                        onChange={(e) => handleQuarterlyChange('observations', e.target.value)}
+                        className="w-full p-2 text-sm border dark:border-gray-600 rounded h-32 bg-white dark:bg-gray-700 dark:text-white"
+                        placeholder={`Document ${selectedQuarter} observations...`}
                       />
                     ) : (
-                      <div className="mt-1 prose prose-sm max-w-none">
-                        <ReactMarkdown>{currentObservation.remediation?.actionPlan || 'No action plan'}</ReactMarkdown>
+                      <div className="text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
+                        {currentObservation.quarters?.[selectedQuarter]?.observations || 'None'}
                       </div>
                     )}
                   </div>
 
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Due Date</label>
-                    {editMode ? (
-                      <input
-                        type="date"
-                        value={currentObservation.remediation?.dueDate || ''}
-                        onChange={(e) => handleRemediationChange('dueDate', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p className="mt-1">{currentObservation.remediation?.dueDate || 'Not set'}</p>
-                    )}
+                  {/* Remediation section */}
+                  <div className="border-t dark:border-gray-700 pt-4 mt-4">
+                    <h4 className="text-xs font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wider mb-3">Remediation</h4>
+
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Owner</span>
+                        <UserSelector
+                          selectedUsers={currentObservation.remediation?.ownerId}
+                          onChange={(userId) => handleRemediationChange('ownerId', userId)}
+                          disabled={!editMode}
+                        />
+                      </div>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">Due Date</span>
+                        {editMode ? (
+                          <input
+                            type="date"
+                            value={currentObservation.remediation?.dueDate || ''}
+                            onChange={(e) => handleRemediationChange('dueDate', e.target.value)}
+                            className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                          />
+                        ) : (
+                          <span className="text-sm text-gray-700 dark:text-gray-300">
+                            {currentObservation.remediation?.dueDate || 'Not set'}
+                          </span>
+                        )}
+                      </div>
+
+                      <div>
+                        <span className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Action Plan</span>
+                        {editMode ? (
+                          <textarea
+                            value={currentObservation.remediation?.actionPlan || ''}
+                            onChange={(e) => handleRemediationChange('actionPlan', e.target.value)}
+                            className="w-full p-2 text-sm border dark:border-gray-600 rounded h-20 bg-white dark:bg-gray-700 dark:text-white"
+                            placeholder="Document remediation actions..."
+                          />
+                        ) : (
+                          <p className="text-sm text-gray-700 dark:text-gray-300">
+                            {currentObservation.remediation?.actionPlan || 'No action plan'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <FileSearch size={48} className="mb-4 opacity-50" />
-                <p>Select an item to assess</p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Full-width table view when no item is selected
+    return (
+      <div className="flex flex-col h-full bg-white dark:bg-gray-900">
+        {/* Header - Jira style */}
+        <div className="bg-white dark:bg-gray-800 border-b dark:border-gray-700 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <button
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                onClick={() => setView('scope')}
+              >
+                <ChevronRight size={18} className="rotate-180 text-gray-500 dark:text-gray-400" />
+              </button>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{currentAssessment?.name}</h1>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{scopedItems.length} evaluations</p>
               </div>
-            )}
+            </div>
+            <div className="flex items-center gap-3">
+              {/* Quarter selector */}
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+                {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => setSelectedQuarter(q)}
+                    className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${
+                      selectedQuarter === q
+                        ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {q}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="flex items-center gap-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 py-1.5 px-3 rounded text-sm"
+                onClick={handleExport}
+              >
+                <Download size={14} />
+                Export
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Full-width Jira-style table */}
+        <div className="flex-1 overflow-auto">
+          {/* Column headers */}
+          <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
+            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-max">
+              <div className="w-8 flex-shrink-0"></div>
+              <div className="w-32 flex-shrink-0">Work</div>
+              <div className="w-28 flex-shrink-0">Assignee</div>
+              <div className="w-64 flex-shrink-0">Test Procedures</div>
+              <div className="w-48 flex-shrink-0">Description</div>
+              <div className="w-16 flex-shrink-0">Artifacts</div>
+              <div className="w-20 flex-shrink-0">{selectedQuarter} Target</div>
+              <div className="w-20 flex-shrink-0">{selectedQuarter} Actual</div>
+              <div className="w-48 flex-shrink-0">{selectedQuarter} Observations</div>
+              <div className="w-24 flex-shrink-0">Status</div>
+            </div>
+          </div>
+
+          {/* Table rows */}
+          <div className="divide-y divide-gray-100 dark:divide-gray-700">
+            {scopedItems.map((item, index) => {
+              const obs = currentAssessment?.observations?.[item.itemId];
+              const quarterData = obs?.quarters?.[selectedQuarter] || {};
+              const auditor = obs?.auditorId ? useUserStore.getState().getUser(obs.auditorId) : null;
+
+              return (
+                <div
+                  key={item.itemId}
+                  className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-w-max"
+                  onClick={() => {
+                    setSelectedItemId(item.itemId);
+                    setEditMode(false);
+                  }}
+                >
+                  {/* Checkbox placeholder */}
+                  <div className="w-8 flex-shrink-0">
+                    <input type="checkbox" className="w-4 h-4 rounded border-gray-300 dark:border-gray-600" onClick={(e) => e.stopPropagation()} />
+                  </div>
+
+                  {/* Work column */}
+                  <div className="w-32 flex-shrink-0 flex items-center gap-2">
+                    <div className="flex-shrink-0 w-5 h-5 rounded bg-blue-500 flex items-center justify-center">
+                      <ClipboardList size={12} className="text-white" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
+                        EVAL-{String(index + 1).padStart(2, '0')}
+                      </span>
+                      <p className="text-sm text-gray-900 dark:text-white truncate">
+                        {item.type === 'control' ? item.controlId : item.subcategoryId || item.id}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Assignee column */}
+                  <div className="w-28 flex-shrink-0 flex items-center">
+                    {auditor ? (
+                      <div className="flex items-center gap-1.5" title={auditor.name}>
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium ${
+                          ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'][
+                            auditor.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 5
+                          ]
+                        }`}>
+                          {auditor.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
+                        </div>
+                        <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
+                          {auditor.name}
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 text-gray-400">
+                        <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-600 flex items-center justify-center">
+                          <User size={12} />
+                        </div>
+                        <span className="text-sm">Unassigned</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Test Procedures column */}
+                  <div className="w-64 flex-shrink-0">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                      {obs?.testProcedures ? obs.testProcedures.substring(0, 80) + (obs.testProcedures.length > 80 ? '...' : '') : '-'}
+                    </p>
+                  </div>
+
+                  {/* Description column */}
+                  <div className="w-48 flex-shrink-0">
+                    <p className="text-sm text-gray-500 dark:text-gray-500 truncate">
+                      {item.type === 'control'
+                        ? (item.implementationDescription?.substring(0, 60) || '-')
+                        : (item.category?.substring(0, 60) || '-')}
+                    </p>
+                  </div>
+
+                  {/* Artifacts column */}
+                  <div className="w-16 flex-shrink-0">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {obs?.linkedArtifacts?.length || 'None'}
+                    </span>
+                  </div>
+
+                  {/* Q Target Score */}
+                  <div className="w-20 flex-shrink-0">
+                    <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-sm text-gray-700 dark:text-gray-300">
+                      {quarterData.targetScore || '-'}
+                    </span>
+                  </div>
+
+                  {/* Q Actual Score */}
+                  <div className="w-20 flex-shrink-0">
+                    <span className={`px-2 py-0.5 rounded text-sm font-bold ${getScoreBadgeStyle(quarterData.actualScore)}`}>
+                      {quarterData.actualScore || '-'}
+                    </span>
+                  </div>
+
+                  {/* Q Observations */}
+                  <div className="w-48 flex-shrink-0">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
+                      {quarterData.observations ? quarterData.observations.substring(0, 50) + '...' : '-'}
+                    </p>
+                  </div>
+
+                  {/* Status column */}
+                  <div className="w-24 flex-shrink-0">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase ${getJiraStatusStyle(quarterData.testingStatus || obs?.testingStatus || 'Not Started')}`}>
+                      {quarterData.testingStatus || obs?.testingStatus || 'Not Started'}
+                      <ChevronRight size={12} className="ml-1 rotate-90" />
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Footer with count */}
+          <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t dark:border-gray-700 px-4 py-2">
+            <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+              <span>+ Create</span>
+              <span>{scopedItems.length} of {scopedItems.length}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -1370,6 +1619,20 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <input
                           type="radio"
                           name="scopeType"
+                          value="requirements"
+                          checked={newAssessment.scopeType === 'requirements'}
+                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                        />
+                        <div>
+                          <span className="font-medium">By Requirements</span>
+                          <span className="text-green-600 ml-2">(Recommended)</span>
+                          <p className="text-xs text-gray-500">Assess directly against framework requirements</p>
+                        </div>
+                      </label>
+                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="radio"
+                          name="scopeType"
                           value="controls"
                           checked={newAssessment.scopeType === 'controls'}
                           onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
@@ -1377,22 +1640,9 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <div>
                           <span className="font-medium">By Controls</span>
                           {controls.length > 0 && (
-                            <span className="text-green-600 ml-2">(Recommended - {controls.length} available)</span>
+                            <span className="text-gray-500 ml-2">({controls.length} available)</span>
                           )}
-                          <p className="text-xs text-gray-500">Assess your organization's defined controls</p>
-                        </div>
-                      </label>
-                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
-                        <input
-                          type="radio"
-                          name="scopeType"
-                          value="requirements"
-                          checked={newAssessment.scopeType === 'requirements'}
-                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
-                        />
-                        <div>
-                          <span className="font-medium">By Requirements</span>
-                          <p className="text-xs text-gray-500">Assess directly against framework requirements</p>
+                          <p className="text-xs text-gray-500">Assess your organization's defined controls (Most commonly used for SOC2)</p>
                         </div>
                       </label>
                     </div>
@@ -1769,7 +2019,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 )}
                 {wizardStep < 3 ? (
                   <button
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:bg-gray-300"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded disabled:bg-gray-300"
                     onClick={() => {
                       if (wizardStep === 1) {
                         if (!newAssessment.name) {

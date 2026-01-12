@@ -18,7 +18,6 @@ const DropdownPortal = ({
   useEffect(() => {
     if (isOpen && triggerRef?.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      console.log('DropdownPortal: trigger rect', rect);
       setPosition({
         top: rect.bottom + 4,
         left: rect.left,
@@ -57,8 +56,6 @@ const DropdownPortal = ({
       document.removeEventListener('keydown', handleEscape);
     };
   }, [isOpen, onClose, triggerRef]);
-
-  console.log('DropdownPortal render: isOpen=', isOpen, 'position=', position);
 
   if (!isOpen) {
     return null;

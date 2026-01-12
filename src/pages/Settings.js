@@ -1,6 +1,5 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
-  Settings as SettingsIcon,
   Upload,
   Download,
   Trash2,
@@ -12,7 +11,11 @@ import {
   ExternalLink,
   Clock,
   AlertCircle,
-  Shield
+  Shield,
+  Cloud,
+  Key,
+  RefreshCw,
+  Loader2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -30,14 +33,19 @@ import useFindingsStore from '../stores/findingsStore';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
-
-// Utils
-import { 
-  getBackupReminderFrequency, 
+import {
+  getBackupReminderFrequency,
   setBackupReminderFrequency,
   getTimeSinceLastExport,
-  getLastExportDate 
+  getLastExportDate
 } from '../utils/backupTracking';
+import {
+  harvestEntryIds,
+  getAllEntryIdMappings,
+  importEntryIdsFromCSV,
+  exportEntryIdsToCSV,
+  updateConfluenceConfig
+} from '../utils/confluenceSync';
 
 const Settings = () => {
   const frameworks = useFrameworksStore((state) => state.frameworks);
@@ -60,6 +68,73 @@ const Settings = () => {
   const [editingFramework, setEditingFramework] = useState(null);
   const [backupFrequency, setBackupFrequency] = useState(getBackupReminderFrequency());
 
+  // Atlassian configuration state
+  const [atlassianSiteUrl, setAtlassianSiteUrl] = useState('');
+  const [atlassianEmail, setAtlassianEmail] = useState('');
+  const [atlassianApiToken, setAtlassianApiToken] = useState('');
+  const [showApiToken, setShowApiToken] = useState(false);
+  const [isHarvesting, setIsHarvesting] = useState(false);
+  const [entryIdCount, setEntryIdCount] = useState(0);
+
+  // Load Atlassian config from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedConfig = localStorage.getItem('atlassian-config');
+      if (savedConfig) {
+        const config = JSON.parse(savedConfig);
+        setAtlassianSiteUrl(config.siteUrl || '');
+        setAtlassianEmail(config.email || '');
+        setAtlassianApiToken(config.apiToken || '');
+      }
+      // Load entry ID count
+      const mappings = getAllEntryIdMappings();
+      setEntryIdCount(Object.keys(mappings).length);
+    } catch (e) {
+      console.error('Failed to load Atlassian config:', e);
+    }
+  }, []);
+
+  // Save Atlassian config to localStorage
+  const saveAtlassianConfig = useCallback(() => {
+    try {
+      const config = {
+        siteUrl: atlassianSiteUrl,
+        email: atlassianEmail,
+        apiToken: atlassianApiToken
+      };
+      localStorage.setItem('atlassian-config', JSON.stringify(config));
+
+      // Update Confluence config with new base URL
+      if (atlassianSiteUrl) {
+        updateConfluenceConfig({ baseUrl: atlassianSiteUrl.replace(/\/$/, '') });
+      }
+
+      toast.success('Atlassian configuration saved');
+    } catch (e) {
+      toast.error('Failed to save configuration');
+    }
+  }, [atlassianSiteUrl, atlassianEmail, atlassianApiToken]);
+
+  // Handle Entry ID harvesting
+  const handleHarvestEntryIds = useCallback(async () => {
+    if (!atlassianEmail || !atlassianApiToken) {
+      toast.error('Please configure Email and API Token first');
+      return;
+    }
+
+    setIsHarvesting(true);
+    try {
+      const mappings = await harvestEntryIds(atlassianApiToken, atlassianEmail);
+      const count = Object.keys(mappings).length;
+      setEntryIdCount(count);
+      toast.success(`Harvested ${count} entry ID mappings from Confluence`);
+    } catch (err) {
+      toast.error(`Harvesting failed: ${err.message}`);
+    } finally {
+      setIsHarvesting(false);
+    }
+  }, [atlassianEmail, atlassianApiToken]);
+
   const fileInputRef = useRef(null);
   const newFrameworkFileInputRef = useRef(null);
   const [importFrameworkId, setImportFrameworkId] = useState(null);
@@ -68,6 +143,7 @@ const Settings = () => {
   const findingsImportRef = useRef(null);
   const artifactsImportRef = useRef(null);
   const assessmentsImportRef = useRef(null);
+  const entryIdImportRef = useRef(null);
 
   // Export handlers
   const handleExportCompleteDatabase = useCallback(() => {
@@ -271,6 +347,43 @@ const Settings = () => {
     e.target.value = '';
   }, []);
 
+  // Entry ID import handler
+  const handleEntryIdImport = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const count = importEntryIdsFromCSV(text);
+      setEntryIdCount(Object.keys(getAllEntryIdMappings()).length);
+      toast.success(`Imported ${count} entry ID mappings`);
+    } catch (err) {
+      toast.error(`Import failed: ${err.message}`);
+    }
+
+    e.target.value = '';
+  }, []);
+
+  // Entry ID export handler
+  const handleEntryIdExport = useCallback(() => {
+    try {
+      const csv = exportEntryIdsToCSV();
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      const date = new Date().toISOString().split('T')[0];
+      link.href = url;
+      link.download = `confluence_entry_ids_${date}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      toast.success('Entry ID mappings exported');
+    } catch (err) {
+      toast.error(`Export failed: ${err.message}`);
+    }
+  }, []);
+
   const handleDownloadTemplate = useCallback(() => {
     const templateContent = `FRAMEWORK,CSF FUNCTION,CATEGORY,SUBCATEGORY ID,SUBCATEGORY DESCRIPTION,ID,IMPLEMENTATION EXAMPLE
 nist-csf-2.0,GOVERN (GV),Organizational Context (GV.OC),GV.OC-01,The organizational mission is understood and informs cybersecurity risk management,GV.OC-01 Ex1,"Ex1: Share the organization's mission (e.g., through vision and mission statements, marketing, and service strategies) to provide a basis for identifying risks that may impede that mission"
@@ -296,6 +409,20 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
   return (
     <div className="p-4 bg-white min-h-full">
       <h1 className="text-2xl font-bold mb-4">Settings</h1>
+
+      {/* Experimental Notice for Jira/Confluence */}
+      <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg max-w-4xl">
+        <div className="flex items-start gap-3">
+          <span className="text-amber-600 dark:text-amber-400 text-xl">⚠️</span>
+          <div>
+            <p className="text-amber-800 dark:text-amber-200 font-medium">Experimental Features</p>
+            <p className="text-amber-700 dark:text-amber-300 text-sm mt-1">
+              The Jira and Confluence import/export features are experimental and still under development.
+              Data formats and functionality may change. Feedback welcome from the community!
+            </p>
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-8">
         {/* Backup & Data Persistence Settings */}
@@ -765,6 +892,163 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </div>
           </div>
 
+          {/* Atlassian API Configuration */}
+          <div className="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-4">
+              <Cloud size={24} className="text-slate-600" />
+              <div>
+                <h3 className="font-medium text-slate-800">Atlassian API Configuration</h3>
+                <p className="text-sm text-slate-600">Configure credentials for Jira Cloud and Confluence API access</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              {/* Site URL */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Atlassian Site URL
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://your-site.atlassian.net"
+                  value={atlassianSiteUrl}
+                  onChange={(e) => setAtlassianSiteUrl(e.target.value)}
+                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p className="text-xs text-slate-500 mt-1">Your Atlassian Cloud site URL (e.g., https://company.atlassian.net)</p>
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  placeholder="your-email@company.com"
+                  value={atlassianEmail}
+                  onChange={(e) => setAtlassianEmail(e.target.value)}
+                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+                <p className="text-xs text-slate-500 mt-1">Email associated with your Atlassian account</p>
+              </div>
+
+              {/* API Token */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  API Token
+                </label>
+                <div className="relative flex items-center">
+                  <input
+                    type={showApiToken ? 'text' : 'password'}
+                    placeholder="Enter your Atlassian API token"
+                    value={atlassianApiToken}
+                    onChange={(e) => setAtlassianApiToken(e.target.value)}
+                    className="w-full p-2 pr-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowApiToken(!showApiToken)}
+                    className="absolute right-2 p-1 text-slate-500 hover:text-slate-700 bg-white rounded"
+                  >
+                    {showApiToken ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Generate at{' '}
+                  <a
+                    href="https://id.atlassian.com/manage-profile/security/api-tokens"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    Atlassian API Tokens
+                  </a>
+                </p>
+              </div>
+
+              {/* Save Button */}
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  onClick={saveAtlassianConfig}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm"
+                >
+                  <Key size={16} className="text-white" />
+                  <span className="text-white">Save Configuration</span>
+                </button>
+                {atlassianSiteUrl && atlassianEmail && atlassianApiToken && (
+                  <span className="text-sm text-green-600 flex items-center gap-1">
+                    <Check size={14} />
+                    Configured
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Entry ID Harvesting */}
+            <div className="mt-6 pt-4 border-t border-slate-200">
+              <h4 className="text-sm font-medium text-slate-800 mb-2">Confluence Entry ID Harvesting</h4>
+              <p className="text-sm text-slate-600 mb-3">
+                Harvest entry IDs from your Confluence Requirements database to enable Smart-Embed linking in Jira issues.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={handleHarvestEntryIds}
+                  disabled={isHarvesting || !atlassianEmail || !atlassianApiToken}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm
+                    ${isHarvesting || !atlassianEmail || !atlassianApiToken
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
+                >
+                  {isHarvesting ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      Harvesting...
+                    </>
+                  ) : (
+                    <>
+                      <RefreshCw size={16} />
+                      Harvest Entry IDs
+                    </>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => entryIdImportRef.current?.click()}
+                  className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium shadow-sm"
+                >
+                  <Upload size={14} />
+                  Import CSV
+                </button>
+
+                <button
+                  onClick={handleEntryIdExport}
+                  disabled={entryIdCount === 0}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm
+                    ${entryIdCount === 0
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300'
+                      : 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                    }`}
+                >
+                  <Download size={14} />
+                  Export CSV
+                </button>
+
+                {entryIdCount > 0 && (
+                  <span className="text-sm text-slate-600 bg-slate-200 px-3 py-1.5 rounded-full">
+                    {entryIdCount} mapping{entryIdCount !== 1 ? 's' : ''} stored
+                  </span>
+                )}
+              </div>
+
+              <p className="text-xs text-slate-500 mt-3">
+                Entry IDs link requirements to their Confluence database entries, enabling Smart-Embed URLs in Jira issue descriptions.
+              </p>
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="mt-6 grid grid-cols-3 gap-4">
             <div className="bg-white p-4 rounded-lg border">
@@ -842,6 +1126,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         style={{ display: 'none' }}
         accept=".csv"
         onChange={handleAssessmentsImport}
+      />
+      <input
+        type="file"
+        ref={entryIdImportRef}
+        style={{ display: 'none' }}
+        accept=".csv"
+        onChange={handleEntryIdImport}
       />
 
       {/* Edit Framework Modal */}
