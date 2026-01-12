@@ -6,12 +6,17 @@ import toast from 'react-hot-toast';
 
 // Components
 import FrameworkBadge from '../components/FrameworkBadge';
+import CSFBadge, { SubcategoryBadge } from '../components/CSFBadge';
 import DropdownPortal from '../components/DropdownPortal';
 import SortableHeader from '../components/SortableHeader';
+import RequirementDetailPanel from '../components/RequirementDetailPanel';
 
 // Stores
 import useRequirementsStore from '../stores/requirementsStore';
 import useFrameworksStore from '../stores/frameworksStore';
+import useControlsStore from '../stores/controlsStore';
+import useArtifactStore from '../stores/artifactStore';
+import useFindingsStore from '../stores/findingsStore';
 
 const Requirements = () => {
   // Store state
@@ -20,12 +25,20 @@ const Requirements = () => {
   const loadInitialData = useRequirementsStore((state) => state.loadInitialData);
   const importRequirementsCSV = useRequirementsStore((state) => state.importRequirementsCSV);
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
+  const updateRequirement = useRequirementsStore((state) => state.updateRequirement);
+  const deleteRequirement = useRequirementsStore((state) => state.deleteRequirement);
 
   const frameworks = useFrameworksStore((state) => state.frameworks);
   const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
   const markFrameworkImported = useFrameworksStore((state) => state.markFrameworkImported);
 
+  // Controls, artifacts, and findings for the detail panel
+  const controls = useControlsStore((state) => state.controls);
+  const artifacts = useArtifactStore((state) => state.artifacts);
+  const findings = useFindingsStore((state) => state.findings);
+
   // Local state
+  const [selectedRequirement, setSelectedRequirement] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterFramework, setFilterFramework] = useState('');
   const [filterFunction, setFilterFunction] = useState('');
@@ -86,7 +99,10 @@ const Requirements = () => {
         r.function?.toLowerCase().includes(search) ||
         r.category?.toLowerCase().includes(search) ||
         r.subcategoryId?.toLowerCase().includes(search) ||
-        r.implementationExample?.toLowerCase().includes(search)
+        r.subcategoryDescription?.toLowerCase().includes(search) ||
+        r.implementationExample?.toLowerCase().includes(search) ||
+        r.controlOwner?.toLowerCase().includes(search) ||
+        r.stakeholders?.toLowerCase().includes(search)
       );
     }
 
@@ -169,6 +185,26 @@ const Requirements = () => {
     exportRequirementsCSV(filterFramework || null);
     toast.success('Requirements exported');
   }, [exportRequirementsCSV, filterFramework]);
+
+  // Handle save requirement from inline panel editing
+  const handleSaveRequirement = useCallback((updatedRequirement) => {
+    updateRequirement(updatedRequirement.id, updatedRequirement);
+    toast.success('Requirement updated');
+    // Update selected requirement to reflect changes
+    setSelectedRequirement(updatedRequirement);
+  }, [updateRequirement]);
+
+  // Handle delete requirement
+  const handleDeleteRequirement = useCallback((requirement) => {
+    if (window.confirm(`Are you sure you want to delete requirement "${requirement.id}"? This cannot be undone.`)) {
+      deleteRequirement(requirement.id);
+      toast.success('Requirement deleted');
+      // Close panel if deleted requirement was selected
+      if (selectedRequirement?.id === requirement.id) {
+        setSelectedRequirement(null);
+      }
+    }
+  }, [deleteRequirement, selectedRequirement]);
 
   if (loading) {
     return (
@@ -386,38 +422,144 @@ const Requirements = () => {
             <p className="text-sm mt-2">Import framework requirements using the Import button</p>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0 z-10">
-              <tr>
-                <SortableHeader label="Framework" sortKey="frameworkId" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="CSF Function" sortKey="function" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="Category" sortKey="category" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="Subcategory" sortKey="subcategoryId" currentSort={sort} onSort={handleSort} />
-                <SortableHeader label="ID" sortKey="id" currentSort={sort} onSort={handleSort} />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Implementation Example</th>
+          <table className="min-w-full bg-white border-collapse" style={{ borderSpacing: 0 }}>
+            <thead className="sticky top-0 z-10">
+              <tr className="bg-gray-50 border-b border-gray-300">
+                <SortableHeader label="Requirement ID" sortKey="id" currentSort={sort} onSort={handleSort} className="w-32 border-r border-gray-200" />
+                <SortableHeader label="Framework" sortKey="frameworkId" currentSort={sort} onSort={handleSort} className="w-36 border-r border-gray-200" />
+                <SortableHeader label="CSF Function" sortKey="function" currentSort={sort} onSort={handleSort} className="w-32 border-r border-gray-200" />
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">CSF Function Description</th>
+                <SortableHeader label="Category Name" sortKey="category" currentSort={sort} onSort={handleSort} className="w-40 border-r border-gray-200" />
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Category Description</th>
+                <SortableHeader label="Subcategory ID" sortKey="subcategoryId" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200" />
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Subcategory Description</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Implementation Example</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-56">Implementation Description (Control)</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Control Owner</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Stakeholders</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Artifacts</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Findings</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Control Evaluation Back Link</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {currentItems.map((req) => (
+            <tbody>
+              {currentItems.map((req, index) => (
                 <tr
                   key={req.id}
-                  className="hover:bg-blue-50"
+                  onClick={() => setSelectedRequirement(req)}
+                  className={`border-b border-gray-200 hover:bg-blue-50/50 transition-colors cursor-pointer ${
+                    selectedRequirement?.id === req.id ? 'bg-blue-100 hover:bg-blue-100' : 'bg-white'
+                  }`}
                 >
-                  <td className="p-3 text-sm">
+                  {/* Requirement ID */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    <SubcategoryBadge subcategoryId={req.id} size="sm" />
+                  </td>
+                  {/* Framework */}
+                  <td className="p-3 text-sm border-r border-gray-200">
                     <FrameworkBadge frameworkId={req.frameworkId} />
                   </td>
-                  <td className="p-3 text-sm font-medium">{req.function}</td>
-                  <td className="p-3 text-sm">
-                    <div className="max-w-xs truncate" title={req.category}>
-                      {req.category}
+                  {/* CSF Function */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    <CSFBadge functionName={req.function} size="sm" />
+                  </td>
+                  {/* CSF Function Description */}
+                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
+                    <div className="line-clamp-3" title={req.functionDescription}>
+                      {req.functionDescription || '-'}
                     </div>
                   </td>
-                  <td className="p-3 text-sm">{req.subcategoryId}</td>
-                  <td className="p-3 text-sm font-mono text-xs">{req.id}</td>
-                  <td className="p-3 text-sm">
-                    <div className="max-w-md line-clamp-2 text-gray-600" title={req.implementationExample}>
-                      {req.implementationExample}
+                  {/* Category Name */}
+                  <td className="p-3 text-sm text-gray-700 border-r border-gray-200">
+                    {req.category || '-'}
+                  </td>
+                  {/* Category Description */}
+                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
+                    <div className="line-clamp-3" title={req.categoryDescription}>
+                      {req.categoryDescription || '-'}
                     </div>
+                  </td>
+                  {/* Subcategory ID */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    <SubcategoryBadge subcategoryId={req.subcategoryId} size="sm" />
+                  </td>
+                  {/* Subcategory Description */}
+                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
+                    <div className="line-clamp-3" title={req.subcategoryDescription}>
+                      {req.subcategoryDescription || '-'}
+                    </div>
+                  </td>
+                  {/* Implementation Example */}
+                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
+                    <div className="line-clamp-3" title={req.implementationExample}>
+                      {req.implementationExample || '-'}
+                    </div>
+                  </td>
+                  {/* Implementation Description (Control) */}
+                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
+                    <div className="line-clamp-3" title={req.implementationDetails}>
+                      {req.implementationDetails || '-'}
+                    </div>
+                  </td>
+                  {/* Control Owner */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    {req.controlOwner ? (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                        {req.controlOwner}
+                      </span>
+                    ) : '-'}
+                  </td>
+                  {/* Stakeholders */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    {req.stakeholders ? (
+                      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
+                        {req.stakeholders}
+                      </span>
+                    ) : '-'}
+                  </td>
+                  {/* Artifacts */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    {req.linkedArtifacts && req.linkedArtifacts.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {req.linkedArtifacts.slice(0, 2).map((name, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs truncate max-w-[100px]">
+                            {name}
+                          </span>
+                        ))}
+                        {req.linkedArtifacts.length > 2 && (
+                          <span className="text-xs text-gray-500">+{req.linkedArtifacts.length - 2}</span>
+                        )}
+                      </div>
+                    ) : '-'}
+                  </td>
+                  {/* Findings */}
+                  <td className="p-3 text-sm border-r border-gray-200">
+                    {req.linkedFindings && req.linkedFindings.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {req.linkedFindings.slice(0, 2).map((id, idx) => (
+                          <span key={idx} className="px-2 py-0.5 bg-orange-100 text-orange-800 rounded text-xs">
+                            {id}
+                          </span>
+                        ))}
+                        {req.linkedFindings.length > 2 && (
+                          <span className="text-xs text-gray-500">+{req.linkedFindings.length - 2}</span>
+                        )}
+                      </div>
+                    ) : '-'}
+                  </td>
+                  {/* Control Evaluation Back Link */}
+                  <td className="p-3 text-sm">
+                    {req.controlEvaluationLink ? (
+                      <a
+                        href={req.controlEvaluationLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:underline text-xs truncate block"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {req.controlEvaluationLink}
+                      </a>
+                    ) : '-'}
                   </td>
                 </tr>
               ))}
@@ -485,6 +627,20 @@ const Requirements = () => {
           </div>
         </div>
       )}
+
+      {/* Requirement Detail Panel */}
+      {selectedRequirement && (
+        <RequirementDetailPanel
+          requirement={selectedRequirement}
+          onClose={() => setSelectedRequirement(null)}
+          onSave={handleSaveRequirement}
+          onDelete={handleDeleteRequirement}
+          controls={controls}
+          artifacts={artifacts}
+          findings={findings}
+        />
+      )}
+
     </div>
   );
 };

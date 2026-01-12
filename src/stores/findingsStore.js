@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput } from '../utils/sanitize';
+import { DEFAULT_FINDINGS } from './defaultFindingsData';
 
 /**
  * Findings Store
@@ -12,7 +13,7 @@ import { sanitizeInput } from '../utils/sanitize';
 const useFindingsStore = create(
   persist(
     (set, get) => ({
-      findings: [],
+      findings: DEFAULT_FINDINGS,
       loading: false,
       error: null,
 
@@ -264,29 +265,40 @@ const useFindingsStore = create(
 
               const newFindings = results.data.map(row => {
                 let remediationOwner = null;
-                const ownerStr = row['Remediation Owner'] || row['Assignee'];
+                const ownerStr = row['Remediation Owner'] || row['Assignee'] || row['Reporter'];
                 if (ownerStr && findOrCreateUser) {
                   const info = parseUserString(ownerStr);
                   if (info) remediationOwner = findOrCreateUser(info);
                 }
 
+                // Map Jira status to our status
+                const mapStatus = (status) => {
+                  if (!status) return 'Not Started';
+                  const s = status.toLowerCase();
+                  if (s === 'to do' || s === 'not started') return 'Not Started';
+                  if (s === 'in progress') return 'In Progress';
+                  if (s === 'done' || s === 'resolved' || s === 'closed') return 'Resolved';
+                  return status;
+                };
+
                 return {
-                  id: row['Finding ID'] || `FND-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  id: row['Issue key'] || row['Finding ID'] || `FND-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   summary: sanitizeInput(row['Summary'] || ''),
+                  description: sanitizeInput(row['Description'] || ''),
                   complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
                   controlId: row['Control ID'] || row['Custom field (Control ID)'] || null,
-                  rootCause: sanitizeInput(row['Root Cause'] || row['Custom field (Root Cause)'] || ''),
+                  rootCause: sanitizeInput(row['Root Cause'] || row['Custom field (Root Cause)'] || row['Custom field (Root Case)'] || ''),
                   remediationActionPlan: sanitizeInput(
                     row['Remediation Action Plan'] ||
                     row['Custom field (Remediation Action Plan (Who will do What by When?))'] || ''
                   ),
                   remediationOwner,
                   dueDate: row['Due Date'] || row['Due date'] || '',
-                  status: row['Status'] || 'Not Started',
+                  status: mapStatus(row['Status']),
                   priority: row['Priority'] || 'Medium',
-                  createdDate: row['Created Date'] || new Date().toISOString(),
-                  lastModified: new Date().toISOString(),
-                  jiraKey: row['Jira Key'] || null,
+                  createdDate: row['Created Date'] || row['Created'] || new Date().toISOString(),
+                  lastModified: row['Updated'] || new Date().toISOString(),
+                  jiraKey: row['Issue key'] || row['Jira Key'] || null,
                   linkedArtifacts: (row['Linked Artifacts'] || '')
                     .split(';').map(s => s.trim()).filter(Boolean)
                 };
@@ -312,6 +324,20 @@ const useFindingsStore = create(
     }),
     {
       name: 'csf-findings-storage',
+      version: 2,
+      migrate: (persistedState, version) => {
+        // Version 2: Added default findings for new installations
+        // Existing users with data keep their findings, new users get defaults
+        if (version < 2) {
+          if (persistedState?.findings?.length > 0) {
+            // Existing user with data - keep their findings
+            return persistedState;
+          }
+          // New user or empty state - use defaults
+          return { findings: DEFAULT_FINDINGS };
+        }
+        return persistedState;
+      },
       partialize: (state) => ({
         findings: state.findings
       })

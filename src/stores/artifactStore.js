@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
+import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
 
 /**
  * Artifact Store
@@ -11,7 +12,7 @@ import Papa from 'papaparse';
 const useArtifactStore = create(
   persist(
     (set, get) => ({
-      artifacts: [],
+      artifacts: DEFAULT_ARTIFACTS,
 
       // Get all artifacts
       getArtifacts: () => get().artifacts,
@@ -227,28 +228,45 @@ const useArtifactStore = create(
         document.body.removeChild(link);
       },
 
-      // Import artifacts from CSV
+      // Import artifacts from CSV (supports both standard and Jira export formats)
       importArtifactsCSV: async (csvText) => {
         return new Promise((resolve, reject) => {
           Papa.parse(csvText, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
-              const newArtifacts = results.data.map(row => ({
-                id: Date.now() + Math.floor(Math.random() * 10000),
-                artifactId: row['Artifact ID'] || `AR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                name: row['Name'] || row['Summary'] || '',
-                description: row['Description'] || '',
-                link: row['Link'] || row['Custom field (Link)'] || '',
-                type: row['Type'] || row['Custom field (Artifact Type)'] || 'Document',
-                complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
-                controlId: row['Control ID'] || row['Custom field (Control ID)'] || null,
-                linkedSubcategoryIds: (row['Linked Subcategories'] || '')
-                  .split(';').map(s => s.trim()).filter(Boolean),
-                createdDate: row['Created Date'] || new Date().toISOString(),
-                lastModified: new Date().toISOString(),
-                jiraKey: row['Jira Key'] || null
-              }));
+              const existingArtifacts = get().artifacts;
+              const existingKeys = new Set(existingArtifacts.map(a => a.artifactId));
+
+              const newArtifacts = results.data
+                .filter(row => {
+                  // Use Jira Issue key as the artifact ID if available
+                  const artifactId = row['Issue key'] || row['Artifact ID'] || null;
+                  // Skip if artifact already exists (by ID)
+                  return !artifactId || !existingKeys.has(artifactId);
+                })
+                .map(row => {
+                  // Use Jira Issue key as the artifact ID (e.g., AR-1768214343793-o7ihrhfh)
+                  const artifactId = row['Issue key'] || row['Artifact ID'] || `AR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+                  return {
+                    id: Date.now() + Math.floor(Math.random() * 10000),
+                    artifactId: artifactId,
+                    name: row['Name'] || row['Summary'] || '',
+                    description: row['Description'] || '',
+                    link: row['Link'] || row['Custom field (Link)'] || '',
+                    type: row['Type'] || row['Custom field (Artifact Type)'] || 'Document',
+                    complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
+                    controlId: row['Control ID'] || row['Custom field (Control ID)'] || null,
+                    linkedSubcategoryIds: (row['Linked Subcategories'] || '')
+                      .split(';').map(s => s.trim()).filter(Boolean),
+                    createdDate: row['Created Date'] || row['Created'] || new Date().toISOString(),
+                    lastModified: new Date().toISOString(),
+                    jiraKey: row['Issue key'] || row['Jira Key'] || null,
+                    status: row['Status'] || 'ACTIVE',
+                    priority: row['Priority'] || 'Medium'
+                  };
+                });
 
               set((state) => ({
                 artifacts: [...state.artifacts, ...newArtifacts]
@@ -270,7 +288,7 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         // Version 2: Added link, complianceRequirement, controlId, type, jiraKey fields
         if (version < 2 && persistedState?.artifacts) {
@@ -285,6 +303,16 @@ const useArtifactStore = create(
             lastModified: artifact.lastModified || new Date().toISOString()
           }));
           return { artifacts: migratedArtifacts };
+        }
+        // Version 3: Added default artifacts for new installations
+        // Existing users with data keep their artifacts, new users get defaults
+        if (version < 3) {
+          if (persistedState?.artifacts?.length > 0) {
+            // Existing user with data - keep their artifacts
+            return persistedState;
+          }
+          // New user or empty state - use defaults
+          return { artifacts: DEFAULT_ARTIFACTS };
         }
         return persistedState;
       },
