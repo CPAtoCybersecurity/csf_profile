@@ -694,6 +694,202 @@ const useAssessmentsStore = create(
         });
       },
 
+      // Export assessment to Jira EVAL project format (Control Evaluations)
+      exportForJiraCSV: (assessmentId, controlsStore, requirementsStore, userStore) => {
+        const assessment = get().getAssessment(assessmentId);
+        if (!assessment) return;
+
+        const users = userStore?.getState?.()?.users || [];
+        const getUserEmail = (userId) => {
+          const user = users.find(u => u.id === userId);
+          return user?.email || '';
+        };
+
+        const getControlDetails = (itemId) => {
+          if (assessment.scopeType === 'controls') {
+            const control = controlsStore?.getState?.()?.getControl?.(itemId);
+            return {
+              id: control?.controlId || itemId,
+              linkedReqs: control?.linkedRequirementIds?.join(', ') || ''
+            };
+          }
+          return { id: itemId, linkedReqs: '' };
+        };
+
+        // Generate smart-embed URL if available
+        const getSmartEmbedUrl = (requirementId) => {
+          try {
+            const { getSmartEmbedUrlForRequirement } = require('../utils/confluenceSync');
+            return getSmartEmbedUrlForRequirement(requirementId) || '';
+          } catch {
+            return '';
+          }
+        };
+
+        const csvData = [];
+
+        // Create one row per control per quarter that has data
+        assessment.scopeIds.forEach(itemId => {
+          const rawObs = assessment.observations[itemId] || {};
+          const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
+          const controlDetails = getControlDetails(itemId);
+
+          // Create separate issues for each quarter with data
+          ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+            const qData = obs.quarters?.[quarter] || createDefaultQuarter();
+
+            // Skip quarters with no meaningful data
+            if (qData.testingStatus === 'Not Started' && !qData.observations && qData.actualScore === 0) {
+              return;
+            }
+
+            // Build assessment methods string
+            const methods = [];
+            if (qData.examine) methods.push('Examine');
+            if (qData.interview) methods.push('Interview');
+            if (qData.test) methods.push('Test');
+
+            // Build description with smart-embed if available
+            let description = `Control Evaluation for ${controlDetails.id} - ${quarter}\n\n`;
+            description += `Test Procedures:\n${obs.testProcedures || 'N/A'}\n\n`;
+            description += `Observations:\n${qData.observations || 'N/A'}\n\n`;
+            description += `Assessment Methods: ${methods.join(', ') || 'None'}\n\n`;
+            if (controlDetails.linkedReqs) {
+              description += `Linked Requirements: ${controlDetails.linkedReqs}\n`;
+              const smartEmbedUrl = getSmartEmbedUrl(controlDetails.linkedReqs.split(',')[0]?.trim());
+              if (smartEmbedUrl) {
+                description += `\nView in Confluence: ${smartEmbedUrl}`;
+              }
+            }
+            if ((obs.linkedArtifacts || []).length > 0) {
+              description += `\nLinked Artifacts: ${obs.linkedArtifacts.join(', ')}`;
+            }
+
+            csvData.push({
+              'Summary': `WP-${assessment.name}-${controlDetails.id}-${quarter}`,
+              'Issue Type': 'Work paper',
+              'Project key': 'EVAL',
+              'Assignee': getUserEmail(obs.auditorId),
+              'Custom field (Control ID)': controlDetails.id,
+              'Custom field (Compliance Requirement)': controlDetails.linkedReqs,
+              'Custom field (Quarter)': quarter,
+              'Custom field (Q1 Actual Score)': quarter === 'Q1' ? qData.actualScore : '',
+              'Custom field (Q1 Target Score)': quarter === 'Q1' ? qData.targetScore : '',
+              'Custom field (Q2 Actual Score)': quarter === 'Q2' ? qData.actualScore : '',
+              'Custom field (Q2 Target Score)': quarter === 'Q2' ? qData.targetScore : '',
+              'Custom field (Q3 Actual Score)': quarter === 'Q3' ? qData.actualScore : '',
+              'Custom field (Q3 Target Score)': quarter === 'Q3' ? qData.targetScore : '',
+              'Custom field (Q4 Actual Score)': quarter === 'Q4' ? qData.actualScore : '',
+              'Custom field (Q4 Target Score)': quarter === 'Q4' ? qData.targetScore : '',
+              'Custom field (Testing Status)': qData.testingStatus,
+              'Custom field (Test Procedures)': obs.testProcedures || '',
+              'Custom field (Observations)': qData.observations || '',
+              'Custom field (Assessment Methods)': methods.join(', '),
+              'Custom field (Artifacts)': (obs.linkedArtifacts || []).join('; '),
+              'Description': description
+            });
+          });
+        });
+
+        if (csvData.length === 0) {
+          console.warn('No data to export for Jira');
+          return;
+        }
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        const safeName = assessment.name.replace(/[^a-z0-9]/gi, '_');
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `jira_eval_import_${safeName}_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
+      // Export all assessments to Jira EVAL format
+      exportAllForJiraCSV: (controlsStore, requirementsStore, userStore) => {
+        const assessments = get().assessments;
+        if (assessments.length === 0) return;
+
+        const users = userStore?.getState?.()?.users || [];
+        const getUserEmail = (userId) => {
+          const user = users.find(u => u.id === userId);
+          return user?.email || '';
+        };
+
+        const csvData = [];
+
+        assessments.forEach(assessment => {
+          const getControlDetails = (itemId) => {
+            if (assessment.scopeType === 'controls') {
+              const control = controlsStore?.getState?.()?.getControl?.(itemId);
+              return {
+                id: control?.controlId || itemId,
+                linkedReqs: control?.linkedRequirementIds?.join(', ') || ''
+              };
+            }
+            return { id: itemId, linkedReqs: '' };
+          };
+
+          assessment.scopeIds.forEach(itemId => {
+            const rawObs = assessment.observations[itemId] || {};
+            const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
+            const controlDetails = getControlDetails(itemId);
+
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+              const qData = obs.quarters?.[quarter] || createDefaultQuarter();
+
+              if (qData.testingStatus === 'Not Started' && !qData.observations && qData.actualScore === 0) {
+                return;
+              }
+
+              const methods = [];
+              if (qData.examine) methods.push('Examine');
+              if (qData.interview) methods.push('Interview');
+              if (qData.test) methods.push('Test');
+
+              csvData.push({
+                'Summary': `WP-${assessment.name}-${controlDetails.id}-${quarter}`,
+                'Issue Type': 'Work paper',
+                'Project key': 'EVAL',
+                'Assignee': getUserEmail(obs.auditorId),
+                'Custom field (Control ID)': controlDetails.id,
+                'Custom field (Compliance Requirement)': controlDetails.linkedReqs,
+                'Custom field (Quarter)': quarter,
+                'Custom field (Actual Score)': qData.actualScore,
+                'Custom field (Target Score)': qData.targetScore,
+                'Custom field (Testing Status)': qData.testingStatus,
+                'Custom field (Test Procedures)': obs.testProcedures || '',
+                'Custom field (Observations)': qData.observations || '',
+                'Custom field (Assessment Methods)': methods.join(', '),
+                'Custom field (Artifacts)': (obs.linkedArtifacts || []).join('; '),
+                'Description': `Control Evaluation for ${controlDetails.id} - ${quarter}\n\nAssessment: ${assessment.name}`
+              });
+            });
+          });
+        });
+
+        if (csvData.length === 0) return;
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `jira_eval_import_all_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
       // Export all assessments to CSV with quarterly columns
       exportAllAssessmentsCSV: (controlsStore, requirementsStore, userStore) => {
         const assessments = get().assessments;

@@ -976,7 +976,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
               </button>
               <div>
                 <h1 className="text-xl font-bold">{currentAssessment?.name}</h1>
-                <p className="text-sm text-gray-600">Assessment Observations</p>
+                <p className="text-sm text-gray-600">Control Evaluations</p>
               </div>
             </div>
             <button
@@ -1097,10 +1097,10 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   />
                 </div>
 
-                {/* Quarterly Observations */}
+                {/* Quarterly Evaluations */}
                 <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
                   <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="font-medium text-gray-700">Quarterly Observations</h3>
+                    <h3 className="font-medium text-gray-700">Quarterly Evaluations</h3>
                     <div className="flex gap-1">
                       {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => {
                         const qData = currentObservation.quarters?.[q] || {};
@@ -1149,7 +1149,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                             )}
                           </div>
                           <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Observation Date</label>
+                            <label className="text-sm font-medium text-gray-500">Evaluation Date</label>
                             {editMode ? (
                               <input
                                 type="date"
@@ -1182,7 +1182,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         </div>
 
                         <div>
-                          <label className="text-sm font-medium text-gray-500">{selectedQuarter} Observations</label>
+                          <label className="text-sm font-medium text-gray-500">{selectedQuarter} Evaluation Notes</label>
                           {editMode ? (
                             <textarea
                               value={quarterData.observations || ''}

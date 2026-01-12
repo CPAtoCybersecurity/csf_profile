@@ -224,10 +224,80 @@ const useRequirementsStore = create(
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        
+
         // Track export for backup reminder system
         const { updateLastExportDate } = require('../utils/backupTracking');
         updateLastExportDate();
+      },
+
+      // Export requirements to Confluence Database format
+      // Matches the Confluence Requirements database schema
+      exportForConfluenceCSV: (frameworkId = null, controlsStore = null, userStore = null) => {
+        let reqs = get().requirements;
+        if (frameworkId) {
+          reqs = reqs.filter(r => r.frameworkId === frameworkId);
+        }
+
+        const users = userStore?.getState?.()?.users || [];
+        const getUserName = (userId) => {
+          const user = users.find(u => u.id === userId);
+          return user?.name || '';
+        };
+
+        // Get controls to find owner and stakeholders for each requirement
+        const controls = controlsStore?.getState?.()?.controls || [];
+        const getControlsForRequirement = (reqId) => {
+          return controls.filter(c =>
+            (c.linkedRequirementIds || []).includes(reqId)
+          );
+        };
+
+        const csvData = reqs.map(r => {
+          const linkedControls = getControlsForRequirement(r.id);
+          const controlOwners = [...new Set(linkedControls.map(c => getUserName(c.ownerId)).filter(Boolean))];
+          const controlStakeholders = [...new Set(
+            linkedControls.flatMap(c => (c.stakeholderIds || []).map(id => getUserName(id)))
+          )].filter(Boolean);
+          const controlsInScope = linkedControls.map(c => c.controlId).join(', ');
+
+          return {
+            'Requirement ID': r.id,
+            'Framework': r.frameworkId || 'NIST CSF 2.0',
+            'CSF Function': r.function,
+            'CSF Function Description': r.functionDescription || '',
+            'Category Name': r.category,
+            'Category Description': r.categoryDescription || '',
+            'Subcategory ID': r.subcategoryId,
+            'Subcategory Description': r.subcategoryDescription,
+            'Implementation Example': r.implementationExample,
+            'In Scope': r.inScope ? 'Yes' : 'No',
+            'Control Owner': controlOwners.join(', '),
+            'Stakeholders': controlStakeholders.join(', '),
+            'Controls In Scope': controlsInScope
+          };
+        });
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        const frameworkSuffix = frameworkId ? `_${frameworkId}` : '';
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `confluence_requirements${frameworkSuffix}_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Track export for backup reminder system
+        try {
+          const { updateLastExportDate } = require('../utils/backupTracking');
+          updateLastExportDate();
+        } catch (e) {
+          // Backup tracking not available
+        }
       }
     }),
     {

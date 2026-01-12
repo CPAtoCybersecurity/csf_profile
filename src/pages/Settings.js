@@ -26,6 +26,7 @@ import useControlsStore from '../stores/controlsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useUserStore from '../stores/userStore';
 import useArtifactStore from '../stores/artifactStore';
+import useFindingsStore from '../stores/findingsStore';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
@@ -62,6 +63,11 @@ const Settings = () => {
   const fileInputRef = useRef(null);
   const newFrameworkFileInputRef = useRef(null);
   const [importFrameworkId, setImportFrameworkId] = useState(null);
+
+  // Jira import refs
+  const findingsImportRef = useRef(null);
+  const artifactsImportRef = useRef(null);
+  const assessmentsImportRef = useRef(null);
 
   // Export handlers
   const handleExportCompleteDatabase = useCallback(() => {
@@ -217,6 +223,52 @@ const Settings = () => {
     setBackupFrequency(days);
     setBackupReminderFrequency(days);
     toast.success(`Backup reminder frequency updated to ${days} day${days !== 1 ? 's' : ''}`);
+  }, []);
+
+  // Jira import handlers
+  const handleFindingsImport = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const count = await useFindingsStore.getState().importFindingsCSV(text, useUserStore);
+      toast.success(`Imported ${count} findings from Jira`);
+    } catch (err) {
+      toast.error(`Import failed: ${err.message}`);
+    }
+
+    e.target.value = '';
+  }, []);
+
+  const handleArtifactsImport = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const count = await useArtifactStore.getState().importArtifactsCSV(text);
+      toast.success(`Imported ${count} artifacts from Jira`);
+    } catch (err) {
+      toast.error(`Import failed: ${err.message}`);
+    }
+
+    e.target.value = '';
+  }, []);
+
+  const handleAssessmentsImport = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const count = await useAssessmentsStore.getState().importAssessmentsCSV(text, useUserStore);
+      toast.success(`Imported ${count} assessment(s) from Jira`);
+    } catch (err) {
+      toast.error(`Import failed: ${err.message}`);
+    }
+
+    e.target.value = '';
   }, []);
 
   const handleDownloadTemplate = useCallback(() => {
@@ -569,6 +621,150 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </p>
           </div>
 
+          {/* Jira/Confluence Integration Export */}
+          <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-indigo-800">Jira / Confluence Integration</h3>
+                <p className="text-sm text-indigo-700 mt-1">Export data in formats compatible with Jira and Confluence import</p>
+              </div>
+            </div>
+
+            {/* Control Evaluations for Jira EVAL */}
+            <div className="mb-4">
+              <h4 className="text-sm font-medium text-indigo-800 mb-2">Control Evaluations (Jira EVAL Project)</h4>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => {
+                    try {
+                      useAssessmentsStore.getState().exportAllForJiraCSV(
+                        useControlsStore,
+                        useRequirementsStore,
+                        useUserStore
+                      );
+                      toast.success('Exported all assessments for Jira EVAL import');
+                    } catch (err) {
+                      toast.error(`Export failed: ${err.message}`);
+                    }
+                  }}
+                >
+                  <Download size={14} />
+                  Export for Jira
+                </button>
+                <button
+                  className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => assessmentsImportRef.current?.click()}
+                >
+                  <Upload size={14} />
+                  Import from Jira
+                </button>
+              </div>
+              <p className="text-xs text-indigo-600 mt-2">
+                Export: CSV formatted for Jira EVAL project with Work Paper issue type and quarterly scores
+              </p>
+              <p className="text-xs text-indigo-600 mt-1">
+                Import: CSV exported from Jira EVAL project (matches standard assessment format)
+              </p>
+            </div>
+
+            {/* Requirements for Confluence */}
+            <div className="mb-4 pt-3 border-t border-indigo-200">
+              <h4 className="text-sm font-medium text-indigo-800 mb-2">Requirements (Confluence Database)</h4>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => {
+                    try {
+                      useRequirementsStore.getState().exportForConfluenceCSV(
+                        null,
+                        useControlsStore,
+                        useUserStore
+                      );
+                      toast.success('Exported requirements for Confluence import');
+                    } catch (err) {
+                      toast.error(`Export failed: ${err.message}`);
+                    }
+                  }}
+                >
+                  <Download size={14} />
+                  Export for Confluence
+                </button>
+              </div>
+              <p className="text-xs text-indigo-600 mt-2">
+                Creates CSV matching Confluence Requirements database schema with linked controls and stakeholders
+              </p>
+            </div>
+
+            {/* Findings for Jira FND */}
+            <div className="mb-4 pt-3 border-t border-indigo-200">
+              <h4 className="text-sm font-medium text-indigo-800 mb-2">Findings (Jira FND Project)</h4>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => {
+                    try {
+                      useFindingsStore.getState().exportForJiraCSV(useUserStore);
+                      toast.success('Exported findings for Jira FND import');
+                    } catch (err) {
+                      toast.error(`Export failed: ${err.message}`);
+                    }
+                  }}
+                >
+                  <Download size={14} />
+                  Export for Jira
+                </button>
+                <button
+                  className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => findingsImportRef.current?.click()}
+                >
+                  <Upload size={14} />
+                  Import from Jira
+                </button>
+              </div>
+              <p className="text-xs text-indigo-600 mt-2">
+                Export: CSV for Jira FND project with Finding issue type, remediation plans, and due dates
+              </p>
+              <p className="text-xs text-indigo-600 mt-1">
+                Import: CSV exported from Jira FND project with findings data
+              </p>
+            </div>
+
+            {/* Artifacts for Jira AR */}
+            <div className="pt-3 border-t border-indigo-200">
+              <h4 className="text-sm font-medium text-indigo-800 mb-2">Artifacts (Jira AR Project)</h4>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => {
+                    try {
+                      useArtifactStore.getState().exportForJiraCSV();
+                      toast.success('Exported artifacts for Jira AR import');
+                    } catch (err) {
+                      toast.error(`Export failed: ${err.message}`);
+                    }
+                  }}
+                >
+                  <Download size={14} />
+                  Export for Jira
+                </button>
+                <button
+                  className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  onClick={() => artifactsImportRef.current?.click()}
+                >
+                  <Upload size={14} />
+                  Import from Jira
+                </button>
+              </div>
+              <p className="text-xs text-indigo-600 mt-2">
+                Export: CSV for Jira AR project with Artifact issue type, links, and compliance mappings
+              </p>
+              <p className="text-xs text-indigo-600 mt-1">
+                Import: CSV exported from Jira AR project with artifact data
+              </p>
+            </div>
+          </div>
+
           {/* Stats */}
           <div className="mt-6 grid grid-cols-3 gap-4">
             <div className="bg-white p-4 rounded-lg border">
@@ -624,6 +820,28 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         style={{ display: 'none' }}
         accept=".csv"
         onChange={handleNewFrameworkImport}
+      />
+      {/* Jira import file inputs */}
+      <input
+        type="file"
+        ref={findingsImportRef}
+        style={{ display: 'none' }}
+        accept=".csv"
+        onChange={handleFindingsImport}
+      />
+      <input
+        type="file"
+        ref={artifactsImportRef}
+        style={{ display: 'none' }}
+        accept=".csv"
+        onChange={handleArtifactsImport}
+      />
+      <input
+        type="file"
+        ref={assessmentsImportRef}
+        style={{ display: 'none' }}
+        accept=".csv"
+        onChange={handleAssessmentsImport}
       />
 
       {/* Edit Framework Modal */}
