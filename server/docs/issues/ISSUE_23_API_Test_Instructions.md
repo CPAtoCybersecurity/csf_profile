@@ -12,7 +12,7 @@ JIRA_EMAIL=your-email@example.com
 JIRA_API_TOKEN=your-jira-api-token
 
 # Confluence
-CONFLUENCE_BASE_URL=https://your-domain.atlassian.net/wiki
+CONFLUENCE_BASE_URL=https://your-domain.atlassian.net/
 CONFLUENCE_EMAIL=your-email@example.com
 CONFLUENCE_API_TOKEN=your-confluence-api-token
 ```
