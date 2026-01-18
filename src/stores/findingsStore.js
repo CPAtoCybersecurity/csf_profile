@@ -35,6 +35,19 @@ const useFindingsStore = create(
         return get().findings.filter(f => f.controlId === controlId);
       },
 
+      // Get findings by evaluation (NEW - primary link for point-in-time findings)
+      getFindingsByEvaluation: (evaluationId) => {
+        return get().findings.filter(f => f.evaluationId === evaluationId);
+      },
+
+      // Get findings by assessment (via evaluations)
+      getFindingsByAssessment: (assessmentId) => {
+        return get().findings.filter(f =>
+          f.assessmentId === assessmentId ||
+          (f.evaluationId && f.evaluationId.includes(assessmentId))
+        );
+      },
+
       // Get findings by status
       getFindingsByStatus: (status) => {
         return get().findings.filter(f => f.status === status);
@@ -50,9 +63,17 @@ const useFindingsStore = create(
         const newFinding = {
           id: `FND-${Date.now()}`,
           summary: sanitizeInput(findingData.summary || ''),
-          complianceRequirement: findingData.complianceRequirement || null,
+
+          // Primary link: Evaluation (point-in-time assessment record)
+          evaluationId: findingData.evaluationId || null,
+
+          // Secondary/cached links (derived from evaluation when possible)
           controlId: findingData.controlId || null,
           assessmentId: findingData.assessmentId || null,
+
+          // DEPRECATED: Use evaluationId → controlId → linkedRequirementIds instead
+          complianceRequirement: findingData.complianceRequirement || null,
+
           rootCause: sanitizeInput(findingData.rootCause || ''),
           remediationActionPlan: sanitizeInput(findingData.remediationActionPlan || ''),
           remediationOwner: findingData.remediationOwner || null,
@@ -175,8 +196,10 @@ const useFindingsStore = create(
         const csvData = findings.map(f => ({
           'Finding ID': f.id,
           'Summary': f.summary,
-          'Compliance Requirement': f.complianceRequirement || '',
+          'Evaluation ID': f.evaluationId || '',
           'Control ID': f.controlId || '',
+          'Assessment ID': f.assessmentId || '',
+          'Compliance Requirement': f.complianceRequirement || '', // Deprecated
           'Root Cause': f.rootCause,
           'Remediation Action Plan': f.remediationActionPlan,
           'Remediation Owner': getUserName(f.remediationOwner),
@@ -220,11 +243,12 @@ const useFindingsStore = create(
           'Priority': f.priority,
           'Assignee': getUserEmail(f.remediationOwner),
           'Due date': f.dueDate,
-          'Custom field (Compliance Requirement)': f.complianceRequirement || '',
+          'Custom field (Evaluation ID)': f.evaluationId || '',
           'Custom field (Control ID)': f.controlId || '',
+          'Custom field (Compliance Requirement)': f.complianceRequirement || '', // Deprecated
           'Custom field (Root Cause)': f.rootCause,
           'Custom field (Remediation Action Plan (Who will do What by When?))': f.remediationActionPlan,
-          'Description': `Finding created from CSF Profile assessment.\n\nRoot Cause:\n${f.rootCause}\n\nRemediation Plan:\n${f.remediationActionPlan}`
+          'Description': `Finding created from CSF Profile assessment.\n\nEvaluation: ${f.evaluationId || 'N/A'}\nControl: ${f.controlId || 'N/A'}\n\nRoot Cause:\n${f.rootCause}\n\nRemediation Plan:\n${f.remediationActionPlan}`
         }));
 
         const csv = Papa.unparse(csvData);
@@ -285,8 +309,17 @@ const useFindingsStore = create(
                   id: row['Issue key'] || row['Finding ID'] || `FND-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                   summary: sanitizeInput(row['Summary'] || ''),
                   description: sanitizeInput(row['Description'] || ''),
-                  complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
+
+                  // Primary link: Evaluation
+                  evaluationId: row['Evaluation ID'] || row['Custom field (Evaluation ID)'] || null,
+
+                  // Secondary/cached links
                   controlId: row['Control ID'] || row['Custom field (Control ID)'] || null,
+                  assessmentId: row['Assessment ID'] || null,
+
+                  // Deprecated
+                  complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
+
                   rootCause: sanitizeInput(row['Root Cause'] || row['Custom field (Root Cause)'] || row['Custom field (Root Case)'] || ''),
                   remediationActionPlan: sanitizeInput(
                     row['Remediation Action Plan'] ||
@@ -324,7 +357,7 @@ const useFindingsStore = create(
     }),
     {
       name: 'csf-findings-storage',
-      version: 2,
+      version: 3,
       migrate: (persistedState, version) => {
         // Version 2: Added default findings for new installations
         // Existing users with data keep their findings, new users get defaults
@@ -334,6 +367,11 @@ const useFindingsStore = create(
             return persistedState;
           }
           // New user or empty state - use defaults
+          return { findings: DEFAULT_FINDINGS };
+        }
+        // Version 3: Update controlId references to align with Controls architecture
+        // Reset to defaults with correct control links
+        if (version < 3) {
           return { findings: DEFAULT_FINDINGS };
         }
         return persistedState;

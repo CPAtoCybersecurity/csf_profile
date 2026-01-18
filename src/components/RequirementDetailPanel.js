@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { X, Link2, FileText, AlertTriangle, ClipboardCheck, Pencil, Trash2, User } from 'lucide-react';
+import { X, Link2, FileText, AlertTriangle, ClipboardCheck, User } from 'lucide-react';
 import FrameworkBadge from './FrameworkBadge';
 import CSFBadge, { SubcategoryBadge } from './CSFBadge';
 
@@ -8,40 +8,23 @@ import CSFBadge, { SubcategoryBadge } from './CSFBadge';
  * Mimics Confluence database entry panel styling
  * Uses Portal to escape overflow-hidden containers
  * Resizable panel without overlay (Confluence-style)
- * Supports dark mode and inline editing
+ *
+ * NOTE: Requirements are READ-ONLY framework data.
+ * Only the 'inScope' field can be toggled.
+ * Control-related data (owner, stakeholders, implementation description)
+ * should be managed through the Controls page and controlsStore.
  */
-const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, controls = [], artifacts = [], findings = [] }) => {
+const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], artifacts = [], findings = [] }) => {
   const [panelWidth, setPanelWidth] = useState(420);
   const [isResizing, setIsResizing] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedRequirement, setEditedRequirement] = useState(null);
   const panelRef = useRef(null);
 
-  // Initialize edited requirement when entering edit mode
-  const handleStartEdit = useCallback(() => {
-    setEditedRequirement({ ...requirement });
-    setIsEditing(true);
-  }, [requirement]);
-
-  // Save changes
-  const handleSave = useCallback(() => {
-    if (onSave && editedRequirement) {
-      onSave(editedRequirement);
+  // Handle inScope toggle - the only editable field
+  const handleScopeToggle = useCallback((inScope) => {
+    if (onSave) {
+      onSave({ ...requirement, inScope });
     }
-    setIsEditing(false);
-    setEditedRequirement(null);
-  }, [onSave, editedRequirement]);
-
-  // Cancel editing
-  const handleCancel = useCallback(() => {
-    setIsEditing(false);
-    setEditedRequirement(null);
-  }, []);
-
-  // Update a field
-  const handleFieldChange = useCallback((field, value) => {
-    setEditedRequirement(prev => ({ ...prev, [field]: value }));
-  }, []);
+  }, [onSave, requirement]);
 
   // Handle resize
   const handleMouseDown = useCallback((e) => {
@@ -83,15 +66,14 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, contro
     (c.linkedRequirementIds || []).includes(requirement.id)
   );
 
-  // Get artifacts linked to those controls
+  // Get artifacts linked to those controls (artifacts have controlId pointing to control)
   const linkedArtifacts = artifacts.filter(a =>
-    linkedControls.some(c => (c.linkedArtifactIds || []).includes(a.id))
+    a.controlId && linkedControls.some(c => c.controlId === a.controlId)
   );
 
-  // Get findings linked to this requirement
+  // Get findings linked to those controls (findings have controlId pointing to control)
   const linkedFindings = findings.filter(f =>
-    f.requirementId === requirement.id ||
-    linkedControls.some(c => c.id === f.controlId)
+    f.controlId && linkedControls.some(c => c.controlId === f.controlId)
   );
 
   const panelContent = (
@@ -129,48 +111,9 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, contro
       {/* Header - Confluence style */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
         <h2 className="text-sm font-medium text-gray-700 dark:text-white">
-          {isEditing ? 'Edit entry' : 'Database entry'}
+          Requirement (Read-Only)
         </h2>
         <div className="flex items-center gap-1">
-          {isEditing ? (
-            <>
-              <button
-                onClick={handleCancel}
-                className="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSave}
-                className="px-2 py-1 text-xs bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded transition-colors"
-              >
-                Save
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleStartEdit();
-                }}
-                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
-                title="Edit"
-              >
-                <Pencil size={16} className="text-gray-500 dark:text-gray-400" />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (onDelete) onDelete(requirement);
-                }}
-                className="p-1.5 hover:bg-red-100 dark:hover:bg-red-900/30 rounded transition-colors"
-                title="Delete"
-              >
-                <Trash2 size={16} className="text-gray-500 hover:text-red-600 dark:text-gray-400 dark:hover:text-red-400" />
-              </button>
-            </>
-          )}
           <button
             onClick={onClose}
             className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
@@ -181,8 +124,8 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, contro
         </div>
       </div>
 
-      {/* Content - Scrollable */}
-      <div className="flex-1 overflow-y-auto">
+      {/* Content - Scrollable (min-h-0 required for flex child scrolling) */}
+      <div className="flex-1 min-h-0 overflow-y-auto panel-scrollbar">
         <div className="py-1">
           {/* Requirement ID - Title field (read-only) */}
           <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
@@ -214,18 +157,9 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, contro
             </FieldRow>
           )}
 
-          {/* Category Name - Editable */}
+          {/* Category Name */}
           <FieldRow icon={null} label="Category Name">
-            {isEditing ? (
-              <input
-                type="text"
-                value={editedRequirement?.category || ''}
-                onChange={(e) => handleFieldChange('category', e.target.value)}
-                className="w-full text-sm px-2 py-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500"
-              />
-            ) : (
-              <span className="text-sm text-gray-700 dark:text-gray-100">{requirement.category}</span>
-            )}
+            <span className="text-sm text-gray-700 dark:text-gray-100">{requirement.category}</span>
           </FieldRow>
 
           {/* Category Description */}
@@ -240,90 +174,62 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, contro
             <SubcategoryBadge subcategoryId={requirement.subcategoryId} size="sm" />
           </FieldRow>
 
-          {/* Subcategory Description - Editable */}
+          {/* Subcategory Description */}
           <FieldRow icon={null} label="Subcategory Description">
-            {isEditing ? (
-              <textarea
-                value={editedRequirement?.subcategoryDescription || ''}
-                onChange={(e) => handleFieldChange('subcategoryDescription', e.target.value)}
-                rows={2}
-                className="w-full text-sm px-2 py-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 resize-none"
-              />
-            ) : (
-              <span className="text-sm text-gray-700 dark:text-gray-100">{requirement.subcategoryDescription || '-'}</span>
-            )}
+            <span className="text-sm text-gray-700 dark:text-gray-100">{requirement.subcategoryDescription || '-'}</span>
           </FieldRow>
 
-          {/* Implementation Example - Editable */}
+          {/* Implementation Example */}
           <FieldRow icon={null} label="Implementation Example">
-            {isEditing ? (
-              <textarea
-                value={editedRequirement?.implementationExample || ''}
-                onChange={(e) => handleFieldChange('implementationExample', e.target.value)}
-                rows={3}
-                className="w-full text-sm px-2 py-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 resize-none"
-              />
-            ) : (
-              <span className="text-sm text-gray-700 dark:text-gray-100 whitespace-pre-wrap">
-                {requirement.implementationExample || '-'}
-              </span>
-            )}
+            <span className="text-sm text-gray-700 dark:text-gray-100 whitespace-pre-wrap">
+              {requirement.implementationExample || '-'}
+            </span>
           </FieldRow>
 
-          {/* Implementation Details (if exists) */}
-          {(requirement.implementationDetails || isEditing) && (
-            <FieldRow icon={null} label="Implementation Details">
-              {isEditing ? (
-                <textarea
-                  value={editedRequirement?.implementationDetails || ''}
-                  onChange={(e) => handleFieldChange('implementationDetails', e.target.value)}
-                  rows={2}
-                  className="w-full text-sm px-2 py-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500 resize-none"
-                />
-              ) : (
+          {/* Implementation Description (from linked Controls - DEPRECATED on Requirements) */}
+          {requirement.implementationDescription && (
+            <FieldRow icon={null} label="Implementation Description">
+              <div>
                 <span className="text-sm text-gray-700 dark:text-gray-100 whitespace-pre-wrap">
-                  {requirement.implementationDetails}
+                  {requirement.implementationDescription}
                 </span>
-              )}
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                  Note: Edit via Controls page
+                </p>
+              </div>
             </FieldRow>
           )}
 
-          {/* Control Owner - Editable */}
+          {/* Control Owner (from linked Controls - DEPRECATED on Requirements) */}
           <FieldRow icon={<User size={14} />} label="Control Owner">
-            {isEditing ? (
-              <input
-                type="text"
-                value={editedRequirement?.controlOwner || ''}
-                onChange={(e) => handleFieldChange('controlOwner', e.target.value)}
-                className="w-full text-sm px-2 py-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500"
-                placeholder="Enter user names (comma separated)"
-              />
-            ) : requirement.controlOwner ? (
-              <div className="flex flex-wrap gap-2">
-                {requirement.controlOwner.split(',').map((name, idx) => (
-                  <UserBadge key={idx} name={name.trim()} />
-                ))}
+            {requirement.controlOwner ? (
+              <div>
+                <div className="flex flex-wrap gap-2">
+                  {requirement.controlOwner.split(',').map((name, idx) => (
+                    <UserBadge key={idx} name={name.trim()} />
+                  ))}
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                  Note: Edit via Controls page
+                </p>
               </div>
             ) : (
               <span className="text-sm text-gray-400 dark:text-gray-500">None</span>
             )}
           </FieldRow>
 
-          {/* Stakeholders - Editable */}
+          {/* Stakeholders (from linked Controls - DEPRECATED on Requirements) */}
           <FieldRow icon={<User size={14} />} label="Stakeholders">
-            {isEditing ? (
-              <input
-                type="text"
-                value={editedRequirement?.stakeholders || ''}
-                onChange={(e) => handleFieldChange('stakeholders', e.target.value)}
-                className="w-full text-sm px-2 py-1 border dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-1 focus:ring-blue-500"
-                placeholder="Enter user names (comma separated)"
-              />
-            ) : requirement.stakeholders ? (
-              <div className="flex flex-wrap gap-2">
-                {requirement.stakeholders.split(',').map((name, idx) => (
-                  <UserBadge key={idx} name={name.trim()} />
-                ))}
+            {requirement.stakeholders ? (
+              <div>
+                <div className="flex flex-wrap gap-2">
+                  {requirement.stakeholders.split(',').map((name, idx) => (
+                    <UserBadge key={idx} name={name.trim()} />
+                  ))}
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                  Note: Edit via Controls page
+                </p>
               </div>
             ) : (
               <span className="text-sm text-gray-400 dark:text-gray-500">None</span>
@@ -384,25 +290,19 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, onDelete, contro
             )}
           </FieldRow>
 
-          {/* In Scope - Editable */}
+          {/* In Scope - ONLY EDITABLE FIELD */}
           <FieldRow icon={null} label="In Scope">
-            {isEditing ? (
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={editedRequirement?.inScope || false}
-                  onChange={(e) => handleFieldChange('inScope', e.target.checked)}
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500"
-                />
-                <span className="text-sm text-gray-700 dark:text-gray-300">
-                  {editedRequirement?.inScope ? 'Yes' : 'No'}
-                </span>
-              </label>
-            ) : (
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={requirement.inScope || false}
+                onChange={(e) => handleScopeToggle(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+              />
               <span className={`text-sm ${requirement.inScope ? 'text-green-700 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
                 {requirement.inScope ? 'Yes' : 'No'}
               </span>
-            )}
+            </label>
           </FieldRow>
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
-  Search, Filter, Upload, Download, FileText
+  Search, Filter, Upload, Download, FileText, Link2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -17,6 +17,7 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useControlsStore from '../stores/controlsStore';
 import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
+import useUserStore from '../stores/userStore';
 import useUIStore from '../stores/uiStore';
 
 const Requirements = () => {
@@ -27,19 +28,70 @@ const Requirements = () => {
   const importRequirementsCSV = useRequirementsStore((state) => state.importRequirementsCSV);
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
   const updateRequirement = useRequirementsStore((state) => state.updateRequirement);
-  const deleteRequirement = useRequirementsStore((state) => state.deleteRequirement);
 
   const frameworks = useFrameworksStore((state) => state.frameworks);
   const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
   const markFrameworkImported = useFrameworksStore((state) => state.markFrameworkImported);
 
-  // Controls, artifacts, and findings for the detail panel
+  // Controls, artifacts, and findings for the detail panel and table display
   const controls = useControlsStore((state) => state.controls);
+  const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
   const artifacts = useArtifactStore((state) => state.artifacts);
+  const getArtifactsByControl = useArtifactStore((state) => state.getArtifactsByControl);
   const findings = useFindingsStore((state) => state.findings);
+  const getFindingsByControl = useFindingsStore((state) => state.getFindingsByControl);
+  const users = useUserStore((state) => state.users);
 
   // UI state
   const darkMode = useUIStore((state) => state.darkMode);
+
+  // Helper: Get user name by ID
+  const getUserName = useCallback((userId) => {
+    if (!userId) return '';
+    const user = users.find(u => u.id === userId);
+    return user?.name || '';
+  }, [users]);
+
+  // Helper: Get control data for a requirement (pulls from linked Controls)
+  // This enables display of control-owned fields (owner, implementation, artifacts, findings)
+  // while keeping Requirements read-only
+  const getControlDataForRequirement = useCallback((requirementId) => {
+    const linkedControls = getControlsByRequirement(requirementId);
+    if (linkedControls.length === 0) {
+      // Fallback: check for control with matching ID (CSF default pattern)
+      const matchingControl = controls.find(c => c.controlId === requirementId);
+      if (matchingControl) {
+        return {
+          controlId: matchingControl.controlId,
+          implementationDescription: matchingControl.implementationDescription || '',
+          controlOwner: getUserName(matchingControl.ownerId),
+          stakeholders: (matchingControl.stakeholderIds || []).map(id => getUserName(id)).filter(Boolean).join(', '),
+          artifacts: getArtifactsByControl(matchingControl.controlId),
+          findings: getFindingsByControl(matchingControl.controlId),
+          controlEvaluationBackLink: matchingControl.controlEvaluationBackLink || ''
+        };
+      }
+      return null;
+    }
+    // Aggregate data from all linked controls
+    const implDescriptions = linkedControls.map(c => c.implementationDescription).filter(Boolean);
+    const owners = [...new Set(linkedControls.map(c => getUserName(c.ownerId)).filter(Boolean))];
+    const stakeholderIds = [...new Set(linkedControls.flatMap(c => c.stakeholderIds || []))];
+    const controlIds = linkedControls.map(c => c.controlId);
+    const allArtifacts = controlIds.flatMap(cid => getArtifactsByControl(cid));
+    const allFindings = controlIds.flatMap(cid => getFindingsByControl(cid));
+    const links = linkedControls.map(c => c.controlEvaluationBackLink).filter(Boolean);
+
+    return {
+      controlIds,
+      implementationDescription: implDescriptions.join(' | '),
+      controlOwner: owners.join(', '),
+      stakeholders: stakeholderIds.map(id => getUserName(id)).filter(Boolean).join(', '),
+      artifacts: allArtifacts,
+      findings: allFindings,
+      controlEvaluationBackLink: links[0] || ''
+    };
+  }, [controls, getControlsByRequirement, getArtifactsByControl, getFindingsByControl, getUserName]);
 
   // Local state
   const [selectedRequirement, setSelectedRequirement] = useState(null);
@@ -190,25 +242,14 @@ const Requirements = () => {
     toast.success('Requirements exported');
   }, [exportRequirementsCSV, filterFramework]);
 
-  // Handle save requirement from inline panel editing
+  // Handle save requirement - Only inScope can be changed (requirements are read-only)
   const handleSaveRequirement = useCallback((updatedRequirement) => {
-    updateRequirement(updatedRequirement.id, updatedRequirement);
-    toast.success('Requirement updated');
+    // Only update the inScope field - requirements are read-only framework data
+    updateRequirement(updatedRequirement.id, { inScope: updatedRequirement.inScope });
+    toast.success('Scope updated');
     // Update selected requirement to reflect changes
     setSelectedRequirement(updatedRequirement);
   }, [updateRequirement]);
-
-  // Handle delete requirement
-  const handleDeleteRequirement = useCallback((requirement) => {
-    if (window.confirm(`Are you sure you want to delete requirement "${requirement.id}"? This cannot be undone.`)) {
-      deleteRequirement(requirement.id);
-      toast.success('Requirement deleted');
-      // Close panel if deleted requirement was selected
-      if (selectedRequirement?.id === requirement.id) {
-        setSelectedRequirement(null);
-      }
-    }
-  }, [deleteRequirement, selectedRequirement]);
 
   if (loading) {
     return (
@@ -438,12 +479,48 @@ const Requirements = () => {
                 <SortableHeader label="Subcategory ID" sortKey="subcategoryId" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200" />
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Subcategory Description</th>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Implementation Example</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-56">Implementation Description (Control)</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Control Owner</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Stakeholders</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Artifacts</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">Findings</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Control Evaluation Back Link</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-56">
+                  <div className="flex items-center gap-1">
+                    <Link2 size={12} className="text-blue-500" />
+                    <span>Implementation Description</span>
+                  </div>
+                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+                  <div className="flex items-center gap-1">
+                    <Link2 size={12} className="text-blue-500" />
+                    <span>Control Owner</span>
+                  </div>
+                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+                  <div className="flex items-center gap-1">
+                    <Link2 size={12} className="text-blue-500" />
+                    <span>Stakeholders</span>
+                  </div>
+                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+                  <div className="flex items-center gap-1">
+                    <Link2 size={12} className="text-blue-500" />
+                    <span>Artifacts</span>
+                  </div>
+                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+                  <div className="flex items-center gap-1">
+                    <Link2 size={12} className="text-blue-500" />
+                    <span>Findings</span>
+                  </div>
+                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
+                </th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
+                  <div className="flex items-center gap-1">
+                    <Link2 size={12} className="text-blue-500" />
+                    <span>Evaluation Link</span>
+                  </div>
+                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -499,97 +576,184 @@ const Requirements = () => {
                       {req.implementationExample || '-'}
                     </div>
                   </td>
-                  {/* Implementation Description (Control) */}
-                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
-                    <div className="line-clamp-3" title={req.implementationDetails}>
-                      {req.implementationDetails || '-'}
-                    </div>
+                  {/* Implementation Description (from Controls) */}
+                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200 bg-blue-50/30">
+                    {(() => {
+                      const controlData = getControlDataForRequirement(req.id);
+                      // Fallback to deprecated field if no control data (for migration period)
+                      const implDesc = controlData?.implementationDescription || req.implementationDescription || '';
+                      return (
+                        <div className="line-clamp-3" title={implDesc}>
+                          {implDesc || '-'}
+                        </div>
+                      );
+                    })()}
                   </td>
-                  {/* Control Owner */}
-                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
-                    {req.controlOwner ? (
-                      <span
-                        className="px-2 py-1 rounded text-xs"
-                        style={{
-                          backgroundColor: darkMode ? '#2563eb' : '#dbeafe',
-                          color: darkMode ? '#ffffff' : '#1e40af'
-                        }}
-                      >
-                        {req.controlOwner}
-                      </span>
-                    ) : '-'}
+                  {/* Control Owner (from Controls) */}
+                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
+                    {(() => {
+                      const controlData = getControlDataForRequirement(req.id);
+                      // Fallback to deprecated field if no control data
+                      const owner = controlData?.controlOwner || req.controlOwner || '';
+                      return owner ? (
+                        <span
+                          className="px-2 py-1 rounded text-xs"
+                          style={{
+                            backgroundColor: darkMode ? '#2563eb' : '#dbeafe',
+                            color: darkMode ? '#ffffff' : '#1e40af'
+                          }}
+                        >
+                          {owner}
+                        </span>
+                      ) : '-';
+                    })()}
                   </td>
-                  {/* Stakeholders */}
-                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
-                    {req.stakeholders ? (
-                      <span
-                        className="px-2 py-1 rounded text-xs"
-                        style={{
-                          backgroundColor: darkMode ? '#9333ea' : '#f3e8ff',
-                          color: darkMode ? '#ffffff' : '#6b21a8'
-                        }}
-                      >
-                        {req.stakeholders}
-                      </span>
-                    ) : '-'}
+                  {/* Stakeholders (from Controls) */}
+                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
+                    {(() => {
+                      const controlData = getControlDataForRequirement(req.id);
+                      // Fallback to deprecated field if no control data
+                      const stakeholders = controlData?.stakeholders || req.stakeholders || '';
+                      return stakeholders ? (
+                        <span
+                          className="px-2 py-1 rounded text-xs"
+                          style={{
+                            backgroundColor: darkMode ? '#9333ea' : '#f3e8ff',
+                            color: darkMode ? '#ffffff' : '#6b21a8'
+                          }}
+                        >
+                          {stakeholders}
+                        </span>
+                      ) : '-';
+                    })()}
                   </td>
-                  {/* Artifacts */}
-                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
-                    {req.linkedArtifacts && req.linkedArtifacts.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {req.linkedArtifacts.slice(0, 2).map((name, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 rounded text-xs truncate max-w-[100px]"
-                            style={{
-                              backgroundColor: darkMode ? '#16a34a' : '#dcfce7',
-                              color: darkMode ? '#ffffff' : '#166534'
-                            }}
-                          >
-                            {name}
-                          </span>
-                        ))}
-                        {req.linkedArtifacts.length > 2 && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">+{req.linkedArtifacts.length - 2}</span>
-                        )}
-                      </div>
-                    ) : '-'}
+                  {/* Artifacts (from Controls) */}
+                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
+                    {(() => {
+                      const controlData = getControlDataForRequirement(req.id);
+                      // Control artifacts are objects from artifactStore
+                      const controlArtifacts = controlData?.artifacts || [];
+                      // Fallback: legacy string from requirement
+                      const legacyArtifacts = req.artifacts ? req.artifacts.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+                      if (controlArtifacts.length > 0) {
+                        return (
+                          <div className="flex flex-wrap gap-1">
+                            {controlArtifacts.slice(0, 2).map((artifact, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded text-xs truncate max-w-[100px]"
+                                style={{
+                                  backgroundColor: darkMode ? '#16a34a' : '#dcfce7',
+                                  color: darkMode ? '#ffffff' : '#166534'
+                                }}
+                                title={artifact.name}
+                              >
+                                {artifact.artifactId || artifact.name}
+                              </span>
+                            ))}
+                            {controlArtifacts.length > 2 && (
+                              <span className="text-xs text-gray-500">+{controlArtifacts.length - 2}</span>
+                            )}
+                          </div>
+                        );
+                      } else if (legacyArtifacts.length > 0) {
+                        return (
+                          <div className="flex flex-wrap gap-1">
+                            {legacyArtifacts.slice(0, 2).map((name, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded text-xs truncate max-w-[100px] opacity-70"
+                                style={{
+                                  backgroundColor: darkMode ? '#16a34a' : '#dcfce7',
+                                  color: darkMode ? '#ffffff' : '#166534'
+                                }}
+                                title={`Legacy: ${name}`}
+                              >
+                                {name}
+                              </span>
+                            ))}
+                            {legacyArtifacts.length > 2 && (
+                              <span className="text-xs text-gray-500">+{legacyArtifacts.length - 2}</span>
+                            )}
+                          </div>
+                        );
+                      }
+                      return '-';
+                    })()}
                   </td>
-                  {/* Findings */}
-                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
-                    {req.linkedFindings && req.linkedFindings.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {req.linkedFindings.slice(0, 2).map((id, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-0.5 rounded text-xs"
-                            style={{
-                              backgroundColor: darkMode ? '#ea580c' : '#ffedd5',
-                              color: darkMode ? '#ffffff' : '#c2410c'
-                            }}
-                          >
-                            {id}
-                          </span>
-                        ))}
-                        {req.linkedFindings.length > 2 && (
-                          <span className="text-xs text-gray-500 dark:text-gray-400">+{req.linkedFindings.length - 2}</span>
-                        )}
-                      </div>
-                    ) : '-'}
+                  {/* Findings (from Controls) */}
+                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
+                    {(() => {
+                      const controlData = getControlDataForRequirement(req.id);
+                      // Control findings are objects from findingsStore
+                      const controlFindings = controlData?.findings || [];
+                      // Fallback: legacy string from requirement
+                      const legacyFindings = req.findings ? req.findings.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+                      if (controlFindings.length > 0) {
+                        return (
+                          <div className="flex flex-wrap gap-1">
+                            {controlFindings.slice(0, 2).map((finding, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded text-xs"
+                                style={{
+                                  backgroundColor: darkMode ? '#ea580c' : '#ffedd5',
+                                  color: darkMode ? '#ffffff' : '#c2410c'
+                                }}
+                                title={finding.summary}
+                              >
+                                {finding.id}
+                              </span>
+                            ))}
+                            {controlFindings.length > 2 && (
+                              <span className="text-xs text-gray-500">+{controlFindings.length - 2}</span>
+                            )}
+                          </div>
+                        );
+                      } else if (legacyFindings.length > 0) {
+                        return (
+                          <div className="flex flex-wrap gap-1">
+                            {legacyFindings.slice(0, 2).map((id, idx) => (
+                              <span
+                                key={idx}
+                                className="px-2 py-0.5 rounded text-xs opacity-70"
+                                style={{
+                                  backgroundColor: darkMode ? '#ea580c' : '#ffedd5',
+                                  color: darkMode ? '#ffffff' : '#c2410c'
+                                }}
+                                title={`Legacy: ${id}`}
+                              >
+                                {id}
+                              </span>
+                            ))}
+                            {legacyFindings.length > 2 && (
+                              <span className="text-xs text-gray-500">+{legacyFindings.length - 2}</span>
+                            )}
+                          </div>
+                        );
+                      }
+                      return '-';
+                    })()}
                   </td>
-                  {/* Control Evaluation Back Link */}
-                  <td className="p-3 text-sm">
-                    {req.controlEvaluationLink ? (
-                      <a
-                        href={req.controlEvaluationLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-xs truncate block"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {req.controlEvaluationLink}
-                      </a>
-                    ) : '-'}
+                  {/* Control Evaluation Back Link (from Controls) */}
+                  <td className="p-3 text-sm bg-blue-50/30">
+                    {(() => {
+                      const controlData = getControlDataForRequirement(req.id);
+                      const link = controlData?.controlEvaluationBackLink || req.controlEvaluationBackLink || '';
+                      return link ? (
+                        <a
+                          href={link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline text-xs truncate block"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {link}
+                        </a>
+                      ) : '-';
+                    })()}
                   </td>
                 </tr>
               ))}
@@ -664,7 +828,6 @@ const Requirements = () => {
           requirement={selectedRequirement}
           onClose={() => setSelectedRequirement(null)}
           onSave={handleSaveRequirement}
-          onDelete={handleDeleteRequirement}
           controls={controls}
           artifacts={artifacts}
           findings={findings}

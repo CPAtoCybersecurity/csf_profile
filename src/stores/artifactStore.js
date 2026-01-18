@@ -26,9 +26,17 @@ const useArtifactStore = create(
           name: artifact.name || '',
           description: artifact.description || '',
           link: artifact.link || '', // URL to external evidence
-          complianceRequirement: artifact.complianceRequirement || null, // Linked requirement ID
-          controlId: artifact.controlId || null, // Linked control ID
+
+          // Primary link: Control (general evidence for a control)
+          controlId: artifact.controlId || null,
+
+          // Secondary link: Evaluations (point-in-time evidence for specific assessments)
+          linkedEvaluationIds: artifact.linkedEvaluationIds || [],
+
+          // DEPRECATED: Use controlId → linkedRequirementIds instead
+          complianceRequirement: artifact.complianceRequirement || null,
           linkedSubcategoryIds: artifact.linkedSubcategoryIds || [],
+
           type: artifact.type || 'Document', // Document, Screenshot, Log, Policy, etc.
           createdDate: artifact.createdDate || new Date().toISOString(),
           lastModified: new Date().toISOString(),
@@ -86,6 +94,22 @@ const useArtifactStore = create(
         return get().artifacts.filter(artifact => artifact.controlId === controlId);
       },
 
+      // Get artifacts by evaluation ID (NEW - for point-in-time evidence)
+      getArtifactsByEvaluation: (evaluationId) => {
+        return get().artifacts.filter(artifact =>
+          (artifact.linkedEvaluationIds || []).includes(evaluationId)
+        );
+      },
+
+      // Get artifacts by assessment (via evaluations)
+      getArtifactsByAssessment: (assessmentId) => {
+        return get().artifacts.filter(artifact =>
+          (artifact.linkedEvaluationIds || []).some(evalId =>
+            evalId && evalId.includes(assessmentId)
+          )
+        );
+      },
+
       // Get artifacts by type
       getArtifactsByType: (type) => {
         return get().artifacts.filter(artifact => artifact.type === type);
@@ -137,6 +161,60 @@ const useArtifactStore = create(
         get().updateArtifact(artifactId, { controlId });
       },
 
+      // Link artifact to evaluation (for point-in-time evidence)
+      linkToEvaluation: (artifactId, evaluationId) => {
+        set((state) => ({
+          artifacts: state.artifacts.map(artifact => {
+            if (artifact.id === artifactId) {
+              const linkedIds = artifact.linkedEvaluationIds || [];
+              if (!linkedIds.includes(evaluationId)) {
+                return {
+                  ...artifact,
+                  linkedEvaluationIds: [...linkedIds, evaluationId],
+                  lastModified: new Date().toISOString()
+                };
+              }
+            }
+            return artifact;
+          })
+        }));
+      },
+
+      // Unlink artifact from evaluation
+      unlinkFromEvaluation: (artifactId, evaluationId) => {
+        set((state) => ({
+          artifacts: state.artifacts.map(artifact => {
+            if (artifact.id === artifactId) {
+              return {
+                ...artifact,
+                linkedEvaluationIds: (artifact.linkedEvaluationIds || [])
+                  .filter(id => id !== evaluationId),
+                lastModified: new Date().toISOString()
+              };
+            }
+            return artifact;
+          })
+        }));
+      },
+
+      // Bulk link artifact to multiple evaluations
+      bulkLinkToEvaluations: (artifactId, evaluationIds) => {
+        set((state) => ({
+          artifacts: state.artifacts.map(artifact => {
+            if (artifact.id === artifactId) {
+              const existingIds = artifact.linkedEvaluationIds || [];
+              const newIds = [...new Set([...existingIds, ...evaluationIds])];
+              return {
+                ...artifact,
+                linkedEvaluationIds: newIds,
+                lastModified: new Date().toISOString()
+              };
+            }
+            return artifact;
+          })
+        }));
+      },
+
       // Set Jira key (for sync tracking)
       setJiraKey: (artifactId, jiraKey) => {
         const artifact = get().artifacts.find(a => a.id === artifactId);
@@ -177,9 +255,10 @@ const useArtifactStore = create(
           'Description': a.description,
           'Link': a.link || '',
           'Type': a.type || 'Document',
-          'Compliance Requirement': a.complianceRequirement || '',
           'Control ID': a.controlId || '',
-          'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '),
+          'Linked Evaluation IDs': (a.linkedEvaluationIds || []).join('; '),
+          'Compliance Requirement': a.complianceRequirement || '', // Deprecated
+          'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '), // Deprecated
           'Created Date': a.createdDate,
           'Jira Key': a.jiraKey || ''
         }));
@@ -208,10 +287,11 @@ const useArtifactStore = create(
           'Issue Type': 'Artifact',
           'Project key': 'AR',
           'Custom field (Link)': a.link || '',
-          'Custom field (Compliance Requirement)': a.complianceRequirement || '',
           'Custom field (Control ID)': a.controlId || '',
+          'Custom field (Linked Evaluation IDs)': (a.linkedEvaluationIds || []).join('; '),
+          'Custom field (Compliance Requirement)': a.complianceRequirement || '', // Deprecated
           'Custom field (Artifact Type)': a.type || 'Document',
-          'Description': a.description || `Evidence artifact: ${a.name}`
+          'Description': a.description || `Evidence artifact: ${a.name}\n\nControl: ${a.controlId || 'N/A'}\nEvaluations: ${(a.linkedEvaluationIds || []).join(', ') || 'N/A'}`
         }));
 
         const csv = Papa.unparse(csvData);
@@ -256,10 +336,19 @@ const useArtifactStore = create(
                     description: row['Description'] || '',
                     link: row['Link'] || row['Custom field (Link)'] || '',
                     type: row['Type'] || row['Custom field (Artifact Type)'] || 'Document',
-                    complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
+
+                    // Primary link
                     controlId: row['Control ID'] || row['Custom field (Control ID)'] || null,
+
+                    // Secondary link: Evaluations
+                    linkedEvaluationIds: (row['Linked Evaluation IDs'] || row['Custom field (Linked Evaluation IDs)'] || '')
+                      .split(';').map(s => s.trim()).filter(Boolean),
+
+                    // Deprecated
+                    complianceRequirement: row['Compliance Requirement'] || row['Custom field (Compliance Requirement)'] || null,
                     linkedSubcategoryIds: (row['Linked Subcategories'] || '')
                       .split(';').map(s => s.trim()).filter(Boolean),
+
                     createdDate: row['Created Date'] || row['Created'] || new Date().toISOString(),
                     lastModified: new Date().toISOString(),
                     jiraKey: row['Issue key'] || row['Jira Key'] || null,
@@ -288,7 +377,7 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 4,
+      version: 5,
       migrate: (persistedState, version) => {
         // Version 2: Added link, complianceRequirement, controlId, type, jiraKey fields
         if (version < 2 && persistedState?.artifacts) {
@@ -318,6 +407,12 @@ const useArtifactStore = create(
         // Removes artifacts with IDs like AR-1768214343793-1crwz9xd2, keeps only AR-## format
         if (version < 4) {
           // Reset to defaults - this cleans up old long IDs
+          return { artifacts: DEFAULT_ARTIFACTS };
+        }
+        // Version 5: Add controlId links to default artifacts (alignment with new Controls architecture)
+        // Existing users get their artifacts updated with correct control links
+        if (version < 5) {
+          // Use new defaults which include controlId links
           return { artifacts: DEFAULT_ARTIFACTS };
         }
         return persistedState;

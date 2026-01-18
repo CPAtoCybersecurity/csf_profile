@@ -10,7 +10,7 @@ export const DEFAULT_ARTIFACTS = [
     description: 'Phishing tool (Go Phish) campaign export of results',
     link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/2025-05-26_Phish-1001-LI-Campaign-Data.xlsx',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.AT-01 Ex2', // Security awareness training control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-10T07:28:00.000Z',
@@ -40,7 +40,7 @@ export const DEFAULT_ARTIFACTS = [
     description: 'Sample case',
     link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'RS.MI-02 Ex2', // Incident eradication control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-10T07:31:00.000Z',
@@ -85,7 +85,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'DE.CM-01 Ex1', // Network monitoring control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T14:35:00.000Z',
@@ -100,7 +100,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'DE.CM-01 Ex1', // Network monitoring control
     linkedSubcategoryIds: [],
     type: 'Screenshot',
     createdDate: '2026-01-11T14:35:00.000Z',
@@ -115,7 +115,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'DE.CM-01 Ex1', // Network monitoring control
     linkedSubcategoryIds: [],
     type: 'Screenshot',
     createdDate: '2026-01-11T14:36:00.000Z',
@@ -130,7 +130,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'DE.CM-01 Ex1', // Network monitoring control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T14:36:00.000Z',
@@ -145,7 +145,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'DE.CM-01 Ex1', // Network monitoring control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T14:46:00.000Z',
@@ -160,7 +160,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'DE.CM-01 Ex1', // Network monitoring control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T14:46:00.000Z',
@@ -190,7 +190,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.PS-05 Ex1', // Unauthorized software prevention control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:05:00.000Z',
@@ -205,7 +205,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.PS-05 Ex1', // Unauthorized software prevention control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:06:00.000Z',
@@ -220,7 +220,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.PS-05 Ex1', // Unauthorized software prevention control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:06:00.000Z',
@@ -235,7 +235,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.PS-05 Ex1', // Unauthorized software prevention control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:06:00.000Z',
@@ -250,7 +250,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.PS-05 Ex1', // Unauthorized software prevention control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:06:00.000Z',
@@ -265,7 +265,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:20:00.000Z',
@@ -280,7 +280,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Screenshot',
     createdDate: '2026-01-11T15:20:00.000Z',
@@ -295,7 +295,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:20:00.000Z',
@@ -310,7 +310,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Diagram',
     createdDate: '2026-01-11T15:20:00.000Z',
@@ -325,7 +325,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:20:00.000Z',
@@ -340,7 +340,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:21:00.000Z',
@@ -355,7 +355,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:21:00.000Z',
@@ -370,7 +370,7 @@ export const DEFAULT_ARTIFACTS = [
     description: '',
     link: '',
     complianceRequirement: null,
-    controlId: null,
+    controlId: 'PR.IR-03 Ex2', // Resilience mechanisms control
     linkedSubcategoryIds: [],
     type: 'Document',
     createdDate: '2026-01-11T15:21:00.000Z',

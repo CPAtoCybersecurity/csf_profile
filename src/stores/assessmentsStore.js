@@ -1360,6 +1360,117 @@ const useAssessmentsStore = create(
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+      },
+
+      // ============ EVALUATIONS STORE INTEGRATION ============
+      // NOTE: The embedded `observations` object is DEPRECATED.
+      // New code should use evaluationsStore for point-in-time evaluation data.
+      // These methods provide migration and compatibility.
+
+      /**
+       * Get scope control IDs (alias for scopeIds with preferred naming)
+       * scopeIds holds control IDs for assessments that scope by controls
+       */
+      getScopeControlIds: (assessmentId) => {
+        const assessment = get().getAssessment(assessmentId);
+        return assessment?.scopeIds || [];
+      },
+
+      /**
+       * Set scope control IDs
+       */
+      setScopeControlIds: (assessmentId, controlIds) => {
+        get().updateAssessment(assessmentId, { scopeIds: controlIds });
+      },
+
+      /**
+       * Migrate embedded observations to evaluationsStore.
+       * This extracts quarterly observation data and creates Evaluation entities.
+       * Should be called once during app migration.
+       *
+       * @param {Object} evaluationsStore - The evaluations store instance
+       * @returns {number} Number of evaluations created
+       */
+      migrateObservationsToEvaluations: (evaluationsStore) => {
+        const assessments = get().assessments;
+        const evaluationsData = [];
+
+        assessments.forEach(assessment => {
+          const observations = assessment.observations || {};
+
+          Object.entries(observations).forEach(([controlId, obs]) => {
+            // Skip if no quarterly data
+            if (!obs.quarters) {
+              // Try to migrate old format
+              const migrated = migrateObservationToQuarterly(obs);
+              if (!migrated?.quarters) return;
+              obs = migrated;
+            }
+
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+              const qData = obs.quarters[quarter];
+
+              // Skip empty quarters (no meaningful data)
+              if (!qData ||
+                  (qData.testingStatus === 'Not Started' &&
+                   !qData.observations &&
+                   qData.actualScore === 0 &&
+                   qData.targetScore === 0)) {
+                return;
+              }
+
+              evaluationsData.push({
+                assessmentId: assessment.id,
+                controlId,
+                quarter,
+                auditorId: obs.auditorId,
+                actualScore: qData.actualScore,
+                targetScore: qData.targetScore,
+                observations: qData.observations,
+                testProcedures: obs.testProcedures,
+                testingStatus: qData.testingStatus,
+                examine: qData.examine,
+                interview: qData.interview,
+                test: qData.test,
+                evaluationDate: qData.observationDate,
+                linkedArtifactIds: obs.linkedArtifacts || [],
+                remediation: obs.remediation,
+                jiraKey: obs.jiraKey,
+                createdDate: assessment.createdDate
+              });
+            });
+          });
+        });
+
+        // Use evaluationsStore bulk create
+        const count = evaluationsStore.getState().bulkCreateEvaluations(evaluationsData);
+        console.log(`[assessmentsStore] Migrated ${count} evaluations from ${assessments.length} assessments`);
+        return count;
+      },
+
+      /**
+       * Get evaluations for an assessment from evaluationsStore.
+       * This is the NEW way to access evaluation data.
+       *
+       * @param {string} assessmentId - Assessment ID
+       * @param {Object} evaluationsStore - The evaluations store instance
+       * @returns {Array} Evaluation objects
+       */
+      getEvaluationsFromStore: (assessmentId, evaluationsStore) => {
+        return evaluationsStore.getState().getEvaluationsByAssessment(assessmentId);
+      },
+
+      /**
+       * Check if assessment has been migrated to evaluationsStore.
+       * An assessment is "migrated" if it has evaluations in evaluationsStore.
+       *
+       * @param {string} assessmentId - Assessment ID
+       * @param {Object} evaluationsStore - The evaluations store instance
+       * @returns {boolean}
+       */
+      isMigratedToEvaluations: (assessmentId, evaluationsStore) => {
+        const evals = evaluationsStore.getState().getEvaluationsByAssessment(assessmentId);
+        return evals.length > 0;
       }
     }),
     {

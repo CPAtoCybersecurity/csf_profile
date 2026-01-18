@@ -98,11 +98,79 @@ const useRequirementsStore = create(
         return reqs;
       },
 
-      // Update a requirement
+      // ============ MIGRATION HELPER ============
+      // Extract control-related data from requirements for migration to controlsStore.
+      // This should be called during initial migration to move deprecated fields to Controls.
+      getControlDataForMigration: () => {
+        return get().requirements
+          .filter(r =>
+            r.implementationDescription ||
+            r.controlOwner ||
+            r.stakeholders ||
+            r.artifacts ||
+            r.findings
+          )
+          .map(r => ({
+            // Use requirement ID as default control ID for CSF
+            controlId: r.id,
+            linkedRequirementIds: [r.id],
+            frameworkId: r.frameworkId,
+
+            // Deprecated fields to migrate
+            implementationDescription: r.implementationDescription || '',
+            controlOwner: r.controlOwner || '',
+            stakeholders: r.stakeholders || '',
+            artifacts: r.artifacts || '',
+            findings: r.findings || '',
+            controlEvaluationBackLink: r.controlEvaluationBackLink || ''
+          }));
+      },
+
+      // Clear deprecated fields after migration (optional cleanup)
+      clearDeprecatedFields: () => {
+        set((state) => ({
+          requirements: state.requirements.map(r => ({
+            ...r,
+            // Keep these as empty strings for backward compatibility, but they're deprecated
+            implementationDescription: '',
+            controlOwner: '',
+            stakeholders: '',
+            artifacts: '',
+            findings: '',
+            controlEvaluationBackLink: ''
+          }))
+        }));
+        console.log('[requirementsStore] Deprecated fields cleared. Use controlsStore for control data.');
+      },
+
+      // Update a requirement (RESTRICTED - Requirements are now READ-ONLY)
+      // Only inScope can be updated. Control-related data should go to controlsStore.
+      // @deprecated Use controlsStore for: controlOwner, stakeholders, implementationDescription
       updateRequirement: (requirementId, updates) => {
+        // Filter to only allow scope-related updates
+        const allowedFields = ['inScope'];
+        const filteredUpdates = {};
+
+        for (const key of allowedFields) {
+          if (updates[key] !== undefined) {
+            filteredUpdates[key] = updates[key];
+          }
+        }
+
+        // Warn about deprecated field updates
+        const deprecatedFields = ['controlOwner', 'stakeholders', 'implementationDescription', 'artifacts', 'findings'];
+        const attemptedDeprecated = Object.keys(updates).filter(k => deprecatedFields.includes(k));
+        if (attemptedDeprecated.length > 0) {
+          console.warn(`[requirementsStore] Attempted to update deprecated fields: ${attemptedDeprecated.join(', ')}. Use controlsStore instead.`);
+        }
+
+        if (Object.keys(filteredUpdates).length === 0) {
+          return; // No valid updates
+        }
+
         set((state) => ({
           requirements: state.requirements.map(r =>
-            r.id === requirementId ? { ...r, ...updates } : r
+            r.id === requirementId ? { ...r, ...filteredUpdates } : r
           )
         }));
       },
@@ -166,6 +234,9 @@ const useRequirementsStore = create(
       },
 
       // Load initial CSF data from Confluence-Requirements.csv
+      // NOTE: Requirements are READ-ONLY framework data. The CSV may contain control-related
+      // fields (controlOwner, implementationDescription, etc.) for migration purposes,
+      // but these should be migrated to controlsStore and are deprecated here.
       loadInitialData: async () => {
         try {
           set({ loading: true, error: null });
@@ -184,6 +255,7 @@ const useRequirementsStore = create(
                   const categoryId = categoryIdMatch ? categoryIdMatch[1] : '';
 
                   return {
+                    // === FRAMEWORK DATA (Read-Only) ===
                     id: row['Requirement ID'] || row.ID || '',
                     frameworkId: row.Framework || row.FRAMEWORK || 'nist-csf-2.0',
                     function: row['CSF Function'] || row['CSF FUNCTION'] || row.Function || '',
@@ -194,13 +266,19 @@ const useRequirementsStore = create(
                     subcategoryId: row['Subcategory ID'] || row['SUBCATEGORY ID'] || '',
                     subcategoryDescription: row['Subcategory Description'] || row['SUBCATEGORY DESCRIPTION'] || '',
                     implementationExample: row['Implementation Example'] || row['IMPLEMENTATION EXAMPLE'] || '',
+
+                    // === SCOPE (User-Manageable) ===
+                    inScope: true, // All pre-loaded requirements are in scope
+
+                    // === DEPRECATED FIELDS (Migrate to controlsStore) ===
+                    // These are loaded for backward compatibility but should NOT be edited here.
+                    // Use getControlDataForMigration() to extract and migrate to controlsStore.
                     implementationDescription: row['Implementation Description (Control)'] || '',
                     controlOwner: row['Control Owner'] || '',
                     stakeholders: row['Stakeholders'] || '',
                     artifacts: row['Artifacts'] || '',
                     findings: row['Findings'] || '',
-                    controlEvaluationBackLink: row['Control Evaluation Back Link'] || '',
-                    inScope: true // All pre-loaded requirements are in scope
+                    controlEvaluationBackLink: row['Control Evaluation Back Link'] || ''
                   };
                 });
 
@@ -288,6 +366,12 @@ const useRequirementsStore = create(
           )].filter(Boolean);
           const controlsInScope = linkedControls.map(c => c.controlId).join(', ');
 
+          // Get implementation descriptions from linked controls
+          const implementationDescriptions = linkedControls
+            .map(c => c.implementationDescription)
+            .filter(Boolean)
+            .join(' | ');
+
           return {
             'Requirement ID': r.id,
             'Framework': r.frameworkId || 'NIST CSF 2.0',
@@ -298,6 +382,7 @@ const useRequirementsStore = create(
             'Subcategory ID': r.subcategoryId,
             'Subcategory Description': r.subcategoryDescription,
             'Implementation Example': r.implementationExample,
+            'Implementation Description (Control)': implementationDescriptions,
             'In Scope': r.inScope ? 'Yes' : 'No',
             'Control Owner': controlOwners.join(', '),
             'Stakeholders': controlStakeholders.join(', '),
