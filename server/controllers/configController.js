@@ -2,13 +2,31 @@
 
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const configPath = path.join(process.cwd(), "config.json");
+// Get directory path relative to this file (works regardless of cwd)
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const configPath = path.join(__dirname, "..", "config.json");
+
+// Validation helper
+const validateConfigFields = (config, requiredFields) => {
+  const missing = requiredFields.filter((field) => !config[field]);
+  return missing.length > 0 ? missing : null;
+};
 
 // POST /api/config/jira
 export const saveJiraConfig = (req, res) => {
   const config = req.body;
-  if (!config) return res.status(400).json({ error: "Missing Jira config data" });
+  if (!config || typeof config !== "object") {
+    return res.status(400).json({ error: "Missing Jira config data" });
+  }
+
+  const missingFields = validateConfigFields(config, ["baseUrl", "email", "apiToken"]);
+  if (missingFields) {
+    return res.status(400).json({
+      error: `Missing required fields: ${missingFields.join(", ")}`,
+    });
+  }
 
   saveConfig({ jira: config }, res);
 };
@@ -16,7 +34,16 @@ export const saveJiraConfig = (req, res) => {
 // POST /api/config/confluence
 export const saveConfluenceConfig = (req, res) => {
   const config = req.body;
-  if (!config) return res.status(400).json({ error: "Missing Confluence config data" });
+  if (!config || typeof config !== "object") {
+    return res.status(400).json({ error: "Missing Confluence config data" });
+  }
+
+  const missingFields = validateConfigFields(config, ["baseUrl", "email", "apiToken"]);
+  if (missingFields) {
+    return res.status(400).json({
+      error: `Missing required fields: ${missingFields.join(", ")}`,
+    });
+  }
 
   saveConfig({ confluence: config }, res);
 };

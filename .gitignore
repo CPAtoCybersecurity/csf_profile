@@ -27,3 +27,6 @@ server/.env.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Server config with credentials (use config.example.json as template)
+server/config.json
