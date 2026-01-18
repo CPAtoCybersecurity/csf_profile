@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
-  Search, Filter, Upload, Download, FileText, Link2
+  Search, Filter, Upload, Download, Link2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -10,6 +10,12 @@ import CSFBadge, { SubcategoryBadge } from '../components/CSFBadge';
 import DropdownPortal from '../components/DropdownPortal';
 import SortableHeader from '../components/SortableHeader';
 import RequirementDetailPanel from '../components/RequirementDetailPanel';
+import { SkeletonTable } from '../components/SkeletonLoader';
+import { EmptySearchResults, EmptyTableState } from '../components/EmptyState';
+import { UserAvatar } from '../components/UserAvatar';
+import { ArtifactBadge, FindingBadge, BadgeGroup } from '../components/BadgeSystem';
+import { RowCheckbox, RowNumber, HeaderCheckbox } from '../components/RowHoverActions';
+import { FilterChip } from '../components/FilterBar';
 
 // Stores
 import useRequirementsStore from '../stores/requirementsStore';
@@ -44,6 +50,10 @@ const Requirements = () => {
 
   // UI state
   const darkMode = useUIStore((state) => state.darkMode);
+  const selectedItemIds = useUIStore((state) => state.selectedItemIds);
+  const toggleItemSelection = useUIStore((state) => state.toggleItemSelection);
+  const selectAllItems = useUIStore((state) => state.selectAllItems);
+  const clearSelection = useUIStore((state) => state.clearSelection);
 
   // Helper: Get user name by ID
   const getUserName = useCallback((userId) => {
@@ -53,18 +63,16 @@ const Requirements = () => {
   }, [users]);
 
   // Helper: Get control data for a requirement (pulls from linked Controls)
-  // This enables display of control-owned fields (owner, implementation, artifacts, findings)
-  // while keeping Requirements read-only
   const getControlDataForRequirement = useCallback((requirementId) => {
     const linkedControls = getControlsByRequirement(requirementId);
     if (linkedControls.length === 0) {
-      // Fallback: check for control with matching ID (CSF default pattern)
       const matchingControl = controls.find(c => c.controlId === requirementId);
       if (matchingControl) {
         return {
           controlId: matchingControl.controlId,
           implementationDescription: matchingControl.implementationDescription || '',
           controlOwner: getUserName(matchingControl.ownerId),
+          ownerId: matchingControl.ownerId,
           stakeholders: (matchingControl.stakeholderIds || []).map(id => getUserName(id)).filter(Boolean).join(', '),
           artifacts: getArtifactsByControl(matchingControl.controlId),
           findings: getFindingsByControl(matchingControl.controlId),
@@ -73,9 +81,9 @@ const Requirements = () => {
       }
       return null;
     }
-    // Aggregate data from all linked controls
     const implDescriptions = linkedControls.map(c => c.implementationDescription).filter(Boolean);
     const owners = [...new Set(linkedControls.map(c => getUserName(c.ownerId)).filter(Boolean))];
+    const ownerIds = [...new Set(linkedControls.map(c => c.ownerId).filter(Boolean))];
     const stakeholderIds = [...new Set(linkedControls.flatMap(c => c.stakeholderIds || []))];
     const controlIds = linkedControls.map(c => c.controlId);
     const allArtifacts = controlIds.flatMap(cid => getArtifactsByControl(cid));
@@ -86,6 +94,7 @@ const Requirements = () => {
       controlIds,
       implementationDescription: implDescriptions.join(' | '),
       controlOwner: owners.join(', '),
+      ownerId: ownerIds[0],
       stakeholders: stakeholderIds.map(id => getUserName(id)).filter(Boolean).join(', '),
       artifacts: allArtifacts,
       findings: allFindings,
@@ -102,6 +111,8 @@ const Requirements = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [sort, setSort] = useState({ key: 'id', direction: 'asc' });
+  const [showRowNumbers, setShowRowNumbers] = useState(true);
+  const [showCheckboxes, setShowCheckboxes] = useState(true);
 
   // Dropdown states
   const [frameworkDropdownOpen, setFrameworkDropdownOpen] = useState(false);
@@ -147,7 +158,6 @@ const Requirements = () => {
   const filteredData = useMemo(() => {
     let result = [...requirements];
 
-    // Apply filters
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       result = result.filter(r =>
@@ -174,7 +184,6 @@ const Requirements = () => {
       result = result.filter(r => r.category === filterCategory);
     }
 
-    // Apply sorting
     result.sort((a, b) => {
       const aVal = a[sort.key] || '';
       const bVal = b[sort.key] || '';
@@ -197,6 +206,10 @@ const Requirements = () => {
     setCurrentPage(1);
   }, [searchTerm, filterFramework, filterFunction, filterCategory]);
 
+  // Selection state
+  const allCurrentItemsSelected = currentItems.length > 0 && currentItems.every(item => selectedItemIds.includes(item.id));
+  const someCurrentItemsSelected = currentItems.some(item => selectedItemIds.includes(item.id));
+
   // Handlers
   const handleSort = useCallback((key) => {
     setSort(prev => ({
@@ -204,6 +217,14 @@ const Requirements = () => {
       direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
     }));
   }, []);
+
+  const handleSelectAll = useCallback(() => {
+    if (allCurrentItemsSelected) {
+      clearSelection();
+    } else {
+      selectAllItems(currentItems.map(item => item.id));
+    }
+  }, [allCurrentItemsSelected, currentItems, selectAllItems, clearSelection]);
 
   const handleImportClick = useCallback(() => {
     fileInputRef.current?.click();
@@ -213,7 +234,6 @@ const Requirements = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Prompt for framework selection
     const frameworkId = prompt(
       'Enter framework ID for import (e.g., nist-csf-2.0, soc2-2017, iso27001-2022):',
       'nist-csf-2.0'
@@ -233,7 +253,6 @@ const Requirements = () => {
       toast.error(`Import failed: ${err.message}`);
     }
 
-    // Reset file input
     e.target.value = '';
   }, [importRequirementsCSV, markFrameworkImported]);
 
@@ -242,19 +261,87 @@ const Requirements = () => {
     toast.success('Requirements exported');
   }, [exportRequirementsCSV, filterFramework]);
 
-  // Handle save requirement - Only inScope can be changed (requirements are read-only)
   const handleSaveRequirement = useCallback((updatedRequirement) => {
-    // Only update the inScope field - requirements are read-only framework data
     updateRequirement(updatedRequirement.id, { inScope: updatedRequirement.inScope });
     toast.success('Scope updated');
-    // Update selected requirement to reflect changes
     setSelectedRequirement(updatedRequirement);
   }, [updateRequirement]);
 
+  const handleClearFilters = useCallback(() => {
+    setSearchTerm('');
+    setFilterFramework('');
+    setFilterFunction('');
+    setFilterCategory('');
+  }, []);
+
+  const handleRemoveFilter = useCallback((filterKey) => {
+    switch (filterKey) {
+      case 'framework':
+        setFilterFramework('');
+        setFilterFunction('');
+        setFilterCategory('');
+        break;
+      case 'function':
+        setFilterFunction('');
+        setFilterCategory('');
+        break;
+      case 'category':
+        setFilterCategory('');
+        break;
+      default:
+        break;
+    }
+  }, []);
+
+  // Active filters for chips
+  const activeFilters = useMemo(() => {
+    const filters = [];
+    if (filterFramework) {
+      const fw = enabledFrameworks.find(f => f.id === filterFramework);
+      filters.push({
+        key: 'framework',
+        label: 'Framework',
+        value: filterFramework,
+        displayValue: fw?.shortName || filterFramework,
+        color: 'blue'
+      });
+    }
+    if (filterFunction) {
+      filters.push({
+        key: 'function',
+        label: 'Function',
+        value: filterFunction,
+        displayValue: filterFunction,
+        color: 'purple'
+      });
+    }
+    if (filterCategory) {
+      filters.push({
+        key: 'category',
+        label: 'Category',
+        value: filterCategory,
+        displayValue: filterCategory,
+        color: 'orange'
+      });
+    }
+    return filters;
+  }, [filterFramework, filterFunction, filterCategory, enabledFrameworks]);
+
+  // Loading state
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-xl font-semibold">Loading requirements...</div>
+      <div className="flex flex-col h-full">
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 flex items-center gap-4 border-b">
+          <div className="w-40 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          <div className="w-40 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          <div className="w-44 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          <div className="flex-grow" />
+          <div className="w-24 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+          <div className="w-24 h-9 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+        </div>
+        <div className="flex-1 overflow-auto">
+          <SkeletonTable rows={10} columns={8} hasCheckbox={showCheckboxes} hasRowNumber={showRowNumbers} />
+        </div>
       </div>
     );
   }
@@ -262,15 +349,15 @@ const Requirements = () => {
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="bg-gray-100 p-4 flex flex-wrap items-center gap-4 border-b relative z-50">
+      <div className="bg-gray-100 dark:bg-gray-800 p-3 flex flex-wrap items-center gap-3 border-b border-gray-200 dark:border-gray-700 relative z-50">
         {/* Search */}
         <div className="relative w-40">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search size={16} className="text-gray-500" />
+            <Search size={14} className="text-gray-400" />
           </div>
           <input
             type="text"
-            className="w-full pl-8 pr-2 py-1.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="Search..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -281,7 +368,7 @@ const Requirements = () => {
         <div className="w-40">
           <div
             ref={frameworkTriggerRef}
-            className="w-full p-2 border rounded-lg bg-white cursor-pointer flex items-center justify-between"
+            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex items-center justify-between text-sm"
             onClick={() => setFrameworkDropdownOpen(!frameworkDropdownOpen)}
           >
             <span className="truncate">
@@ -289,7 +376,7 @@ const Requirements = () => {
                 ? enabledFrameworks.find(f => f.id === filterFramework)?.shortName || filterFramework
                 : 'All Frameworks'}
             </span>
-            <Filter size={16} className="text-gray-500 flex-shrink-0" />
+            <Filter size={14} className="text-gray-400 flex-shrink-0" />
           </div>
           <DropdownPortal
             isOpen={frameworkDropdownOpen}
@@ -298,7 +385,7 @@ const Requirements = () => {
             className="max-h-60 overflow-auto"
           >
             <div className="p-2">
-              <label className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+              <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
                 <input
                   type="radio"
                   className="mr-2"
@@ -311,7 +398,7 @@ const Requirements = () => {
                 <span>All Frameworks</span>
               </label>
               {enabledFrameworks.map((fw) => (
-                <label key={fw.id} className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+                <label key={fw.id} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
                   <input
                     type="radio"
                     className="mr-2"
@@ -332,14 +419,14 @@ const Requirements = () => {
         </div>
 
         {/* CSF Function filter */}
-        <div className="w-44">
+        <div className="w-40">
           <div
             ref={functionTriggerRef}
-            className="w-full p-2 border rounded-lg bg-white cursor-pointer flex items-center justify-between"
+            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex items-center justify-between text-sm"
             onClick={() => setFunctionDropdownOpen(!functionDropdownOpen)}
           >
-            <span className="truncate">{filterFunction || 'All CSF Functions'}</span>
-            <Filter size={16} className="text-gray-500 flex-shrink-0" />
+            <span className="truncate">{filterFunction || 'All Functions'}</span>
+            <Filter size={14} className="text-gray-400 flex-shrink-0" />
           </div>
           <DropdownPortal
             isOpen={functionDropdownOpen}
@@ -348,7 +435,7 @@ const Requirements = () => {
             className="max-h-60 overflow-auto"
           >
             <div className="p-2">
-              <label className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+              <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
                 <input
                   type="radio"
                   className="mr-2"
@@ -359,10 +446,10 @@ const Requirements = () => {
                     setFunctionDropdownOpen(false);
                   }}
                 />
-                <span>All CSF Functions</span>
+                <span>All Functions</span>
               </label>
               {functions.map((func) => (
-                <label key={func} className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+                <label key={func} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
                   <input
                     type="radio"
                     className="mr-2"
@@ -373,7 +460,7 @@ const Requirements = () => {
                       setFunctionDropdownOpen(false);
                     }}
                   />
-                  <span>{func}</span>
+                  <CSFBadge functionName={func} size="xs" />
                 </label>
               ))}
             </div>
@@ -381,14 +468,14 @@ const Requirements = () => {
         </div>
 
         {/* Category filter */}
-        <div className="w-44">
+        <div className="w-40">
           <div
             ref={categoryTriggerRef}
-            className="w-full p-2 border rounded-lg bg-white cursor-pointer flex items-center justify-between"
+            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex items-center justify-between text-sm"
             onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
           >
             <span className="truncate">{filterCategory || 'All Categories'}</span>
-            <Filter size={16} className="text-gray-500 flex-shrink-0" />
+            <Filter size={14} className="text-gray-400 flex-shrink-0" />
           </div>
           <DropdownPortal
             isOpen={categoryDropdownOpen}
@@ -397,7 +484,7 @@ const Requirements = () => {
             className="max-h-60 overflow-auto"
           >
             <div className="p-2">
-              <label className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+              <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
                 <input
                   type="radio"
                   className="mr-2"
@@ -410,7 +497,7 @@ const Requirements = () => {
                 <span>All Categories</span>
               </label>
               {categories.map((cat) => (
-                <label key={cat} className="flex items-center p-2 hover:bg-gray-100 rounded cursor-pointer">
+                <label key={cat} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
                   <input
                     type="radio"
                     className="mr-2"
@@ -427,6 +514,30 @@ const Requirements = () => {
           </DropdownPortal>
         </div>
 
+        {/* Active filter chips */}
+        {activeFilters.length > 0 && (
+          <div className="flex items-center gap-2 px-2 py-1 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+            <span className="text-xs text-gray-500 dark:text-gray-400">Active:</span>
+            {activeFilters.map((filter) => (
+              <FilterChip
+                key={filter.key}
+                label={filter.label}
+                value={filter.displayValue}
+                onRemove={() => handleRemoveFilter(filter.key)}
+                color={filter.color}
+              />
+            ))}
+            {activeFilters.length > 1 && (
+              <button
+                onClick={handleClearFilters}
+                className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                Clear all
+              </button>
+            )}
+          </div>
+        )}
+
         {/* Spacer */}
         <div className="flex-grow" />
 
@@ -440,323 +551,208 @@ const Requirements = () => {
             style={{ display: 'none' }}
           />
           <button
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
+            className="flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded-lg text-sm font-medium transition-colors"
             onClick={handleImportClick}
             title="Import requirements from CSV"
           >
-            <Upload size={16} />
+            <Upload size={14} />
             Import
           </button>
           <button
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
+            className="flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded-lg text-sm font-medium transition-colors"
             onClick={handleExport}
             title="Export requirements to CSV"
           >
-            <Download size={16} />
+            <Download size={14} />
             Export
           </button>
         </div>
       </div>
 
+      {/* Selection info bar */}
+      {selectedItemIds.length > 0 && (
+        <div className="bg-blue-50 dark:bg-blue-900/30 px-4 py-2 flex items-center gap-4 border-b border-blue-200 dark:border-blue-800">
+          <span className="text-sm text-blue-700 dark:text-blue-300">
+            {selectedItemIds.length} item{selectedItemIds.length !== 1 ? 's' : ''} selected
+          </span>
+          <button
+            onClick={clearSelection}
+            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200"
+          >
+            Clear selection
+          </button>
+        </div>
+      )}
+
       {/* Table */}
       <div className="flex-1 overflow-auto">
         {filteredData.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <FileText size={48} className="mb-4 opacity-50" />
-            <p className="text-lg">No requirements found</p>
-            <p className="text-sm mt-2">Import framework requirements using the Import button</p>
-          </div>
+          requirements.length === 0 ? (
+            <EmptyTableState
+              entityName="requirements"
+              onImport={handleImportClick}
+            />
+          ) : (
+            <EmptySearchResults
+              onClearFilters={handleClearFilters}
+              searchTerm={searchTerm}
+            />
+          )
         ) : (
-          <table className="min-w-full bg-white border-collapse" style={{ borderSpacing: 0 }}>
+          <table className="min-w-full bg-white dark:bg-gray-900 border-collapse" style={{ borderSpacing: 0 }}>
             <thead className="sticky top-0 z-10">
-              <tr className="bg-gray-50 border-b border-gray-300">
-                <SortableHeader label="Requirement ID" sortKey="id" currentSort={sort} onSort={handleSort} className="w-32 border-r border-gray-200" />
-                <SortableHeader label="Framework" sortKey="frameworkId" currentSort={sort} onSort={handleSort} className="w-36 border-r border-gray-200" />
-                <SortableHeader label="CSF Function" sortKey="function" currentSort={sort} onSort={handleSort} className="w-32 border-r border-gray-200" />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">CSF Function Description</th>
-                <SortableHeader label="Category Name" sortKey="category" currentSort={sort} onSort={handleSort} className="w-40 border-r border-gray-200" />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Category Description</th>
-                <SortableHeader label="Subcategory ID" sortKey="subcategoryId" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200" />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Subcategory Description</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-48">Implementation Example</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-56">
-                  <div className="flex items-center gap-1">
-                    <Link2 size={12} className="text-blue-500" />
-                    <span>Implementation Description</span>
-                  </div>
-                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
-                </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+              <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
+                {/* Checkbox column */}
+                {showCheckboxes && (
+                  <th className="p-3 w-10 border-r border-gray-200 dark:border-gray-700">
+                    <HeaderCheckbox
+                      checked={allCurrentItemsSelected}
+                      indeterminate={someCurrentItemsSelected && !allCurrentItemsSelected}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                )}
+                {/* Row number column */}
+                {showRowNumbers && (
+                  <th className="p-3 w-12 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                    #
+                  </th>
+                )}
+                <SortableHeader label="Requirement ID" sortKey="id" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200 dark:border-gray-700" />
+                <SortableHeader label="Framework" sortKey="frameworkId" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200 dark:border-gray-700" />
+                <SortableHeader label="CSF Function" sortKey="function" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200 dark:border-gray-700" />
+                <SortableHeader label="Category" sortKey="category" currentSort={sort} onSort={handleSort} className="w-36 border-r border-gray-200 dark:border-gray-700" />
+                <SortableHeader label="Subcategory" sortKey="subcategoryId" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200 dark:border-gray-700" />
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 w-48">Description</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 w-44 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-1">
                     <Link2 size={12} className="text-blue-500" />
                     <span>Control Owner</span>
                   </div>
-                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
-                  <div className="flex items-center gap-1">
-                    <Link2 size={12} className="text-blue-500" />
-                    <span>Stakeholders</span>
-                  </div>
-                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
-                </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 w-32 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-1">
                     <Link2 size={12} className="text-blue-500" />
                     <span>Artifacts</span>
                   </div>
-                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-r border-gray-200 w-32">
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-1">
                     <Link2 size={12} className="text-blue-500" />
                     <span>Findings</span>
                   </div>
-                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
-                </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">
-                  <div className="flex items-center gap-1">
-                    <Link2 size={12} className="text-blue-500" />
-                    <span>Evaluation Link</span>
-                  </div>
-                  <span className="text-[10px] font-normal normal-case text-blue-500">(from Controls)</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((req, index) => (
-                <tr
-                  key={req.id}
-                  onClick={() => setSelectedRequirement(req)}
-                  className={`border-b border-gray-200 hover:bg-blue-50/50 transition-colors cursor-pointer ${
-                    selectedRequirement?.id === req.id ? 'bg-blue-100 hover:bg-blue-100' : 'bg-white'
-                  }`}
-                >
-                  {/* Requirement ID */}
-                  <td className="p-3 text-sm border-r border-gray-200">
-                    <SubcategoryBadge subcategoryId={req.id} size="sm" />
-                  </td>
-                  {/* Framework */}
-                  <td className="p-3 text-sm border-r border-gray-200">
-                    <FrameworkBadge frameworkId={req.frameworkId} />
-                  </td>
-                  {/* CSF Function */}
-                  <td className="p-3 text-sm border-r border-gray-200">
-                    <CSFBadge functionName={req.function} size="sm" />
-                  </td>
-                  {/* CSF Function Description */}
-                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
-                    <div className="line-clamp-3" title={req.functionDescription}>
-                      {req.functionDescription || '-'}
-                    </div>
-                  </td>
-                  {/* Category Name */}
-                  <td className="p-3 text-sm text-gray-700 border-r border-gray-200">
-                    {req.category || '-'}
-                  </td>
-                  {/* Category Description */}
-                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
-                    <div className="line-clamp-3" title={req.categoryDescription}>
-                      {req.categoryDescription || '-'}
-                    </div>
-                  </td>
-                  {/* Subcategory ID */}
-                  <td className="p-3 text-sm border-r border-gray-200">
-                    <SubcategoryBadge subcategoryId={req.subcategoryId} size="sm" />
-                  </td>
-                  {/* Subcategory Description */}
-                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
-                    <div className="line-clamp-3" title={req.subcategoryDescription}>
-                      {req.subcategoryDescription || '-'}
-                    </div>
-                  </td>
-                  {/* Implementation Example */}
-                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200">
-                    <div className="line-clamp-3" title={req.implementationExample}>
-                      {req.implementationExample || '-'}
-                    </div>
-                  </td>
-                  {/* Implementation Description (from Controls) */}
-                  <td className="p-3 text-sm text-gray-600 border-r border-gray-200 bg-blue-50/30">
-                    {(() => {
-                      const controlData = getControlDataForRequirement(req.id);
-                      // Fallback to deprecated field if no control data (for migration period)
-                      const implDesc = controlData?.implementationDescription || req.implementationDescription || '';
-                      return (
-                        <div className="line-clamp-3" title={implDesc}>
-                          {implDesc || '-'}
-                        </div>
-                      );
-                    })()}
-                  </td>
-                  {/* Control Owner (from Controls) */}
-                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
-                    {(() => {
-                      const controlData = getControlDataForRequirement(req.id);
-                      // Fallback to deprecated field if no control data
-                      const owner = controlData?.controlOwner || req.controlOwner || '';
-                      return owner ? (
-                        <span
-                          className="px-2 py-1 rounded text-xs"
-                          style={{
-                            backgroundColor: darkMode ? '#2563eb' : '#dbeafe',
-                            color: darkMode ? '#ffffff' : '#1e40af'
-                          }}
-                        >
-                          {owner}
-                        </span>
-                      ) : '-';
-                    })()}
-                  </td>
-                  {/* Stakeholders (from Controls) */}
-                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
-                    {(() => {
-                      const controlData = getControlDataForRequirement(req.id);
-                      // Fallback to deprecated field if no control data
-                      const stakeholders = controlData?.stakeholders || req.stakeholders || '';
-                      return stakeholders ? (
-                        <span
-                          className="px-2 py-1 rounded text-xs"
-                          style={{
-                            backgroundColor: darkMode ? '#9333ea' : '#f3e8ff',
-                            color: darkMode ? '#ffffff' : '#6b21a8'
-                          }}
-                        >
-                          {stakeholders}
-                        </span>
-                      ) : '-';
-                    })()}
-                  </td>
-                  {/* Artifacts (from Controls) */}
-                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
-                    {(() => {
-                      const controlData = getControlDataForRequirement(req.id);
-                      // Control artifacts are objects from artifactStore
-                      const controlArtifacts = controlData?.artifacts || [];
-                      // Fallback: legacy string from requirement
-                      const legacyArtifacts = req.artifacts ? req.artifacts.split(',').map(s => s.trim()).filter(Boolean) : [];
+              {currentItems.map((req, index) => {
+                const controlData = getControlDataForRequirement(req.id);
+                const isSelected = selectedItemIds.includes(req.id);
+                const rowNumber = (currentPage - 1) * itemsPerPage + index + 1;
 
-                      if (controlArtifacts.length > 0) {
-                        return (
-                          <div className="flex flex-wrap gap-1">
-                            {controlArtifacts.slice(0, 2).map((artifact, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 rounded text-xs truncate max-w-[100px]"
-                                style={{
-                                  backgroundColor: darkMode ? '#16a34a' : '#dcfce7',
-                                  color: darkMode ? '#ffffff' : '#166534'
-                                }}
-                                title={artifact.name}
-                              >
-                                {artifact.artifactId || artifact.name}
-                              </span>
-                            ))}
-                            {controlArtifacts.length > 2 && (
-                              <span className="text-xs text-gray-500">+{controlArtifacts.length - 2}</span>
-                            )}
-                          </div>
-                        );
-                      } else if (legacyArtifacts.length > 0) {
-                        return (
-                          <div className="flex flex-wrap gap-1">
-                            {legacyArtifacts.slice(0, 2).map((name, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 rounded text-xs truncate max-w-[100px] opacity-70"
-                                style={{
-                                  backgroundColor: darkMode ? '#16a34a' : '#dcfce7',
-                                  color: darkMode ? '#ffffff' : '#166534'
-                                }}
-                                title={`Legacy: ${name}`}
-                              >
-                                {name}
-                              </span>
-                            ))}
-                            {legacyArtifacts.length > 2 && (
-                              <span className="text-xs text-gray-500">+{legacyArtifacts.length - 2}</span>
-                            )}
-                          </div>
-                        );
-                      }
-                      return '-';
-                    })()}
-                  </td>
-                  {/* Findings (from Controls) */}
-                  <td className="p-3 text-sm border-r border-gray-200 bg-blue-50/30">
-                    {(() => {
-                      const controlData = getControlDataForRequirement(req.id);
-                      // Control findings are objects from findingsStore
-                      const controlFindings = controlData?.findings || [];
-                      // Fallback: legacy string from requirement
-                      const legacyFindings = req.findings ? req.findings.split(',').map(s => s.trim()).filter(Boolean) : [];
-
-                      if (controlFindings.length > 0) {
-                        return (
-                          <div className="flex flex-wrap gap-1">
-                            {controlFindings.slice(0, 2).map((finding, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 rounded text-xs"
-                                style={{
-                                  backgroundColor: darkMode ? '#ea580c' : '#ffedd5',
-                                  color: darkMode ? '#ffffff' : '#c2410c'
-                                }}
-                                title={finding.summary}
-                              >
-                                {finding.id}
-                              </span>
-                            ))}
-                            {controlFindings.length > 2 && (
-                              <span className="text-xs text-gray-500">+{controlFindings.length - 2}</span>
-                            )}
-                          </div>
-                        );
-                      } else if (legacyFindings.length > 0) {
-                        return (
-                          <div className="flex flex-wrap gap-1">
-                            {legacyFindings.slice(0, 2).map((id, idx) => (
-                              <span
-                                key={idx}
-                                className="px-2 py-0.5 rounded text-xs opacity-70"
-                                style={{
-                                  backgroundColor: darkMode ? '#ea580c' : '#ffedd5',
-                                  color: darkMode ? '#ffffff' : '#c2410c'
-                                }}
-                                title={`Legacy: ${id}`}
-                              >
-                                {id}
-                              </span>
-                            ))}
-                            {legacyFindings.length > 2 && (
-                              <span className="text-xs text-gray-500">+{legacyFindings.length - 2}</span>
-                            )}
-                          </div>
-                        );
-                      }
-                      return '-';
-                    })()}
-                  </td>
-                  {/* Control Evaluation Back Link (from Controls) */}
-                  <td className="p-3 text-sm bg-blue-50/30">
-                    {(() => {
-                      const controlData = getControlDataForRequirement(req.id);
-                      const link = controlData?.controlEvaluationBackLink || req.controlEvaluationBackLink || '';
-                      return link ? (
-                        <a
-                          href={link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:underline text-xs truncate block"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {link}
-                        </a>
-                      ) : '-';
-                    })()}
-                  </td>
-                </tr>
-              ))}
+                return (
+                  <tr
+                    key={req.id}
+                    onClick={() => setSelectedRequirement(req)}
+                    className={`
+                      border-b border-gray-200 dark:border-gray-700
+                      transition-colors cursor-pointer
+                      ${isSelected ? 'table-row-selected' : ''}
+                      ${selectedRequirement?.id === req.id ? 'bg-blue-100 dark:bg-blue-900/40' : 'table-row-hover'}
+                    `}
+                  >
+                    {/* Checkbox */}
+                    {showCheckboxes && (
+                      <td className="p-3 checkbox-cell border-r border-gray-200 dark:border-gray-700">
+                        <RowCheckbox
+                          checked={isSelected}
+                          onChange={() => toggleItemSelection(req.id)}
+                        />
+                      </td>
+                    )}
+                    {/* Row number */}
+                    {showRowNumbers && (
+                      <td className="p-3 border-r border-gray-200 dark:border-gray-700">
+                        <RowNumber number={rowNumber} />
+                      </td>
+                    )}
+                    {/* Requirement ID */}
+                    <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
+                      <SubcategoryBadge subcategoryId={req.id} size="sm" />
+                    </td>
+                    {/* Framework */}
+                    <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
+                      <FrameworkBadge frameworkId={req.frameworkId} size="xs" />
+                    </td>
+                    {/* CSF Function */}
+                    <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
+                      <CSFBadge functionName={req.function} size="xs" />
+                    </td>
+                    {/* Category Name */}
+                    <td className="p-3 text-sm text-gray-700 dark:text-gray-200 border-r border-gray-200 dark:border-gray-700">
+                      <div className="line-clamp-2" title={req.category}>
+                        {req.category || <span className="empty-value">Empty</span>}
+                      </div>
+                    </td>
+                    {/* Subcategory ID */}
+                    <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
+                      <SubcategoryBadge subcategoryId={req.subcategoryId} size="xs" />
+                    </td>
+                    {/* Subcategory Description */}
+                    <td className="p-3 text-sm text-gray-600 dark:text-gray-300 border-r border-gray-200 dark:border-gray-700">
+                      <div className="line-clamp-2" title={req.subcategoryDescription}>
+                        {req.subcategoryDescription || <span className="empty-value">Empty</span>}
+                      </div>
+                    </td>
+                    {/* Control Owner (from Controls) */}
+                    <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700 bg-blue-50/30 dark:bg-blue-900/10">
+                      {controlData?.controlOwner ? (
+                        <UserAvatar name={controlData.controlOwner} size="sm" showName={true} />
+                      ) : (
+                        <span className="empty-value">Unassigned</span>
+                      )}
+                    </td>
+                    {/* Artifacts (from Controls) */}
+                    <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700 bg-blue-50/30 dark:bg-blue-900/10">
+                      {controlData?.artifacts && controlData.artifacts.length > 0 ? (
+                        <BadgeGroup
+                          badges={controlData.artifacts}
+                          maxVisible={2}
+                          renderBadge={(artifact, idx) => (
+                            <ArtifactBadge
+                              key={idx}
+                              name={artifact.name}
+                              artifactId={artifact.artifactId}
+                              size="xs"
+                            />
+                          )}
+                        />
+                      ) : (
+                        <span className="empty-value">None</span>
+                      )}
+                    </td>
+                    {/* Findings (from Controls) */}
+                    <td className="p-3 text-sm bg-blue-50/30 dark:bg-blue-900/10">
+                      {controlData?.findings && controlData.findings.length > 0 ? (
+                        <BadgeGroup
+                          badges={controlData.findings}
+                          maxVisible={2}
+                          renderBadge={(finding, idx) => (
+                            <FindingBadge
+                              key={idx}
+                              id={finding.id}
+                              summary={finding.summary}
+                              size="xs"
+                            />
+                          )}
+                        />
+                      ) : (
+                        <span className="empty-value">None</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -764,23 +760,23 @@ const Requirements = () => {
 
       {/* Pagination */}
       {filteredData.length > 0 && (
-        <div className="flex items-center justify-between bg-white px-4 py-3 border-t">
-          <div className="flex items-center">
-            <p className="text-sm text-gray-700 mr-4">
+        <div className="flex items-center justify-between bg-white dark:bg-gray-900 px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
               <span className="font-medium">{Math.min(currentPage * itemsPerPage, filteredData.length)}</span>{' '}
-              of <span className="font-medium">{filteredData.length}</span> requirements
+              of <span className="font-medium">{filteredData.length}</span>
             </p>
 
-            <div className="flex items-center">
-              <span className="text-sm text-gray-700 mr-2">Show:</span>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600 dark:text-gray-300">Show:</span>
               <select
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(e.target.value === 'All' ? filteredData.length : Number(e.target.value));
                   setCurrentPage(1);
                 }}
-                className="border rounded p-1 text-sm"
+                className="border border-gray-300 dark:border-gray-600 rounded p-1 text-sm bg-white dark:bg-gray-800"
               >
                 <option value={10}>10</option>
                 <option value={25}>25</option>
@@ -791,29 +787,29 @@ const Requirements = () => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className={`px-3 py-1 rounded-md ${
+              className={`px-3 py-1 rounded-md text-sm ${
                 currentPage === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
               Previous
             </button>
 
-            <span className="px-3 py-1 bg-blue-600 text-white rounded-md">{currentPage}</span>
-            <span className="text-gray-500">of {totalPages}</span>
+            <span className="px-3 py-1 bg-blue-600 text-white rounded-md text-sm">{currentPage}</span>
+            <span className="text-gray-500 dark:text-gray-400 text-sm">of {totalPages}</span>
 
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded-md ${
+              className={`px-3 py-1 rounded-md text-sm ${
                 currentPage === totalPages
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
               }`}
             >
               Next

@@ -665,3 +665,187 @@ nav a:active { text-decoration: none !important; }
 .dark .panel-scrollbar::-webkit-scrollbar-thumb:hover {
   background-color: #94a3b8;
 }
+
+/* Animation keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Row hover effects for tables */
+.table-row-hover:hover {
+  background-color: #f8fafc;
+}
+.dark .table-row-hover:hover {
+  background-color: #1e293b;
+}
+
+/* Selected row style */
+.table-row-selected {
+  background-color: #dbeafe !important;
+}
+.dark .table-row-selected {
+  background-color: #1e3a8a !important;
+}
+
+/* Row number column */
+.row-number {
+  color: #9ca3af;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.dark .row-number {
+  color: #6b7280;
+}
+
+/* Row hover actions container */
+.row-hover-actions {
+  opacity: 0;
+  transition: opacity 0.15s ease-in-out;
+}
+tr:hover .row-hover-actions {
+  opacity: 1;
+}
+
+/* Filter chip styles */
+.filter-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background-color: #dbeafe;
+  color: #1e40af;
+  transition: all 0.15s ease-in-out;
+}
+.filter-chip:hover {
+  background-color: #bfdbfe;
+}
+.filter-chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  margin-left: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+.filter-chip-remove:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.dark .filter-chip {
+  background-color: #1e3a8a;
+  color: #bfdbfe;
+}
+.dark .filter-chip:hover {
+  background-color: #1e40af;
+}
+
+/* Empty state styling */
+.empty-value {
+  color: #9ca3af;
+  font-style: italic;
+}
+.dark .empty-value {
+  color: #6b7280;
+}
+
+/* Checkbox styling */
+.checkbox-cell {
+  width: 2.5rem;
+  text-align: center;
+}
+
+/* Line clamp utilities */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Negative margins for avatar groups */
+.-space-x-2 > * + * {
+  margin-left: -0.5rem;
+}
+
+/* Ring utilities */
+.ring-2 {
+  box-shadow: 0 0 0 2px;
+}
+.ring-white {
+  --tw-ring-color: #ffffff;
+  box-shadow: 0 0 0 2px var(--tw-ring-color);
+}
+.dark .ring-white {
+  --tw-ring-color: #111827;
+}
+
+/* Button hover states */
+.hover\:bg-gray-100:hover {
+  background-color: #f3f4f6;
+}
+.hover\:bg-gray-300:hover {
+  background-color: #d1d5db;
+}
+.hover\:bg-green-700:hover {
+  background-color: #15803d;
+}
+
+/* Flex utilities */
+.flex-shrink-0 {
+  flex-shrink: 0;
+}
+
+/* Width utilities */
+.w-7 { width: 1.75rem; }
+.h-7 { height: 1.75rem; }
+.w-12 { width: 3rem; }
+.h-12 { height: 3rem; }
+.min-h-0 { min-height: 0; }
+
+/* Background with opacity for linked columns */
+.bg-blue-50\/30 {
+  background-color: rgba(239, 246, 255, 0.3);
+}
+.dark .bg-blue-50\/30 {
+  background-color: rgba(30, 58, 138, 0.15);
+}
+
+/* Z-index utilities */
+.z-20 { z-index: 20; }
+.z-30 { z-index: 30; }
+.z-40 { z-index: 40; }
+.z-50 { z-index: 50; }

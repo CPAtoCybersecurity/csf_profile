@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { X, Link2, FileText, AlertTriangle, ClipboardCheck, User } from 'lucide-react';
 import FrameworkBadge from './FrameworkBadge';
 import CSFBadge, { SubcategoryBadge } from './CSFBadge';
+import { UserAvatar } from './UserAvatar';
+import { ArtifactBadge, FindingBadge, ControlBadge } from './BadgeSystem';
 
 /**
  * RequirementDetailPanel - Side panel for viewing requirement details
@@ -176,14 +178,22 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], a
 
           {/* Subcategory Description */}
           <FieldRow icon={null} label="Subcategory Description">
-            <span className="text-sm text-gray-700 dark:text-gray-100">{requirement.subcategoryDescription || '-'}</span>
+            {requirement.subcategoryDescription ? (
+              <span className="text-sm text-gray-700 dark:text-gray-100">{requirement.subcategoryDescription}</span>
+            ) : (
+              <span className="text-sm empty-value">Empty</span>
+            )}
           </FieldRow>
 
           {/* Implementation Example */}
           <FieldRow icon={null} label="Implementation Example">
-            <span className="text-sm text-gray-700 dark:text-gray-100 whitespace-pre-wrap">
-              {requirement.implementationExample || '-'}
-            </span>
+            {requirement.implementationExample ? (
+              <span className="text-sm text-gray-700 dark:text-gray-100 whitespace-pre-wrap">
+                {requirement.implementationExample}
+              </span>
+            ) : (
+              <span className="text-sm empty-value">Empty</span>
+            )}
           </FieldRow>
 
           {/* Implementation Description (from linked Controls - DEPRECATED on Requirements) */}
@@ -206,7 +216,7 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], a
               <div>
                 <div className="flex flex-wrap gap-2">
                   {requirement.controlOwner.split(',').map((name, idx) => (
-                    <UserBadge key={idx} name={name.trim()} />
+                    <UserAvatar key={idx} name={name.trim()} size="sm" showName={true} />
                   ))}
                 </div>
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
@@ -214,7 +224,7 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], a
                 </p>
               </div>
             ) : (
-              <span className="text-sm text-gray-400 dark:text-gray-500">None</span>
+              <span className="text-sm empty-value">Unassigned</span>
             )}
           </FieldRow>
 
@@ -224,7 +234,7 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], a
               <div>
                 <div className="flex flex-wrap gap-2">
                   {requirement.stakeholders.split(',').map((name, idx) => (
-                    <UserBadge key={idx} name={name.trim()} />
+                    <UserAvatar key={idx} name={name.trim()} size="sm" showName={true} />
                   ))}
                 </div>
                 <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
@@ -232,61 +242,61 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], a
                 </p>
               </div>
             ) : (
-              <span className="text-sm text-gray-400 dark:text-gray-500">None</span>
+              <span className="text-sm empty-value">None</span>
             )}
           </FieldRow>
 
           {/* Artifacts */}
           <FieldRow icon={<FileText size={14} />} label="Artifacts">
             {linkedArtifacts.length > 0 ? (
-              <div className="space-y-1">
+              <div className="flex flex-wrap gap-1.5">
                 {linkedArtifacts.map((artifact) => (
-                  <div
+                  <ArtifactBadge
                     key={`artifact-${artifact.id}`}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                  >
-                    {artifact.name || artifact.title}
-                  </div>
+                    name={artifact.name || artifact.title}
+                    artifactId={artifact.artifactId}
+                    size="sm"
+                  />
                 ))}
               </div>
             ) : (
-              <span className="text-sm text-gray-400 dark:text-gray-500">Empty</span>
+              <span className="text-sm empty-value">No artifacts linked</span>
             )}
           </FieldRow>
 
           {/* Findings */}
           <FieldRow icon={<AlertTriangle size={14} />} label="Findings">
             {linkedFindings.length > 0 ? (
-              <div className="space-y-1">
+              <div className="flex flex-wrap gap-1.5">
                 {linkedFindings.map((finding) => (
-                  <div
+                  <FindingBadge
                     key={`finding-${finding.id}`}
-                    className="text-sm text-amber-600 dark:text-amber-400 hover:underline cursor-pointer"
-                  >
-                    {finding.title || finding.summary}
-                  </div>
+                    id={finding.id}
+                    summary={finding.title || finding.summary}
+                    size="sm"
+                  />
                 ))}
               </div>
             ) : (
-              <span className="text-sm text-gray-400 dark:text-gray-500">Empty</span>
+              <span className="text-sm empty-value">No findings</span>
             )}
           </FieldRow>
 
           {/* Control Evaluations */}
           <FieldRow icon={<ClipboardCheck size={14} />} label="Linked Controls">
             {linkedControls.length > 0 ? (
-              <div className="space-y-1">
+              <div className="flex flex-wrap gap-1.5">
                 {linkedControls.map((control) => (
-                  <div
+                  <ControlBadge
                     key={`control-${control.id}`}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
-                  >
-                    {control.controlId}: {control.title || control.name}
-                  </div>
+                    controlId={control.controlId}
+                    title={control.title || control.name}
+                    size="sm"
+                  />
                 ))}
               </div>
             ) : (
-              <span className="text-sm text-gray-400 dark:text-gray-500">Empty</span>
+              <span className="text-sm empty-value">No controls linked</span>
             )}
           </FieldRow>
 
@@ -327,50 +337,5 @@ const FieldRow = ({ icon, label, children }) => (
     </div>
   </div>
 );
-
-/**
- * User Badge Component - Jira-style avatar with initials
- */
-const UserBadge = ({ name }) => {
-  // Get initials from name (first letter of first and last name)
-  const getInitials = (fullName) => {
-    const parts = fullName.trim().split(/\s+/);
-    if (parts.length >= 2) {
-      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return fullName.slice(0, 2).toUpperCase();
-  };
-
-  // Generate consistent color based on name
-  const getColor = (str) => {
-    const colors = [
-      { bg: 'bg-blue-500', text: 'text-white' },
-      { bg: 'bg-green-500', text: 'text-white' },
-      { bg: 'bg-purple-500', text: 'text-white' },
-      { bg: 'bg-orange-500', text: 'text-white' },
-      { bg: 'bg-pink-500', text: 'text-white' },
-      { bg: 'bg-teal-500', text: 'text-white' },
-      { bg: 'bg-indigo-500', text: 'text-white' },
-      { bg: 'bg-red-500', text: 'text-white' },
-    ];
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      hash = str.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return colors[Math.abs(hash) % colors.length];
-  };
-
-  const initials = getInitials(name);
-  const color = getColor(name);
-
-  return (
-    <div className="inline-flex items-center gap-2 group" title={name}>
-      <div className={`w-7 h-7 rounded-full ${color.bg} ${color.text} flex items-center justify-center text-xs font-medium flex-shrink-0`}>
-        {initials}
-      </div>
-      <span className="text-sm text-gray-700 dark:text-gray-200">{name}</span>
-    </div>
-  );
-};
 
 export default RequirementDetailPanel;

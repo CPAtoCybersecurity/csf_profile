@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useMemo } from 'react';
+import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import {
   Search, Filter, Plus, Edit, Save, Trash2, Link, X,
   Upload, Download, Users, User, ChevronRight
@@ -65,6 +65,8 @@ const UserControls = () => {
   const [reqPickerOpen, setReqPickerOpen] = useState(false);
   const [reqPickerSearch, setReqPickerSearch] = useState('');
   const [reqPickerFramework, setReqPickerFramework] = useState('');
+  const [reqPanelWidth, setReqPanelWidth] = useState(380);
+  const [isResizingReqPanel, setIsResizingReqPanel] = useState(false);
 
   // Dropdown states
   const [ownerDropdownOpen, setOwnerDropdownOpen] = useState(false);
@@ -74,6 +76,38 @@ const UserControls = () => {
   const ownerTriggerRef = useRef(null);
   const frameworkTriggerRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Resize handlers for requirement picker panel
+  const handleReqPanelMouseDown = useCallback((e) => {
+    e.preventDefault();
+    setIsResizingReqPanel(true);
+  }, []);
+
+  const handleReqPanelMouseMove = useCallback((e) => {
+    if (!isResizingReqPanel) return;
+    const newWidth = window.innerWidth - e.clientX;
+    setReqPanelWidth(Math.max(320, Math.min(800, newWidth)));
+  }, [isResizingReqPanel]);
+
+  const handleReqPanelMouseUp = useCallback(() => {
+    setIsResizingReqPanel(false);
+  }, []);
+
+  // Add/remove event listeners for resize
+  useEffect(() => {
+    if (isResizingReqPanel) {
+      document.addEventListener('mousemove', handleReqPanelMouseMove);
+      document.addEventListener('mouseup', handleReqPanelMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleReqPanelMouseMove);
+      document.removeEventListener('mouseup', handleReqPanelMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizingReqPanel, handleReqPanelMouseMove, handleReqPanelMouseUp]);
 
   // Get user name helper
   const getUserName = useCallback((userId) => {
@@ -810,71 +844,102 @@ const UserControls = () => {
           </div>
         )}
 
-        {/* Requirement Picker Modal */}
+        {/* Requirement Picker Side Panel (Expandable) */}
         {reqPickerOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-              <div className="p-4 border-b flex items-center justify-between">
-                <h3 className="text-lg font-bold">Link Requirement</h3>
-                <button
-                  className="text-gray-500 hover:text-gray-700"
-                  onClick={() => {
-                    setReqPickerOpen(false);
-                    setReqPickerSearch('');
-                  }}
-                >
-                  <X size={20} />
-                </button>
-              </div>
+          <div
+            style={{
+              width: `${reqPanelWidth}px`,
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1000,
+              boxShadow: '-4px 0 20px rgba(0,0,0,0.15)'
+            }}
+            className="flex flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+          >
+            {/* Resize Handle */}
+            <div
+              onMouseDown={handleReqPanelMouseDown}
+              style={{
+                position: 'absolute',
+                left: '-4px',
+                top: 0,
+                bottom: 0,
+                width: '8px',
+                cursor: 'col-resize',
+                zIndex: 10
+              }}
+              className={`transition-colors ${
+                isResizingReqPanel ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
+              }`}
+              title="Drag to resize"
+            />
 
-              <div className="p-4 border-b flex gap-4">
-                <div className="relative flex-grow">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    className="w-full pl-9 pr-3 py-2 border rounded-lg"
-                    placeholder="Search requirements..."
-                    value={reqPickerSearch}
-                    onChange={(e) => setReqPickerSearch(e.target.value)}
-                    autoFocus
-                  />
-                </div>
-                <select
-                  className="border rounded-lg px-3 py-2"
-                  value={reqPickerFramework}
-                  onChange={(e) => setReqPickerFramework(e.target.value)}
-                >
-                  <option value="">All Frameworks</option>
-                  {enabledFrameworks.map(fw => (
-                    <option key={fw.id} value={fw.id}>{fw.shortName}</option>
-                  ))}
-                </select>
-              </div>
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-white dark:bg-gray-800">
+              <h3 className="text-sm font-medium text-gray-700 dark:text-white">Link Requirement</h3>
+              <button
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
+                onClick={() => {
+                  setReqPickerOpen(false);
+                  setReqPickerSearch('');
+                }}
+                title="Close panel"
+              >
+                <X size={16} className="text-gray-500 dark:text-gray-400" />
+              </button>
+            </div>
 
-              <div className="flex-1 overflow-auto p-4">
-                {filteredRequirements.length === 0 ? (
-                  <p className="text-center text-gray-500">No requirements found</p>
-                ) : (
-                  <div className="space-y-2">
-                    {filteredRequirements.map((req) => (
-                      <div
-                        key={req.id}
-                        className="flex items-center justify-between p-3 border rounded hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleLinkRequirement(req.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <FrameworkBadge frameworkId={req.frameworkId} />
-                          <div>
-                            <div className="font-medium">{req.subcategoryId || req.id}</div>
-                            <div className="text-sm text-gray-500">{req.function} / {req.category}</div>
-                          </div>
+            {/* Search and Filter */}
+            <div className="p-3 border-b border-gray-200 dark:border-gray-700 space-y-2">
+              <div className="relative">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                  placeholder="Search requirements..."
+                  value={reqPickerSearch}
+                  onChange={(e) => setReqPickerSearch(e.target.value)}
+                  autoFocus
+                />
+              </div>
+              <select
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                value={reqPickerFramework}
+                onChange={(e) => setReqPickerFramework(e.target.value)}
+              >
+                <option value="">All Frameworks</option>
+                {enabledFrameworks.map(fw => (
+                  <option key={fw.id} value={fw.id}>{fw.shortName}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Requirements List */}
+            <div className="flex-1 overflow-auto min-h-0">
+              {filteredRequirements.length === 0 ? (
+                <p className="text-center text-gray-500 dark:text-gray-400 py-8 text-sm">No requirements found</p>
+              ) : (
+                <div className="divide-y divide-gray-100 dark:divide-gray-700">
+                  {filteredRequirements.map((req) => (
+                    <div
+                      key={req.id}
+                      className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer transition-colors"
+                      onClick={() => handleLinkRequirement(req.id)}
+                    >
+                      <div className="flex items-center gap-2 min-w-0">
+                        <FrameworkBadge frameworkId={req.frameworkId} size="sm" />
+                        <div className="min-w-0">
+                          <div className="font-medium text-sm text-gray-900 dark:text-gray-100 truncate">{req.subcategoryId || req.id}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{req.function} / {req.category}</div>
                         </div>
-                        <Plus size={16} className="text-blue-600" />
                       </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+                      <Plus size={14} className="text-blue-600 dark:text-blue-400 flex-shrink-0 ml-2" />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )}

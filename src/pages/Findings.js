@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useFindingsStore from '../stores/findingsStore';
@@ -29,6 +29,42 @@ const Findings = () => {
   const [editMode, setEditMode] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedFinding, setSelectedFinding] = useState(null);
+
+  // Panel resize state
+  const [panelWidth, setPanelWidth] = useState(480);
+  const [isResizing, setIsResizing] = useState(false);
+
+  // Resize handlers
+  const handleMouseDown = useCallback((e) => {
+    e.preventDefault();
+    setIsResizing(true);
+  }, []);
+
+  const handleMouseMove = useCallback((e) => {
+    if (!isResizing) return;
+    const newWidth = window.innerWidth - e.clientX;
+    setPanelWidth(Math.max(380, Math.min(900, newWidth)));
+  }, [isResizing]);
+
+  const handleMouseUp = useCallback(() => {
+    setIsResizing(false);
+  }, []);
+
+  // Add/remove event listeners for resize
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, handleMouseMove, handleMouseUp]);
 
   // Sorting
   const { sortedData } = useSort(findings);
@@ -149,31 +185,31 @@ const Findings = () => {
     setFormData({ ...finding });
   };
 
-  // Get status badge style
+  // Get status badge style - using colors that work in both light and dark mode
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Resolved':
-        return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+        return 'bg-green-600 text-white';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white';
+        return 'bg-blue-600 text-white';
       case 'Not Started':
       default:
-        return 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-200';
+        return 'bg-gray-500 text-white';
     }
   };
 
-  // Get priority badge style
+  // Get priority badge style - using colors that work in both light and dark mode
   const getPriorityStyle = (priority) => {
     switch (priority) {
       case 'Critical':
-        return 'bg-red-100 text-red-700 dark:bg-red-600 dark:text-white';
+        return 'bg-red-600 text-white';
       case 'High':
-        return 'bg-orange-100 text-orange-700 dark:bg-orange-600 dark:text-white';
+        return 'bg-orange-500 text-white';
       case 'Medium':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+        return 'bg-yellow-500 text-gray-900';
       case 'Low':
       default:
-        return 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-200';
+        return 'bg-gray-400 text-gray-900 dark:bg-gray-500 dark:text-white';
     }
   };
 
@@ -359,10 +395,39 @@ const Findings = () => {
           </div>
         </div>
 
-        {/* Right - Detail Panel */}
+        {/* Right - Detail Panel (Resizable) */}
         {(selectedFinding || editMode) && (
-          <div className="w-1/2 overflow-auto bg-white dark:bg-gray-900">
-            <div className="p-6">
+          <div
+            style={{
+              width: `${panelWidth}px`,
+              position: 'fixed',
+              top: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1000,
+              boxShadow: '-4px 0 20px rgba(0,0,0,0.15)'
+            }}
+            className="flex flex-col border-l border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900"
+          >
+            {/* Resize Handle */}
+            <div
+              onMouseDown={handleMouseDown}
+              style={{
+                position: 'absolute',
+                left: '-4px',
+                top: 0,
+                bottom: 0,
+                width: '8px',
+                cursor: 'col-resize',
+                zIndex: 10
+              }}
+              className={`transition-colors ${
+                isResizing ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
+              }`}
+              title="Drag to resize"
+            />
+
+            <div className="flex-1 overflow-auto p-6">
               {/* Detail Header */}
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
