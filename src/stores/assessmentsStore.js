@@ -13,7 +13,7 @@ const DEFAULT_ASSESSMENTS = [
     id: 'ASM-default-2025-alma',
     name: '2025 Alma Security CSF',
     description: 'Annual CSF 2.0 assessment for Alma Security covering all implemented controls',
-    scopeType: 'controls',
+    scopeType: 'requirements',
     frameworkFilter: null,
     createdDate: '2025-01-01T00:00:00.000Z',
     scopeIds: [
@@ -110,6 +110,195 @@ const useAssessmentsStore = create(
           loading: false,
           error: null
         });
+      },
+
+      // Load initial assessment data from JIRA-Assessments.csv
+      loadInitialData: async () => {
+        try {
+          set({ loading: true, error: null });
+
+          const response = await fetch('/JIRA-Assessments.csv');
+          const csvText = await response.text();
+
+          return new Promise((resolve, reject) => {
+            Papa.parse(csvText, {
+              header: true,
+              skipEmptyLines: true,
+              complete: (results) => {
+                // Detect Jira format (has Issue Type and Issue key columns)
+                const isJiraFormat = results.meta.fields?.includes('Issue Type') &&
+                                     results.meta.fields?.includes('Issue key');
+
+                if (!isJiraFormat) {
+                  // Fallback to DEFAULT_ASSESSMENTS if not Jira format
+                  set({ loading: false });
+                  resolve(get().assessments);
+                  return;
+                }
+
+                // First pass: identify Epics as Assessments
+                const jiraEpics = {};
+                results.data.forEach(row => {
+                  if (row['Issue Type'] === 'Epic') {
+                    const epicKey = row['Issue key'];
+                    const epicId = row['Issue id'];
+                    jiraEpics[epicKey] = {
+                      id: epicId,
+                      key: epicKey,
+                      name: row['Summary'] || epicKey,
+                      description: row['Description'] || '',
+                      jiraKey: epicKey
+                    };
+                    if (epicId) {
+                      jiraEpics[epicId] = jiraEpics[epicKey];
+                    }
+                  }
+                });
+
+                // Group work paper rows by parent Epic or Parent summary
+                const assessmentGroups = {};
+                results.data.forEach(row => {
+                  if (row['Issue Type'] === 'Epic') return;
+
+                  const parentKey = row['Parent key'] || row['Parent'];
+                  const parentId = row['Parent'];
+                  const parentSummary = row['Parent summary']; // Use Parent summary for assessment name
+                  const parentEpic = jiraEpics[parentKey] || jiraEpics[parentId];
+
+                  let assessmentName, assessmentJiraKey;
+                  if (parentEpic) {
+                    assessmentName = parentEpic.name;
+                    assessmentJiraKey = parentEpic.key;
+                  } else if (parentSummary) {
+                    // Use Parent summary as the assessment name (preferred)
+                    assessmentName = parentSummary;
+                    assessmentJiraKey = parentKey || null;
+                  } else if (parentKey || parentId) {
+                    assessmentName = parentKey || `Assessment-${parentId}`;
+                    assessmentJiraKey = parentKey;
+                  } else {
+                    return;
+                  }
+
+                  if (!assessmentGroups[assessmentName]) {
+                    const epicInfo = assessmentJiraKey ? jiraEpics[assessmentJiraKey] : null;
+                    assessmentGroups[assessmentName] = {
+                      name: assessmentName,
+                      description: epicInfo?.description || '',
+                      scopeType: 'requirements', // JIRA work papers use subcategory IDs which map to requirements
+                      jiraKey: assessmentJiraKey,
+                      rows: []
+                    };
+                  }
+                  assessmentGroups[assessmentName].rows.push(row);
+                });
+
+                // Create assessments from groups
+                const newAssessments = Object.values(assessmentGroups).map(group => {
+                  const scopeIds = [];
+                  const observations = {};
+
+                  group.rows.forEach(row => {
+                    // Extract control ID from Summary (e.g., "GV.SC-02")
+                    const itemId = row['Summary'] || row['Issue key'];
+                    if (!itemId) return;
+
+                    scopeIds.push(itemId);
+
+                    // Parse quarter data from Jira custom fields
+                    const q1Obs = row['Custom field (Q1 Observations)'] || '';
+                    const q2Obs = row['Custom field (Q2 Observations)'] || '';
+                    const q3Obs = row['Custom field (Q3 Observations)'] || '';
+                    const q4Obs = row['Custom field (Q4 Observations)'] || '';
+
+                    observations[itemId] = {
+                      auditorId: null,
+                      testProcedures: sanitizeInput(row['Custom field (Test Procedures)'] || ''),
+                      linkedArtifacts: (row['Custom field (Artifacts)'] || '').split(';').map(s => s.trim()).filter(Boolean),
+                      jiraKey: row['Issue key'] || null,
+                      remediation: {
+                        ownerId: null,
+                        actionPlan: sanitizeInput(row['Custom field (Remediation Action Plan (Who will do What by When?) )'] || ''),
+                        dueDate: ''
+                      },
+                      quarters: {
+                        Q1: {
+                          actualScore: parseFloat(row['Custom field (Q1 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q1 Target Score)']) || 0,
+                          observations: sanitizeInput(q1Obs),
+                          observationDate: '',
+                          testingStatus: row['Custom field (Testing Status)'] || row['Status'] || 'Not Started',
+                          examine: (row['Custom field (Assessment Methods)'] || '').toLowerCase().includes('examine'),
+                          interview: (row['Custom field (Assessment Methods)'] || '').toLowerCase().includes('interview'),
+                          test: (row['Custom field (Assessment Methods)'] || '').toLowerCase().includes('test')
+                        },
+                        Q2: {
+                          actualScore: parseFloat(row['Custom field (Q2 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q2 Target Score)']) || 0,
+                          observations: sanitizeInput(q2Obs),
+                          observationDate: '',
+                          testingStatus: q2Obs ? 'In Progress' : 'Not Started',
+                          examine: false,
+                          interview: false,
+                          test: false
+                        },
+                        Q3: {
+                          actualScore: parseFloat(row['Custom field (Q3 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q3 Target Score)']) || 0,
+                          observations: sanitizeInput(q3Obs),
+                          observationDate: '',
+                          testingStatus: q3Obs ? 'In Progress' : 'Not Started',
+                          examine: false,
+                          interview: false,
+                          test: false
+                        },
+                        Q4: {
+                          actualScore: parseFloat(row['Custom field (Q4 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q4 Target Score)']) || 0,
+                          observations: sanitizeInput(q4Obs),
+                          observationDate: '',
+                          testingStatus: q4Obs ? 'In Progress' : 'Not Started',
+                          examine: false,
+                          interview: false,
+                          test: false
+                        }
+                      }
+                    };
+                  });
+
+                  return {
+                    id: `ASM-jira-${group.jiraKey || Date.now()}`,
+                    name: group.name,
+                    description: group.description,
+                    scopeType: group.scopeType,
+                    scopeIds: [...new Set(scopeIds)],
+                    frameworkFilter: null,
+                    jiraKey: group.jiraKey || null,
+                    status: 'In Progress',
+                    createdDate: new Date().toISOString(),
+                    lastModified: new Date().toISOString(),
+                    observations
+                  };
+                });
+
+                // Replace assessments with loaded data
+                set({
+                  assessments: newAssessments.length > 0 ? newAssessments : DEFAULT_ASSESSMENTS,
+                  loading: false,
+                  error: null
+                });
+                resolve(newAssessments);
+              },
+              error: (error) => {
+                set({ error: `Error parsing CSV: ${error.message}`, loading: false });
+                reject(error);
+              }
+            });
+          });
+        } catch (err) {
+          set({ error: `Error loading file: ${err.message}`, loading: false });
+          throw err;
+        }
       },
 
       // Get all assessments
@@ -1175,7 +1364,7 @@ const useAssessmentsStore = create(
     }),
     {
       name: 'csf-assessments-storage',
-      version: 3,
+      version: 5,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -1223,6 +1412,51 @@ const useAssessmentsStore = create(
                 ...assessment,
                 observations: UPDATED_OBSERVATIONS
               };
+            }
+            return assessment;
+          });
+          return {
+            ...persistedState,
+            assessments: updatedAssessments
+          };
+        }
+        // Version 4: Fix scopeType from 'controls' to 'requirements'
+        // The scopeIds are subcategory/requirement IDs, not control IDs
+        if (version < 4) {
+          const assessments = persistedState?.assessments || [];
+          const updatedAssessments = assessments.map(assessment => {
+            // Fix scopeType for assessments that have requirement/subcategory-style IDs
+            if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
+              const firstId = assessment.scopeIds[0];
+              // If IDs look like subcategory IDs (e.g., GV.SC-04, DE.AE-02) or requirement IDs (e.g., GV.SC-04 Ex1)
+              if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
+                return {
+                  ...assessment,
+                  scopeType: 'requirements'
+                };
+              }
+            }
+            return assessment;
+          });
+          return {
+            ...persistedState,
+            assessments: updatedAssessments
+          };
+        }
+        // Version 5: Re-run scopeType fix with improved regex for subcategory IDs
+        // Handles cases like GV.SC-02, DE.CM-03 that were missed in v4
+        if (version < 5) {
+          const assessments = persistedState?.assessments || [];
+          const updatedAssessments = assessments.map(assessment => {
+            if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
+              const firstId = assessment.scopeIds[0];
+              // Match subcategory IDs: XX.YY-NN or XX.YYY-NN (e.g., GV.SC-02, DE.CM-03)
+              if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
+                return {
+                  ...assessment,
+                  scopeType: 'requirements'
+                };
+              }
             }
             return assessment;
           });

@@ -490,10 +490,15 @@ const UserControls = () => {
         {/* Table */}
         <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto transition-all duration-300`}>
           {controls.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-center px-4">
               <Users size={48} className="mb-4 opacity-50" />
-              <p className="text-lg">No controls defined</p>
+              <p className="text-lg font-medium">No controls defined</p>
               <p className="text-sm mt-2">Click "New Control" to create a control or "Import" to import from CSV</p>
+              <p className="text-sm mt-4 text-gray-400 dark:text-gray-500 leading-relaxed">
+                There are two options for creating assessments: by <span className="font-medium text-gray-500 dark:text-gray-400">Requirement</span> or by <span className="font-medium text-gray-500 dark:text-gray-400">Control</span>.
+                Typically, assessment by requirement is recommended for CSF, ISO 27001, and similar frameworks/standards, with the organization filling out an Implementation Description for each requirement.
+                Use controls for SOC 2 or frameworks where many requirements link to a single control.
+              </p>
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">

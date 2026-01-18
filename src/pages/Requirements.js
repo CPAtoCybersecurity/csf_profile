@@ -17,6 +17,7 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useControlsStore from '../stores/controlsStore';
 import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
+import useUIStore from '../stores/uiStore';
 
 const Requirements = () => {
   // Store state
@@ -36,6 +37,9 @@ const Requirements = () => {
   const controls = useControlsStore((state) => state.controls);
   const artifacts = useArtifactStore((state) => state.artifacts);
   const findings = useFindingsStore((state) => state.findings);
+
+  // UI state
+  const darkMode = useUIStore((state) => state.darkMode);
 
   // Local state
   const [selectedRequirement, setSelectedRequirement] = useState(null);
@@ -502,47 +506,73 @@ const Requirements = () => {
                     </div>
                   </td>
                   {/* Control Owner */}
-                  <td className="p-3 text-sm border-r border-gray-200">
+                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
                     {req.controlOwner ? (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                      <span
+                        className="px-2 py-1 rounded text-xs"
+                        style={{
+                          backgroundColor: darkMode ? '#2563eb' : '#dbeafe',
+                          color: darkMode ? '#ffffff' : '#1e40af'
+                        }}
+                      >
                         {req.controlOwner}
                       </span>
                     ) : '-'}
                   </td>
                   {/* Stakeholders */}
-                  <td className="p-3 text-sm border-r border-gray-200">
+                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
                     {req.stakeholders ? (
-                      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">
+                      <span
+                        className="px-2 py-1 rounded text-xs"
+                        style={{
+                          backgroundColor: darkMode ? '#9333ea' : '#f3e8ff',
+                          color: darkMode ? '#ffffff' : '#6b21a8'
+                        }}
+                      >
                         {req.stakeholders}
                       </span>
                     ) : '-'}
                   </td>
                   {/* Artifacts */}
-                  <td className="p-3 text-sm border-r border-gray-200">
+                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
                     {req.linkedArtifacts && req.linkedArtifacts.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {req.linkedArtifacts.slice(0, 2).map((name, idx) => (
-                          <span key={idx} className="px-2 py-0.5 bg-green-100 text-green-800 rounded text-xs truncate max-w-[100px]">
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 rounded text-xs truncate max-w-[100px]"
+                            style={{
+                              backgroundColor: darkMode ? '#16a34a' : '#dcfce7',
+                              color: darkMode ? '#ffffff' : '#166534'
+                            }}
+                          >
                             {name}
                           </span>
                         ))}
                         {req.linkedArtifacts.length > 2 && (
-                          <span className="text-xs text-gray-500">+{req.linkedArtifacts.length - 2}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">+{req.linkedArtifacts.length - 2}</span>
                         )}
                       </div>
                     ) : '-'}
                   </td>
                   {/* Findings */}
-                  <td className="p-3 text-sm border-r border-gray-200">
+                  <td className="p-3 text-sm border-r border-gray-200 dark:border-gray-700">
                     {req.linkedFindings && req.linkedFindings.length > 0 ? (
                       <div className="flex flex-wrap gap-1">
                         {req.linkedFindings.slice(0, 2).map((id, idx) => (
-                          <span key={idx} className="px-2 py-0.5 bg-orange-100 text-orange-800 rounded text-xs">
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 rounded text-xs"
+                            style={{
+                              backgroundColor: darkMode ? '#ea580c' : '#ffedd5',
+                              color: darkMode ? '#ffffff' : '#c2410c'
+                            }}
+                          >
                             {id}
                           </span>
                         ))}
                         {req.linkedFindings.length > 2 && (
-                          <span className="text-xs text-gray-500">+{req.linkedFindings.length - 2}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">+{req.linkedFindings.length - 2}</span>
                         )}
                       </div>
                     ) : '-'}

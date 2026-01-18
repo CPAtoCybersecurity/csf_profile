@@ -165,12 +165,12 @@ const useRequirementsStore = create(
         });
       },
 
-      // Load initial CSF data (migrated from csfStore)
+      // Load initial CSF data from Confluence-Requirements.csv
       loadInitialData: async () => {
         try {
           set({ loading: true, error: null });
 
-          const response = await fetch('/tblProfile_Demo.csv');
+          const response = await fetch('/Confluence-Requirements.csv');
           const csvText = await response.text();
 
           return new Promise((resolve, reject) => {
@@ -179,22 +179,28 @@ const useRequirementsStore = create(
               skipEmptyLines: true,
               complete: (results) => {
                 const requirements = results.data.map(row => {
-                  // Extract category ID from category string
-                  const categoryIdMatch = row.Category && row.Category.match(/\(([^)]+)\)/);
+                  // Extract category ID from category string if present
+                  const categoryIdMatch = row['Category Name'] && row['Category Name'].match(/\(([^)]+)\)/);
                   const categoryId = categoryIdMatch ? categoryIdMatch[1] : '';
 
                   return {
-                    id: row.ID,
-                    frameworkId: 'nist-csf-2.0',
-                    function: row.Function || '',
-                    functionDescription: row['Function Description'] || '',
-                    category: row.Category || '',
+                    id: row['Requirement ID'] || row.ID || '',
+                    frameworkId: row.Framework || row.FRAMEWORK || 'nist-csf-2.0',
+                    function: row['CSF Function'] || row['CSF FUNCTION'] || row.Function || '',
+                    functionDescription: row['CSF Function Description'] || row['Function Description'] || '',
+                    category: row['Category Name'] || row.CATEGORY || row.Category || '',
                     categoryDescription: row['Category Description'] || '',
                     categoryId: categoryId,
-                    subcategoryId: row['Subcategory ID'] || '',
-                    subcategoryDescription: row['Subcategory Description'] || '',
-                    implementationExample: row['Implementation Example'] || '',
-                    inScope: (row['In Scope? '] || 'No') === 'Yes'
+                    subcategoryId: row['Subcategory ID'] || row['SUBCATEGORY ID'] || '',
+                    subcategoryDescription: row['Subcategory Description'] || row['SUBCATEGORY DESCRIPTION'] || '',
+                    implementationExample: row['Implementation Example'] || row['IMPLEMENTATION EXAMPLE'] || '',
+                    implementationDescription: row['Implementation Description (Control)'] || '',
+                    controlOwner: row['Control Owner'] || '',
+                    stakeholders: row['Stakeholders'] || '',
+                    artifacts: row['Artifacts'] || '',
+                    findings: row['Findings'] || '',
+                    controlEvaluationBackLink: row['Control Evaluation Back Link'] || '',
+                    inScope: true // All pre-loaded requirements are in scope
                   };
                 });
 

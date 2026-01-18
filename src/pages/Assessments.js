@@ -132,11 +132,16 @@ const Assessments = () => {
         const control = getControl(itemId);
         return control ? { ...control, type: 'control', itemId: control.controlId } : null;
       } else {
-        const req = getRequirement(itemId);
-        return req ? { ...req, type: 'requirement', itemId: req.id } : null;
+        // Try to find by id first, then by subcategoryId (for JIRA imports using subcategory IDs)
+        let req = getRequirement(itemId);
+        if (!req) {
+          // Look for requirements where subcategoryId matches the scopeId
+          req = requirements.find(r => r.subcategoryId === itemId);
+        }
+        return req ? { ...req, type: 'requirement', itemId: itemId } : null;
       }
     }).filter(Boolean);
-  }, [currentAssessment, getControl, getRequirement]);
+  }, [currentAssessment, getControl, getRequirement, requirements]);
 
   // Get available items for scope selection
   const availableItems = useMemo(() => {
@@ -157,7 +162,10 @@ const Assessments = () => {
       }
       items = items.map(c => ({ ...c, type: 'control', itemId: c.controlId }));
     } else {
-      items = requirements.filter(r => !scopeIds.includes(r.id));
+      // Filter out requirements that are already scoped (by id or subcategoryId)
+      items = requirements.filter(r =>
+        !scopeIds.includes(r.id) && !scopeIds.includes(r.subcategoryId)
+      );
       if (currentAssessment.frameworkFilter) {
         items = items.filter(r => r.frameworkId === currentAssessment.frameworkFilter);
       }

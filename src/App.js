@@ -30,6 +30,7 @@ import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 // Stores
 import useUserStore from './stores/userStore';
 import useRequirementsStore from './stores/requirementsStore';
+import useAssessmentsStore from './stores/assessmentsStore';
 
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
@@ -37,6 +38,7 @@ import { checkEnvironmentVariables } from './utils/envValidation';
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
+  const loadAssessments = useAssessmentsStore((state) => state.loadInitialData);
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
   const [showBackupReminder, setShowBackupReminder] = useState(false);
   const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
@@ -50,8 +52,10 @@ const AppContent = () => {
     checkEnvironmentVariables();
     // Fix email addresses using store directly
     useUserStore.getState().fixEmailAddresses();
-    // Load requirements data
+    // Load requirements data from Confluence-Requirements.csv
     loadRequirements();
+    // Load assessments data from JIRA-Assessments.csv
+    loadAssessments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
   

@@ -288,7 +288,7 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
         // Version 2: Added link, complianceRequirement, controlId, type, jiraKey fields
         if (version < 2 && persistedState?.artifacts) {
@@ -312,6 +312,12 @@ const useArtifactStore = create(
             return persistedState;
           }
           // New user or empty state - use defaults
+          return { artifacts: DEFAULT_ARTIFACTS };
+        }
+        // Version 4: Filter out long timestamp-based artifact IDs and reset to clean defaults
+        // Removes artifacts with IDs like AR-1768214343793-1crwz9xd2, keeps only AR-## format
+        if (version < 4) {
+          // Reset to defaults - this cleans up old long IDs
           return { artifacts: DEFAULT_ARTIFACTS };
         }
         return persistedState;
