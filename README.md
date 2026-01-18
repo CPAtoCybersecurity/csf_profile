@@ -202,6 +202,22 @@ If you encounter issues with `react-scripts` not installing correctly on Kali Li
    ls node_modules/.bin/ | grep react-scripts
    ```
 
+#### Installation via Docker (has not been tested with the new backend integration)
+
+You can use the provided **Dockerfile** to spin up a local container of this app on any OS.
+
+1. Install Docker and clone the repository
+2. copy and make changes to the .env-file (if needed, see above)
+3. build the Docker-Image and run it:
+
+``` 
+# build the image 
+docker build -t csf_profile .
+
+# start the container 
+docker run -p 3000:3000 --name csf_profile -d csf_profile 
+```
+
 ## Confluence Cloud Integration
 
 This application supports fetching control documentation from **Confluence Cloud** using a secure backend integration.
