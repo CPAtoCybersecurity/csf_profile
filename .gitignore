@@ -30,3 +30,6 @@ yarn-error.log*
 
 # Server config with credentials (use config.example.json as template)
 server/config.json
+
+# Internal reports and confidential documents
+_reports/

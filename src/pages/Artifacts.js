@@ -72,6 +72,17 @@ const Artifacts = () => {
     };
   }, []);
 
+  // Keyboard shortcut: 'n' to create new artifact
+  useEffect(() => {
+    const handleNewItem = () => {
+      resetForm();
+      setSelectedArtifact(null);
+      setEditMode(true);
+    };
+    window.addEventListener('keyboard-new-item', handleNewItem);
+    return () => window.removeEventListener('keyboard-new-item', handleNewItem);
+  }, []);
+
   // File input ref for CSV import
   const fileInputRef = useRef(null);
 

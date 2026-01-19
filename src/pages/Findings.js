@@ -88,6 +88,17 @@ const Findings = () => {
     };
   }, [isResizing, handleMouseMove, handleMouseUp]);
 
+  // Keyboard shortcut: 'n' to create new finding
+  useEffect(() => {
+    const handleNewItem = () => {
+      resetForm();
+      setSelectedFinding(null);
+      setEditMode(true);
+    };
+    window.addEventListener('keyboard-new-item', handleNewItem);
+    return () => window.removeEventListener('keyboard-new-item', handleNewItem);
+  }, []);
+
   // Sorting
   const { sortedData } = useSort(findings);
 
@@ -325,10 +336,11 @@ const Findings = () => {
                 setSelectedFinding(null);
                 setEditMode(true);
               }}
-              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded text-sm"
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 text-white py-2 px-4 rounded text-sm font-medium transition-colors"
+              title="Create a new finding to track compliance gaps or issues"
             >
               <Plus size={16} />
-              Create
+              Create Finding
             </button>
           </div>
         </div>

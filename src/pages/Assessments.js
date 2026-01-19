@@ -106,6 +106,15 @@ const Assessments = () => {
     }
   }, [llmProvider, checkOllama]);
 
+  // Keyboard shortcut: 'n' to create new assessment
+  React.useEffect(() => {
+    const handleNewItem = () => {
+      setShowNewModal(true);
+    };
+    window.addEventListener('keyboard-new-item', handleNewItem);
+    return () => window.removeEventListener('keyboard-new-item', handleNewItem);
+  }, []);
+
   // Scope picker state
   const [scopePickerSearch, setScopePickerSearch] = useState('');
   const [availableItemsSort, setAvailableItemsSort] = useState({ key: 'subcategoryId', direction: 'asc' });
@@ -716,9 +725,24 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                         <span>Scope: {assessment.scopeType === 'controls' ? 'Controls' : 'Requirements'}</span>
                         <span>{prog.total} items</span>
-                        <span className={getStatusColor(assessment.status)}>
+                        <button
+                          className={`${getStatusColor(assessment.status)} px-2 py-0.5 rounded hover:opacity-80 transition-opacity`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentAssessmentId(assessment.id);
+                            // Get first scoped item
+                            const firstScopeId = assessment.scopeIds?.[0];
+                            if (firstScopeId) {
+                              setSelectedItemId(firstScopeId);
+                              setView('assess');
+                            } else {
+                              setView('scope');
+                            }
+                          }}
+                          title="Click to score this assessment"
+                        >
                           {prog.completed}/{prog.total} complete
-                        </span>
+                        </button>
                       </div>
                     </div>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
@@ -739,15 +763,32 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     </div>
                   </div>
 
-                  {/* Progress bar */}
+                  {/* Progress bar with color gradient */}
                   <div className="mt-3">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-green-500 transition-all"
+                        className={`h-full transition-all duration-300 ${
+                          prog.percentage === 100 ? 'bg-green-500' :
+                          prog.percentage >= 75 ? 'bg-emerald-500' :
+                          prog.percentage >= 50 ? 'bg-blue-500' :
+                          prog.percentage >= 25 ? 'bg-amber-500' :
+                          'bg-red-400'
+                        }`}
                         style={{ width: `${prog.percentage}%` }}
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{prog.percentage}% complete</p>
+                    <div className="flex justify-between items-center mt-1">
+                      <p className={`text-xs font-medium ${
+                        prog.percentage === 100 ? 'text-green-600 dark:text-green-400' :
+                        prog.percentage >= 50 ? 'text-blue-600 dark:text-blue-400' :
+                        'text-gray-500 dark:text-gray-400'
+                      }`}>
+                        {prog.percentage}% complete
+                      </p>
+                      {prog.percentage === 100 && (
+                        <span className="text-xs text-green-600 dark:text-green-400 font-medium">✓ Done</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -788,6 +829,21 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
               </button>
             )}
             <button
+              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg"
+              onClick={() => {
+                if (scopedItems.length > 0) {
+                  setSelectedItemId(scopedItems[0].itemId);
+                  setView('assess');
+                } else {
+                  toast.error('Add items to scope first before scoring');
+                }
+              }}
+              title="Enter quarterly scores and evaluations"
+            >
+              <FileSearch size={16} />
+              Score Assessment
+            </button>
+            <button
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
               onClick={handleExport}
             >
@@ -797,13 +853,43 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
           </div>
         </div>
 
-        {/* Progress summary */}
+        {/* Progress summary - clickable to navigate to scoring */}
         {progress && (
           <div className="mt-3 flex items-center gap-4 text-sm">
-            <span className="text-gray-600">Progress:</span>
-            <span className="px-2 py-1 bg-gray-200 rounded">{progress.total} scoped</span>
-            <span className="px-2 py-1 bg-green-100 text-green-700 rounded">{progress.completed} complete</span>
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white rounded">{progress.inProgress} in progress</span>
+            <span className="text-gray-600 dark:text-gray-400">Progress:</span>
+            <span className="px-2 py-1 bg-gray-200 dark:bg-gray-700 dark:text-gray-300 rounded">{progress.total} scoped</span>
+            <button
+              className="px-2 py-1 bg-green-100 text-green-700 dark:bg-green-600 dark:text-white rounded hover:bg-green-200 dark:hover:bg-green-500 transition-colors cursor-pointer"
+              onClick={() => {
+                if (scopedItems.length > 0) {
+                  setSelectedItemId(scopedItems[0].itemId);
+                  setView('assess');
+                }
+              }}
+              title="Click to start scoring"
+            >
+              {progress.completed} complete
+            </button>
+            <button
+              className="px-2 py-1 bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white rounded hover:bg-blue-200 dark:hover:bg-blue-500 transition-colors cursor-pointer"
+              onClick={() => {
+                // Find first in-progress item
+                const inProgressItem = scopedItems.find(item => {
+                  const obs = currentAssessment?.observations?.[item.itemId];
+                  return obs?.testingStatus === 'In Progress';
+                });
+                if (inProgressItem) {
+                  setSelectedItemId(inProgressItem.itemId);
+                  setView('assess');
+                } else if (scopedItems.length > 0) {
+                  setSelectedItemId(scopedItems[0].itemId);
+                  setView('assess');
+                }
+              }}
+              title="Click to continue scoring in-progress items"
+            >
+              {progress.inProgress} in progress
+            </button>
           </div>
         )}
       </div>

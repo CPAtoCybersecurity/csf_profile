@@ -61,6 +61,9 @@ const DropdownPortal = ({
     return null;
   }
 
+  // Check if dark mode is active
+  const isDarkMode = document.documentElement.classList.contains('dark');
+
   return createPortal(
     <div
       ref={dropdownRef}
@@ -70,10 +73,11 @@ const DropdownPortal = ({
         left: position.left,
         minWidth: position.width,
         zIndex: 99999,
-        backgroundColor: 'white',
-        border: '1px solid #ccc',
+        backgroundColor: isDarkMode ? '#1f2937' : 'white',
+        border: isDarkMode ? '1px solid #374151' : '1px solid #ccc',
         borderRadius: '8px',
-        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        boxShadow: isDarkMode ? '0 4px 20px rgba(0,0,0,0.5)' : '0 4px 20px rgba(0,0,0,0.3)',
+        color: isDarkMode ? '#f9fafb' : 'inherit',
       }}
       className={className}
     >
