@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Search, Filter, Plus, Edit, Save, Trash2, Link, X,
   Upload, Download, Users, User, ChevronRight
@@ -19,6 +20,8 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
 
 const UserControls = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
   // Store state
   const controls = useControlsStore((state) => state.controls);
   const createControl = useControlsStore((state) => state.createControl);
@@ -68,6 +71,10 @@ const UserControls = () => {
   const [reqPanelWidth, setReqPanelWidth] = useState(380);
   const [isResizingReqPanel, setIsResizingReqPanel] = useState(false);
 
+  // Detail panel resize state
+  const [detailPanelWidth, setDetailPanelWidth] = useState(420);
+  const [isResizingDetailPanel, setIsResizingDetailPanel] = useState(false);
+
   // Dropdown states
   const [ownerDropdownOpen, setOwnerDropdownOpen] = useState(false);
   const [frameworkDropdownOpen, setFrameworkDropdownOpen] = useState(false);
@@ -76,6 +83,22 @@ const UserControls = () => {
   const ownerTriggerRef = useRef(null);
   const frameworkTriggerRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  // Handle URL query parameter for deep linking to a specific control
+  useEffect(() => {
+    const selectedParam = searchParams.get('selected');
+    if (selectedParam) {
+      const control = controls.find(c => c.controlId === selectedParam);
+      if (control) {
+        setSelectedControlId(selectedParam);
+        setDetailPanelOpen(true);
+        setEditMode(false);
+        setIsCreating(false);
+        // Clear the URL parameter after selection
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, controls, setSearchParams]);
 
   // Resize handlers for requirement picker panel
   const handleReqPanelMouseDown = useCallback((e) => {
@@ -93,6 +116,22 @@ const UserControls = () => {
     setIsResizingReqPanel(false);
   }, []);
 
+  // Detail panel resize handlers
+  const handleDetailPanelMouseDown = useCallback((e) => {
+    e.preventDefault();
+    setIsResizingDetailPanel(true);
+  }, []);
+
+  const handleDetailPanelMouseMove = useCallback((e) => {
+    if (!isResizingDetailPanel) return;
+    const newWidth = window.innerWidth - e.clientX;
+    setDetailPanelWidth(Math.max(320, Math.min(800, newWidth)));
+  }, [isResizingDetailPanel]);
+
+  const handleDetailPanelMouseUp = useCallback(() => {
+    setIsResizingDetailPanel(false);
+  }, []);
+
   // Add/remove event listeners for resize
   useEffect(() => {
     if (isResizingReqPanel) {
@@ -108,6 +147,22 @@ const UserControls = () => {
       document.body.style.userSelect = '';
     };
   }, [isResizingReqPanel, handleReqPanelMouseMove, handleReqPanelMouseUp]);
+
+  // Add/remove event listeners for detail panel resize
+  useEffect(() => {
+    if (isResizingDetailPanel) {
+      document.addEventListener('mousemove', handleDetailPanelMouseMove);
+      document.addEventListener('mouseup', handleDetailPanelMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    }
+    return () => {
+      document.removeEventListener('mousemove', handleDetailPanelMouseMove);
+      document.removeEventListener('mouseup', handleDetailPanelMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizingDetailPanel, handleDetailPanelMouseMove, handleDetailPanelMouseUp]);
 
   // Get user name helper
   const getUserName = useCallback((userId) => {
@@ -522,7 +577,10 @@ const UserControls = () => {
 
       <div className="flex flex-1 min-h-0 relative z-0">
         {/* Table */}
-        <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto transition-all duration-300`}>
+        <div
+          className="overflow-auto transition-all duration-300"
+          style={{ width: detailPanelOpen ? `calc(100% - ${detailPanelWidth}px)` : '100%' }}
+        >
           {controls.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-center px-4">
               <Users size={48} className="mb-4 opacity-50" />
@@ -668,7 +726,28 @@ const UserControls = () => {
 
         {/* Detail Panel */}
         {detailPanelOpen && (
-          <div className="w-1/3 overflow-auto p-4 bg-gray-50 border-l">
+          <div
+            className="overflow-auto bg-gray-50 border-l relative flex-shrink-0"
+            style={{ width: `${detailPanelWidth}px` }}
+          >
+            {/* Resize Handle */}
+            <div
+              onMouseDown={handleDetailPanelMouseDown}
+              style={{
+                position: 'absolute',
+                left: '-4px',
+                top: 0,
+                bottom: 0,
+                width: '8px',
+                cursor: 'col-resize',
+                zIndex: 10
+              }}
+              className={`transition-colors ${
+                isResizingDetailPanel ? 'bg-blue-500' : 'bg-transparent hover:bg-blue-400'
+              }`}
+              title="Drag to resize"
+            />
+            <div className="p-4 h-full">
             {currentControl ? (
               <div className="space-y-6">
                 {/* Header */}
@@ -841,6 +920,7 @@ const UserControls = () => {
                 <p>Select a control to view details</p>
               </div>
             )}
+            </div>
           </div>
         )}
 

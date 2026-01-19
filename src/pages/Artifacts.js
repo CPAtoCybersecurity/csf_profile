@@ -1,13 +1,16 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
 import useArtifactStore from '../stores/artifactStore';
 import useUserStore from '../stores/userStore';
+import useControlsStore from '../stores/controlsStore';
 import useSort from '../hooks/useSort';
 import { extractArtifactsFromProfile } from '../updateArtifactLinks';
 
 const Artifacts = () => {
+  const navigate = useNavigate();
   const data = useCSFStore((state) => state.data);
   const artifacts = useArtifactStore((state) => state.artifacts);
   const setArtifacts = useArtifactStore((state) => state.setArtifacts);
@@ -15,6 +18,7 @@ const Artifacts = () => {
   const updateArtifact = useArtifactStore((state) => state.updateArtifact);
   const deleteArtifact = useArtifactStore((state) => state.deleteArtifact);
   const users = useUserStore((state) => state.users);
+  const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
 
   const [formData, setFormData] = useState({
     id: null,
@@ -36,6 +40,23 @@ const Artifacts = () => {
 
   // Sorting
   const { sort, sortedData, handleSort } = useSort(artifacts);
+
+  // Get linked controls for the selected artifact
+  const linkedControls = useMemo(() => {
+    if (!selectedArtifact?.linkedSubcategoryIds?.length) return [];
+    const controlsSet = new Set();
+    const controls = [];
+    selectedArtifact.linkedSubcategoryIds.forEach(reqId => {
+      const reqControls = getControlsByRequirement(reqId);
+      reqControls.forEach(ctrl => {
+        if (!controlsSet.has(ctrl.controlId)) {
+          controlsSet.add(ctrl.controlId);
+          controls.push(ctrl);
+        }
+      });
+    });
+    return controls;
+  }, [selectedArtifact, getControlsByRequirement]);
 
   // Handle click outside to close dropdown
   useEffect(() => {
@@ -587,6 +608,31 @@ const Artifacts = () => {
                       )}
                     </div>
                   )}
+                </div>
+
+                {/* Linked Controls */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1 flex items-center gap-1">
+                    <Shield size={14} />
+                    Linked Controls
+                  </label>
+                  <div className="flex flex-wrap gap-1">
+                    {linkedControls.length > 0 ? (
+                      linkedControls.map(ctrl => (
+                        <button
+                          key={ctrl.controlId}
+                          onClick={() => navigate(`/controls?selected=${encodeURIComponent(ctrl.controlId)}`)}
+                          className="px-2 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full text-xs flex items-center gap-1 transition-colors"
+                          title={ctrl.implementationDescription || 'View control'}
+                        >
+                          <Shield size={10} />
+                          {ctrl.controlId}
+                        </button>
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-400 dark:text-gray-500">No controls linked to these requirements</span>
+                    )}
+                  </div>
                 </div>
               </div>
 

@@ -1,11 +1,16 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar } from 'lucide-react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar, Shield } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useFindingsStore from '../stores/findingsStore';
 import useUserStore from '../stores/userStore';
+import useControlsStore from '../stores/controlsStore';
+import useRequirementsStore from '../stores/requirementsStore';
 import useSort from '../hooks/useSort';
 
 const Findings = () => {
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const findings = useFindingsStore((state) => state.findings);
   const createFinding = useFindingsStore((state) => state.createFinding);
   const updateFinding = useFindingsStore((state) => state.updateFinding);
@@ -13,6 +18,8 @@ const Findings = () => {
   const importFindingsCSV = useFindingsStore((state) => state.importFindingsCSV);
   const exportFindingsCSV = useFindingsStore((state) => state.exportFindingsCSV);
   const users = useUserStore((state) => state.users);
+  const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
+  const requirements = useRequirementsStore((state) => state.requirements);
 
   const [formData, setFormData] = useState({
     id: null,
@@ -33,6 +40,21 @@ const Findings = () => {
   // Panel resize state
   const [panelWidth, setPanelWidth] = useState(480);
   const [isResizing, setIsResizing] = useState(false);
+
+  // Handle URL query parameter for deep linking to a specific finding
+  useEffect(() => {
+    const selectedParam = searchParams.get('selected');
+    if (selectedParam) {
+      const finding = findings.find(f => f.id === selectedParam);
+      if (finding) {
+        setSelectedFinding(finding);
+        setFormData({ ...finding });
+        setEditMode(false);
+        // Clear the URL parameter after selection
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, findings, setSearchParams]);
 
   // Resize handlers
   const handleMouseDown = useCallback((e) => {
@@ -68,6 +90,35 @@ const Findings = () => {
 
   // Sorting
   const { sortedData } = useSort(findings);
+
+  // Get linked controls for the selected finding based on complianceRequirement
+  const linkedControls = useMemo(() => {
+    if (!selectedFinding?.complianceRequirement) return [];
+    const csfRef = selectedFinding.complianceRequirement.trim();
+    const controlsSet = new Set();
+    const controls = [];
+
+    // Find requirements that match or contain the CSF reference
+    const matchingReqs = requirements.filter(req =>
+      req.id === csfRef ||
+      req.subcategoryId === csfRef ||
+      req.id?.includes(csfRef) ||
+      req.subcategoryId?.includes(csfRef)
+    );
+
+    // Get controls linked to these requirements
+    matchingReqs.forEach(req => {
+      const reqControls = getControlsByRequirement(req.id);
+      reqControls.forEach(ctrl => {
+        if (!controlsSet.has(ctrl.controlId)) {
+          controlsSet.add(ctrl.controlId);
+          controls.push(ctrl);
+        }
+      });
+    });
+
+    return controls;
+  }, [selectedFinding, requirements, getControlsByRequirement]);
 
   // File input ref for CSV import
   const fileInputRef = useRef(null);
@@ -615,6 +666,32 @@ const Findings = () => {
                       </span>
                     )}
                   </div>
+
+                  {/* Linked Controls */}
+                  {!editMode && selectedFinding?.complianceRequirement && (
+                    <div className="flex items-start justify-between">
+                      <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                        <Shield size={14} />
+                        Linked Controls
+                      </span>
+                      <div className="flex flex-wrap gap-1 justify-end max-w-[200px]">
+                        {linkedControls.length > 0 ? (
+                          linkedControls.map(ctrl => (
+                            <button
+                              key={ctrl.controlId}
+                              onClick={() => navigate(`/controls?selected=${encodeURIComponent(ctrl.controlId)}`)}
+                              className="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-xs flex items-center gap-1 transition-colors"
+                              title={ctrl.implementationDescription || 'View control'}
+                            >
+                              {ctrl.controlId}
+                            </button>
+                          ))
+                        ) : (
+                          <span className="text-xs text-gray-400 dark:text-gray-500">None</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Remediation Owner */}
                   <div className="flex items-center justify-between">

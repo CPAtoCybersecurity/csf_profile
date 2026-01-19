@@ -11,6 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import FrameworkBadge from '../components/FrameworkBadge';
 import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
+import FindingSelector from '../components/FindingSelector';
 import SortableHeader from '../components/SortableHeader';
 
 // Stores
@@ -527,17 +528,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     if (!currentAssessmentId || !selectedItemId) return;
     updateQuarterlyObservation(currentAssessmentId, selectedItemId, selectedQuarter, { [field]: value });
   }, [currentAssessmentId, selectedItemId, selectedQuarter, updateQuarterlyObservation]);
-
-  const handleRemediationChange = useCallback((field, value) => {
-    if (!currentAssessmentId || !selectedItemId) return;
-    const currentObs = getObservation(currentAssessmentId, selectedItemId);
-    updateObservation(currentAssessmentId, selectedItemId, {
-      remediation: {
-        ...currentObs.remediation,
-        [field]: value
-      }
-    });
-  }, [currentAssessmentId, selectedItemId, getObservation, updateObservation]);
 
   const handleExport = useCallback(() => {
     if (!currentAssessmentId) return;
@@ -1140,22 +1130,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
                   {/* Findings */}
                   <div className="mb-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="text-sm text-gray-500 dark:text-gray-400">Findings</label>
-                      {!editMode && <span className="text-sm text-blue-600 dark:text-blue-400 cursor-pointer">Add finding</span>}
-                    </div>
-                    {currentObservation.linkedFindings && currentObservation.linkedFindings.length > 0 ? (
-                      <div className="space-y-1">
-                        {currentObservation.linkedFindings.map((findingId, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-sm">
-                            <span className="text-orange-600 dark:text-orange-400">⚠</span>
-                            <span className="text-gray-700 dark:text-gray-300">{findingId}</span>
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <p className="text-sm text-gray-400 dark:text-gray-500">No findings linked</p>
-                    )}
+                    <FindingSelector
+                      label="Findings"
+                      selectedFindings={currentObservation.linkedFindings || []}
+                      onChange={(findings) => handleObservationChange('linkedFindings', findings)}
+                      disabled={!editMode}
+                    />
                   </div>
 
                   {/* Linked work items placeholder */}
@@ -1299,53 +1279,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     )}
                   </div>
 
-                  {/* Remediation section */}
-                  <div className="border-t dark:border-gray-700 pt-4 mt-4">
-                    <h4 className="text-xs font-medium text-orange-600 dark:text-orange-400 uppercase tracking-wider mb-3">Remediation</h4>
-
-                    <div className="space-y-3">
-                      <div className="flex items-start justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Owner</span>
-                        <UserSelector
-                          selectedUsers={currentObservation.remediation?.ownerId}
-                          onChange={(userId) => handleRemediationChange('ownerId', userId)}
-                          disabled={!editMode}
-                        />
-                      </div>
-
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-500 dark:text-gray-400">Due Date</span>
-                        {editMode ? (
-                          <input
-                            type="date"
-                            value={currentObservation.remediation?.dueDate || ''}
-                            onChange={(e) => handleRemediationChange('dueDate', e.target.value)}
-                            className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
-                          />
-                        ) : (
-                          <span className="text-sm text-gray-700 dark:text-gray-300">
-                            {currentObservation.remediation?.dueDate || 'Not set'}
-                          </span>
-                        )}
-                      </div>
-
-                      <div>
-                        <span className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Action Plan</span>
-                        {editMode ? (
-                          <textarea
-                            value={currentObservation.remediation?.actionPlan || ''}
-                            onChange={(e) => handleRemediationChange('actionPlan', e.target.value)}
-                            className="w-full p-2 text-sm border dark:border-gray-600 rounded h-20 bg-white dark:bg-gray-700 dark:text-white"
-                            placeholder="Document remediation actions..."
-                          />
-                        ) : (
-                          <p className="text-sm text-gray-700 dark:text-gray-300">
-                            {currentObservation.remediation?.actionPlan || 'No action plan'}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
