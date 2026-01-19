@@ -75,45 +75,126 @@ const Settings = () => {
   const [showApiToken, setShowApiToken] = useState(false);
   const [isHarvesting, setIsHarvesting] = useState(false);
   const [entryIdCount, setEntryIdCount] = useState(0);
+  const [isSavingConfig, setIsSavingConfig] = useState(false);
+  const [isTestingConnection, setIsTestingConnection] = useState(false);
+  const [configStatus, setConfigStatus] = useState({ jira: false, confluence: false });
 
-  // Load Atlassian config from localStorage on mount
+  // Backend API base URL
+  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+
+  // Load Atlassian config status from backend on mount (credentials stored server-side)
   useEffect(() => {
-    try {
-      const savedConfig = localStorage.getItem('atlassian-config');
-      if (savedConfig) {
-        const config = JSON.parse(savedConfig);
-        setAtlassianSiteUrl(config.siteUrl || '');
-        setAtlassianEmail(config.email || '');
-        setAtlassianApiToken(config.apiToken || '');
+    const loadConfigStatus = async () => {
+      try {
+        const response = await fetch(`${API_BASE}/api/config/status`);
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.data) {
+            // Load non-sensitive data from backend (tokens are masked)
+            if (result.data.jira) {
+              setAtlassianSiteUrl(result.data.jira.baseUrl || '');
+              setAtlassianEmail(result.data.jira.email || '');
+              setConfigStatus(prev => ({ ...prev, jira: result.data.jira.configured }));
+            }
+            if (result.data.confluence) {
+              setConfigStatus(prev => ({ ...prev, confluence: result.data.confluence.configured }));
+            }
+          }
+        }
+      } catch (e) {
+        // Backend may not be running - that's OK for local-only mode
+        console.log('Backend not available, using local-only mode');
       }
       // Load entry ID count
       const mappings = getAllEntryIdMappings();
       setEntryIdCount(Object.keys(mappings).length);
-    } catch (e) {
-      console.error('Failed to load Atlassian config:', e);
-    }
-  }, []);
+    };
+    loadConfigStatus();
+  }, [API_BASE]);
 
-  // Save Atlassian config to localStorage
-  const saveAtlassianConfig = useCallback(() => {
+  // Test connection to Atlassian (validates credentials without storing)
+  const testAtlassianConnection = useCallback(async (service = 'jira') => {
+    if (!atlassianSiteUrl || !atlassianEmail || !atlassianApiToken) {
+      toast.error('Please fill in all fields');
+      return false;
+    }
+
+    setIsTestingConnection(true);
     try {
-      const config = {
-        siteUrl: atlassianSiteUrl,
+      const response = await fetch(`${API_BASE}/api/config/test`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          service,
+          baseUrl: atlassianSiteUrl.replace(/\/$/, ''),
+          email: atlassianEmail,
+          apiToken: atlassianApiToken
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast.success(result.message);
+        return true;
+      } else {
+        toast.error(result.error || 'Connection failed');
+        return false;
+      }
+    } catch (e) {
+      toast.error(`Connection test failed: ${e.message}`);
+      return false;
+    } finally {
+      setIsTestingConnection(false);
+    }
+  }, [API_BASE, atlassianSiteUrl, atlassianEmail, atlassianApiToken]);
+
+  // Save Atlassian config to backend (credentials stored securely server-side, NOT in localStorage)
+  const saveAtlassianConfig = useCallback(async () => {
+    if (!atlassianSiteUrl || !atlassianEmail || !atlassianApiToken) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setIsSavingConfig(true);
+    try {
+      // Save to both Jira and Confluence config on backend
+      const configData = {
+        baseUrl: atlassianSiteUrl.replace(/\/$/, ''),
         email: atlassianEmail,
         apiToken: atlassianApiToken
       };
-      localStorage.setItem('atlassian-config', JSON.stringify(config));
 
-      // Update Confluence config with new base URL
-      if (atlassianSiteUrl) {
+      const [jiraRes, confluenceRes] = await Promise.all([
+        fetch(`${API_BASE}/api/config/jira`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(configData)
+        }),
+        fetch(`${API_BASE}/api/config/confluence`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(configData)
+        })
+      ]);
+
+      if (jiraRes.ok && confluenceRes.ok) {
+        // Clear token from state after saving (don't keep sensitive data in memory)
+        setAtlassianApiToken('');
+        setConfigStatus({ jira: true, confluence: true });
+
+        // Update Confluence config with new base URL for local operations
         updateConfluenceConfig({ baseUrl: atlassianSiteUrl.replace(/\/$/, '') });
-      }
 
-      toast.success('Atlassian configuration saved');
+        toast.success('Configuration saved securely to server');
+      } else {
+        const error = await jiraRes.json();
+        toast.error(error.error || 'Failed to save configuration');
+      }
     } catch (e) {
-      toast.error('Failed to save configuration');
+      toast.error(`Failed to save: ${e.message}. Is the backend running?`);
+    } finally {
+      setIsSavingConfig(false);
     }
-  }, [atlassianSiteUrl, atlassianEmail, atlassianApiToken]);
+  }, [API_BASE, atlassianSiteUrl, atlassianEmail, atlassianApiToken]);
 
   // Handle Entry ID harvesting
   const handleHarvestEntryIds = useCallback(async () => {
@@ -967,22 +1048,71 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 </p>
               </div>
 
-              {/* Save Button */}
-              <div className="flex items-center gap-3 pt-2">
+              {/* Save and Test Buttons */}
+              <div className="flex flex-wrap items-center gap-3 pt-2">
                 <button
                   onClick={saveAtlassianConfig}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium shadow-sm"
+                  disabled={isSavingConfig || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors
+                    ${isSavingConfig || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                    }`}
                 >
-                  <Key size={16} className="text-white" />
-                  <span className="text-white">Save Configuration</span>
+                  {isSavingConfig ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Key size={16} />
+                      <span>Save Configuration</span>
+                    </>
+                  )}
                 </button>
-                {atlassianSiteUrl && atlassianEmail && atlassianApiToken && (
-                  <span className="text-sm text-green-600 flex items-center gap-1">
-                    <Check size={14} />
-                    Configured
-                  </span>
+                <button
+                  onClick={() => testAtlassianConnection('jira')}
+                  disabled={isTestingConnection || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors
+                    ${isTestingConnection || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken
+                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300'
+                      : 'bg-green-600 hover:bg-green-700 text-white'
+                    }`}
+                >
+                  {isTestingConnection ? (
+                    <>
+                      <Loader2 size={16} className="animate-spin" />
+                      <span>Testing...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Check size={16} />
+                      <span>Test Connection</span>
+                    </>
+                  )}
+                </button>
+                {/* Config Status Indicators */}
+                {(configStatus.jira || configStatus.confluence) && (
+                  <div className="flex items-center gap-2 ml-2">
+                    {configStatus.jira && (
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                        <Check size={12} />
+                        Jira
+                      </span>
+                    )}
+                    {configStatus.confluence && (
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                        <Check size={12} />
+                        Confluence
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
+              <p className="text-xs text-slate-500 mt-2">
+                <strong>Security Note:</strong> Credentials are stored securely on the server, not in your browser.
+              </p>
             </div>
 
             {/* Entry ID Harvesting */}
