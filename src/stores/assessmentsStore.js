@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput } from '../utils/sanitize';
+import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
 
 // Default assessment for new installations
@@ -597,7 +598,8 @@ const useAssessmentsStore = create(
       canRedo: () => get().historyIndex < get().history.length - 1,
 
       // Export assessment to CSV with quarterly columns
-      exportAssessmentCSV: (assessmentId, controlsStore, requirementsStore, userStore) => {
+      // Optionally encrypt if a password is provided.
+      exportAssessmentCSV: async (assessmentId, controlsStore, requirementsStore, userStore, { password } = {}) => {
         const assessment = get().getAssessment(assessmentId);
         if (!assessment) return;
 
@@ -653,14 +655,32 @@ const useAssessmentsStore = create(
         });
 
         const csv = Papa.unparse(csvData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const trimmedPassword = (password || '').trim();
+
+        let blob;
         const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
         const date = new Date().toISOString().split('T')[0];
         const safeName = assessment.name.replace(/[^a-z0-9]/gi, '_');
+        const baseFilename = `assessment_${safeName}_${date}.csv`;
+
+        if (trimmedPassword) {
+          const encoder = new TextEncoder();
+          const encryptedBytes = await encryptBytesWithPassword(
+            encoder.encode(csv),
+            trimmedPassword
+          );
+          blob = new Blob([encryptedBytes], { type: 'application/octet-stream' });
+        } else {
+          blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        }
+
+        const url = URL.createObjectURL(blob);
 
         link.setAttribute('href', url);
-        link.setAttribute('download', `assessment_${safeName}_${date}.csv`);
+        link.setAttribute(
+          'download',
+          trimmedPassword ? buildEncryptedFilename(baseFilename) : baseFilename
+        );
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -1287,7 +1307,7 @@ const useAssessmentsStore = create(
       },
 
       // Export all assessments to CSV with quarterly columns
-      exportAllAssessmentsCSV: (controlsStore, requirementsStore, userStore) => {
+      exportAllAssessmentsCSV: async (controlsStore, requirementsStore, userStore, { password } = {}) => {
         const assessments = get().assessments;
         if (assessments.length === 0) return;
 
@@ -1349,17 +1369,33 @@ const useAssessmentsStore = create(
         });
 
         const csv = Papa.unparse(csvData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const date = new Date().toISOString().split('T')[0];
+        const baseFilename = `assessments_${date}.csv`;
+
+        let blob;
+        let filename;
+
+        if (password && String(password).trim().length > 0) {
+          const encoder = new TextEncoder();
+          const plaintextBytes = encoder.encode(csv);
+          const encryptedBytes = await encryptBytesWithPassword(plaintextBytes, String(password));
+          blob = new Blob([encryptedBytes], { type: 'application/octet-stream' });
+          filename = buildEncryptedFilename(baseFilename);
+        } else {
+          blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          filename = baseFilename;
+        }
+
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
-        const date = new Date().toISOString().split('T')[0];
 
         link.setAttribute('href', url);
-        link.setAttribute('download', `assessments_${date}.csv`);
+        link.setAttribute('download', filename);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(url);
       },
 
       // ============ EVALUATIONS STORE INTEGRATION ============

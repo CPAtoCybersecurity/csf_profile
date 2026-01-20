@@ -118,6 +118,34 @@ macOS typically comes with Git pre-installed. You only need to install Node.js:
 4. **Access the application**
    Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
 
+## Encrypted Exports (.enc.csv)
+
+Some exports support optional password protection. If you provide a password, the downloaded file will be named like:
+
+- `assessments_YYYY-MM-DD.enc.csv`
+
+This is an encrypted file format intended for secure backup/storage. It will not open directly in Excel/VS Code.
+
+### How to decrypt
+
+Use the provided Node script to decrypt an encrypted export back into a regular CSV:
+
+**Note:** The script works on modern Node versions (Node 18+ recommended). On Node 22+ `globalThis.crypto` is read-only; the script handles this internally.
+
+```bash
+node scripts/decrypt-export.mjs --in <input.enc.csv> --out <output.csv>
+```
+
+Example:
+
+```bash
+node scripts/decrypt-export.mjs --in assessments_2026-01-19.enc.csv --out assessments_2026-01-19.csv
+```
+
+If the password is wrong (or the file is modified), decryption will fail.
+
+Security note: Passing `--password` on the command line may save it in your shell history. If needed for automation, you can still provide `--password "..."`.
+
 ### Environment Variables Configuration (Optional)
 
 The application supports integration with JIRA and Confluence for enhanced tracking capabilities. To enable these integrations, you'll need to configure environment variables with your API credentials.
