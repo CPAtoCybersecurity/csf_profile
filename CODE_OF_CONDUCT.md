@@ -8,6 +8,9 @@ Create an environment where everyone feels welcome
 ## 🌱 SUPPORT
 Promote a safe space for learning and growth
 
+## 🔗 Join the Community
+Connect with others on the cybersecurity journey: https://simplycyber.io/discord
+
 ## 👥 COLLABORATION
 Foster and seek collective wisdom and cooperation
 
