@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-> **You are viewing the `feature/api-integration` branch (Pre-Alpha)**
-> This branch contains experimental Atlassian API integration. For the stable version, see the [main branch](https://github.com/CPAtoCybersecurity/csf_profile).
-
-# Simply Cyber Academy - CSF Profile Assessment Database v2.1
-=======
 ﻿# Simply Cyber Academy - CSF Profile Assessment Database v2.2
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 
@@ -209,21 +202,6 @@ If you encounter issues with `react-scripts` not installing correctly on Kali Li
    ls node_modules/.bin/ | grep react-scripts
    ```
 
-<<<<<<< HEAD
-## Confluence Cloud Integration
-
-This application supports fetching control documentation from **Confluence Cloud** using a secure backend integration.
-
-### Required Environment Variables
-
-Set the following environment variables in your backend `.env` file:
-
-```env
-CONFLUENCE_BASE_URL=https://your-company.atlassian.net
-CONFLUENCE_EMAIL=your-email@example.com
-CONFLUENCE_API_TOKEN=your-api-token
-```
-=======
 ### Docker 
 
 The application is now fully containerized with production-grade security hardening. This is the fastest and most secure way to get started.
@@ -293,7 +271,6 @@ docker compose --profile tools run --rm atlassian-tool node scripts/export-to-ji
 
 
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 ## Integration Options
 
 This project supports two paths depending on your infrastructure needs:

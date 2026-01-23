@@ -13,11 +13,7 @@ const DEFAULT_ASSESSMENTS = [
     id: 'ASM-default-2025-alma',
     name: '2025 Alma Security CSF',
     description: 'Annual CSF 2.0 assessment for Alma Security covering all implemented controls',
-<<<<<<< HEAD
-    scopeType: 'controls',
-=======
     scopeType: 'requirements',
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     frameworkFilter: null,
     createdDate: '2025-01-01T00:00:00.000Z',
     scopeIds: [
@@ -116,8 +112,6 @@ const useAssessmentsStore = create(
         });
       },
 
-<<<<<<< HEAD
-=======
       // Load initial assessment data from JIRA-Assessments.csv
       loadInitialData: async () => {
         try {
@@ -307,7 +301,6 @@ const useAssessmentsStore = create(
         }
       },
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Get all assessments
       getAssessments: () => get().assessments,
 
@@ -696,12 +689,9 @@ const useAssessmentsStore = create(
       },
 
       // Import assessments from CSV with quarterly columns support
-<<<<<<< HEAD
-=======
       // Supports both standard format AND Jira EVAL format:
       // - Jira Epic (Issue Type = "Epic") → React Assessment
       // - Jira Work paper with Parent/Parent key → React Observation within that Assessment
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       importAssessmentsCSV: async (csvText, userStore) => {
         return new Promise((resolve, reject) => {
           Papa.parse(csvText, {
@@ -710,27 +700,16 @@ const useAssessmentsStore = create(
             complete: (results) => {
               const findOrCreateUser = userStore?.getState?.()?.findOrCreateUser;
 
-<<<<<<< HEAD
-=======
               // Detect if this is a Jira EVAL export (has Issue Type and Issue key columns)
               const isJiraFormat = results.meta.fields?.includes('Issue Type') &&
                                    results.meta.fields?.includes('Issue key');
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
               // Group rows by assessment name
               // Carry forward assessment name from previous row if current row is blank
               const assessmentGroups = {};
               let lastAssessmentName = null;
               let lastScopeType = 'controls';
 
-<<<<<<< HEAD
-              results.data.forEach(row => {
-                let assessmentName = row['Assessment'] || row['Assessment Name'] || row.assessment;
-
-                // If assessment name is empty, use the last known assessment name
-                if (!assessmentName && lastAssessmentName) {
-                  assessmentName = lastAssessmentName;
-=======
               // For Jira format: First pass to identify Epics as Assessments
               const jiraEpics = {};
               if (isJiraFormat) {
@@ -787,7 +766,6 @@ const useAssessmentsStore = create(
                   if (!assessmentName && lastAssessmentName) {
                     assessmentName = lastAssessmentName;
                   }
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                 }
 
                 if (!assessmentName) return;
@@ -798,13 +776,6 @@ const useAssessmentsStore = create(
                 if (!assessmentGroups[assessmentName]) {
                   const scopeType = (row['Scope Type'] || row.scopeType || lastScopeType || 'controls').toLowerCase();
                   lastScopeType = scopeType;
-<<<<<<< HEAD
-                  assessmentGroups[assessmentName] = {
-                    name: assessmentName,
-                    description: row['Description'] || row.description || '',
-                    scopeType: scopeType,
-                    frameworkFilter: row['Framework Filter'] || row.frameworkFilter || null,
-=======
 
                   // For Jira format, use Epic description if available
                   const epicInfo = assessmentJiraKey ? jiraEpics[assessmentJiraKey] : null;
@@ -815,7 +786,6 @@ const useAssessmentsStore = create(
                     scopeType: scopeType,
                     frameworkFilter: row['Framework Filter'] || row.frameworkFilter || null,
                     jiraKey: assessmentJiraKey, // Store Jira Epic key for reference
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     rows: []
                   };
                 }
@@ -878,9 +848,6 @@ const useAssessmentsStore = create(
                 const observations = {};
 
                 group.rows.forEach(row => {
-<<<<<<< HEAD
-                  const itemId = row['ID'] || row['Item ID'] || row.itemId || row.id;
-=======
                   // For Jira format, extract Control ID from custom field or Summary
                   let itemId;
                   if (isJiraFormat) {
@@ -896,7 +863,6 @@ const useAssessmentsStore = create(
                   } else {
                     itemId = row['ID'] || row['Item ID'] || row.itemId || row.id;
                   }
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                   if (!itemId) return;
 
                   scopeIds.push(itemId);
@@ -917,9 +883,6 @@ const useAssessmentsStore = create(
                     if (info) remediationOwnerId = findOrCreateUser(info);
                   }
 
-<<<<<<< HEAD
-                  if (hasQuarterlyColumns) {
-=======
                   if (isJiraFormat) {
                     // Jira EVAL format - each row is a single quarter's observation
                     const quarter = row['Custom field (Quarter)'] ||
@@ -980,7 +943,6 @@ const useAssessmentsStore = create(
 
                     observations[itemId] = existingObs;
                   } else if (hasQuarterlyColumns) {
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     // New quarterly format
                     observations[itemId] = {
                       auditorId,
@@ -1037,10 +999,7 @@ const useAssessmentsStore = create(
                   scopeType: group.scopeType,
                   scopeIds: [...new Set(scopeIds)],
                   frameworkFilter: group.frameworkFilter,
-<<<<<<< HEAD
-=======
                   jiraKey: group.jiraKey || null, // Store Jira Epic key for sync reference
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                   status: 'Not Started',
                   createdDate: new Date().toISOString(),
                   lastModified: new Date().toISOString(),
@@ -1060,8 +1019,6 @@ const useAssessmentsStore = create(
         });
       },
 
-<<<<<<< HEAD
-=======
       // Export assessment to Jira EVAL project format (Control Evaluations)
       // Includes Epic row for assessment + Work paper rows for observations
       exportForJiraCSV: (assessmentId, controlsStore, requirementsStore, userStore) => {
@@ -1329,7 +1286,6 @@ const useAssessmentsStore = create(
         document.body.removeChild(link);
       },
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Export all assessments to CSV with quarterly columns
       exportAllAssessmentsCSV: (controlsStore, requirementsStore, userStore) => {
         const assessments = get().assessments;
@@ -1404,8 +1360,6 @@ const useAssessmentsStore = create(
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-<<<<<<< HEAD
-=======
       },
 
       // ============ EVALUATIONS STORE INTEGRATION ============
@@ -1517,16 +1471,11 @@ const useAssessmentsStore = create(
       isMigratedToEvaluations: (assessmentId, evaluationsStore) => {
         const evals = evaluationsStore.getState().getEvaluationsByAssessment(assessmentId);
         return evals.length > 0;
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       }
     }),
     {
       name: 'csf-assessments-storage',
-<<<<<<< HEAD
-      version: 3,
-=======
       version: 5,
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -1582,8 +1531,6 @@ const useAssessmentsStore = create(
             assessments: updatedAssessments
           };
         }
-<<<<<<< HEAD
-=======
         // Version 4: Fix scopeType from 'controls' to 'requirements'
         // The scopeIds are subcategory/requirement IDs, not control IDs
         if (version < 4) {
@@ -1629,7 +1576,6 @@ const useAssessmentsStore = create(
             assessments: updatedAssessments
           };
         }
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
         return persistedState;
       },
       partialize: (state) => ({

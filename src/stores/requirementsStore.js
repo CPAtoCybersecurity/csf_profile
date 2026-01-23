@@ -98,8 +98,6 @@ const useRequirementsStore = create(
         return reqs;
       },
 
-<<<<<<< HEAD
-=======
       // ============ MIGRATION HELPER ============
       // Extract control-related data from requirements for migration to controlsStore.
       // This should be called during initial migration to move deprecated fields to Controls.
@@ -184,7 +182,6 @@ const useRequirementsStore = create(
         }));
       },
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Count requirements by framework
       getRequirementCount: (frameworkId) => {
         return get().requirements.filter(r => r.frameworkId === frameworkId).length;
@@ -202,19 +199,6 @@ const useRequirementsStore = create(
                 const rowFramework = row.FRAMEWORK || row.Framework || row.framework || frameworkId;
 
                 return {
-<<<<<<< HEAD
-                  id: row.ID || row.id || `${rowFramework}-${index}`,
-                  frameworkId: rowFramework,
-                  function: row['CSF FUNCTION'] || row['CSF Function'] || row.Function || row.function || row.level1 || '',
-                  category: row.CATEGORY || row.Category || row.category || row.level2 || '',
-                  subcategoryId: row['SUBCATEGORY ID'] || row['Subcategory ID'] || row.subcategoryId || row.Subcategory || row.level3 || '',
-                  subcategoryDescription: row['SUBCATEGORY DESCRIPTION'] || row['Subcategory Description'] || row.subcategoryDescription || '',
-                  implementationExample: row['IMPLEMENTATION EXAMPLE'] || row['Implementation Example'] || row.implementationExample || row.level4 || '',
-                  inScope: false,
-                  // Additional metadata
-                  functionDescription: row['Function Description'] || row.functionDescription || '',
-                  categoryDescription: row['Category Description'] || row.categoryDescription || ''
-=======
                   id: row['Requirement ID'] || row.ID || row.id || `${rowFramework}-${index}`,
                   frameworkId: rowFramework,
                   function: row['CSF FUNCTION'] || row['CSF Function'] || row.Function || row.function || row.level1 || '',
@@ -229,7 +213,6 @@ const useRequirementsStore = create(
                   // Confluence fields
                   controlOwner: row['Control Owner'] || row.controlOwner || '',
                   stakeholders: row['Stakeholders'] || row.stakeholders || ''
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                 };
               });
 
@@ -250,23 +233,15 @@ const useRequirementsStore = create(
         });
       },
 
-<<<<<<< HEAD
-      // Load initial CSF data (migrated from csfStore)
-=======
       // Load initial CSF data from Confluence-Requirements.csv
       // NOTE: Requirements are READ-ONLY framework data. The CSV may contain control-related
       // fields (controlOwner, implementationDescription, etc.) for migration purposes,
       // but these should be migrated to controlsStore and are deprecated here.
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       loadInitialData: async () => {
         try {
           set({ loading: true, error: null });
 
-<<<<<<< HEAD
-          const response = await fetch('/tblProfile_Demo.csv');
-=======
           const response = await fetch('/Confluence-Requirements.csv');
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           const csvText = await response.text();
 
           return new Promise((resolve, reject) => {
@@ -275,24 +250,6 @@ const useRequirementsStore = create(
               skipEmptyLines: true,
               complete: (results) => {
                 const requirements = results.data.map(row => {
-<<<<<<< HEAD
-                  // Extract category ID from category string
-                  const categoryIdMatch = row.Category && row.Category.match(/\(([^)]+)\)/);
-                  const categoryId = categoryIdMatch ? categoryIdMatch[1] : '';
-
-                  return {
-                    id: row.ID,
-                    frameworkId: 'nist-csf-2.0',
-                    function: row.Function || '',
-                    functionDescription: row['Function Description'] || '',
-                    category: row.Category || '',
-                    categoryDescription: row['Category Description'] || '',
-                    categoryId: categoryId,
-                    subcategoryId: row['Subcategory ID'] || '',
-                    subcategoryDescription: row['Subcategory Description'] || '',
-                    implementationExample: row['Implementation Example'] || '',
-                    inScope: (row['In Scope? '] || 'No') === 'Yes'
-=======
                   // Extract category ID from category string if present
                   const categoryIdMatch = row['Category Name'] && row['Category Name'].match(/\(([^)]+)\)/);
                   const categoryId = categoryIdMatch ? categoryIdMatch[1] : '';
@@ -322,7 +279,6 @@ const useRequirementsStore = create(
                     artifacts: row['Artifacts'] || '',
                     findings: row['Findings'] || '',
                     controlEvaluationBackLink: row['Control Evaluation Back Link'] || ''
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                   };
                 });
 
@@ -349,14 +305,6 @@ const useRequirementsStore = create(
         }
 
         const csvData = reqs.map(r => ({
-<<<<<<< HEAD
-          'Framework': r.frameworkId,
-          'Function': r.function,
-          'Category': r.category,
-          'Subcategory': r.subcategoryId,
-          'ID': r.id,
-          'Implementation Example': r.implementationExample,
-=======
           'Requirement ID': r.id,
           'Framework': r.frameworkId,
           'CSF Function': r.function,
@@ -366,7 +314,6 @@ const useRequirementsStore = create(
           'Implementation Example': r.implementationExample,
           'Control Owner': r.controlOwner || '',
           'Stakeholders': r.stakeholders || '',
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           'In Scope': r.inScope ? 'Yes' : 'No'
         }));
 
@@ -383,12 +330,6 @@ const useRequirementsStore = create(
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-<<<<<<< HEAD
-        
-        // Track export for backup reminder system
-        const { updateLastExportDate } = require('../utils/backupTracking');
-        updateLastExportDate();
-=======
 
         // Track export for backup reminder system
         const { updateLastExportDate } = require('../utils/backupTracking');
@@ -470,7 +411,6 @@ const useRequirementsStore = create(
         } catch (e) {
           // Backup tracking not available
         }
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       }
     }),
     {

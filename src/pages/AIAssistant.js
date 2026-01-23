@@ -95,8 +95,6 @@ const AIAssistant = () => {
         </p>
       </div>
 
-<<<<<<< HEAD
-=======
       {/* Experimental Notice */}
       <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
         <div className="flex items-start gap-3">
@@ -112,7 +110,6 @@ const AIAssistant = () => {
         </div>
       </div>
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       {/* Configuration Panel */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

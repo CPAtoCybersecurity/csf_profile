@@ -14,11 +14,7 @@
     "axios": "^1.13.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-<<<<<<< HEAD
-    "express": "^5.2.1"
-=======
     "express": "^5.2.1",
     "express-rate-limit": "^8.2.1"
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   }
 }

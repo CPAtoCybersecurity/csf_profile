@@ -2,11 +2,7 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
-<<<<<<< HEAD
-  FileUp, FileText, Loader2, Bot, Sparkles
-=======
   FileUp, FileText, Loader2, Bot, Sparkles, User, Settings
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
@@ -15,10 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import FrameworkBadge from '../components/FrameworkBadge';
 import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
-<<<<<<< HEAD
-=======
 import FindingSelector from '../components/FindingSelector';
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 import SortableHeader from '../components/SortableHeader';
 
 // Stores
@@ -93,11 +86,7 @@ const Assessments = () => {
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
-<<<<<<< HEAD
-    scopeType: 'controls',
-=======
     scopeType: 'requirements',
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     frameworkFilter: ''
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
@@ -117,8 +106,6 @@ const Assessments = () => {
     }
   }, [llmProvider, checkOllama]);
 
-<<<<<<< HEAD
-=======
   // Keyboard shortcut: 'n' to create new assessment
   React.useEffect(() => {
     const handleNewItem = () => {
@@ -128,7 +115,6 @@ const Assessments = () => {
     return () => window.removeEventListener('keyboard-new-item', handleNewItem);
   }, []);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   // Scope picker state
   const [scopePickerSearch, setScopePickerSearch] = useState('');
   const [availableItemsSort, setAvailableItemsSort] = useState({ key: 'subcategoryId', direction: 'asc' });
@@ -156,13 +142,6 @@ const Assessments = () => {
         const control = getControl(itemId);
         return control ? { ...control, type: 'control', itemId: control.controlId } : null;
       } else {
-<<<<<<< HEAD
-        const req = getRequirement(itemId);
-        return req ? { ...req, type: 'requirement', itemId: req.id } : null;
-      }
-    }).filter(Boolean);
-  }, [currentAssessment, getControl, getRequirement]);
-=======
         // Try to find by id first, then by subcategoryId (for JIRA imports using subcategory IDs)
         let req = getRequirement(itemId);
         if (!req) {
@@ -173,7 +152,6 @@ const Assessments = () => {
       }
     }).filter(Boolean);
   }, [currentAssessment, getControl, getRequirement, requirements]);
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
   // Get available items for scope selection
   const availableItems = useMemo(() => {
@@ -194,14 +172,10 @@ const Assessments = () => {
       }
       items = items.map(c => ({ ...c, type: 'control', itemId: c.controlId }));
     } else {
-<<<<<<< HEAD
-      items = requirements.filter(r => !scopeIds.includes(r.id));
-=======
       // Filter out requirements that are already scoped (by id or subcategoryId)
       items = requirements.filter(r =>
         !scopeIds.includes(r.id) && !scopeIds.includes(r.subcategoryId)
       );
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       if (currentAssessment.frameworkFilter) {
         items = items.filter(r => r.frameworkId === currentAssessment.frameworkFilter);
       }
@@ -255,17 +229,10 @@ const Assessments = () => {
   // Helper functions
   const getStatusColor = useCallback((status) => {
     switch (status) {
-<<<<<<< HEAD
-      case 'Complete': return 'text-green-600 bg-green-100';
-      case 'In Progress': return 'text-blue-600 bg-blue-100';
-      case 'Submitted': return 'text-orange-600 bg-orange-100';
-      default: return 'text-gray-500 bg-gray-100';
-=======
       case 'Complete': return 'text-green-600 bg-green-100 dark:bg-green-600 dark:text-white';
       case 'In Progress': return 'text-blue-600 bg-blue-100 dark:bg-blue-600 dark:text-white';
       case 'Submitted': return 'text-orange-600 bg-orange-100 dark:bg-orange-600 dark:text-white';
       default: return 'text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     }
   }, []);
 
@@ -451,11 +418,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-<<<<<<< HEAD
-    setNewAssessment({ name: '', description: '', scopeType: 'controls', frameworkFilter: '' });
-=======
     setNewAssessment({ name: '', description: '', scopeType: 'requirements', frameworkFilter: '' });
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     setSelectedScopeItems(new Set());
     setScopeFilterText('');
     setGenerateTestProcedures(false);
@@ -575,20 +538,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     updateQuarterlyObservation(currentAssessmentId, selectedItemId, selectedQuarter, { [field]: value });
   }, [currentAssessmentId, selectedItemId, selectedQuarter, updateQuarterlyObservation]);
 
-<<<<<<< HEAD
-  const handleRemediationChange = useCallback((field, value) => {
-    if (!currentAssessmentId || !selectedItemId) return;
-    const currentObs = getObservation(currentAssessmentId, selectedItemId);
-    updateObservation(currentAssessmentId, selectedItemId, {
-      remediation: {
-        ...currentObs.remediation,
-        [field]: value
-      }
-    });
-  }, [currentAssessmentId, selectedItemId, getObservation, updateObservation]);
-
-=======
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   const handleExport = useCallback(() => {
     if (!currentAssessmentId) return;
     exportAssessmentCSV(currentAssessmentId, useControlsStore, useRequirementsStore, useUserStore);
@@ -697,30 +646,17 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Render assessment list view
   const renderListView = () => (
     <div className="flex flex-col h-full">
-<<<<<<< HEAD
-      <div className="bg-gray-100 p-4 border-b flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <ClipboardList size={24} className="text-blue-600" />
-          <div>
-            <h1 className="text-xl font-bold">Assessments</h1>
-            <p className="text-sm text-gray-600">{assessments.length} assessment(s)</p>
-=======
       <div className="bg-gray-100 dark:bg-gray-800 p-4 border-b dark:border-gray-700 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <ClipboardList size={24} className="text-blue-600" />
           <div>
             <h1 className="text-xl font-bold dark:text-white">Control Evaluations</h1>
             <p className="text-sm text-gray-600 dark:text-gray-400">{assessments.length} evaluation(s)</p>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           </div>
         </div>
         <div className="flex gap-2">
           <button
-<<<<<<< HEAD
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-=======
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             onClick={() => setShowNewModal(true)}
           >
             <Plus size={16} />
@@ -734,11 +670,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             style={{ display: 'none' }}
           />
           <button
-<<<<<<< HEAD
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-=======
             className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white py-2 px-4 rounded-lg"
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             onClick={handleImportClick}
             title="Import assessments from CSV"
           >
@@ -793,11 +725,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                         <span>Scope: {assessment.scopeType === 'controls' ? 'Controls' : 'Requirements'}</span>
                         <span>{prog.total} items</span>
-<<<<<<< HEAD
-                        <span className={getStatusColor(assessment.status)}>
-                          {prog.completed}/{prog.total} complete
-                        </span>
-=======
                         <button
                           className={`${getStatusColor(assessment.status)} px-2 py-0.5 rounded hover:opacity-80 transition-opacity`}
                           onClick={(e) => {
@@ -816,7 +743,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         >
                           {prog.completed}/{prog.total} complete
                         </button>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                       </div>
                     </div>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
@@ -837,17 +763,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     </div>
                   </div>
 
-<<<<<<< HEAD
-                  {/* Progress bar */}
-                  <div className="mt-3">
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 transition-all"
-                        style={{ width: `${prog.percentage}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">{prog.percentage}% complete</p>
-=======
                   {/* Progress bar with color gradient */}
                   <div className="mt-3">
                     <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
@@ -874,7 +789,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <span className="text-xs text-green-600 dark:text-green-400 font-medium">✓ Done</span>
                       )}
                     </div>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                   </div>
                 </div>
               );
@@ -888,20 +802,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Render scope definition view
   const renderScopeView = () => (
     <div className="flex flex-col h-full">
-<<<<<<< HEAD
-      <div className="bg-gray-100 p-4 border-b">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              className="p-2 hover:bg-gray-200 rounded"
-              onClick={() => setView('list')}
-            >
-              <ChevronRight size={20} className="rotate-180" />
-            </button>
-            <div>
-              <h1 className="text-xl font-bold">{currentAssessment?.name}</h1>
-              <p className="text-sm text-gray-600">
-=======
       <div className="bg-gray-100 dark:bg-gray-800 p-4 border-b dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -914,7 +814,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             <div>
               <h1 className="text-xl font-bold dark:text-white">{currentAssessment?.name}</h1>
               <p className="text-sm text-gray-600 dark:text-gray-400">
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                 Define scope - {currentAssessment?.scopeType === 'controls' ? 'Select Controls' : 'Select Requirements'}
               </p>
             </div>
@@ -930,8 +829,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
               </button>
             )}
             <button
-<<<<<<< HEAD
-=======
               className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg"
               onClick={() => {
                 if (scopedItems.length > 0) {
@@ -947,7 +844,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
               Score Assessment
             </button>
             <button
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
               onClick={handleExport}
             >
@@ -957,15 +853,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
           </div>
         </div>
 
-<<<<<<< HEAD
-        {/* Progress summary */}
-        {progress && (
-          <div className="mt-3 flex items-center gap-4 text-sm">
-            <span className="text-gray-600">Progress:</span>
-            <span className="px-2 py-1 bg-gray-200 rounded">{progress.total} scoped</span>
-            <span className="px-2 py-1 bg-green-100 text-green-700 rounded">{progress.completed} complete</span>
-            <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded">{progress.inProgress} in progress</span>
-=======
         {/* Progress summary - clickable to navigate to scoring */}
         {progress && (
           <div className="mt-3 flex items-center gap-4 text-sm">
@@ -1003,20 +890,13 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             >
               {progress.inProgress} in progress
             </button>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           </div>
         )}
       </div>
 
-<<<<<<< HEAD
-      <div className="flex flex-1 min-h-0">
-        {/* Scoped items */}
-        <div className="w-1/2 border-r overflow-auto">
-=======
       <div className="grid grid-cols-2 flex-1 min-h-0 overflow-hidden">
         {/* Scoped items */}
         <div className="border-r overflow-auto">
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           <div className="p-3 bg-gray-50 border-b sticky top-0">
             <h3 className="font-medium">Scoped Items ({scopedItems.length})</h3>
           </div>
@@ -1074,11 +954,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
         </div>
 
         {/* Available items */}
-<<<<<<< HEAD
-        <div className="w-1/2 overflow-auto flex flex-col">
-=======
         <div className="overflow-auto flex flex-col">
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           <div className="p-3 bg-gray-50 border-b sticky top-0 z-10">
             <h3 className="font-medium mb-2">Available Items ({availableItems.length})</h3>
             <input
@@ -1167,124 +1043,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     </div>
   );
 
-<<<<<<< HEAD
-  // Render assessment view
-  const renderAssessView = () => {
-    const currentItem = scopedItems.find(i => i.itemId === selectedItemId);
-
-    return (
-      <div className="flex flex-col h-full">
-        <div className="bg-gray-100 p-4 border-b">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                className="p-2 hover:bg-gray-200 rounded"
-                onClick={() => setView('scope')}
-              >
-                <ChevronRight size={20} className="rotate-180" />
-              </button>
-              <div>
-                <h1 className="text-xl font-bold">{currentAssessment?.name}</h1>
-                <p className="text-sm text-gray-600">Assessment Observations</p>
-              </div>
-            </div>
-            <button
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
-              onClick={handleExport}
-            >
-              <Download size={16} />
-              Export
-            </button>
-          </div>
-        </div>
-
-        <div className="flex flex-1 min-h-0">
-          {/* Item list */}
-          <div className="w-64 min-w-64 border-r overflow-auto flex-shrink-0">
-            {scopedItems.map(item => {
-              const obs = currentAssessment?.observations?.[item.itemId];
-              return (
-                <div
-                  key={item.itemId}
-                  className={`p-3 border-b cursor-pointer hover:bg-blue-50 dark:hover:bg-gray-700 ${
-                    selectedItemId === item.itemId ? 'bg-blue-100 dark:bg-gray-600' : ''
-                  }`}
-                  onClick={() => {
-                    setSelectedItemId(item.itemId);
-                    setEditMode(false);
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium whitespace-nowrap text-sm">
-                      {item.type === 'control' ? item.controlId : item.subcategoryId || item.id}
-                    </span>
-                    {obs?.testingStatus && (
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(obs.testingStatus)}`}>
-                        {obs.testingStatus}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Observation detail */}
-          <div className="flex-1 overflow-auto p-4">
-            {currentObservation && currentItem ? (
-              <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-bold">
-                      {currentItem.type === 'control' ? currentItem.controlId : currentItem.subcategoryId || currentItem.id}
-                    </h2>
-                    {currentItem.type === 'requirement' && (
-                      <FrameworkBadge frameworkId={currentItem.frameworkId} />
-                    )}
-                  </div>
-                  {editMode ? (
-                    <button
-                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-md"
-                      onClick={() => setEditMode(false)}
-                    >
-                      <Save size={16} />
-                      Done
-                    </button>
-                  ) : (
-                    <button
-                      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md"
-                      onClick={() => setEditMode(true)}
-                    >
-                      <Edit size={16} />
-                      Edit
-                    </button>
-                  )}
-                </div>
-
-                {/* Item description */}
-                <div className="bg-gray-50 p-3 rounded border">
-                  <p className="text-sm text-gray-600">
-                    {currentItem.type === 'control'
-                      ? currentItem.implementationDescription
-                      : currentItem.implementationExample || currentItem.category}
-                  </p>
-                </div>
-
-                {/* Assessment fields - Per-item info */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  <h3 className="font-medium text-gray-700 border-b pb-2">Assessment Information</h3>
-
-                  <UserSelector
-                    label="Auditor"
-                    selectedUsers={currentObservation.auditorId}
-                    onChange={(userId) => handleObservationChange('auditorId', userId)}
-                    disabled={!editMode}
-                  />
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Test Procedure(s)</label>
-=======
   // Get status badge style (Jira-style)
   const getJiraStatusStyle = (status) => {
     switch (status) {
@@ -1429,43 +1187,20 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   {/* Test Procedures */}
                   <div className="mb-4">
                     <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Test Procedures</label>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     {editMode ? (
                       <textarea
                         value={currentObservation.testProcedures || ''}
                         onChange={(e) => handleObservationChange('testProcedures', e.target.value)}
-<<<<<<< HEAD
-                        className="mt-1 w-full p-2 border rounded h-20"
-                        placeholder="Document test procedures..."
-                      />
-                    ) : (
-                      <div className="mt-1 prose prose-sm max-w-none bg-gray-50 p-4 rounded-lg border">
-=======
                         className="w-full p-3 text-sm border dark:border-gray-600 rounded-lg h-32 bg-white dark:bg-gray-700 dark:text-white"
                         placeholder="Document test procedures..."
                       />
                     ) : (
                       <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                         <ReactMarkdown>{formatTestProcedures(currentObservation.testProcedures) || 'No test procedures defined'}</ReactMarkdown>
                       </div>
                     )}
                   </div>
 
-<<<<<<< HEAD
-                  <ArtifactSelector
-                    label="Linked Artifacts"
-                    selectedArtifacts={currentObservation.linkedArtifacts || []}
-                    onChange={(artifacts) => handleObservationChange('linkedArtifacts', artifacts)}
-                    disabled={!editMode}
-                  />
-                </div>
-
-                {/* Quarterly Observations */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  <div className="flex items-center justify-between border-b pb-2">
-                    <h3 className="font-medium text-gray-700">Quarterly Observations</h3>
-=======
                   {/* Artifacts */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1">
@@ -1550,7 +1285,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   {/* Quarter selector */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">Quarter</span>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     <div className="flex gap-1">
                       {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => {
                         const qData = currentObservation.quarters?.[q] || {};
@@ -1559,21 +1293,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           <button
                             key={q}
                             onClick={() => setSelectedQuarter(q)}
-<<<<<<< HEAD
-                            className={`px-3 py-1 text-sm font-medium rounded-t transition-colors ${
-                              selectedQuarter === q
-                                ? 'bg-blue-600 text-white'
-                                : hasData
-                                ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-=======
                             className={`px-2 py-0.5 text-xs font-medium rounded transition-colors ${
                               selectedQuarter === q
                                 ? 'bg-blue-600 dark:bg-blue-500 text-white'
                                 : hasData
                                 ? 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white'
                                 : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                             }`}
                           >
                             {q}
@@ -1583,143 +1308,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     </div>
                   </div>
 
-<<<<<<< HEAD
-                  {(() => {
-                    const quarterData = currentObservation.quarters?.[selectedQuarter] || {};
-                    return (
-                      <div className="space-y-4">
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Testing Status</label>
-                            {editMode ? (
-                              <select
-                                value={quarterData.testingStatus || 'Not Started'}
-                                onChange={(e) => handleQuarterlyChange('testingStatus', e.target.value)}
-                                className="mt-1 w-full p-2 border rounded"
-                              >
-                                <option value="Not Started">Not Started</option>
-                                <option value="In Progress">In Progress</option>
-                                <option value="Submitted">Submitted</option>
-                                <option value="Complete">Complete</option>
-                              </select>
-                            ) : (
-                              <p className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(quarterData.testingStatus || 'Not Started')}`}>
-                                {quarterData.testingStatus || 'Not Started'}
-                              </p>
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Observation Date</label>
-                            {editMode ? (
-                              <input
-                                type="date"
-                                value={quarterData.observationDate || ''}
-                                onChange={(e) => handleQuarterlyChange('observationDate', e.target.value)}
-                                className="mt-1 w-full p-2 border rounded"
-                              />
-                            ) : (
-                              <p className="mt-1">{quarterData.observationDate || 'Not set'}</p>
-                            )}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium text-gray-500">Assessment Method(s)</label>
-                          <div className="mt-1 flex gap-4">
-                            {['examine', 'interview', 'test'].map((method) => (
-                              <label key={method} className="flex items-center gap-2">
-                                <input
-                                  type="checkbox"
-                                  checked={quarterData[method] || false}
-                                  onChange={(e) => handleQuarterlyChange(method, e.target.checked)}
-                                  disabled={!editMode}
-                                  className="rounded"
-                                />
-                                <span className="text-sm capitalize">{method}</span>
-                              </label>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div>
-                          <label className="text-sm font-medium text-gray-500">{selectedQuarter} Observations</label>
-                          {editMode ? (
-                            <textarea
-                              value={quarterData.observations || ''}
-                              onChange={(e) => handleQuarterlyChange('observations', e.target.value)}
-                              className="mt-1 w-full p-2 border rounded h-32"
-                              placeholder={`Document ${selectedQuarter} observations...`}
-                            />
-                          ) : (
-                            <div className="mt-1 prose prose-sm max-w-none">
-                              <ReactMarkdown>{quarterData.observations || 'No observations'}</ReactMarkdown>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="flex gap-4">
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Actual Score</label>
-                            {editMode ? (
-                              <select
-                                value={quarterData.actualScore || 0}
-                                onChange={(e) => handleQuarterlyChange('actualScore', Number(e.target.value))}
-                                className="mt-1 w-full p-2 border rounded"
-                              >
-                                {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map(s => (
-                                  <option key={s} value={s}>{s}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <p className="mt-1 text-lg font-bold">{quarterData.actualScore || 0}</p>
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <label className="text-sm font-medium text-gray-500">Target Score</label>
-                            {editMode ? (
-                              <select
-                                value={quarterData.targetScore || 0}
-                                onChange={(e) => handleQuarterlyChange('targetScore', Number(e.target.value))}
-                                className="mt-1 w-full p-2 border rounded"
-                              >
-                                {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map(s => (
-                                  <option key={s} value={s}>{s}</option>
-                                ))}
-                              </select>
-                            ) : (
-                              <p className="mt-1 text-lg font-bold">{quarterData.targetScore || 0}</p>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-                {/* Remediation Plan */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  <h3 className="font-medium text-gray-700 border-b pb-2">Remediation Plan</h3>
-
-                  <UserSelector
-                    label="Remediation Owner"
-                    selectedUsers={currentObservation.remediation?.ownerId}
-                    onChange={(userId) => handleRemediationChange('ownerId', userId)}
-                    disabled={!editMode}
-                  />
-
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Action Plan</label>
-                    {editMode ? (
-                      <textarea
-                        value={currentObservation.remediation?.actionPlan || ''}
-                        onChange={(e) => handleRemediationChange('actionPlan', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded h-24"
-                        placeholder="Document remediation actions..."
-                      />
-                    ) : (
-                      <div className="mt-1 prose prose-sm max-w-none">
-                        <ReactMarkdown>{currentObservation.remediation?.actionPlan || 'No action plan'}</ReactMarkdown>
-=======
                   {/* Q Target Score */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Target Score</span>
@@ -1773,34 +1361,10 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     ) : (
                       <div className="text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
                         {currentObservation.quarters?.[selectedQuarter]?.observations || 'None'}
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                       </div>
                     )}
                   </div>
 
-<<<<<<< HEAD
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Due Date</label>
-                    {editMode ? (
-                      <input
-                        type="date"
-                        value={currentObservation.remediation?.dueDate || ''}
-                        onChange={(e) => handleRemediationChange('dueDate', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded"
-                      />
-                    ) : (
-                      <p className="mt-1">{currentObservation.remediation?.dueDate || 'Not set'}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <FileSearch size={48} className="mb-4 opacity-50" />
-                <p>Select an item to assess</p>
-              </div>
-            )}
-=======
                 </div>
               </div>
             </div>
@@ -1996,7 +1560,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
               <span>+ Create</span>
               <span>{scopedItems.length} of {scopedItems.length}</span>
             </div>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           </div>
         </div>
       </div>
@@ -2083,8 +1646,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <input
                           type="radio"
                           name="scopeType"
-<<<<<<< HEAD
-=======
                           value="requirements"
                           checked={newAssessment.scopeType === 'requirements'}
                           onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
@@ -2099,7 +1660,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <input
                           type="radio"
                           name="scopeType"
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                           value="controls"
                           checked={newAssessment.scopeType === 'controls'}
                           onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
@@ -2107,28 +1667,9 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <div>
                           <span className="font-medium">By Controls</span>
                           {controls.length > 0 && (
-<<<<<<< HEAD
-                            <span className="text-green-600 ml-2">(Recommended - {controls.length} available)</span>
-                          )}
-                          <p className="text-xs text-gray-500">Assess your organization's defined controls</p>
-                        </div>
-                      </label>
-                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
-                        <input
-                          type="radio"
-                          name="scopeType"
-                          value="requirements"
-                          checked={newAssessment.scopeType === 'requirements'}
-                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
-                        />
-                        <div>
-                          <span className="font-medium">By Requirements</span>
-                          <p className="text-xs text-gray-500">Assess directly against framework requirements</p>
-=======
                             <span className="text-gray-500 ml-2">({controls.length} available)</span>
                           )}
                           <p className="text-xs text-gray-500">Assess your organization's defined controls (Most commonly used for SOC2)</p>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                         </div>
                       </label>
                     </div>
@@ -2505,11 +2046,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 )}
                 {wizardStep < 3 ? (
                   <button
-<<<<<<< HEAD
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded disabled:bg-gray-300"
-=======
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded disabled:bg-gray-300"
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     onClick={() => {
                       if (wizardStep === 1) {
                         if (!newAssessment.name) {

@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download } from 'lucide-react';
-import Papa from 'papaparse';
-import toast from 'react-hot-toast';
-import useCSFStore from '../stores/csfStore';
-import useArtifactStore from '../stores/artifactStore';
-import useSort from '../hooks/useSort';
-import SortableHeader from '../components/SortableHeader';
-import { extractArtifactsFromProfile, processImportedCSV } from '../updateArtifactLinks';
-
-const Artifacts = () => {
-=======
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -24,18 +11,14 @@ import { extractArtifactsFromProfile } from '../updateArtifactLinks';
 
 const Artifacts = () => {
   const navigate = useNavigate();
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   const data = useCSFStore((state) => state.data);
   const artifacts = useArtifactStore((state) => state.artifacts);
   const setArtifacts = useArtifactStore((state) => state.setArtifacts);
   const addArtifact = useArtifactStore((state) => state.addArtifact);
   const updateArtifact = useArtifactStore((state) => state.updateArtifact);
   const deleteArtifact = useArtifactStore((state) => state.deleteArtifact);
-<<<<<<< HEAD
-=======
   const users = useUserStore((state) => state.users);
   const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
   const [formData, setFormData] = useState({
     id: null,
@@ -43,13 +26,10 @@ const Artifacts = () => {
     name: '',
     description: '',
     link: '',
-<<<<<<< HEAD
-=======
     status: 'ACTIVE',
     assigneeId: null,
     reporterId: null,
     priority: 'Medium',
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     linkedSubcategoryIds: []
   });
   const [editMode, setEditMode] = useState(false);
@@ -61,8 +41,6 @@ const Artifacts = () => {
   // Sorting
   const { sort, sortedData, handleSort } = useSort(artifacts);
 
-<<<<<<< HEAD
-=======
   // Get linked controls for the selected artifact
   const linkedControls = useMemo(() => {
     if (!selectedArtifact?.linkedSubcategoryIds?.length) return [];
@@ -80,7 +58,6 @@ const Artifacts = () => {
     return controls;
   }, [selectedArtifact, getControlsByRequirement]);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   // Handle click outside to close dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -95,8 +72,6 @@ const Artifacts = () => {
     };
   }, []);
 
-<<<<<<< HEAD
-=======
   // Keyboard shortcut: 'n' to create new artifact
   useEffect(() => {
     const handleNewItem = () => {
@@ -108,7 +83,6 @@ const Artifacts = () => {
     return () => window.removeEventListener('keyboard-new-item', handleNewItem);
   }, []);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   // File input ref for CSV import
   const fileInputRef = useRef(null);
 
@@ -128,59 +102,6 @@ const Artifacts = () => {
     }
   }, [data, setArtifacts]);
 
-<<<<<<< HEAD
-  // Handle CSV import
-  const handleImportCSV = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const csvText = e.target.result;
-      Papa.parse(csvText, {
-        header: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const updatedArtifacts = processImportedCSV(results.data);
-          setArtifacts(updatedArtifacts);
-          toast.success(`Imported ${updatedArtifacts.length} artifacts`);
-        },
-        error: (error) => {
-          console.error('Error parsing imported CSV:', error);
-          toast.error('Error parsing the imported CSV file');
-        }
-      });
-    };
-    reader.readAsText(file);
-    event.target.value = null;
-  };
-
-  // Handle CSV export
-  const handleExportCSV = () => {
-    const csvData = artifacts.map(artifact => ({
-      'Artifact ID': artifact.artifactId,
-      'Name': artifact.name,
-      'Description': artifact.description,
-      'Link': artifact.link,
-      'Linked Subcategory IDs': artifact.linkedSubcategoryIds.join(', ')
-    }));
-
-    const csv = Papa.unparse(csvData);
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'artifacts_export.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('Artifacts exported to CSV');
-    
-    // Track export for backup reminder system
-    const { updateLastExportDate } = require('../utils/backupTracking');
-    updateLastExportDate();
-  };
-=======
   // Handle CSV import - uses store's importArtifactsCSV (same as Settings Jira import)
   const handleImportCSV = useCallback(async (event) => {
     const file = event.target.files?.[0];
@@ -206,7 +127,6 @@ const Artifacts = () => {
       toast.error(`Export failed: ${err.message}`);
     }
   }, []);
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
   // Extract all subcategory IDs from the data
   const subcategoryIds = data ? [...new Set(data.map(item => item.ID))].filter(Boolean).sort() : [];
@@ -219,17 +139,6 @@ const Artifacts = () => {
       newErrors.name = 'Name is required';
     }
 
-<<<<<<< HEAD
-    if (!formData.description.trim()) {
-      newErrors.description = 'Description is required';
-    }
-
-    if (formData.link && !/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(formData.link)) {
-      newErrors.link = 'Link must be a valid URL';
-    }
-
-=======
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -270,18 +179,6 @@ const Artifacts = () => {
 
     if (editMode) {
       updateArtifact(formData.id, formData);
-<<<<<<< HEAD
-      toast.success('Artifact updated');
-    } else {
-      addArtifact({
-        ...formData,
-        artifactId: formData.artifactId || `A${artifacts.length + 1}`
-      });
-      toast.success('Artifact added');
-    }
-
-    resetForm();
-=======
       setSelectedArtifact({ ...formData });
       toast.success('Artifact updated');
     } else {
@@ -298,19 +195,14 @@ const Artifacts = () => {
     }
 
     setEditMode(false);
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   };
 
   // Handle edit artifact
   const handleEdit = (artifact) => {
-<<<<<<< HEAD
-    setFormData(artifact);
-=======
     setFormData({
       ...artifact,
       linkedSubcategoryIds: artifact.linkedSubcategoryIds || []
     });
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     setEditMode(true);
     setSelectedArtifact(artifact);
   };
@@ -336,13 +228,10 @@ const Artifacts = () => {
       name: '',
       description: '',
       link: '',
-<<<<<<< HEAD
-=======
       status: 'ACTIVE',
       assigneeId: null,
       reporterId: null,
       priority: 'Medium',
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       linkedSubcategoryIds: []
     });
     setEditMode(false);
@@ -354,171 +243,6 @@ const Artifacts = () => {
   const handleViewDetails = (artifact) => {
     setSelectedArtifact(artifact);
     setEditMode(false);
-<<<<<<< HEAD
-  };
-
-  return (
-    <div className="p-4 bg-white min-h-full">
-      <h1 className="text-2xl font-bold mb-4">Evidence</h1>
-
-      <div className="flex flex-col gap-6">
-        {/* Artifacts List */}
-        <div className="w-full">
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h2 className="text-lg font-semibold">Evidence List</h2>
-              <div className="flex gap-2">
-                <input
-                  type="file"
-                  accept=".csv"
-                  ref={fileInputRef}
-                  onChange={handleImportCSV}
-                  className="hidden"
-                />
-                <button
-                  onClick={() => fileInputRef.current.click()}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-                  title="Import artifacts from CSV"
-                >
-                  <Upload size={16} />
-                  Import CSV
-                </button>
-                <button
-                  onClick={handleExportCSV}
-                  className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
-                  title="Export artifacts to CSV"
-                >
-                  <Download size={16} />
-                  Export CSV
-                </button>
-                <button
-                  onClick={() => {
-                    resetForm();
-                    setSelectedArtifact(null);
-                  }}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-                >
-                  <Plus size={16} />
-                  Add New Artifact
-                </button>
-              </div>
-            </div>
-
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <SortableHeader label="ID" sortKey="artifactId" currentSort={sort} onSort={handleSort} />
-                  <SortableHeader label="Name" sortKey="name" currentSort={sort} onSort={handleSort} />
-                  <SortableHeader label="Description" sortKey="description" currentSort={sort} onSort={handleSort} />
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Linked Subcategories</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {sortedData.length > 0 ? (
-                  sortedData.map((artifact) => (
-                    <tr
-                      key={artifact.id}
-                      className={`hover:bg-blue-50:bg-gray-700 cursor-pointer ${selectedArtifact?.id === artifact.id ? 'bg-blue-100' : ''}`}
-                      onClick={() => handleViewDetails(artifact)}
-                    >
-                      <td className="p-3 text-sm">{artifact.artifactId || `A${artifact.id}`}</td>
-                      <td className="p-3 text-sm">{artifact.name}</td>
-                      <td className="p-3 text-sm">
-                        <div className="line-clamp-2">{artifact.description}</div>
-                      </td>
-                      <td className="p-3 text-sm">
-                        {artifact.link ? (
-                          <a
-                            href={artifact.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800:text-blue-300 flex items-center gap-1"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <LinkIcon size={14} />
-                            Link
-                          </a>
-                        ) : (
-                          <span className="text-gray-400">No link</span>
-                        )}
-                      </td>
-                      <td className="p-3 text-sm">
-                        <div className="flex flex-wrap gap-1">
-                          {artifact.linkedSubcategoryIds.map(id => (
-                            <span key={id} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                              {id}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="p-3 text-sm">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEdit(artifact);
-                            }}
-                            className="p-1 text-blue-600 hover:text-blue-800:text-blue-300"
-                            title="Edit"
-                          >
-                            <Edit size={16} />
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(artifact.id);
-                            }}
-                            className="p-1 text-red-600 hover:text-red-800:text-red-300"
-                            title="Delete"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td colSpan="6" className="p-3 text-center text-sm text-gray-500">
-                      No artifacts found. Add a new artifact to get started.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Artifact Form */}
-        <div className="w-full">
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
-            <h2 className="text-lg font-semibold mb-4">
-              {editMode ? 'Edit Artifact' : 'Add New Artifact'}
-            </h2>
-
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Artifact ID
-                  </label>
-                  <input
-                    type="text"
-                    name="artifactId"
-                    value={formData.artifactId}
-                    onChange={handleChange}
-                    className="w-full p-2 border rounded-lg"
-                    placeholder="Enter artifact ID (e.g., A1, A2)"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name
-                  </label>
-=======
     setFormData({
       ...artifact,
       linkedSubcategoryIds: artifact.linkedSubcategoryIds || []
@@ -746,154 +470,11 @@ const Artifacts = () => {
               {/* Title */}
               <div className="mb-6">
                 {editMode ? (
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                   <input
                     type="text"
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-<<<<<<< HEAD
-                    className={`w-full p-2 border rounded-lg ${errors.name ? 'border-red-500' : ''}`}
-                    placeholder="Enter artifact name"
-                  />
-                  {errors.name && (
-                    <p className="text-red-600 text-xs mt-1">{errors.name}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    className={`w-full p-2 border rounded-lg h-24 ${errors.description ? 'border-red-500' : ''}`}
-                    placeholder="Enter artifact description"
-                  />
-                  {errors.description && (
-                    <p className="text-red-600 text-xs mt-1">{errors.description}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Link
-                  </label>
-                  <input
-                    type="text"
-                    name="link"
-                    value={formData.link}
-                    onChange={handleChange}
-                    className={`w-full p-2 border rounded-lg ${errors.link ? 'border-red-500' : ''}`}
-                    placeholder="Enter artifact link"
-                  />
-                  {errors.link && (
-                    <p className="text-red-600 text-xs mt-1">{errors.link}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Linked Subcategory IDs
-                  </label>
-                  <div className="relative" ref={dropdownRef}>
-                    <div
-                      className="w-full p-2 border rounded-lg flex items-center flex-wrap gap-1 min-h-[42px] cursor-pointer"
-                      onClick={() => setDropdownOpen(prevState => !prevState)}
-                    >
-                      {formData.linkedSubcategoryIds.length > 0 ? (
-                        formData.linkedSubcategoryIds.map(id => (
-                          <span key={id} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs flex items-center gap-1">
-                            {id}
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleSubcategoryIdChange(id);
-                              }}
-                              className="text-blue-600 hover:text-blue-800:text-blue-100"
-                            >
-                              <X size={12} />
-                            </button>
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-gray-400">Select subcategory IDs</span>
-                      )}
-                    </div>
-
-                    {dropdownOpen && (
-                      <div className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-40 overflow-y-auto">
-                        {subcategoryIds.length > 0 ? (
-                          subcategoryIds.map(id => (
-                            <div
-                              key={id}
-                              className={`p-2 hover:bg-gray-100:bg-gray-600 cursor-pointer ${formData.linkedSubcategoryIds.includes(id) ? 'bg-blue-50' : ''}`}
-                              onClick={() => {
-                                handleSubcategoryIdChange(id);
-                              }}
-                            >
-                              {id}
-                            </div>
-                          ))
-                        ) : (
-                          <p className="p-2 text-gray-500 text-sm">No subcategory IDs available</p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex gap-2 mt-4">
-                <button
-                  type="submit"
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-                >
-                  {editMode ? <Save size={16} /> : <Plus size={16} />}
-                  {editMode ? 'Save Changes' : 'Add Artifact'}
-                </button>
-
-                {editMode && (
-                  <button
-                    type="button"
-                    onClick={resetForm}
-                    className="flex items-center gap-2 bg-gray-200 hover:bg-gray-300:bg-gray-500 text-gray-700 py-2 px-4 rounded-lg"
-                  >
-                    <X size={16} />
-                    Cancel
-                  </button>
-                )}
-              </div>
-            </form>
-          </div>
-
-          {/* Artifact Details */}
-          {selectedArtifact && !editMode && (
-            <div className="bg-white p-4 rounded-lg shadow-sm border mt-4">
-              <h2 className="text-lg font-semibold mb-4">Artifact Details</h2>
-
-              <div className="space-y-3">
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Artifact ID</h3>
-                  <p className="">{selectedArtifact.artifactId || `A${selectedArtifact.id}`}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Name</h3>
-                  <p className="">{selectedArtifact.name}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Description</h3>
-                  <p className="whitespace-pre-wrap">{selectedArtifact.description}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Link</h3>
-                  {selectedArtifact.link ? (
-=======
                     className={`w-full text-xl font-semibold text-gray-900 dark:text-white bg-transparent border-b-2 ${errors.name ? 'border-red-500' : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600 focus:border-blue-500'} pb-1 focus:outline-none`}
                     placeholder="Enter artifact name"
                   />
@@ -944,55 +525,16 @@ const Artifacts = () => {
                       placeholder="https://..."
                     />
                   ) : selectedArtifact?.link ? (
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     <a
                       href={selectedArtifact.link}
                       target="_blank"
                       rel="noopener noreferrer"
-<<<<<<< HEAD
-                      className="text-blue-600 hover:text-blue-800:text-blue-300 flex items-center gap-1"
-=======
                       className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     >
                       <LinkIcon size={14} />
                       {selectedArtifact.link}
                     </a>
                   ) : (
-<<<<<<< HEAD
-                    <p className="text-gray-400">No link provided</p>
-                  )}
-                </div>
-
-                <div>
-                  <h3 className="text-sm font-medium text-gray-500">Linked Subcategory IDs</h3>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {selectedArtifact.linkedSubcategoryIds.length > 0 ? (
-                      selectedArtifact.linkedSubcategoryIds.map(id => (
-                        <span key={id} className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">
-                          {id}
-                        </span>
-                      ))
-                    ) : (
-                      <p className="text-gray-400">No subcategories linked</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="pt-2">
-                  <button
-                    onClick={() => handleEdit(selectedArtifact)}
-                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg"
-                  >
-                    <Edit size={16} />
-                    Edit Artifact
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-=======
                     <p className="text-sm text-gray-400 dark:text-gray-500">No link provided</p>
                   )}
                 </div>
@@ -1226,7 +768,6 @@ const Artifacts = () => {
             </div>
           </div>
         )}
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       </div>
     </div>
   );

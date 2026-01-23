@@ -1,16 +1,4 @@
 import "./env.js";
-<<<<<<< HEAD
-import express from 'express';
-import cors from 'cors';
-import bodyParser from 'body-parser';
-import confluenceRoutes from "./routes/confluence.js";
-
-
-
-
-const app = express();
-const PORT = process.env.PORT || 4000;  
-=======
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -22,23 +10,10 @@ import apiLimiter from "./utils/rateLimiter.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 app.use(cors());
 app.use(bodyParser.json());
 
-<<<<<<< HEAD
-
-app.get('/', (req, res) => {
-  res.json({ message: 'Welcome to the Express server!' });
-});
-
-app.use("/api/confluence", confluenceRoutes);
-
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-=======
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the Express server!" });
 });
@@ -60,4 +35,3 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)

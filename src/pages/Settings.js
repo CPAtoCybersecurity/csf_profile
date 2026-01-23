@@ -1,11 +1,5 @@
-<<<<<<< HEAD
-import React, { useState, useRef, useCallback } from 'react';
-import {
-  Settings as SettingsIcon,
-=======
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   Upload,
   Download,
   Trash2,
@@ -17,15 +11,11 @@ import {
   ExternalLink,
   Clock,
   AlertCircle,
-<<<<<<< HEAD
-  Shield
-=======
   Shield,
   Cloud,
   Key,
   RefreshCw,
   Loader2
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -39,19 +29,6 @@ import useControlsStore from '../stores/controlsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useUserStore from '../stores/userStore';
 import useArtifactStore from '../stores/artifactStore';
-<<<<<<< HEAD
-
-// Utils
-import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
-
-// Utils
-import { 
-  getBackupReminderFrequency, 
-  setBackupReminderFrequency,
-  getTimeSinceLastExport,
-  getLastExportDate 
-} from '../utils/backupTracking';
-=======
 import useFindingsStore from '../stores/findingsStore';
 
 // Utils
@@ -69,7 +46,6 @@ import {
   exportEntryIdsToCSV,
   updateConfluenceConfig
 } from '../utils/confluenceSync';
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 const Settings = () => {
   const frameworks = useFrameworksStore((state) => state.frameworks);
@@ -92,8 +68,6 @@ const Settings = () => {
   const [editingFramework, setEditingFramework] = useState(null);
   const [backupFrequency, setBackupFrequency] = useState(getBackupReminderFrequency());
 
-<<<<<<< HEAD
-=======
   // Atlassian configuration state
   const [atlassianSiteUrl, setAtlassianSiteUrl] = useState('');
   const [atlassianEmail, setAtlassianEmail] = useState('');
@@ -242,20 +216,16 @@ const Settings = () => {
     }
   }, [atlassianEmail, atlassianApiToken]);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   const fileInputRef = useRef(null);
   const newFrameworkFileInputRef = useRef(null);
   const [importFrameworkId, setImportFrameworkId] = useState(null);
 
-<<<<<<< HEAD
-=======
   // Jira import refs
   const findingsImportRef = useRef(null);
   const artifactsImportRef = useRef(null);
   const assessmentsImportRef = useRef(null);
   const entryIdImportRef = useRef(null);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   // Export handlers
   const handleExportCompleteDatabase = useCallback(() => {
     try {
@@ -412,8 +382,6 @@ const Settings = () => {
     toast.success(`Backup reminder frequency updated to ${days} day${days !== 1 ? 's' : ''}`);
   }, []);
 
-<<<<<<< HEAD
-=======
   // Jira import handlers
   const handleFindingsImport = useCallback(async (e) => {
     const file = e.target.files?.[0];
@@ -497,7 +465,6 @@ const Settings = () => {
     }
   }, []);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   const handleDownloadTemplate = useCallback(() => {
     const templateContent = `FRAMEWORK,CSF FUNCTION,CATEGORY,SUBCATEGORY ID,SUBCATEGORY DESCRIPTION,ID,IMPLEMENTATION EXAMPLE
 nist-csf-2.0,GOVERN (GV),Organizational Context (GV.OC),GV.OC-01,The organizational mission is understood and informs cybersecurity risk management,GV.OC-01 Ex1,"Ex1: Share the organization's mission (e.g., through vision and mission statements, marketing, and service strategies) to provide a basis for identifying risks that may impede that mission"
@@ -524,8 +491,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
     <div className="p-4 bg-white min-h-full">
       <h1 className="text-2xl font-bold mb-4">Settings</h1>
 
-<<<<<<< HEAD
-=======
       {/* Experimental Notice for Jira/Confluence */}
       <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg max-w-4xl">
         <div className="flex items-start gap-3">
@@ -540,7 +505,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         </div>
       </div>
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       <div className="space-y-8">
         {/* Backup & Data Persistence Settings */}
         <div className="max-w-4xl">
@@ -865,8 +829,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </p>
           </div>
 
-<<<<<<< HEAD
-=======
           {/* Jira/Confluence Integration Export */}
           <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
@@ -1217,7 +1179,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </div>
           </div>
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           {/* Stats */}
           <div className="mt-6 grid grid-cols-3 gap-4">
             <div className="bg-white p-4 rounded-lg border">
@@ -1274,8 +1235,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         accept=".csv"
         onChange={handleNewFrameworkImport}
       />
-<<<<<<< HEAD
-=======
       {/* Jira import file inputs */}
       <input
         type="file"
@@ -1305,7 +1264,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         accept=".csv"
         onChange={handleEntryIdImport}
       />
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
       {/* Edit Framework Modal */}
       {editingFramework && (

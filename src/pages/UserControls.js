@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import React, { useState, useCallback, useRef, useMemo } from 'react';
-=======
 import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 import {
   Search, Filter, Plus, Edit, Save, Trash2, Link, X,
   Upload, Download, Users, User, ChevronRight
@@ -24,11 +20,8 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
 
 const UserControls = () => {
-<<<<<<< HEAD
-=======
   const [searchParams, setSearchParams] = useSearchParams();
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   // Store state
   const controls = useControlsStore((state) => state.controls);
   const createControl = useControlsStore((state) => state.createControl);
@@ -75,15 +68,12 @@ const UserControls = () => {
   const [reqPickerOpen, setReqPickerOpen] = useState(false);
   const [reqPickerSearch, setReqPickerSearch] = useState('');
   const [reqPickerFramework, setReqPickerFramework] = useState('');
-<<<<<<< HEAD
-=======
   const [reqPanelWidth, setReqPanelWidth] = useState(380);
   const [isResizingReqPanel, setIsResizingReqPanel] = useState(false);
 
   // Detail panel resize state
   const [detailPanelWidth, setDetailPanelWidth] = useState(420);
   const [isResizingDetailPanel, setIsResizingDetailPanel] = useState(false);
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
   // Dropdown states
   const [ownerDropdownOpen, setOwnerDropdownOpen] = useState(false);
@@ -94,8 +84,6 @@ const UserControls = () => {
   const frameworkTriggerRef = useRef(null);
   const fileInputRef = useRef(null);
 
-<<<<<<< HEAD
-=======
   // Handle URL query parameter for deep linking to a specific control
   useEffect(() => {
     const selectedParam = searchParams.get('selected');
@@ -176,7 +164,6 @@ const UserControls = () => {
     };
   }, [isResizingDetailPanel, handleDetailPanelMouseMove, handleDetailPanelMouseUp]);
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   // Get user name helper
   const getUserName = useCallback((userId) => {
     if (!userId) return 'Unassigned';
@@ -590,14 +577,6 @@ const UserControls = () => {
 
       <div className="flex flex-1 min-h-0 relative z-0">
         {/* Table */}
-<<<<<<< HEAD
-        <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto transition-all duration-300`}>
-          {controls.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-gray-500">
-              <Users size={48} className="mb-4 opacity-50" />
-              <p className="text-lg">No controls defined</p>
-              <p className="text-sm mt-2">Click "New Control" to create a control or "Import" to import from CSV</p>
-=======
         <div
           className="overflow-auto transition-all duration-300"
           style={{ width: detailPanelOpen ? `calc(100% - ${detailPanelWidth}px)` : '100%' }}
@@ -612,7 +591,6 @@ const UserControls = () => {
                 Typically, assessment by requirement is recommended for CSF, ISO 27001, and similar frameworks/standards, with the organization filling out an Implementation Description for each requirement.
                 Use controls for SOC 2 or frameworks where many requirements link to a single control.
               </p>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
@@ -748,9 +726,6 @@ const UserControls = () => {
 
         {/* Detail Panel */}
         {detailPanelOpen && (
-<<<<<<< HEAD
-          <div className="w-1/3 overflow-auto p-4 bg-gray-50 border-l">
-=======
           <div
             className="overflow-auto bg-gray-50 border-l relative flex-shrink-0"
             style={{ width: `${detailPanelWidth}px` }}
@@ -773,7 +748,6 @@ const UserControls = () => {
               title="Drag to resize"
             />
             <div className="p-4 h-full">
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             {currentControl ? (
               <div className="space-y-6">
                 {/* Header */}
@@ -946,76 +920,6 @@ const UserControls = () => {
                 <p>Select a control to view details</p>
               </div>
             )}
-<<<<<<< HEAD
-          </div>
-        )}
-
-        {/* Requirement Picker Modal */}
-        {reqPickerOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[80vh] flex flex-col">
-              <div className="p-4 border-b flex items-center justify-between">
-                <h3 className="text-lg font-bold">Link Requirement</h3>
-                <button
-                  className="text-gray-500 hover:text-gray-700"
-                  onClick={() => {
-                    setReqPickerOpen(false);
-                    setReqPickerSearch('');
-                  }}
-                >
-                  <X size={20} />
-                </button>
-              </div>
-
-              <div className="p-4 border-b flex gap-4">
-                <div className="relative flex-grow">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    className="w-full pl-9 pr-3 py-2 border rounded-lg"
-                    placeholder="Search requirements..."
-                    value={reqPickerSearch}
-                    onChange={(e) => setReqPickerSearch(e.target.value)}
-                    autoFocus
-                  />
-                </div>
-                <select
-                  className="border rounded-lg px-3 py-2"
-                  value={reqPickerFramework}
-                  onChange={(e) => setReqPickerFramework(e.target.value)}
-                >
-                  <option value="">All Frameworks</option>
-                  {enabledFrameworks.map(fw => (
-                    <option key={fw.id} value={fw.id}>{fw.shortName}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex-1 overflow-auto p-4">
-                {filteredRequirements.length === 0 ? (
-                  <p className="text-center text-gray-500">No requirements found</p>
-                ) : (
-                  <div className="space-y-2">
-                    {filteredRequirements.map((req) => (
-                      <div
-                        key={req.id}
-                        className="flex items-center justify-between p-3 border rounded hover:bg-blue-50 cursor-pointer"
-                        onClick={() => handleLinkRequirement(req.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <FrameworkBadge frameworkId={req.frameworkId} />
-                          <div>
-                            <div className="font-medium">{req.subcategoryId || req.id}</div>
-                            <div className="text-sm text-gray-500">{req.function} / {req.category}</div>
-                          </div>
-                        </div>
-                        <Plus size={16} className="text-blue-600" />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-=======
             </div>
           </div>
         )}
@@ -1116,7 +1020,6 @@ const UserControls = () => {
                   ))}
                 </div>
               )}
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             </div>
           </div>
         )}

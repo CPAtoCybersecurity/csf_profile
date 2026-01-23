@@ -1,7 +1,5 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-<<<<<<< HEAD
-=======
 import Papa from 'papaparse';
 import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
 
@@ -10,28 +8,20 @@ import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
  * Manages evidence/artifacts linked to controls and requirements.
  * Enhanced to align with Jira AR (Artifacts) project structure.
  */
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 const useArtifactStore = create(
   persist(
     (set, get) => ({
-<<<<<<< HEAD
-      artifacts: [],
-=======
       artifacts: DEFAULT_ARTIFACTS,
 
       // Get all artifacts
       getArtifacts: () => get().artifacts,
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
       // Add artifact
       addArtifact: (artifact) => {
         const newArtifact = {
           ...artifact,
           id: artifact.id || Date.now() + Math.floor(Math.random() * 1000),
-<<<<<<< HEAD
-          linkedSubcategoryIds: artifact.linkedSubcategoryIds || [],
-=======
           artifactId: artifact.artifactId || `AR-${Date.now()}`,
           name: artifact.name || '',
           description: artifact.description || '',
@@ -51,7 +41,6 @@ const useArtifactStore = create(
           createdDate: artifact.createdDate || new Date().toISOString(),
           lastModified: new Date().toISOString(),
           jiraKey: artifact.jiraKey || null // Jira issue key if synced
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
         };
         set((state) => ({
           artifacts: [...state.artifacts, newArtifact]
@@ -63,13 +52,9 @@ const useArtifactStore = create(
       updateArtifact: (id, updates) => {
         set((state) => ({
           artifacts: state.artifacts.map(artifact =>
-<<<<<<< HEAD
-            artifact.id === id ? { ...artifact, ...updates } : artifact
-=======
             artifact.id === id
               ? { ...artifact, ...updates, lastModified: new Date().toISOString() }
               : artifact
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           )
         }));
       },
@@ -86,21 +71,16 @@ const useArtifactStore = create(
         return get().artifacts.find(artifact => artifact.id === id);
       },
 
-<<<<<<< HEAD
-=======
       // Get artifact by artifact ID string
       getArtifactByArtifactId: (artifactId) => {
         return get().artifacts.find(artifact => artifact.artifactId === artifactId);
       },
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Get artifact by name
       getArtifactByName: (name) => {
         return get().artifacts.find(artifact => artifact.name === name);
       },
 
-<<<<<<< HEAD
-=======
       // Get artifacts by compliance requirement
       getArtifactsByRequirement: (requirementId) => {
         return get().artifacts.filter(artifact =>
@@ -135,7 +115,6 @@ const useArtifactStore = create(
         return get().artifacts.filter(artifact => artifact.type === type);
       },
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Link artifact to subcategory
       linkToSubcategory: (artifactId, subcategoryId) => {
         set((state) => ({
@@ -145,12 +124,8 @@ const useArtifactStore = create(
               if (!linkedIds.includes(subcategoryId)) {
                 return {
                   ...artifact,
-<<<<<<< HEAD
-                  linkedSubcategoryIds: [...linkedIds, subcategoryId]
-=======
                   linkedSubcategoryIds: [...linkedIds, subcategoryId],
                   lastModified: new Date().toISOString()
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                 };
               }
             }
@@ -167,12 +142,8 @@ const useArtifactStore = create(
               return {
                 ...artifact,
                 linkedSubcategoryIds: (artifact.linkedSubcategoryIds || [])
-<<<<<<< HEAD
-                  .filter(id => id !== subcategoryId)
-=======
                   .filter(id => id !== subcategoryId),
                 lastModified: new Date().toISOString()
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
               };
             }
             return artifact;
@@ -180,8 +151,6 @@ const useArtifactStore = create(
         }));
       },
 
-<<<<<<< HEAD
-=======
       // Link artifact to compliance requirement
       linkToRequirement: (artifactId, requirementId) => {
         get().updateArtifact(artifactId, { complianceRequirement: requirementId });
@@ -254,7 +223,6 @@ const useArtifactStore = create(
         }
       },
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Get artifacts for subcategory
       getArtifactsForSubcategory: (subcategoryId) => {
         return get().artifacts.filter(artifact =>
@@ -263,22 +231,11 @@ const useArtifactStore = create(
       },
 
       // Find or create artifact
-<<<<<<< HEAD
-      findOrCreateArtifact: (name, link = '') => {
-=======
       findOrCreateArtifact: (name, link = '', complianceRequirement = null) => {
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
         const existing = get().getArtifactByName(name);
         if (existing) return existing.id;
 
         return get().addArtifact({
-<<<<<<< HEAD
-          artifactId: `A${get().artifacts.length + 1}`,
-          name,
-          description: `Created on ${new Date().toLocaleDateString()}`,
-          link,
-          linkedSubcategoryIds: [],
-=======
           artifactId: `AR-${get().artifacts.length + 1}`,
           name,
           description: `Created on ${new Date().toLocaleDateString()}`,
@@ -410,19 +367,12 @@ const useArtifactStore = create(
               reject(new Error(`CSV parsing error: ${error.message}`));
             }
           });
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
         });
       },
 
       // Set all artifacts (for import)
       setArtifacts: (artifacts) => {
         set({ artifacts });
-<<<<<<< HEAD
-      },
-    }),
-    {
-      name: 'csf-artifacts-storage',
-=======
       }
     }),
     {
@@ -470,7 +420,6 @@ const useArtifactStore = create(
       partialize: (state) => ({
         artifacts: state.artifacts
       })
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     }
   )
 );

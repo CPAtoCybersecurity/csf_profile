@@ -154,8 +154,6 @@ export function useKeyboardNavigation() {
           }
           break;
 
-<<<<<<< HEAD
-=======
         case 'n': // 'n' to create new item
           event.preventDefault();
           // Dispatch custom event for pages to handle new item creation
@@ -180,7 +178,6 @@ export function useKeyboardNavigation() {
           }
           break;
 
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
         default:
           break;
       }

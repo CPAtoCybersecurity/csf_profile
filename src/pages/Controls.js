@@ -539,11 +539,7 @@ const Controls = () => {
 
                 <div className="bg-white p-4 rounded-lg shadow-sm border">
                   <div className="flex items-center justify-between mb-2">
-<<<<<<< HEAD
-                    <h3 className="font-medium text-gray-700">Assessment Observations</h3>
-=======
                     <h3 className="font-medium text-gray-700">Control Evaluations</h3>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                     <div className="flex items-center gap-1">
                       <Calendar size={14} className="text-gray-400" />
                       <div className="flex rounded-md overflow-hidden border">
@@ -634,11 +630,7 @@ const Controls = () => {
                     </div>
 
                     <div>
-<<<<<<< HEAD
-                      <span className="text-sm font-medium text-gray-500">Observation Date:</span>
-=======
                       <span className="text-sm font-medium text-gray-500">Evaluation Date:</span>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                       {editMode ? (
                         <input
                           type="date"
@@ -681,11 +673,7 @@ const Controls = () => {
                     </div>
 
                     <div>
-<<<<<<< HEAD
-                      <span className="text-sm font-medium text-gray-500">Observations:</span>
-=======
                       <span className="text-sm font-medium text-gray-500">Evaluation Notes:</span>
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
                       {editMode ? (
                         <textarea
                           value={getQuarterData(currentItem.ID, selectedQuarter)?.observations || ''}

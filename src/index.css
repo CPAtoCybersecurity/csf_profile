@@ -547,8 +547,6 @@ code {
 .dark .from-gray-900 { --tw-gradient-from: #111827; }
 .dark .to-gray-800 { --tw-gradient-to: #1f2937; }
 .dark .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
-<<<<<<< HEAD
-=======
 
 /* Navigation - Jira-style colors */
 .bg-green-50 { background-color: #f0fdf4; }
@@ -851,4 +849,3 @@ tr:hover .row-hover-actions {
 .z-30 { z-index: 30; }
 .z-40 { z-index: 40; }
 .z-50 { z-index: 50; }
->>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
