@@ -154,6 +154,33 @@ export function useKeyboardNavigation() {
           }
           break;
 
+<<<<<<< HEAD
+=======
+        case 'n': // 'n' to create new item
+          event.preventDefault();
+          // Dispatch custom event for pages to handle new item creation
+          window.dispatchEvent(new CustomEvent('keyboard-new-item'));
+          break;
+
+        case '/': // '/' to focus search
+          event.preventDefault();
+          // Find and focus the search input
+          const searchInput = document.querySelector('input[placeholder*="Search"]') ||
+                            document.querySelector('input[type="search"]');
+          if (searchInput) {
+            searchInput.focus();
+            searchInput.select();
+          }
+          break;
+
+        case '?': // '?' to show keyboard shortcuts help
+          if (event.shiftKey) {
+            event.preventDefault();
+            window.dispatchEvent(new CustomEvent('keyboard-show-help'));
+          }
+          break;
+
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
         default:
           break;
       }

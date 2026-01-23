@@ -8,6 +8,12 @@ Create an environment where everyone feels welcome
 ## 🌱 SUPPORT
 Promote a safe space for learning and growth
 
+<<<<<<< HEAD
+=======
+## 🔗 Join the Community
+Connect with others on the cybersecurity journey: https://simplycyber.io/discord
+
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 ## 👥 COLLABORATION
 Foster and seek collective wisdom and cooperation
 

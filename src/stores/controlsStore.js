@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput } from '../utils/sanitize';
+<<<<<<< HEAD
 
 // Default controls for new installations
 // User IDs reference default users: 1=Gerry(CISO), 3=Jane, 4=John, 5=Chris.Magann, 6=Nadia.Khan, 7=Tigan.Wang
@@ -368,6 +369,9 @@ const DEFAULT_CONTROLS = [
     lastModified: '2025-01-01T00:00:00.000Z'
   }
 ];
+=======
+import { DEFAULT_CONTROLS } from './defaultControlsData';
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 const useControlsStore = create(
   persist(
@@ -439,6 +443,14 @@ const useControlsStore = create(
           ownerId: controlData.ownerId || null,
           stakeholderIds: controlData.stakeholderIds || [],
           linkedRequirementIds: controlData.linkedRequirementIds || [],
+<<<<<<< HEAD
+=======
+          status: controlData.status || 'Not Implemented',
+          // Optional fields from migration
+          artifacts: controlData.artifacts || '',
+          findings: controlData.findings || '',
+          controlEvaluationBackLink: controlData.controlEvaluationBackLink || '',
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
           createdDate: new Date().toISOString(),
           lastModified: new Date().toISOString()
         };
@@ -448,6 +460,36 @@ const useControlsStore = create(
         return newControl;
       },
 
+<<<<<<< HEAD
+=======
+      // Get or create control for a requirement (auto-creates for CSF where controlId = requirement.id)
+      getOrCreateControlForRequirement: (requirement) => {
+        // For CSF, use requirement.id as control ID
+        const controlId = requirement.id;
+        const existingControl = get().getControl(controlId);
+
+        if (existingControl) {
+          return existingControl;
+        }
+
+        // Auto-create control linked to this requirement
+        return get().createControl({
+          controlId,
+          linkedRequirementIds: [requirement.id],
+          status: 'Not Implemented'
+        });
+      },
+
+      // Bulk get or create controls for multiple requirements
+      ensureControlsForRequirements: (requirements) => {
+        const results = [];
+        requirements.forEach(req => {
+          results.push(get().getOrCreateControlForRequirement(req));
+        });
+        return results;
+      },
+
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       // Update existing control
       updateControl: (controlId, updates) => {
         const sanitizedUpdates = {
@@ -712,10 +754,103 @@ const useControlsStore = create(
           return max;
         }, 0);
         return `CTL-${String(maxNum + 1).padStart(3, '0')}`;
+<<<<<<< HEAD
+=======
+      },
+
+      // ============ MIGRATION METHODS ============
+
+      /**
+       * Migrate control data from requirementsStore to controlsStore.
+       * For CSF, each requirement becomes a control with the same ID.
+       * This imports: implementationDescription, controlOwner, stakeholders, artifacts, findings
+       *
+       * @param {Object} requirementsStore - The requirements store instance
+       * @param {Object} userStore - The user store instance (for finding/creating users)
+       */
+      migrateFromRequirements: (requirementsStore, userStore) => {
+        const migrationData = requirementsStore.getState().getControlDataForMigration();
+
+        if (migrationData.length === 0) {
+          console.log('[controlsStore] No control data to migrate from requirements');
+          return 0;
+        }
+
+        const parseUserString = get().parseUserString;
+        const findOrCreateUser = userStore?.getState?.()?.findOrCreateUser;
+
+        let migratedCount = 0;
+
+        migrationData.forEach(data => {
+          // Skip if control already exists
+          const existingControl = get().getControl(data.controlId);
+          if (existingControl) {
+            // Update existing control with any missing data
+            const updates = {};
+            if (!existingControl.implementationDescription && data.implementationDescription) {
+              updates.implementationDescription = data.implementationDescription;
+            }
+            if (!existingControl.artifacts && data.artifacts) {
+              updates.artifacts = data.artifacts;
+            }
+            if (!existingControl.findings && data.findings) {
+              updates.findings = data.findings;
+            }
+            if (Object.keys(updates).length > 0) {
+              get().updateControl(data.controlId, updates);
+              migratedCount++;
+            }
+            return;
+          }
+
+          // Parse owner
+          let ownerId = null;
+          if (data.controlOwner && findOrCreateUser) {
+            const ownerInfo = parseUserString(data.controlOwner);
+            if (ownerInfo) {
+              ownerId = findOrCreateUser(ownerInfo);
+            }
+          }
+
+          // Parse stakeholders
+          let stakeholderIds = [];
+          if (data.stakeholders && findOrCreateUser) {
+            const stakeholders = data.stakeholders.split(/[;,]/).map(s => s.trim()).filter(Boolean);
+            stakeholderIds = stakeholders.map(s => {
+              const info = parseUserString(s);
+              return info ? findOrCreateUser(info) : null;
+            }).filter(Boolean);
+          }
+
+          // Create new control
+          get().createControl({
+            controlId: data.controlId,
+            implementationDescription: data.implementationDescription,
+            ownerId,
+            stakeholderIds,
+            linkedRequirementIds: data.linkedRequirementIds,
+            artifacts: data.artifacts,
+            findings: data.findings,
+            controlEvaluationBackLink: data.controlEvaluationBackLink,
+            status: 'Not Implemented'
+          });
+
+          migratedCount++;
+        });
+
+        console.log(`[controlsStore] Migrated ${migratedCount} controls from requirements`);
+        return migratedCount;
+      },
+
+      // Reset store (for testing)
+      reset: () => {
+        set({ controls: [], history: [], historyIndex: -1, loading: false, error: null });
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       }
     }),
     {
       name: 'csf-controls-storage',
+<<<<<<< HEAD
       version: 3,
       migrate: (persistedState, version) => {
         // Version 3: Force update controls with correct stable owner IDs (1-7)
@@ -755,6 +890,21 @@ const useControlsStore = create(
         }
         // New user or empty state - use defaults
         return { controls: DEFAULT_CONTROLS };
+=======
+      version: 5,
+      migrate: (persistedState, version) => {
+        // Version 5: Default controls from Alma Security example data
+        // Existing users with data keep their controls, new users get Alma Security examples
+        if (version < 5) {
+          if (persistedState?.controls?.length > 0) {
+            // Existing user with data - keep their controls
+            return persistedState;
+          }
+          // New user or empty state - use Alma Security example controls
+          return { controls: DEFAULT_CONTROLS };
+        }
+        return persistedState;
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
       },
       partialize: (state) => ({
         controls: state.controls

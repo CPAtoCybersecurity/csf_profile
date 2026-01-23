@@ -27,3 +27,12 @@ server/.env.*
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+<<<<<<< HEAD
+=======
+
+# Server config with credentials (use config.example.json as template)
+server/config.json
+
+# Internal reports and confidential documents
+_reports/
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)

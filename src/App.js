@@ -22,6 +22,10 @@ import ScoringLegend from './pages/ScoringLegend';
 import Artifacts from './pages/Artifacts';
 import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
+<<<<<<< HEAD
+=======
+import Findings from './pages/Findings';
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -29,6 +33,10 @@ import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 // Stores
 import useUserStore from './stores/userStore';
 import useRequirementsStore from './stores/requirementsStore';
+<<<<<<< HEAD
+=======
+import useAssessmentsStore from './stores/assessmentsStore';
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
@@ -36,6 +44,10 @@ import { checkEnvironmentVariables } from './utils/envValidation';
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
+<<<<<<< HEAD
+=======
+  const loadAssessments = useAssessmentsStore((state) => state.loadInitialData);
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
   const [showBackupReminder, setShowBackupReminder] = useState(false);
   const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
@@ -49,8 +61,15 @@ const AppContent = () => {
     checkEnvironmentVariables();
     // Fix email addresses using store directly
     useUserStore.getState().fixEmailAddresses();
+<<<<<<< HEAD
     // Load requirements data
     loadRequirements();
+=======
+    // Load requirements data from Confluence-Requirements.csv
+    loadRequirements();
+    // Load assessments data from JIRA-Assessments.csv
+    loadAssessments();
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
   
@@ -94,6 +113,7 @@ const AppContent = () => {
     <React.Fragment>
     <div className="flex flex-col h-screen">
       <div className="flex flex-col h-full bg-white text-gray-700">
+<<<<<<< HEAD
         {/* Header */}
         <header className="bg-blue-700 text-white p-4">
           <div className="flex justify-between items-center">
@@ -108,11 +128,35 @@ const AppContent = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
+=======
+        {/* Header - Compact Jira-style */}
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+          <div className="flex justify-between items-center">
+            {/* Left: Logo and title */}
+            <div className="flex items-center gap-3">
+              <img
+                src="/SC_SimplyCyberAcademy.png"
+                alt="Simply Cyber Academy Logo"
+                className="h-8"
+              />
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">CSF Profile Assessment</span>
+            </div>
+
+            {/* Center: Navigation */}
+            <Navigation />
+
+            {/* Right: Utilities */}
+            <div className="flex items-center gap-2">
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
               <LastBackupIndicator onExportClick={handleExportFromIndicator} key={lastBackupTrigger} />
               <AutoSaveIndicator />
               <UndoRedoButtons />
               <ThemeToggle />
+<<<<<<< HEAD
               <Navigation />
+=======
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             </div>
           </div>
         </header>
@@ -126,6 +170,10 @@ const AppContent = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/scoring" element={<ScoringLegend />} />
             <Route path="/artifacts" element={<Artifacts />} />
+<<<<<<< HEAD
+=======
+            <Route path="/findings" element={<Findings />} />
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />

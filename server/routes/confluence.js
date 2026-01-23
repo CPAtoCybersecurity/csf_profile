@@ -1,4 +1,5 @@
 import express from "express";
+<<<<<<< HEAD
 import confluenceClient from "../services/confluenceClient.js";
 
 const router = express.Router();
@@ -21,5 +22,16 @@ router.post("/validate", async (req, res) => {
     });
   }
 });
+=======
+import { getPage, validateConfluence } from "../controllers/confluenceController.js";
+
+const router = express.Router();
+
+// GET /api/confluence/page/:pageId
+router.get("/page/:pageId", getPage);
+
+// POST /api/confluence/validate
+router.post("/validate", validateConfluence);
+>>>>>>> e0ad92c (feat: implemented hardened docker infrasture and security report)
 
 export default router;
