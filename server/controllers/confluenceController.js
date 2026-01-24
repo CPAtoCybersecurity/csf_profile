@@ -1,4 +1,5 @@
 import confluenceClient from "../services/confluenceClient.js";
+import { sanitizeErrorResponse, getErrorStatus } from "../utils/errorUtils.js";
 
 // GET /api/confluence/page/:pageId
 export const getPage = async (req, res) => {
@@ -18,13 +19,7 @@ export const getPage = async (req, res) => {
       data: response.data,
     });
   } catch (error) {
-    console.error("STATUS:", error.response?.status);
-    console.error("DATA:", error.response?.data || error.message);
-
-    res.status(error.response?.status || 500).json({
-      success: false,
-      error: error.response?.data || error.message,
-    });
+    res.status(getErrorStatus(error)).json(sanitizeErrorResponse(error, 'Confluence getPage'));
   }
 };
 
@@ -38,12 +33,6 @@ export const validateConfluence = async (req, res) => {
       message: "Confluence authentication successful",
     });
   } catch (error) {
-    console.error("STATUS:", error.response?.status);
-    console.error("DATA:", error.response?.data || error.message);
-
-    res.status(500).json({
-      success: false,
-      message: "Failed to authenticate with Confluence",
-    });
+    res.status(getErrorStatus(error)).json(sanitizeErrorResponse(error, 'Confluence validateConfluence'));
   }
 };

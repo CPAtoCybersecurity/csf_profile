@@ -1,4 +1,5 @@
 import jiraClient from "../services/jiraClient.js";
+import { sanitizeErrorResponse, getErrorStatus } from "../utils/errorUtils.js";
 
 // POST /api/jira/issues
 export const createIssue = async (req, res) => {
@@ -19,11 +20,7 @@ export const createIssue = async (req, res) => {
     });
     res.json({ success: true, data: response.data });
   } catch (error) {
-    console.error(error.response?.data || error.message);
-    res.status(error.response?.status || 500).json({
-      success: false,
-      error: error.response?.data || error.message,
-    });
+    res.status(getErrorStatus(error)).json(sanitizeErrorResponse(error, 'Jira createIssue'));
   }
 };
 
@@ -39,10 +36,6 @@ export const getIssueStatus = async (req, res) => {
     const response = await jiraClient.get(`/rest/api/3/issue/${issueKey}`);
     res.json({ success: true, data: response.data });
   } catch (error) {
-    console.error(error.response?.data || error.message);
-    res.status(error.response?.status || 500).json({
-      success: false,
-      error: error.response?.data || error.message,
-    });
+    res.status(getErrorStatus(error)).json(sanitizeErrorResponse(error, 'Jira getIssueStatus'));
   }
 };
