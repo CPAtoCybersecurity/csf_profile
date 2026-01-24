@@ -20,8 +20,7 @@ services:
 
     build:
       context: ./server # Backend code
-    ports:
-      - "4000:4000" # Only expose if you need to hit the API directly
+    # Port 4000 not exposed externally - backend only accessible via secure-network
     environment:
       - PORT=4000
     # Security: Don't let the backend use too much power
