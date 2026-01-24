@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import useAIStore from '../stores/aiStore';
 import { Upload, FileText, Trash2, ArrowLeft, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
 
@@ -36,7 +37,7 @@ const DocumentUpload = ({ embedded = false }) => {
     for (const file of files) {
       const text = await extractTextFromFile(file);
       newDocs.push({
-        id: Date.now() + Math.random(),
+        id: uuidv4(),
         name: file.name,
         type: file.type,
         size: file.size,

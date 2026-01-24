@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
+import { v4 as uuidv4 } from 'uuid';
 import { escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
 
@@ -22,8 +23,8 @@ const useArtifactStore = create(
       addArtifact: (artifact) => {
         const newArtifact = {
           ...artifact,
-          id: artifact.id || Date.now() + Math.floor(Math.random() * 1000),
-          artifactId: artifact.artifactId || `AR-${Date.now()}`,
+          id: artifact.id || uuidv4(),
+          artifactId: artifact.artifactId || `AR-${uuidv4()}`,
           name: artifact.name || '',
           description: artifact.description || '',
           link: artifact.link || '', // URL to external evidence
@@ -328,10 +329,10 @@ const useArtifactStore = create(
                 })
                 .map(row => {
                   // Use Jira Issue key as the artifact ID (e.g., AR-1768214343793-o7ihrhfh)
-                  const artifactId = row['Issue key'] || row['Artifact ID'] || `AR-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+                  const artifactId = row['Issue key'] || row['Artifact ID'] || `AR-${uuidv4()}`;
 
                   return {
-                    id: Date.now() + Math.floor(Math.random() * 10000),
+                    id: uuidv4(),
                     artifactId: artifactId,
                     name: row['Name'] || row['Summary'] || '',
                     description: row['Description'] || '',

@@ -4,6 +4,7 @@ import {
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
   FileUp, FileText, Loader2, Bot, Sparkles, User, Settings
 } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import ReactMarkdown from 'react-markdown';
 
@@ -357,7 +358,7 @@ Format as a numbered list. Be specific and actionable.`;
     for (const file of files) {
       const text = await extractTextFromFile(file);
       newDocs.push({
-        id: Date.now() + Math.random(),
+        id: uuidv4(),
         name: file.name,
         type: file.type,
         size: file.size,

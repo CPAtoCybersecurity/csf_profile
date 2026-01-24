@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
+import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
@@ -1013,7 +1014,7 @@ const useAssessmentsStore = create(
                 });
 
                 return {
-                  id: `ASM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  id: `ASM-${uuidv4()}`,
                   name: group.name,
                   description: group.description,
                   scopeType: group.scopeType,

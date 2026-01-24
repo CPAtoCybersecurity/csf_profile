@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
+import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_FINDINGS } from './defaultFindingsData';
 
@@ -61,7 +62,7 @@ const useFindingsStore = create(
       // Create new finding
       createFinding: (findingData) => {
         const newFinding = {
-          id: `FND-${Date.now()}`,
+          id: `FND-${uuidv4()}`,
           summary: sanitizeInput(findingData.summary || ''),
 
           // Primary link: Evaluation (point-in-time assessment record)
@@ -306,7 +307,7 @@ const useFindingsStore = create(
                 };
 
                 return {
-                  id: row['Issue key'] || row['Finding ID'] || `FND-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  id: row['Issue key'] || row['Finding ID'] || `FND-${uuidv4()}`,
                   summary: sanitizeInput(row['Summary'] || ''),
                   description: sanitizeInput(row['Description'] || ''),
 

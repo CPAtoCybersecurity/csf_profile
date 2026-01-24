@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { v4 as uuidv4 } from 'uuid';
 
 // Default users for new installations
 const DEFAULT_USERS = [
@@ -21,7 +22,7 @@ const useUserStore = create(
       addUser: (user) => {
         const newUser = {
           ...user,
-          id: user.id || Date.now() + Math.floor(Math.random() * 1000),
+          id: user.id || uuidv4(),
         };
         set((state) => ({
           users: [...state.users, newUser]
