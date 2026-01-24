@@ -95,6 +95,21 @@ const AIAssistant = () => {
         </p>
       </div>
 
+      {/* Experimental Notice */}
+      <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+        <div className="flex items-start gap-3">
+          <span className="text-amber-600 dark:text-amber-400 text-xl">⚠️</span>
+          <div>
+            <p className="text-amber-800 dark:text-amber-200 font-medium">Experimental Feature</p>
+            <p className="text-amber-700 dark:text-amber-300 text-sm mt-1">
+              These AI-powered features are experimental and still under development.
+              Results may vary and should be reviewed by qualified personnel.
+              Feedback welcome from the community!
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Configuration Panel */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

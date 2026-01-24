@@ -1,7 +1,4 @@
-> **You are viewing the `feature/api-integration` branch (Pre-Alpha)**
-> This branch contains experimental Atlassian API integration. For the stable version, see the [main branch](https://github.com/CPAtoCybersecurity/csf_profile).
-
-# Simply Cyber Academy - CSF Profile Assessment Database v2.1
+﻿# Simply Cyber Academy - CSF Profile Assessment Database v2.2
 
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 
@@ -205,19 +202,75 @@ If you encounter issues with `react-scripts` not installing correctly on Kali Li
    ls node_modules/.bin/ | grep react-scripts
    ```
 
-## Confluence Cloud Integration
+### Docker 
 
-This application supports fetching control documentation from **Confluence Cloud** using a secure backend integration.
+The application is now fully containerized with production-grade security hardening. This is the fastest and most secure way to get started.
 
-### Required Environment Variables
 
-Set the following environment variables in your backend `.env` file:
 
-```env
+1. **Prerequisites**
+* [Docker Desktop](https://www.docker.com/products/docker-desktop/) installed and running.
+
+2. **Quick Start**
+```bash
+# Clone the repository
+git clone https://github.com/CPAtoCybersecurity/csf_profile
+cd csf_profile
+
+# 1. Configure Root environment (Frontend/Backend)
+cp .env.example .env
+
+# 2. Configure Atlassian credentials
+cp atlassian-integration/.env.example atlassian-integration/.env
+
+# 3. Launch the application
+docker compose up -d
+```
+
+3. **Confluence Cloud Integration**
+
+To enable Atlassian features, set the following environment variables in your `atlassian-integration/.env` file:
+
+```bash
+
 CONFLUENCE_BASE_URL=https://your-company.atlassian.net
 CONFLUENCE_EMAIL=your-email@example.com
 CONFLUENCE_API_TOKEN=your-api-token
+
 ```
+
+4. **Accessing the Application**
+
+    • Frontend UI: http://localhost
+
+    • Backend API: http://localhost:4000
+
+    • Internal DNS: Containers communicate internally via `http://csf-backend:4000`.
+
+
+5. **Running Atlassian Integration Tools**
+
+Run the sync scripts as isolated tasks without needing Node.js installed on your host machine.
+
+> [!IMPORTANT] 
+> **Data Placement:** You must place your `csf-export.json` file inside the `./atlassian-integration/exports/` folder on your local machine for the container to access it.
+
+```bash
+# Step A: Find Jira Field IDs (Verifies your connection)
+docker compose --profile tools run --rm atlassian-tool node scripts/setup-jira.js
+
+# Step B: Export to Confluence
+docker compose --profile tools run --rm atlassian-tool node scripts/export-to-confluence.js --file exports/csf-export.json --type all
+
+# Step C: Export to Jira
+docker compose --profile tools run --rm atlassian-tool node scripts/export-to-jira.js --file exports/csf-export.json
+
+```
+> [!IMPORTANT] 
+> **Security Hardening:** This deployment utilizes non-root users, multi-stage builds, and network isolation. For a full technical report on the security controls implemented, see **[DOCKER_SECURITY.md](./DOCKER_SECURITY.md)**.
+
+
+
 ## Integration Options
 
 This project supports two paths depending on your infrastructure needs:

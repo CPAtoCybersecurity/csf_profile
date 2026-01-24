@@ -1,0 +1,56 @@
+services:
+  csf-frontend:
+
+    image: csf-profile/frontend:latest
+    container_name: csf-frontend
+
+    build: 
+      context: . # React code in root
+    ports:
+      - "80:80"
+    networks:
+      - secure-network
+    depends_on:
+      - csf-backend
+
+  csf-backend:
+
+    image: csf-profile/backend:latest
+    container_name: csf-backend
+
+    build:
+      context: ./server # Backend code
+    ports:
+      - "4000:4000" # Only expose if you need to hit the API directly
+    environment:
+      - PORT=4000
+    # Security: Don't let the backend use too much power
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+    networks:
+      - secure-network
+    
+  atlassian-tool:
+
+      build: ./atlassian-integration
+      image: csf-profile/atlassian-sync:latest
+      container_name: csf-atlassian-sync
+
+      volumes:
+        - ./atlassian-integration/exports:/app/exports
+        - ./atlassian-integration/output:/app/output
+      env_file:
+        - path: ./atlassian-integration/.env
+          required: false
+
+      profiles: ["tools"]
+
+      networks:
+      - secure-network
+
+networks:
+  secure-network:
+    driver: bridge
