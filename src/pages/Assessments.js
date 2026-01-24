@@ -24,6 +24,22 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
 import useAIStore from '../stores/aiStore';
 
+// File upload security configuration
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_EXTENSIONS = ['.txt', '.md', '.csv', '.pdf', '.docx'];
+const ALLOWED_MIME_TYPES = [
+  'text/plain',
+  'text/markdown',
+  'text/csv',
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+];
+
+// Sanitize filename to prevent path traversal and injection
+const sanitizeFilename = (filename) => {
+  return filename.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 255);
+};
+
 // Helper function to format test procedures for display
 const formatTestProcedures = (text) => {
   if (!text) return '';
@@ -352,14 +368,36 @@ Format as a numbered list. Be specific and actionable.`;
     return `[Content from ${file.name} - PDF/DOCX extraction requires additional setup. Please use TXT or MD files.]`;
   };
 
-  // Handle evidence file upload
+  // Handle evidence file upload with validation
   const handleEvidenceUpload = useCallback(async (files) => {
     const newDocs = [];
     for (const file of files) {
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`File "${file.name}" exceeds 10MB limit`);
+        continue;
+      }
+
+      // Validate file extension
+      const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
+      if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+        toast.error(`File "${file.name}" has unsupported type. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`);
+        continue;
+      }
+
+      // Validate MIME type (additional check)
+      if (file.type && !ALLOWED_MIME_TYPES.includes(file.type) && file.type !== '') {
+        console.warn(`File "${file.name}" has unexpected MIME type: ${file.type}`);
+      }
+
+      // Sanitize filename
+      const safeName = sanitizeFilename(file.name);
+
       const text = await extractTextFromFile(file);
       newDocs.push({
         id: uuidv4(),
-        name: file.name,
+        name: safeName,
+        originalName: file.name,
         type: file.type,
         size: file.size,
         text: text,
