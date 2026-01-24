@@ -13,6 +13,7 @@ import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
 import FindingSelector from '../components/FindingSelector';
 import SortableHeader from '../components/SortableHeader';
+import ExportPasswordDialog from '../components/ExportPasswordDialog';
 
 // Stores
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -79,6 +80,10 @@ const Assessments = () => {
   const [editMode, setEditMode] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState('Q1'); // Q1, Q2, Q3, Q4
+
+  // Export (optional password protection)
+  const [showExportPasswordDialog, setShowExportPasswordDialog] = useState(false);
+  const [showSingleExportPasswordDialog, setShowSingleExportPasswordDialog] = useState(false);
 
   // New assessment wizard state
   const [showNewModal, setShowNewModal] = useState(false);
@@ -540,8 +545,30 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
   const handleExport = useCallback(() => {
     if (!currentAssessmentId) return;
-    exportAssessmentCSV(currentAssessmentId, useControlsStore, useRequirementsStore, useUserStore);
-    toast.success('Assessment exported');
+    setShowSingleExportPasswordDialog(true);
+  }, [currentAssessmentId]);
+
+  const handleCancelExportSingle = useCallback(() => {
+    setShowSingleExportPasswordDialog(false);
+  }, []);
+
+  const handleConfirmExportSingle = useCallback(async (password) => {
+    setShowSingleExportPasswordDialog(false);
+    if (!currentAssessmentId) return;
+
+    try {
+      const trimmed = (password || '').trim();
+      await exportAssessmentCSV(
+        currentAssessmentId,
+        useControlsStore,
+        useRequirementsStore,
+        useUserStore,
+        { password: trimmed }
+      );
+      toast.success(trimmed ? 'Assessment exported (encrypted)' : 'Assessment exported');
+    } catch (err) {
+      toast.error(`Export failed: ${err.message}`);
+    }
   }, [currentAssessmentId, exportAssessmentCSV]);
 
   const handleAvailableItemsSort = useCallback((key) => {
@@ -571,8 +598,24 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   }, [importAssessmentsCSV]);
 
   const handleExportAll = useCallback(() => {
-    exportAllAssessmentsCSV(useControlsStore, useRequirementsStore, useUserStore);
-    toast.success('Assessments exported');
+    setShowExportPasswordDialog(true);
+  }, []);
+
+  const handleCancelExportAll = useCallback(() => {
+    setShowExportPasswordDialog(false);
+  }, []);
+
+  const handleConfirmExportAll = useCallback(async (password) => {
+    setShowExportPasswordDialog(false);
+    try {
+      const trimmed = (password || '').trim();
+      await exportAllAssessmentsCSV(useControlsStore, useRequirementsStore, useUserStore, {
+        password: trimmed
+      });
+      toast.success(trimmed ? 'Assessments exported (encrypted)' : 'Assessments exported');
+    } catch (err) {
+      toast.error(`Export failed: ${err.message}`);
+    }
   }, [exportAllAssessmentsCSV]);
 
   const handleDownloadTemplate = useCallback(() => {
@@ -1572,6 +1615,22 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       {view === 'list' && renderListView()}
       {view === 'scope' && currentAssessment && renderScopeView()}
       {view === 'assess' && currentAssessment && renderAssessView()}
+
+      <ExportPasswordDialog
+        isOpen={showExportPasswordDialog}
+        title="Export All Assessments"
+        description="Optionally set a password to encrypt the export before download."
+        onCancel={handleCancelExportAll}
+        onConfirm={handleConfirmExportAll}
+      />
+
+      <ExportPasswordDialog
+        isOpen={showSingleExportPasswordDialog}
+        title="Export Assessment"
+        description="Optionally set a password to encrypt the export before download."
+        onCancel={handleCancelExportSingle}
+        onConfirm={handleConfirmExportSingle}
+      />
 
       {/* New Assessment Wizard Modal */}
       {showNewModal && (
