@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
+import { escapeCSVValue } from '../utils/sanitize';
 
 const useRequirementsStore = create(
   persist(
@@ -305,15 +306,15 @@ const useRequirementsStore = create(
         }
 
         const csvData = reqs.map(r => ({
-          'Requirement ID': r.id,
-          'Framework': r.frameworkId,
-          'CSF Function': r.function,
-          'Category Name': r.category,
-          'Subcategory ID': r.subcategoryId,
-          'Subcategory Description': r.subcategoryDescription || '',
-          'Implementation Example': r.implementationExample,
-          'Control Owner': r.controlOwner || '',
-          'Stakeholders': r.stakeholders || '',
+          'Requirement ID': escapeCSVValue(r.id),
+          'Framework': escapeCSVValue(r.frameworkId),
+          'CSF Function': escapeCSVValue(r.function),
+          'Category Name': escapeCSVValue(r.category),
+          'Subcategory ID': escapeCSVValue(r.subcategoryId),
+          'Subcategory Description': escapeCSVValue(r.subcategoryDescription || ''),
+          'Implementation Example': escapeCSVValue(r.implementationExample),
+          'Control Owner': escapeCSVValue(r.controlOwner || ''),
+          'Stakeholders': escapeCSVValue(r.stakeholders || ''),
           'In Scope': r.inScope ? 'Yes' : 'No'
         }));
 
@@ -373,20 +374,20 @@ const useRequirementsStore = create(
             .join(' | ');
 
           return {
-            'Requirement ID': r.id,
-            'Framework': r.frameworkId || 'NIST CSF 2.0',
-            'CSF Function': r.function,
-            'CSF Function Description': r.functionDescription || '',
-            'Category Name': r.category,
-            'Category Description': r.categoryDescription || '',
-            'Subcategory ID': r.subcategoryId,
-            'Subcategory Description': r.subcategoryDescription,
-            'Implementation Example': r.implementationExample,
-            'Implementation Description (Control)': implementationDescriptions,
+            'Requirement ID': escapeCSVValue(r.id),
+            'Framework': escapeCSVValue(r.frameworkId || 'NIST CSF 2.0'),
+            'CSF Function': escapeCSVValue(r.function),
+            'CSF Function Description': escapeCSVValue(r.functionDescription || ''),
+            'Category Name': escapeCSVValue(r.category),
+            'Category Description': escapeCSVValue(r.categoryDescription || ''),
+            'Subcategory ID': escapeCSVValue(r.subcategoryId),
+            'Subcategory Description': escapeCSVValue(r.subcategoryDescription),
+            'Implementation Example': escapeCSVValue(r.implementationExample),
+            'Implementation Description (Control)': escapeCSVValue(implementationDescriptions),
             'In Scope': r.inScope ? 'Yes' : 'No',
-            'Control Owner': controlOwners.join(', '),
-            'Stakeholders': controlStakeholders.join(', '),
-            'Controls In Scope': controlsInScope
+            'Control Owner': escapeCSVValue(controlOwners.join(', ')),
+            'Stakeholders': escapeCSVValue(controlStakeholders.join(', ')),
+            'Controls In Scope': escapeCSVValue(controlsInScope)
           };
         });
 

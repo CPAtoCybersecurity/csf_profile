@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
-import { sanitizeInput } from '../utils/sanitize';
+import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_FINDINGS } from './defaultFindingsData';
 
 /**
@@ -195,20 +195,20 @@ const useFindingsStore = create(
 
         const csvData = findings.map(f => ({
           'Finding ID': f.id,
-          'Summary': f.summary,
+          'Summary': escapeCSVValue(f.summary),
           'Evaluation ID': f.evaluationId || '',
-          'Control ID': f.controlId || '',
+          'Control ID': escapeCSVValue(f.controlId || ''),
           'Assessment ID': f.assessmentId || '',
-          'Compliance Requirement': f.complianceRequirement || '', // Deprecated
-          'Root Cause': f.rootCause,
-          'Remediation Action Plan': f.remediationActionPlan,
-          'Remediation Owner': getUserName(f.remediationOwner),
+          'Compliance Requirement': escapeCSVValue(f.complianceRequirement || ''), // Deprecated
+          'Root Cause': escapeCSVValue(f.rootCause),
+          'Remediation Action Plan': escapeCSVValue(f.remediationActionPlan),
+          'Remediation Owner': escapeCSVValue(getUserName(f.remediationOwner)),
           'Due Date': f.dueDate,
           'Status': f.status,
           'Priority': f.priority,
           'Created Date': f.createdDate,
           'Jira Key': f.jiraKey || '',
-          'Linked Artifacts': (f.linkedArtifacts || []).join('; ')
+          'Linked Artifacts': escapeCSVValue((f.linkedArtifacts || []).join('; '))
         }));
 
         const csv = Papa.unparse(csvData);
@@ -237,18 +237,18 @@ const useFindingsStore = create(
 
         // Jira CSV import format for FND project
         const csvData = findings.map(f => ({
-          'Summary': f.summary,
+          'Summary': escapeCSVValue(f.summary),
           'Issue Type': 'Finding',
           'Project key': 'FND',
           'Priority': f.priority,
-          'Assignee': getUserEmail(f.remediationOwner),
+          'Assignee': escapeCSVValue(getUserEmail(f.remediationOwner)),
           'Due date': f.dueDate,
           'Custom field (Evaluation ID)': f.evaluationId || '',
-          'Custom field (Control ID)': f.controlId || '',
-          'Custom field (Compliance Requirement)': f.complianceRequirement || '', // Deprecated
-          'Custom field (Root Cause)': f.rootCause,
-          'Custom field (Remediation Action Plan (Who will do What by When?))': f.remediationActionPlan,
-          'Description': `Finding created from CSF Profile assessment.\n\nEvaluation: ${f.evaluationId || 'N/A'}\nControl: ${f.controlId || 'N/A'}\n\nRoot Cause:\n${f.rootCause}\n\nRemediation Plan:\n${f.remediationActionPlan}`
+          'Custom field (Control ID)': escapeCSVValue(f.controlId || ''),
+          'Custom field (Compliance Requirement)': escapeCSVValue(f.complianceRequirement || ''), // Deprecated
+          'Custom field (Root Cause)': escapeCSVValue(f.rootCause),
+          'Custom field (Remediation Action Plan (Who will do What by When?))': escapeCSVValue(f.remediationActionPlan),
+          'Description': escapeCSVValue(`Finding created from CSF Profile assessment.\n\nEvaluation: ${f.evaluationId || 'N/A'}\nControl: ${f.controlId || 'N/A'}\n\nRoot Cause:\n${f.rootCause}\n\nRemediation Plan:\n${f.remediationActionPlan}`)
         }));
 
         const csv = Papa.unparse(csvData);

@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
+import { escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
 
 /**
@@ -250,14 +251,14 @@ const useArtifactStore = create(
         const artifacts = get().artifacts;
 
         const csvData = artifacts.map(a => ({
-          'Artifact ID': a.artifactId,
-          'Name': a.name,
-          'Description': a.description,
-          'Link': a.link || '',
-          'Type': a.type || 'Document',
-          'Control ID': a.controlId || '',
+          'Artifact ID': escapeCSVValue(a.artifactId),
+          'Name': escapeCSVValue(a.name),
+          'Description': escapeCSVValue(a.description),
+          'Link': escapeCSVValue(a.link || ''),
+          'Type': escapeCSVValue(a.type || 'Document'),
+          'Control ID': escapeCSVValue(a.controlId || ''),
           'Linked Evaluation IDs': (a.linkedEvaluationIds || []).join('; '),
-          'Compliance Requirement': a.complianceRequirement || '', // Deprecated
+          'Compliance Requirement': escapeCSVValue(a.complianceRequirement || ''), // Deprecated
           'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '), // Deprecated
           'Created Date': a.createdDate,
           'Jira Key': a.jiraKey || ''
@@ -283,15 +284,15 @@ const useArtifactStore = create(
 
         // Jira CSV import format for AR project
         const csvData = artifacts.map(a => ({
-          'Summary': a.name,
+          'Summary': escapeCSVValue(a.name),
           'Issue Type': 'Artifact',
           'Project key': 'AR',
-          'Custom field (Link)': a.link || '',
-          'Custom field (Control ID)': a.controlId || '',
+          'Custom field (Link)': escapeCSVValue(a.link || ''),
+          'Custom field (Control ID)': escapeCSVValue(a.controlId || ''),
           'Custom field (Linked Evaluation IDs)': (a.linkedEvaluationIds || []).join('; '),
-          'Custom field (Compliance Requirement)': a.complianceRequirement || '', // Deprecated
-          'Custom field (Artifact Type)': a.type || 'Document',
-          'Description': a.description || `Evidence artifact: ${a.name}\n\nControl: ${a.controlId || 'N/A'}\nEvaluations: ${(a.linkedEvaluationIds || []).join(', ') || 'N/A'}`
+          'Custom field (Compliance Requirement)': escapeCSVValue(a.complianceRequirement || ''), // Deprecated
+          'Custom field (Artifact Type)': escapeCSVValue(a.type || 'Document'),
+          'Description': escapeCSVValue(a.description || `Evidence artifact: ${a.name}\n\nControl: ${a.controlId || 'N/A'}\nEvaluations: ${(a.linkedEvaluationIds || []).join(', ') || 'N/A'}`)
         }));
 
         const csv = Papa.unparse(csvData);

@@ -31,15 +31,22 @@ export function sanitizeHTML(html) {
 
 /**
  * Escape special characters for CSV export
+ * Prevents CSV injection attacks by prefixing formula characters
  * @param {string} value - The value to escape
- * @returns {string} - Escaped value
+ * @returns {string} - Escaped value safe for CSV export
  */
 export function escapeCSVValue(value) {
   if (value === null || value === undefined) return '';
-  const stringValue = String(value);
+  let stringValue = String(value);
+
+  // SECURITY: Prevent CSV injection by prefixing formula-triggering characters
+  // Characters =, +, -, @ can execute formulas in Excel/LibreOffice
+  if (/^[=+\-@\t\r]/.test(stringValue)) {
+    stringValue = "'" + stringValue;
+  }
 
   // If the value contains quotes, commas, or newlines, wrap in quotes and escape internal quotes
-  if (stringValue.includes('"') || stringValue.includes(',') || stringValue.includes('\n')) {
+  if (stringValue.includes('"') || stringValue.includes(',') || stringValue.includes('\n') || stringValue.includes("'")) {
     return `"${stringValue.replace(/"/g, '""')}"`;
   }
 

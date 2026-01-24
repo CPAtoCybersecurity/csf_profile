@@ -2,7 +2,7 @@ import { useEffect, useCallback, useRef } from 'react';
 import useCSFStore from '../stores/csfStore';
 import useUserStore from '../stores/userStore';
 import { parseUserInfo, findOrCreateUser, formatUserInfo, formatMultipleUsers } from '../utils/userUtils';
-import { validateCSVImport, sanitizeInput } from '../utils/sanitize';
+import { validateCSVImport, sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import Papa from 'papaparse';
 import toast from 'react-hot-toast';
 
@@ -375,67 +375,67 @@ function exportDataAsCSV(data, users, filenamePrefix) {
     const q4 = quarters.Q4 || {};
 
     return {
-      'ID': item.ID,
-      'Function': item.Function,
-      'Function Description': item['Function Description'],
-      'Category ID': categoryId,
-      'Category': item.Category,
-      'Category Description': item['Category Description'],
-      'Subcategory ID': item['Subcategory ID'],
-      'Subcategory Description': item['Subcategory Description'],
-      'Implementation Example': item['Implementation Example'],
-      'Implementation Description': item['Implementation Description'] || item['Control Implementation Description'] || '',
+      'ID': escapeCSVValue(item.ID),
+      'Function': escapeCSVValue(item.Function),
+      'Function Description': escapeCSVValue(item['Function Description']),
+      'Category ID': escapeCSVValue(categoryId),
+      'Category': escapeCSVValue(item.Category),
+      'Category Description': escapeCSVValue(item['Category Description']),
+      'Subcategory ID': escapeCSVValue(item['Subcategory ID']),
+      'Subcategory Description': escapeCSVValue(item['Subcategory Description']),
+      'Implementation Example': escapeCSVValue(item['Implementation Example']),
+      'Implementation Description': escapeCSVValue(item['Implementation Description'] || item['Control Implementation Description'] || ''),
       'In Scope? ': item['In Scope? '],
-      'Owner': formatUserInfo(item.ownerId, users),
-      'Stakeholder(s)': formatMultipleUsers(item.stakeholderIds, users),
-      'Auditor': formatUserInfo(item.auditorId, users),
-      'NIST 800-53 Control Ref': item['Control Implementation Description'] || item['NIST 800-53 Control Ref'] || '',
-      'Test Procedure(s)': item['Test Procedure(s)'] || '',
+      'Owner': escapeCSVValue(formatUserInfo(item.ownerId, users)),
+      'Stakeholder(s)': escapeCSVValue(formatMultipleUsers(item.stakeholderIds, users)),
+      'Auditor': escapeCSVValue(formatUserInfo(item.auditorId, users)),
+      'NIST 800-53 Control Ref': escapeCSVValue(item['Control Implementation Description'] || item['NIST 800-53 Control Ref'] || ''),
+      'Test Procedure(s)': escapeCSVValue(item['Test Procedure(s)'] || ''),
       // Q1 (First Quarter)
       'Q1 Actual Score': q1.actualScore ?? '',
       'Q1 Target Score': q1.targetScore ?? '',
-      'Q1 Observations': q1.observations || '',
+      'Q1 Observations': escapeCSVValue(q1.observations || ''),
       'Q1 Observation Date': q1.observationDate || '',
-      'Q1 Testing Status': q1.testingStatus || '',
+      'Q1 Testing Status': escapeCSVValue(q1.testingStatus || ''),
       'Q1 Examine': q1.examine ? 'Yes' : 'No',
       'Q1 Interview': q1.interview ? 'Yes' : 'No',
       'Q1 Test': q1.test ? 'Yes' : 'No',
       // Q2 (Second Quarter)
       'Q2 Actual Score': q2.actualScore ?? '',
       'Q2 Target Score': q2.targetScore ?? '',
-      'Q2 Observations': q2.observations || '',
+      'Q2 Observations': escapeCSVValue(q2.observations || ''),
       'Q2 Observation Date': q2.observationDate || '',
-      'Q2 Testing Status': q2.testingStatus || '',
+      'Q2 Testing Status': escapeCSVValue(q2.testingStatus || ''),
       'Q2 Examine': q2.examine ? 'Yes' : 'No',
       'Q2 Interview': q2.interview ? 'Yes' : 'No',
       'Q2 Test': q2.test ? 'Yes' : 'No',
       // Q3 (Third Quarter)
       'Q3 Actual Score': q3.actualScore ?? '',
       'Q3 Target Score': q3.targetScore ?? '',
-      'Q3 Observations': q3.observations || '',
+      'Q3 Observations': escapeCSVValue(q3.observations || ''),
       'Q3 Observation Date': q3.observationDate || '',
-      'Q3 Testing Status': q3.testingStatus || '',
+      'Q3 Testing Status': escapeCSVValue(q3.testingStatus || ''),
       'Q3 Examine': q3.examine ? 'Yes' : 'No',
       'Q3 Interview': q3.interview ? 'Yes' : 'No',
       'Q3 Test': q3.test ? 'Yes' : 'No',
       // Q4 (Fourth Quarter)
       'Q4 Actual Score': q4.actualScore ?? '',
       'Q4 Target Score': q4.targetScore ?? '',
-      'Q4 Observations': q4.observations || '',
+      'Q4 Observations': escapeCSVValue(q4.observations || ''),
       'Q4 Observation Date': q4.observationDate || '',
-      'Q4 Testing Status': q4.testingStatus || '',
+      'Q4 Testing Status': escapeCSVValue(q4.testingStatus || ''),
       'Q4 Examine': q4.examine ? 'Yes' : 'No',
       'Q4 Interview': q4.interview ? 'Yes' : 'No',
       'Q4 Test': q4.test ? 'Yes' : 'No',
       // Remediation fields
-      'Remediation Owner': formatUserInfo(item.remediationOwnerId, users),
+      'Remediation Owner': escapeCSVValue(formatUserInfo(item.remediationOwnerId, users)),
       'Remediation Due Date': item['Remediation Due Date'] || '',
       // Other fields
       'Minimum Target': item['Minimum Target'] || 0,
-      'Action Plan': item['Action Plan'] || '',
-      'Artifact Name': Array.isArray(item.linkedArtifacts)
+      'Action Plan': escapeCSVValue(item['Action Plan'] || ''),
+      'Artifact Name': escapeCSVValue(Array.isArray(item.linkedArtifacts)
         ? item.linkedArtifacts.join('; ')
-        : (item.linkedArtifacts || ''),
+        : (item.linkedArtifacts || '')),
     };
   });
 

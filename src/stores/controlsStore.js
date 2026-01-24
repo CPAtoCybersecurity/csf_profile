@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
-import { sanitizeInput } from '../utils/sanitize';
+import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_CONTROLS } from './defaultControlsData';
 
 const useControlsStore = create(
@@ -304,11 +304,11 @@ const useControlsStore = create(
         };
 
         const csvData = get().controls.map(c => ({
-          'Control ID': c.controlId,
-          'Control Implementation Description': c.implementationDescription,
-          'Control Owner': getUserName(c.ownerId),
+          'Control ID': escapeCSVValue(c.controlId),
+          'Control Implementation Description': escapeCSVValue(c.implementationDescription),
+          'Control Owner': escapeCSVValue(getUserName(c.ownerId)),
           'Control Owner ID': c.ownerId || '',
-          'Stakeholder(s)': (c.stakeholderIds || []).map(id => getUserName(id)).join('; '),
+          'Stakeholder(s)': escapeCSVValue((c.stakeholderIds || []).map(id => getUserName(id)).join('; ')),
           'Stakeholder IDs': (c.stakeholderIds || []).join('; '),
           'Linked Requirements': (c.linkedRequirementIds || []).join('; '),
           'Created Date': c.createdDate,

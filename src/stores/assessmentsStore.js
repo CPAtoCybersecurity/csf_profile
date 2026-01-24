@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
-import { sanitizeInput } from '../utils/sanitize';
+import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
 
@@ -626,11 +626,11 @@ const useAssessmentsStore = create(
           const remediation = obs.remediation || {};
 
           const row = {
-            'ID': getItemName(itemId),
-            'Assessment': assessment.name,
-            'Scope Type': assessment.scopeType,
-            'Auditor': getUserName(obs.auditorId),
-            'Test Procedure(s)': obs.testProcedures || ''
+            'ID': escapeCSVValue(getItemName(itemId)),
+            'Assessment': escapeCSVValue(assessment.name),
+            'Scope Type': escapeCSVValue(assessment.scopeType),
+            'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
+            'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
           };
 
           // Add quarterly columns
@@ -638,7 +638,7 @@ const useAssessmentsStore = create(
             const qData = obs.quarters?.[q] || createDefaultQuarter();
             row[`${q} Actual Score`] = qData.actualScore || 0;
             row[`${q} Target Score`] = qData.targetScore || 0;
-            row[`${q} Observations`] = qData.observations || '';
+            row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
             row[`${q} Observation Date`] = qData.observationDate || '';
             row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
             row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
@@ -646,9 +646,9 @@ const useAssessmentsStore = create(
             row[`${q} Test`] = qData.test ? 'Yes' : 'No';
           });
 
-          row['Linked Artifacts'] = (obs.linkedArtifacts || []).join('; ');
-          row['Remediation Owner'] = getUserName(remediation.ownerId);
-          row['Action Plan'] = remediation.actionPlan || '';
+          row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
+          row['Remediation Owner'] = escapeCSVValue(getUserName(remediation.ownerId));
+          row['Action Plan'] = escapeCSVValue(remediation.actionPlan || '');
           row['Remediation Due Date'] = remediation.dueDate || '';
 
           return row;
@@ -1078,11 +1078,11 @@ const useAssessmentsStore = create(
         // Use existing jiraKey if available, otherwise generate a new one
         const epicKey = assessment.jiraKey || `EVAL-EPIC-${assessment.id}`;
         csvData.push({
-          'Summary': assessment.name,
+          'Summary': escapeCSVValue(assessment.name),
           'Issue Type': 'Epic',
           'Issue key': epicKey,
           'Project key': 'EVAL',
-          'Description': assessment.description || `CSF Assessment: ${assessment.name}\nScope Type: ${assessment.scopeType}\nCreated: ${assessment.createdDate}`,
+          'Description': escapeCSVValue(assessment.description || `CSF Assessment: ${assessment.name}\nScope Type: ${assessment.scopeType}\nCreated: ${assessment.createdDate}`),
           'Status': assessment.status || 'Not Started',
           // Empty custom fields for Epic row
           'Assignee': '',
@@ -1144,15 +1144,15 @@ const useAssessmentsStore = create(
             }
 
             csvData.push({
-              'Summary': `WP-${assessment.name}-${controlDetails.id}-${quarter}`,
+              'Summary': escapeCSVValue(`WP-${assessment.name}-${controlDetails.id}-${quarter}`),
               'Issue Type': 'Work paper',
               'Issue key': obs.jiraKey || '', // Include Jira key if synced
               'Project key': 'EVAL',
               'Parent': epicKey, // Link to parent Epic (Assessment)
               'Parent key': epicKey,
-              'Assignee': getUserEmail(obs.auditorId),
-              'Custom field (Control ID)': controlDetails.id,
-              'Custom field (Compliance Requirement)': controlDetails.linkedReqs,
+              'Assignee': escapeCSVValue(getUserEmail(obs.auditorId)),
+              'Custom field (Control ID)': escapeCSVValue(controlDetails.id),
+              'Custom field (Compliance Requirement)': escapeCSVValue(controlDetails.linkedReqs),
               'Custom field (Quarter)': quarter,
               'Custom field (Q1 Actual Score)': quarter === 'Q1' ? qData.actualScore : '',
               'Custom field (Q1 Target Score)': quarter === 'Q1' ? qData.targetScore : '',
@@ -1163,11 +1163,11 @@ const useAssessmentsStore = create(
               'Custom field (Q4 Actual Score)': quarter === 'Q4' ? qData.actualScore : '',
               'Custom field (Q4 Target Score)': quarter === 'Q4' ? qData.targetScore : '',
               'Custom field (Testing Status)': qData.testingStatus,
-              'Custom field (Test Procedures)': obs.testProcedures || '',
-              'Custom field (Observations)': qData.observations || '',
+              'Custom field (Test Procedures)': escapeCSVValue(obs.testProcedures || ''),
+              'Custom field (Observations)': escapeCSVValue(qData.observations || ''),
               'Custom field (Assessment Methods)': methods.join(', '),
-              'Custom field (Artifacts)': (obs.linkedArtifacts || []).join('; '),
-              'Description': description
+              'Custom field (Artifacts)': escapeCSVValue((obs.linkedArtifacts || []).join('; ')),
+              'Description': escapeCSVValue(description)
             });
           });
         });
@@ -1337,13 +1337,13 @@ const useAssessmentsStore = create(
             const remediation = obs.remediation || {};
 
             const row = {
-              'ID': getItemName(itemId),
-              'Assessment': assessment.name,
-              'Description': assessment.description || '',
-              'Scope Type': assessment.scopeType,
-              'Framework Filter': assessment.frameworkFilter || '',
-              'Auditor': getUserName(obs.auditorId),
-              'Test Procedure(s)': obs.testProcedures || ''
+              'ID': escapeCSVValue(getItemName(itemId)),
+              'Assessment': escapeCSVValue(assessment.name),
+              'Description': escapeCSVValue(assessment.description || ''),
+              'Scope Type': escapeCSVValue(assessment.scopeType),
+              'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
+              'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
+              'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
             };
 
             // Add quarterly columns
@@ -1351,7 +1351,7 @@ const useAssessmentsStore = create(
               const qData = obs.quarters?.[q] || createDefaultQuarter();
               row[`${q} Actual Score`] = qData.actualScore || 0;
               row[`${q} Target Score`] = qData.targetScore || 0;
-              row[`${q} Observations`] = qData.observations || '';
+              row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
               row[`${q} Observation Date`] = qData.observationDate || '';
               row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
               row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
@@ -1359,9 +1359,9 @@ const useAssessmentsStore = create(
               row[`${q} Test`] = qData.test ? 'Yes' : 'No';
             });
 
-            row['Linked Artifacts'] = (obs.linkedArtifacts || []).join('; ');
-            row['Remediation Owner'] = getUserName(remediation.ownerId);
-            row['Action Plan'] = remediation.actionPlan || '';
+            row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
+            row['Remediation Owner'] = escapeCSVValue(getUserName(remediation.ownerId));
+            row['Action Plan'] = escapeCSVValue(remediation.actionPlan || '');
             row['Remediation Due Date'] = remediation.dueDate || '';
 
             csvData.push(row);
