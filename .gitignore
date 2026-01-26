@@ -33,3 +33,6 @@ server/config.json
 
 # Internal reports and confidential documents
 _reports/
+
+# Backup files
+*.backup
