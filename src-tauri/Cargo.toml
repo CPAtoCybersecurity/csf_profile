@@ -1,0 +1,25 @@
+[package]
+name = "csf-profile-assessment"
+version = "2.2.0"
+description = "NIST CSF 2.0 Profile Assessment Tool - Desktop Application"
+authors = ["Simply Cyber Academy", "CPAtoCybersecurity"]
+license = "MIT"
+repository = "https://github.com/CPAtoCybersecurity/csf_profile"
+edition = "2021"
+rust-version = "1.77.2"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "csf_profile_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.5.3" }
+
+[dependencies]
+serde_json = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+log = "0.4"
+tauri = { version = "2.9.5" }
+tauri-plugin-log = "2"
