@@ -9,7 +9,7 @@ A tool designed to help organizations implement and assess their cybersecurity p
 * Export to csv for data visualization in Excel (find a companion Excel template in public/Sample_Artifacts)
 * Track remediation progress
 
-The is an open source project, and improvement ideas to drive cyber risk reduction with CSF assessments are welcome from the Simply Cyber and other awesome communities.
+This is an open source project, and improvement ideas to drive cyber risk reduction with CSF assessments are welcome from the Simply Cyber and other awesome communities.
 
 ![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
