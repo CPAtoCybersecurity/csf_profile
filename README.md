@@ -59,6 +59,10 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 
 [![Video Title](https://img.youtube.com/vi/h206z7wIYqY/0.jpg)](https://youtu.be/h206z7wIYqY)
 
+### Quick Overview (YouTube Short):
+
+[![CSF Profile Assessment Quick Overview](https://img.youtube.com/vi/Zf-84mT17VQ/0.jpg)](https://youtube.com/shorts/Zf-84mT17VQ)
+
 ### Prerequisites by Operating System
 
 #### macOS
