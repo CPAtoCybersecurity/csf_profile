@@ -13,6 +13,8 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 
 ![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
+[![CSF Profile Assessment Quick Overview](https://img.youtube.com/vi/Zf-84mT17VQ/0.jpg)](https://youtube.com/shorts/Zf-84mT17VQ)
+
 Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: [https://academy.simplycyber.io/p/accrp](https://academy.simplycyber.io/p/accrp)
 
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
@@ -58,10 +60,6 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 ### Installation:
 
 [![Video Title](https://img.youtube.com/vi/h206z7wIYqY/0.jpg)](https://youtu.be/h206z7wIYqY)
-
-### Quick Overview (YouTube Short):
-
-[![CSF Profile Assessment Quick Overview](https://img.youtube.com/vi/Zf-84mT17VQ/0.jpg)](https://youtube.com/shorts/Zf-84mT17VQ)
 
 ### Prerequisites by Operating System
 
