@@ -1,10 +1,10 @@
-# PR.AA-05: Access Authorization Management - Q1 2025 Observation
+# PR.AA-05: Access Authorization Management - Q1 2026 Observation
 
 **CSF Subcategory:** PR.AA-05 - Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed
 
-**Assessment Period:** Q1 2025
+**Assessment Period:** Q1 2026
 
-**Observation Date:** 2025-02-15
+**Observation Date:** 2026-02-15
 
 **Testing Status:** Complete
 
@@ -52,7 +52,7 @@ Minor gaps identified:
 
 - Access Management Policy (ALMA-POL-2024-002)
 - ServiceNow access request workflow configuration
-- Q4 2024 access certification campaign results
+- Q4 2025 access certification campaign results
 - CyberArk privileged account inventory
 - Third-party access roster
 
