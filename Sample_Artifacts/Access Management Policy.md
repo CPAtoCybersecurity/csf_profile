@@ -2,10 +2,10 @@
 
 | Field | Value |
 |-------|-------|
-| **Policy ID** | ALMA-POL-2024-002 |
-| **Version** | 1.2 |
-| **Effective Date** | March 1, 2024 |
-| **Next Review Date** | March 1, 2025 |
+| **Policy ID** | ALMA-POL-2025-002 |
+| **Version** | 1.3 |
+| **Effective Date** | March 1, 2025 |
+| **Next Review Date** | March 1, 2026 |
 | **Policy Owner** | Chief Information Security Officer (CISO) |
 | **Approved By** | Executive Leadership Team |
 | **Classification** | Internal Use Only |
@@ -199,11 +199,11 @@ Violations of this policy will be managed in accordgance with the HR Policies an
 
 | Document | Reference |
 |----------|-----------|
-| Information Security Policy | ALMA-POL-2024-001 |
-| Acceptable Use Policy | ALMA-POL-2024-003 |
-| Password Standard | ALMA-STD-2024-002 |
-| Access Request Procedure | ALMA-SOP-2024-005 |
-| Access Certification Procedure | ALMA-SOP-2024-006 |
+| Information Security Policy | ALMA-POL-2025-001 |
+| Acceptable Use Policy | ALMA-POL-2025-003 |
+| Password Standard | ALMA-STD-2025-002 |
+| Access Request Procedure | ALMA-SOP-2025-005 |
+| Access Certification Procedure | ALMA-SOP-2025-006 |
 
 ---
 
@@ -211,9 +211,10 @@ Violations of this policy will be managed in accordgance with the HR Policies an
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | January 15, 2024 | A. Johnson | Initial policy release |
-| 1.1 | February 1, 2024 | A. Johnson | Added SSH key management requirements |
-| 1.2 | March 1, 2024 | S. Chen | Enhanced privileged access and third-party sections |
+| 1.0 | January 15, 2025 | A. Johnson | Initial policy release |
+| 1.1 | February 1, 2025 | A. Johnson | Added SSH key management requirements |
+| 1.2 | March 1, 2025 | S. Chen | Enhanced privileged access and third-party sections |
+| 1.3 | February 16, 2026 | S. Chen | Annual review; no substantive changes |
 
 ---
 
