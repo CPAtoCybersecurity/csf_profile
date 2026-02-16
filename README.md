@@ -6,7 +6,7 @@ A tool designed to help organizations implement and assess their cybersecurity p
 * Assign ownership and stakeholders to controls
 * Document observations and findings
 * Score current and desired security states
-* Export to csv for data visualization in Excel (find a companion Excel template in public/Sample_Artifacts)
+* Export to csv for data visualization in Excel (find a companion Excel template in Sample_Artifacts)
 * Track remediation progress
 
 This is an open source project, and improvement ideas to drive cyber risk reduction with CSF assessments are welcome from the Simply Cyber and other awesome communities.
