@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
-import { sanitizeInput } from '../utils/sanitize';
+import { v4 as uuidv4 } from 'uuid';
+import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
+import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
 
 // Default assessment for new installations
@@ -13,7 +15,7 @@ const DEFAULT_ASSESSMENTS = [
     id: 'ASM-default-2025-alma',
     name: '2025 Alma Security CSF',
     description: 'Annual CSF 2.0 assessment for Alma Security covering all implemented controls',
-    scopeType: 'controls',
+    scopeType: 'requirements',
     frameworkFilter: null,
     createdDate: '2025-01-01T00:00:00.000Z',
     scopeIds: [
@@ -110,6 +112,195 @@ const useAssessmentsStore = create(
           loading: false,
           error: null
         });
+      },
+
+      // Load initial assessment data from JIRA-Assessments.csv
+      loadInitialData: async () => {
+        try {
+          set({ loading: true, error: null });
+
+          const response = await fetch('/JIRA-Assessments.csv');
+          const csvText = await response.text();
+
+          return new Promise((resolve, reject) => {
+            Papa.parse(csvText, {
+              header: true,
+              skipEmptyLines: true,
+              complete: (results) => {
+                // Detect Jira format (has Issue Type and Issue key columns)
+                const isJiraFormat = results.meta.fields?.includes('Issue Type') &&
+                                     results.meta.fields?.includes('Issue key');
+
+                if (!isJiraFormat) {
+                  // Fallback to DEFAULT_ASSESSMENTS if not Jira format
+                  set({ loading: false });
+                  resolve(get().assessments);
+                  return;
+                }
+
+                // First pass: identify Epics as Assessments
+                const jiraEpics = {};
+                results.data.forEach(row => {
+                  if (row['Issue Type'] === 'Epic') {
+                    const epicKey = row['Issue key'];
+                    const epicId = row['Issue id'];
+                    jiraEpics[epicKey] = {
+                      id: epicId,
+                      key: epicKey,
+                      name: row['Summary'] || epicKey,
+                      description: row['Description'] || '',
+                      jiraKey: epicKey
+                    };
+                    if (epicId) {
+                      jiraEpics[epicId] = jiraEpics[epicKey];
+                    }
+                  }
+                });
+
+                // Group work paper rows by parent Epic or Parent summary
+                const assessmentGroups = {};
+                results.data.forEach(row => {
+                  if (row['Issue Type'] === 'Epic') return;
+
+                  const parentKey = row['Parent key'] || row['Parent'];
+                  const parentId = row['Parent'];
+                  const parentSummary = row['Parent summary']; // Use Parent summary for assessment name
+                  const parentEpic = jiraEpics[parentKey] || jiraEpics[parentId];
+
+                  let assessmentName, assessmentJiraKey;
+                  if (parentEpic) {
+                    assessmentName = parentEpic.name;
+                    assessmentJiraKey = parentEpic.key;
+                  } else if (parentSummary) {
+                    // Use Parent summary as the assessment name (preferred)
+                    assessmentName = parentSummary;
+                    assessmentJiraKey = parentKey || null;
+                  } else if (parentKey || parentId) {
+                    assessmentName = parentKey || `Assessment-${parentId}`;
+                    assessmentJiraKey = parentKey;
+                  } else {
+                    return;
+                  }
+
+                  if (!assessmentGroups[assessmentName]) {
+                    const epicInfo = assessmentJiraKey ? jiraEpics[assessmentJiraKey] : null;
+                    assessmentGroups[assessmentName] = {
+                      name: assessmentName,
+                      description: epicInfo?.description || '',
+                      scopeType: 'requirements', // JIRA work papers use subcategory IDs which map to requirements
+                      jiraKey: assessmentJiraKey,
+                      rows: []
+                    };
+                  }
+                  assessmentGroups[assessmentName].rows.push(row);
+                });
+
+                // Create assessments from groups
+                const newAssessments = Object.values(assessmentGroups).map(group => {
+                  const scopeIds = [];
+                  const observations = {};
+
+                  group.rows.forEach(row => {
+                    // Extract control ID from Summary (e.g., "GV.SC-02")
+                    const itemId = row['Summary'] || row['Issue key'];
+                    if (!itemId) return;
+
+                    scopeIds.push(itemId);
+
+                    // Parse quarter data from Jira custom fields
+                    const q1Obs = row['Custom field (Q1 Observations)'] || '';
+                    const q2Obs = row['Custom field (Q2 Observations)'] || '';
+                    const q3Obs = row['Custom field (Q3 Observations)'] || '';
+                    const q4Obs = row['Custom field (Q4 Observations)'] || '';
+
+                    observations[itemId] = {
+                      auditorId: null,
+                      testProcedures: sanitizeInput(row['Custom field (Test Procedures)'] || ''),
+                      linkedArtifacts: (row['Custom field (Artifacts)'] || '').split(';').map(s => s.trim()).filter(Boolean),
+                      jiraKey: row['Issue key'] || null,
+                      remediation: {
+                        ownerId: null,
+                        actionPlan: sanitizeInput(row['Custom field (Remediation Action Plan (Who will do What by When?) )'] || ''),
+                        dueDate: ''
+                      },
+                      quarters: {
+                        Q1: {
+                          actualScore: parseFloat(row['Custom field (Q1 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q1 Target Score)']) || 0,
+                          observations: sanitizeInput(q1Obs),
+                          observationDate: '',
+                          testingStatus: row['Custom field (Testing Status)'] || row['Status'] || 'Not Started',
+                          examine: (row['Custom field (Assessment Methods)'] || '').toLowerCase().includes('examine'),
+                          interview: (row['Custom field (Assessment Methods)'] || '').toLowerCase().includes('interview'),
+                          test: (row['Custom field (Assessment Methods)'] || '').toLowerCase().includes('test')
+                        },
+                        Q2: {
+                          actualScore: parseFloat(row['Custom field (Q2 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q2 Target Score)']) || 0,
+                          observations: sanitizeInput(q2Obs),
+                          observationDate: '',
+                          testingStatus: q2Obs ? 'In Progress' : 'Not Started',
+                          examine: false,
+                          interview: false,
+                          test: false
+                        },
+                        Q3: {
+                          actualScore: parseFloat(row['Custom field (Q3 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q3 Target Score)']) || 0,
+                          observations: sanitizeInput(q3Obs),
+                          observationDate: '',
+                          testingStatus: q3Obs ? 'In Progress' : 'Not Started',
+                          examine: false,
+                          interview: false,
+                          test: false
+                        },
+                        Q4: {
+                          actualScore: parseFloat(row['Custom field (Q4 Actual Score)']) || 0,
+                          targetScore: parseFloat(row['Custom field (Q4 Target Score)']) || 0,
+                          observations: sanitizeInput(q4Obs),
+                          observationDate: '',
+                          testingStatus: q4Obs ? 'In Progress' : 'Not Started',
+                          examine: false,
+                          interview: false,
+                          test: false
+                        }
+                      }
+                    };
+                  });
+
+                  return {
+                    id: `ASM-jira-${group.jiraKey || Date.now()}`,
+                    name: group.name,
+                    description: group.description,
+                    scopeType: group.scopeType,
+                    scopeIds: [...new Set(scopeIds)],
+                    frameworkFilter: null,
+                    jiraKey: group.jiraKey || null,
+                    status: 'In Progress',
+                    createdDate: new Date().toISOString(),
+                    lastModified: new Date().toISOString(),
+                    observations
+                  };
+                });
+
+                // Replace assessments with loaded data
+                set({
+                  assessments: newAssessments.length > 0 ? newAssessments : DEFAULT_ASSESSMENTS,
+                  loading: false,
+                  error: null
+                });
+                resolve(newAssessments);
+              },
+              error: (error) => {
+                set({ error: `Error parsing CSV: ${error.message}`, loading: false });
+                reject(error);
+              }
+            });
+          });
+        } catch (err) {
+          set({ error: `Error loading file: ${err.message}`, loading: false });
+          throw err;
+        }
       },
 
       // Get all assessments
@@ -408,7 +599,8 @@ const useAssessmentsStore = create(
       canRedo: () => get().historyIndex < get().history.length - 1,
 
       // Export assessment to CSV with quarterly columns
-      exportAssessmentCSV: (assessmentId, controlsStore, requirementsStore, userStore) => {
+      // Optionally encrypt if a password is provided.
+      exportAssessmentCSV: async (assessmentId, controlsStore, requirementsStore, userStore, { password } = {}) => {
         const assessment = get().getAssessment(assessmentId);
         if (!assessment) return;
 
@@ -435,11 +627,11 @@ const useAssessmentsStore = create(
           const remediation = obs.remediation || {};
 
           const row = {
-            'ID': getItemName(itemId),
-            'Assessment': assessment.name,
-            'Scope Type': assessment.scopeType,
-            'Auditor': getUserName(obs.auditorId),
-            'Test Procedure(s)': obs.testProcedures || ''
+            'ID': escapeCSVValue(getItemName(itemId)),
+            'Assessment': escapeCSVValue(assessment.name),
+            'Scope Type': escapeCSVValue(assessment.scopeType),
+            'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
+            'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
           };
 
           // Add quarterly columns
@@ -447,7 +639,7 @@ const useAssessmentsStore = create(
             const qData = obs.quarters?.[q] || createDefaultQuarter();
             row[`${q} Actual Score`] = qData.actualScore || 0;
             row[`${q} Target Score`] = qData.targetScore || 0;
-            row[`${q} Observations`] = qData.observations || '';
+            row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
             row[`${q} Observation Date`] = qData.observationDate || '';
             row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
             row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
@@ -455,23 +647,41 @@ const useAssessmentsStore = create(
             row[`${q} Test`] = qData.test ? 'Yes' : 'No';
           });
 
-          row['Linked Artifacts'] = (obs.linkedArtifacts || []).join('; ');
-          row['Remediation Owner'] = getUserName(remediation.ownerId);
-          row['Action Plan'] = remediation.actionPlan || '';
+          row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
+          row['Remediation Owner'] = escapeCSVValue(getUserName(remediation.ownerId));
+          row['Action Plan'] = escapeCSVValue(remediation.actionPlan || '');
           row['Remediation Due Date'] = remediation.dueDate || '';
 
           return row;
         });
 
         const csv = Papa.unparse(csvData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const trimmedPassword = (password || '').trim();
+
+        let blob;
         const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
         const date = new Date().toISOString().split('T')[0];
         const safeName = assessment.name.replace(/[^a-z0-9]/gi, '_');
+        const baseFilename = `assessment_${safeName}_${date}.csv`;
+
+        if (trimmedPassword) {
+          const encoder = new TextEncoder();
+          const encryptedBytes = await encryptBytesWithPassword(
+            encoder.encode(csv),
+            trimmedPassword
+          );
+          blob = new Blob([encryptedBytes], { type: 'application/octet-stream' });
+        } else {
+          blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        }
+
+        const url = URL.createObjectURL(blob);
 
         link.setAttribute('href', url);
-        link.setAttribute('download', `assessment_${safeName}_${date}.csv`);
+        link.setAttribute(
+          'download',
+          trimmedPassword ? buildEncryptedFilename(baseFilename) : baseFilename
+        );
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
@@ -500,6 +710,9 @@ const useAssessmentsStore = create(
       },
 
       // Import assessments from CSV with quarterly columns support
+      // Supports both standard format AND Jira EVAL format:
+      // - Jira Epic (Issue Type = "Epic") → React Assessment
+      // - Jira Work paper with Parent/Parent key → React Observation within that Assessment
       importAssessmentsCSV: async (csvText, userStore) => {
         return new Promise((resolve, reject) => {
           Papa.parse(csvText, {
@@ -508,18 +721,72 @@ const useAssessmentsStore = create(
             complete: (results) => {
               const findOrCreateUser = userStore?.getState?.()?.findOrCreateUser;
 
+              // Detect if this is a Jira EVAL export (has Issue Type and Issue key columns)
+              const isJiraFormat = results.meta.fields?.includes('Issue Type') &&
+                                   results.meta.fields?.includes('Issue key');
+
               // Group rows by assessment name
               // Carry forward assessment name from previous row if current row is blank
               const assessmentGroups = {};
               let lastAssessmentName = null;
               let lastScopeType = 'controls';
 
-              results.data.forEach(row => {
-                let assessmentName = row['Assessment'] || row['Assessment Name'] || row.assessment;
+              // For Jira format: First pass to identify Epics as Assessments
+              const jiraEpics = {};
+              if (isJiraFormat) {
+                results.data.forEach(row => {
+                  if (row['Issue Type'] === 'Epic') {
+                    const epicKey = row['Issue key'];
+                    const epicId = row['Issue id']; // Jira internal ID used in Parent field
+                    jiraEpics[epicKey] = {
+                      id: epicId,
+                      key: epicKey,
+                      name: row['Summary'] || epicKey,
+                      description: row['Description'] || '',
+                      jiraKey: epicKey
+                    };
+                    // Also map by ID for Parent field lookups
+                    if (epicId) {
+                      jiraEpics[epicId] = jiraEpics[epicKey];
+                    }
+                  }
+                });
+              }
 
-                // If assessment name is empty, use the last known assessment name
-                if (!assessmentName && lastAssessmentName) {
-                  assessmentName = lastAssessmentName;
+              results.data.forEach(row => {
+                let assessmentName;
+                let assessmentJiraKey = null;
+
+                if (isJiraFormat) {
+                  // Skip Epic rows - they define assessments, not observations
+                  if (row['Issue Type'] === 'Epic') return;
+
+                  // For Work papers, find parent Epic to determine assessment
+                  const parentKey = row['Parent key'] || row['Parent'];
+                  const parentId = row['Parent'];
+
+                  // Try to find the Epic by key or ID
+                  const parentEpic = jiraEpics[parentKey] || jiraEpics[parentId];
+
+                  if (parentEpic) {
+                    assessmentName = parentEpic.name;
+                    assessmentJiraKey = parentEpic.key;
+                  } else if (parentKey || parentId) {
+                    // Parent exists but Epic not found in this CSV - use parent key as assessment name
+                    assessmentName = parentKey || `Assessment-${parentId}`;
+                    assessmentJiraKey = parentKey;
+                  } else {
+                    // No parent - skip or use Summary as standalone
+                    return;
+                  }
+                } else {
+                  // Standard format
+                  assessmentName = row['Assessment'] || row['Assessment Name'] || row.assessment;
+
+                  // If assessment name is empty, use the last known assessment name
+                  if (!assessmentName && lastAssessmentName) {
+                    assessmentName = lastAssessmentName;
+                  }
                 }
 
                 if (!assessmentName) return;
@@ -530,11 +797,16 @@ const useAssessmentsStore = create(
                 if (!assessmentGroups[assessmentName]) {
                   const scopeType = (row['Scope Type'] || row.scopeType || lastScopeType || 'controls').toLowerCase();
                   lastScopeType = scopeType;
+
+                  // For Jira format, use Epic description if available
+                  const epicInfo = assessmentJiraKey ? jiraEpics[assessmentJiraKey] : null;
+
                   assessmentGroups[assessmentName] = {
                     name: assessmentName,
-                    description: row['Description'] || row.description || '',
+                    description: epicInfo?.description || row['Description'] || row.description || '',
                     scopeType: scopeType,
                     frameworkFilter: row['Framework Filter'] || row.frameworkFilter || null,
+                    jiraKey: assessmentJiraKey, // Store Jira Epic key for reference
                     rows: []
                   };
                 }
@@ -597,7 +869,21 @@ const useAssessmentsStore = create(
                 const observations = {};
 
                 group.rows.forEach(row => {
-                  const itemId = row['ID'] || row['Item ID'] || row.itemId || row.id;
+                  // For Jira format, extract Control ID from custom field or Summary
+                  let itemId;
+                  if (isJiraFormat) {
+                    itemId = row['Custom field (Control ID)'] ||
+                             row['Custom field (Compliance Requirement)'] ||
+                             // Parse from Summary if in format "WP-AssessmentName-ControlID-Quarter"
+                             (() => {
+                               const summary = row['Summary'] || '';
+                               const match = summary.match(/^WP-.*?-(.+?)-Q\d$/);
+                               return match ? match[1] : null;
+                             })() ||
+                             row['Issue key']; // Fallback to Jira key
+                  } else {
+                    itemId = row['ID'] || row['Item ID'] || row.itemId || row.id;
+                  }
                   if (!itemId) return;
 
                   scopeIds.push(itemId);
@@ -618,7 +904,66 @@ const useAssessmentsStore = create(
                     if (info) remediationOwnerId = findOrCreateUser(info);
                   }
 
-                  if (hasQuarterlyColumns) {
+                  if (isJiraFormat) {
+                    // Jira EVAL format - each row is a single quarter's observation
+                    const quarter = row['Custom field (Quarter)'] ||
+                                    (() => {
+                                      const summary = row['Summary'] || '';
+                                      const match = summary.match(/Q(\d)$/);
+                                      return match ? `Q${match[1]}` : 'Q1';
+                                    })();
+
+                    // Parse assessment methods from custom field
+                    const methodsStr = row['Custom field (Assessment Methods)'] || '';
+                    const examine = methodsStr.toLowerCase().includes('examine');
+                    const interview = methodsStr.toLowerCase().includes('interview');
+                    const test = methodsStr.toLowerCase().includes('test');
+
+                    // Get or create existing observation for this item
+                    const existingObs = observations[itemId] || {
+                      auditorId: null,
+                      testProcedures: '',
+                      linkedArtifacts: [],
+                      remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+                      jiraKey: null,
+                      quarters: createDefaultQuarters()
+                    };
+
+                    // Update with this row's data
+                    existingObs.auditorId = auditorId || existingObs.auditorId;
+                    existingObs.testProcedures = sanitizeInput(
+                      row['Custom field (Test Procedures)'] ||
+                      row['Custom field (Observations)'] ||
+                      existingObs.testProcedures || ''
+                    );
+                    existingObs.jiraKey = row['Issue key'] || existingObs.jiraKey;
+                    existingObs.linkedArtifacts = (row['Custom field (Artifacts)'] || '')
+                      .split(';').map(s => s.trim()).filter(Boolean);
+
+                    // Update the specific quarter
+                    if (['Q1', 'Q2', 'Q3', 'Q4'].includes(quarter)) {
+                      existingObs.quarters[quarter] = {
+                        actualScore: parseFloat(row['Custom field (Q1 Actual Score)'] ||
+                                                row['Custom field (Q2 Actual Score)'] ||
+                                                row['Custom field (Q3 Actual Score)'] ||
+                                                row['Custom field (Q4 Actual Score)'] ||
+                                                row['Custom field (Actual Score)']) || 0,
+                        targetScore: parseFloat(row['Custom field (Q1 Target Score)'] ||
+                                                row['Custom field (Q2 Target Score)'] ||
+                                                row['Custom field (Q3 Target Score)'] ||
+                                                row['Custom field (Q4 Target Score)'] ||
+                                                row['Custom field (Target Score)']) || 0,
+                        observations: sanitizeInput(row['Custom field (Observations)'] || row['Description'] || ''),
+                        observationDate: parseDate(row['Created'] || row['Updated'] || ''),
+                        testingStatus: row['Custom field (Testing Status)'] || row['Status'] || 'Not Started',
+                        examine,
+                        interview,
+                        test
+                      };
+                    }
+
+                    observations[itemId] = existingObs;
+                  } else if (hasQuarterlyColumns) {
                     // New quarterly format
                     observations[itemId] = {
                       auditorId,
@@ -669,12 +1014,13 @@ const useAssessmentsStore = create(
                 });
 
                 return {
-                  id: `ASM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  id: `ASM-${uuidv4()}`,
                   name: group.name,
                   description: group.description,
                   scopeType: group.scopeType,
                   scopeIds: [...new Set(scopeIds)],
                   frameworkFilter: group.frameworkFilter,
+                  jiraKey: group.jiraKey || null, // Store Jira Epic key for sync reference
                   status: 'Not Started',
                   createdDate: new Date().toISOString(),
                   lastModified: new Date().toISOString(),
@@ -694,8 +1040,275 @@ const useAssessmentsStore = create(
         });
       },
 
+      // Export assessment to Jira EVAL project format (Control Evaluations)
+      // Includes Epic row for assessment + Work paper rows for observations
+      exportForJiraCSV: (assessmentId, controlsStore, requirementsStore, userStore) => {
+        const assessment = get().getAssessment(assessmentId);
+        if (!assessment) return;
+
+        const users = userStore?.getState?.()?.users || [];
+        const getUserEmail = (userId) => {
+          const user = users.find(u => u.id === userId);
+          return user?.email || '';
+        };
+
+        const getControlDetails = (itemId) => {
+          if (assessment.scopeType === 'controls') {
+            const control = controlsStore?.getState?.()?.getControl?.(itemId);
+            return {
+              id: control?.controlId || itemId,
+              linkedReqs: control?.linkedRequirementIds?.join(', ') || ''
+            };
+          }
+          return { id: itemId, linkedReqs: '' };
+        };
+
+        // Generate smart-embed URL if available
+        const getSmartEmbedUrl = (requirementId) => {
+          try {
+            const { getSmartEmbedUrlForRequirement } = require('../utils/confluenceSync');
+            return getSmartEmbedUrlForRequirement(requirementId) || '';
+          } catch {
+            return '';
+          }
+        };
+
+        const csvData = [];
+
+        // First row: Epic representing the Assessment
+        // Use existing jiraKey if available, otherwise generate a new one
+        const epicKey = assessment.jiraKey || `EVAL-EPIC-${assessment.id}`;
+        csvData.push({
+          'Summary': escapeCSVValue(assessment.name),
+          'Issue Type': 'Epic',
+          'Issue key': epicKey,
+          'Project key': 'EVAL',
+          'Description': escapeCSVValue(assessment.description || `CSF Assessment: ${assessment.name}\nScope Type: ${assessment.scopeType}\nCreated: ${assessment.createdDate}`),
+          'Status': assessment.status || 'Not Started',
+          // Empty custom fields for Epic row
+          'Assignee': '',
+          'Custom field (Control ID)': '',
+          'Custom field (Compliance Requirement)': '',
+          'Custom field (Quarter)': '',
+          'Custom field (Q1 Actual Score)': '',
+          'Custom field (Q1 Target Score)': '',
+          'Custom field (Q2 Actual Score)': '',
+          'Custom field (Q2 Target Score)': '',
+          'Custom field (Q3 Actual Score)': '',
+          'Custom field (Q3 Target Score)': '',
+          'Custom field (Q4 Actual Score)': '',
+          'Custom field (Q4 Target Score)': '',
+          'Custom field (Testing Status)': '',
+          'Custom field (Test Procedures)': '',
+          'Custom field (Observations)': '',
+          'Custom field (Assessment Methods)': '',
+          'Custom field (Artifacts)': '',
+          'Parent': '',
+          'Parent key': ''
+        });
+
+        // Create one row per control per quarter that has data (Work papers)
+        assessment.scopeIds.forEach(itemId => {
+          const rawObs = assessment.observations[itemId] || {};
+          const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
+          const controlDetails = getControlDetails(itemId);
+
+          // Create separate issues for each quarter with data
+          ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+            const qData = obs.quarters?.[quarter] || createDefaultQuarter();
+
+            // Skip quarters with no meaningful data
+            if (qData.testingStatus === 'Not Started' && !qData.observations && qData.actualScore === 0) {
+              return;
+            }
+
+            // Build assessment methods string
+            const methods = [];
+            if (qData.examine) methods.push('Examine');
+            if (qData.interview) methods.push('Interview');
+            if (qData.test) methods.push('Test');
+
+            // Build description with smart-embed if available
+            let description = `Control Evaluation for ${controlDetails.id} - ${quarter}\n\n`;
+            description += `Test Procedures:\n${obs.testProcedures || 'N/A'}\n\n`;
+            description += `Observations:\n${qData.observations || 'N/A'}\n\n`;
+            description += `Assessment Methods: ${methods.join(', ') || 'None'}\n\n`;
+            if (controlDetails.linkedReqs) {
+              description += `Linked Requirements: ${controlDetails.linkedReqs}\n`;
+              const smartEmbedUrl = getSmartEmbedUrl(controlDetails.linkedReqs.split(',')[0]?.trim());
+              if (smartEmbedUrl) {
+                description += `\nView in Confluence: ${smartEmbedUrl}`;
+              }
+            }
+            if ((obs.linkedArtifacts || []).length > 0) {
+              description += `\nLinked Artifacts: ${obs.linkedArtifacts.join(', ')}`;
+            }
+
+            csvData.push({
+              'Summary': escapeCSVValue(`WP-${assessment.name}-${controlDetails.id}-${quarter}`),
+              'Issue Type': 'Work paper',
+              'Issue key': obs.jiraKey || '', // Include Jira key if synced
+              'Project key': 'EVAL',
+              'Parent': epicKey, // Link to parent Epic (Assessment)
+              'Parent key': epicKey,
+              'Assignee': escapeCSVValue(getUserEmail(obs.auditorId)),
+              'Custom field (Control ID)': escapeCSVValue(controlDetails.id),
+              'Custom field (Compliance Requirement)': escapeCSVValue(controlDetails.linkedReqs),
+              'Custom field (Quarter)': quarter,
+              'Custom field (Q1 Actual Score)': quarter === 'Q1' ? qData.actualScore : '',
+              'Custom field (Q1 Target Score)': quarter === 'Q1' ? qData.targetScore : '',
+              'Custom field (Q2 Actual Score)': quarter === 'Q2' ? qData.actualScore : '',
+              'Custom field (Q2 Target Score)': quarter === 'Q2' ? qData.targetScore : '',
+              'Custom field (Q3 Actual Score)': quarter === 'Q3' ? qData.actualScore : '',
+              'Custom field (Q3 Target Score)': quarter === 'Q3' ? qData.targetScore : '',
+              'Custom field (Q4 Actual Score)': quarter === 'Q4' ? qData.actualScore : '',
+              'Custom field (Q4 Target Score)': quarter === 'Q4' ? qData.targetScore : '',
+              'Custom field (Testing Status)': qData.testingStatus,
+              'Custom field (Test Procedures)': escapeCSVValue(obs.testProcedures || ''),
+              'Custom field (Observations)': escapeCSVValue(qData.observations || ''),
+              'Custom field (Assessment Methods)': methods.join(', '),
+              'Custom field (Artifacts)': escapeCSVValue((obs.linkedArtifacts || []).join('; ')),
+              'Description': escapeCSVValue(description)
+            });
+          });
+        });
+
+        // If only the Epic row exists (no work papers with data), still export the Epic
+        if (csvData.length === 1) {
+          // Keep the Epic row, just log that there's no work paper data
+          console.info('Exporting assessment Epic with no work paper data');
+        }
+
+        if (csvData.length === 0) {
+          console.warn('No data to export for Jira');
+          return;
+        }
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+        const safeName = assessment.name.replace(/[^a-z0-9]/gi, '_');
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `jira_eval_import_${safeName}_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
+      // Export all assessments to Jira EVAL format
+      // Includes Epic rows for each assessment + Work paper rows for observations
+      exportAllForJiraCSV: (controlsStore, requirementsStore, userStore) => {
+        const assessments = get().assessments;
+        if (assessments.length === 0) return;
+
+        const users = userStore?.getState?.()?.users || [];
+        const getUserEmail = (userId) => {
+          const user = users.find(u => u.id === userId);
+          return user?.email || '';
+        };
+
+        const csvData = [];
+
+        assessments.forEach(assessment => {
+          // First: Epic row representing the Assessment
+          const epicKey = assessment.jiraKey || `EVAL-EPIC-${assessment.id}`;
+          csvData.push({
+            'Summary': assessment.name,
+            'Issue Type': 'Epic',
+            'Issue key': epicKey,
+            'Project key': 'EVAL',
+            'Description': assessment.description || `CSF Assessment: ${assessment.name}\nScope Type: ${assessment.scopeType}\nCreated: ${assessment.createdDate}`,
+            'Status': assessment.status || 'Not Started',
+            'Parent': '',
+            'Parent key': '',
+            'Assignee': '',
+            'Custom field (Control ID)': '',
+            'Custom field (Compliance Requirement)': '',
+            'Custom field (Quarter)': '',
+            'Custom field (Actual Score)': '',
+            'Custom field (Target Score)': '',
+            'Custom field (Testing Status)': '',
+            'Custom field (Test Procedures)': '',
+            'Custom field (Observations)': '',
+            'Custom field (Assessment Methods)': '',
+            'Custom field (Artifacts)': ''
+          });
+
+          const getControlDetails = (itemId) => {
+            if (assessment.scopeType === 'controls') {
+              const control = controlsStore?.getState?.()?.getControl?.(itemId);
+              return {
+                id: control?.controlId || itemId,
+                linkedReqs: control?.linkedRequirementIds?.join(', ') || ''
+              };
+            }
+            return { id: itemId, linkedReqs: '' };
+          };
+
+          // Then: Work paper rows for each observation
+          assessment.scopeIds.forEach(itemId => {
+            const rawObs = assessment.observations[itemId] || {};
+            const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
+            const controlDetails = getControlDetails(itemId);
+
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+              const qData = obs.quarters?.[quarter] || createDefaultQuarter();
+
+              if (qData.testingStatus === 'Not Started' && !qData.observations && qData.actualScore === 0) {
+                return;
+              }
+
+              const methods = [];
+              if (qData.examine) methods.push('Examine');
+              if (qData.interview) methods.push('Interview');
+              if (qData.test) methods.push('Test');
+
+              csvData.push({
+                'Summary': `WP-${assessment.name}-${controlDetails.id}-${quarter}`,
+                'Issue Type': 'Work paper',
+                'Issue key': obs.jiraKey || '',
+                'Project key': 'EVAL',
+                'Parent': epicKey, // Link to parent Epic (Assessment)
+                'Parent key': epicKey,
+                'Assignee': getUserEmail(obs.auditorId),
+                'Custom field (Control ID)': controlDetails.id,
+                'Custom field (Compliance Requirement)': controlDetails.linkedReqs,
+                'Custom field (Quarter)': quarter,
+                'Custom field (Actual Score)': qData.actualScore,
+                'Custom field (Target Score)': qData.targetScore,
+                'Custom field (Testing Status)': qData.testingStatus,
+                'Custom field (Test Procedures)': obs.testProcedures || '',
+                'Custom field (Observations)': qData.observations || '',
+                'Custom field (Assessment Methods)': methods.join(', '),
+                'Custom field (Artifacts)': (obs.linkedArtifacts || []).join('; '),
+                'Description': `Control Evaluation for ${controlDetails.id} - ${quarter}\n\nAssessment: ${assessment.name}`
+              });
+            });
+          });
+        });
+
+        if (csvData.length === 0) return;
+
+        const csv = Papa.unparse(csvData);
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        const date = new Date().toISOString().split('T')[0];
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `jira_eval_import_all_${date}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      },
+
       // Export all assessments to CSV with quarterly columns
-      exportAllAssessmentsCSV: (controlsStore, requirementsStore, userStore) => {
+      exportAllAssessmentsCSV: async (controlsStore, requirementsStore, userStore, { password } = {}) => {
         const assessments = get().assessments;
         if (assessments.length === 0) return;
 
@@ -725,13 +1338,13 @@ const useAssessmentsStore = create(
             const remediation = obs.remediation || {};
 
             const row = {
-              'ID': getItemName(itemId),
-              'Assessment': assessment.name,
-              'Description': assessment.description || '',
-              'Scope Type': assessment.scopeType,
-              'Framework Filter': assessment.frameworkFilter || '',
-              'Auditor': getUserName(obs.auditorId),
-              'Test Procedure(s)': obs.testProcedures || ''
+              'ID': escapeCSVValue(getItemName(itemId)),
+              'Assessment': escapeCSVValue(assessment.name),
+              'Description': escapeCSVValue(assessment.description || ''),
+              'Scope Type': escapeCSVValue(assessment.scopeType),
+              'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
+              'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
+              'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
             };
 
             // Add quarterly columns
@@ -739,7 +1352,7 @@ const useAssessmentsStore = create(
               const qData = obs.quarters?.[q] || createDefaultQuarter();
               row[`${q} Actual Score`] = qData.actualScore || 0;
               row[`${q} Target Score`] = qData.targetScore || 0;
-              row[`${q} Observations`] = qData.observations || '';
+              row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
               row[`${q} Observation Date`] = qData.observationDate || '';
               row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
               row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
@@ -747,9 +1360,9 @@ const useAssessmentsStore = create(
               row[`${q} Test`] = qData.test ? 'Yes' : 'No';
             });
 
-            row['Linked Artifacts'] = (obs.linkedArtifacts || []).join('; ');
-            row['Remediation Owner'] = getUserName(remediation.ownerId);
-            row['Action Plan'] = remediation.actionPlan || '';
+            row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
+            row['Remediation Owner'] = escapeCSVValue(getUserName(remediation.ownerId));
+            row['Action Plan'] = escapeCSVValue(remediation.actionPlan || '');
             row['Remediation Due Date'] = remediation.dueDate || '';
 
             csvData.push(row);
@@ -757,22 +1370,149 @@ const useAssessmentsStore = create(
         });
 
         const csv = Papa.unparse(csvData);
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const date = new Date().toISOString().split('T')[0];
+        const baseFilename = `assessments_${date}.csv`;
+
+        let blob;
+        let filename;
+
+        if (password && String(password).trim().length > 0) {
+          const encoder = new TextEncoder();
+          const plaintextBytes = encoder.encode(csv);
+          const encryptedBytes = await encryptBytesWithPassword(plaintextBytes, String(password));
+          blob = new Blob([encryptedBytes], { type: 'application/octet-stream' });
+          filename = buildEncryptedFilename(baseFilename);
+        } else {
+          blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+          filename = baseFilename;
+        }
+
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
-        const date = new Date().toISOString().split('T')[0];
 
         link.setAttribute('href', url);
-        link.setAttribute('download', `assessments_${date}.csv`);
+        link.setAttribute('download', filename);
         link.style.visibility = 'hidden';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      },
+
+      // ============ EVALUATIONS STORE INTEGRATION ============
+      // NOTE: The embedded `observations` object is DEPRECATED.
+      // New code should use evaluationsStore for point-in-time evaluation data.
+      // These methods provide migration and compatibility.
+
+      /**
+       * Get scope control IDs (alias for scopeIds with preferred naming)
+       * scopeIds holds control IDs for assessments that scope by controls
+       */
+      getScopeControlIds: (assessmentId) => {
+        const assessment = get().getAssessment(assessmentId);
+        return assessment?.scopeIds || [];
+      },
+
+      /**
+       * Set scope control IDs
+       */
+      setScopeControlIds: (assessmentId, controlIds) => {
+        get().updateAssessment(assessmentId, { scopeIds: controlIds });
+      },
+
+      /**
+       * Migrate embedded observations to evaluationsStore.
+       * This extracts quarterly observation data and creates Evaluation entities.
+       * Should be called once during app migration.
+       *
+       * @param {Object} evaluationsStore - The evaluations store instance
+       * @returns {number} Number of evaluations created
+       */
+      migrateObservationsToEvaluations: (evaluationsStore) => {
+        const assessments = get().assessments;
+        const evaluationsData = [];
+
+        assessments.forEach(assessment => {
+          const observations = assessment.observations || {};
+
+          Object.entries(observations).forEach(([controlId, obs]) => {
+            // Skip if no quarterly data
+            if (!obs.quarters) {
+              // Try to migrate old format
+              const migrated = migrateObservationToQuarterly(obs);
+              if (!migrated?.quarters) return;
+              obs = migrated;
+            }
+
+            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(quarter => {
+              const qData = obs.quarters[quarter];
+
+              // Skip empty quarters (no meaningful data)
+              if (!qData ||
+                  (qData.testingStatus === 'Not Started' &&
+                   !qData.observations &&
+                   qData.actualScore === 0 &&
+                   qData.targetScore === 0)) {
+                return;
+              }
+
+              evaluationsData.push({
+                assessmentId: assessment.id,
+                controlId,
+                quarter,
+                auditorId: obs.auditorId,
+                actualScore: qData.actualScore,
+                targetScore: qData.targetScore,
+                observations: qData.observations,
+                testProcedures: obs.testProcedures,
+                testingStatus: qData.testingStatus,
+                examine: qData.examine,
+                interview: qData.interview,
+                test: qData.test,
+                evaluationDate: qData.observationDate,
+                linkedArtifactIds: obs.linkedArtifacts || [],
+                remediation: obs.remediation,
+                jiraKey: obs.jiraKey,
+                createdDate: assessment.createdDate
+              });
+            });
+          });
+        });
+
+        // Use evaluationsStore bulk create
+        const count = evaluationsStore.getState().bulkCreateEvaluations(evaluationsData);
+        console.log(`[assessmentsStore] Migrated ${count} evaluations from ${assessments.length} assessments`);
+        return count;
+      },
+
+      /**
+       * Get evaluations for an assessment from evaluationsStore.
+       * This is the NEW way to access evaluation data.
+       *
+       * @param {string} assessmentId - Assessment ID
+       * @param {Object} evaluationsStore - The evaluations store instance
+       * @returns {Array} Evaluation objects
+       */
+      getEvaluationsFromStore: (assessmentId, evaluationsStore) => {
+        return evaluationsStore.getState().getEvaluationsByAssessment(assessmentId);
+      },
+
+      /**
+       * Check if assessment has been migrated to evaluationsStore.
+       * An assessment is "migrated" if it has evaluations in evaluationsStore.
+       *
+       * @param {string} assessmentId - Assessment ID
+       * @param {Object} evaluationsStore - The evaluations store instance
+       * @returns {boolean}
+       */
+      isMigratedToEvaluations: (assessmentId, evaluationsStore) => {
+        const evals = evaluationsStore.getState().getEvaluationsByAssessment(assessmentId);
+        return evals.length > 0;
       }
     }),
     {
       name: 'csf-assessments-storage',
-      version: 3,
+      version: 5,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -820,6 +1560,51 @@ const useAssessmentsStore = create(
                 ...assessment,
                 observations: UPDATED_OBSERVATIONS
               };
+            }
+            return assessment;
+          });
+          return {
+            ...persistedState,
+            assessments: updatedAssessments
+          };
+        }
+        // Version 4: Fix scopeType from 'controls' to 'requirements'
+        // The scopeIds are subcategory/requirement IDs, not control IDs
+        if (version < 4) {
+          const assessments = persistedState?.assessments || [];
+          const updatedAssessments = assessments.map(assessment => {
+            // Fix scopeType for assessments that have requirement/subcategory-style IDs
+            if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
+              const firstId = assessment.scopeIds[0];
+              // If IDs look like subcategory IDs (e.g., GV.SC-04, DE.AE-02) or requirement IDs (e.g., GV.SC-04 Ex1)
+              if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
+                return {
+                  ...assessment,
+                  scopeType: 'requirements'
+                };
+              }
+            }
+            return assessment;
+          });
+          return {
+            ...persistedState,
+            assessments: updatedAssessments
+          };
+        }
+        // Version 5: Re-run scopeType fix with improved regex for subcategory IDs
+        // Handles cases like GV.SC-02, DE.CM-03 that were missed in v4
+        if (version < 5) {
+          const assessments = persistedState?.assessments || [];
+          const updatedAssessments = assessments.map(assessment => {
+            if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
+              const firstId = assessment.scopeIds[0];
+              // Match subcategory IDs: XX.YY-NN or XX.YYY-NN (e.g., GV.SC-02, DE.CM-03)
+              if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
+                return {
+                  ...assessment,
+                  scopeType: 'requirements'
+                };
+              }
             }
             return assessment;
           });

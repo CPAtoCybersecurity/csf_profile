@@ -3,6 +3,7 @@ import { UserPlus, Edit, Trash2, Save, X, Upload, Download } from 'lucide-react'
 import Papa from 'papaparse';
 import toast from 'react-hot-toast';
 import useUserStore from '../stores/userStore';
+import { escapeCSVValue } from '../utils/sanitize';
 
 const UserManagement = () => {
   const users = useUserStore((state) => state.users);
@@ -73,9 +74,9 @@ const UserManagement = () => {
   // Handle CSV export
   const handleExportCSV = () => {
     const csvData = users.map(user => ({
-      'User': user.name,
-      'Title': user.title,
-      'Email': user.email
+      'User': escapeCSVValue(user.name),
+      'Title': escapeCSVValue(user.title),
+      'Email': escapeCSVValue(user.email)
     }));
 
     const csv = Papa.unparse(csvData);

@@ -22,6 +22,7 @@ import ScoringLegend from './pages/ScoringLegend';
 import Artifacts from './pages/Artifacts';
 import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
+import Findings from './pages/Findings';
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -29,12 +30,15 @@ import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 // Stores
 import useUserStore from './stores/userStore';
 import useRequirementsStore from './stores/requirementsStore';
+import useAssessmentsStore from './stores/assessmentsStore';
 
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
+import { checkEnvironmentVariables } from './utils/envValidation';
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
+  const loadAssessments = useAssessmentsStore((state) => state.loadInitialData);
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
   const [showBackupReminder, setShowBackupReminder] = useState(false);
   const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
@@ -44,10 +48,14 @@ const AppContent = () => {
 
   // Load data on mount - run once
   useEffect(() => {
+    // Validate environment variables for JIRA/Confluence integration
+    checkEnvironmentVariables();
     // Fix email addresses using store directly
     useUserStore.getState().fixEmailAddresses();
-    // Load requirements data
+    // Load requirements data from Confluence-Requirements.csv
     loadRequirements();
+    // Load assessments data from JIRA-Assessments.csv
+    loadAssessments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
   
@@ -91,25 +99,29 @@ const AppContent = () => {
     <React.Fragment>
     <div className="flex flex-col h-screen">
       <div className="flex flex-col h-full bg-white text-gray-700">
-        {/* Header */}
-        <header className="bg-blue-700 text-white p-4">
+        {/* Header - Compact Jira-style */}
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
+            {/* Left: Logo and title */}
+            <div className="flex items-center gap-3">
               <img
                 src="/SC_SimplyCyberAcademy.png"
                 alt="Simply Cyber Academy Logo"
-                className="h-16 mr-4"
+                className="h-8"
               />
-              <div>
-                <h1 className="text-2xl font-bold">CSF Profile Assessment Database v2.1</h1>
-              </div>
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">CSF Profile Assessment</span>
             </div>
-            <div className="flex items-center gap-4">
+
+            {/* Center: Navigation */}
+            <Navigation />
+
+            {/* Right: Utilities */}
+            <div className="flex items-center gap-2">
               <LastBackupIndicator onExportClick={handleExportFromIndicator} key={lastBackupTrigger} />
               <AutoSaveIndicator />
               <UndoRedoButtons />
               <ThemeToggle />
-              <Navigation />
             </div>
           </div>
         </header>
@@ -123,6 +135,7 @@ const AppContent = () => {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/scoring" element={<ScoringLegend />} />
             <Route path="/artifacts" element={<Artifacts />} />
+            <Route path="/findings" element={<Findings />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />

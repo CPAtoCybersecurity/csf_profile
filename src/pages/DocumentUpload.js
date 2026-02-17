@@ -1,7 +1,24 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 import useAIStore from '../stores/aiStore';
 import { Upload, FileText, Trash2, ArrowLeft, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+
+// File upload security configuration
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_EXTENSIONS = ['.txt', '.md', '.csv', '.pdf', '.docx'];
+const ALLOWED_MIME_TYPES = [
+  'text/plain',
+  'text/markdown',
+  'text/csv',
+  'application/pdf',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+];
+
+// Sanitize filename to prevent path traversal and injection
+const sanitizeFilename = (filename) => {
+  return filename.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 255);
+};
 
 const DocumentUpload = ({ embedded = false }) => {
   const navigate = useNavigate();
@@ -30,14 +47,37 @@ const DocumentUpload = ({ embedded = false }) => {
     return `[Content from ${file.name} - PDF/DOCX extraction requires additional setup. Please use TXT or MD files for now.]`;
   };
 
-  // Handle file upload
+  // Handle file upload with validation
   const handleFileUpload = async (files) => {
     const newDocs = [];
     for (const file of files) {
+      // Validate file size
+      if (file.size > MAX_FILE_SIZE) {
+        alert(`File "${file.name}" exceeds 10MB limit and was not uploaded.`);
+        continue;
+      }
+
+      // Validate file extension
+      const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
+      if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
+        alert(`File "${file.name}" has an unsupported file type. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`);
+        continue;
+      }
+
+      // Validate MIME type (additional check beyond extension)
+      if (file.type && !ALLOWED_MIME_TYPES.includes(file.type) && file.type !== '') {
+        // Allow empty MIME type as some browsers don't set it for .md files
+        console.warn(`File "${file.name}" has unexpected MIME type: ${file.type}`);
+      }
+
+      // Sanitize filename
+      const safeName = sanitizeFilename(file.name);
+
       const text = await extractTextFromFile(file);
       newDocs.push({
-        id: Date.now() + Math.random(),
-        name: file.name,
+        id: uuidv4(),
+        name: safeName,
+        originalName: file.name, // Keep original for display
         type: file.type,
         size: file.size,
         text: text,
