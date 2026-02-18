@@ -277,7 +277,8 @@ class AtlassianClient {
       console.log(`✓ Connected as: ${user.data.displayName} (${user.data.emailAddress})`);
       return true;
     } catch (error) {
-      console.error('✗ Connection failed:', error.message);
+      console.error('Connection test error:', e);
+      toast.error('Connection test failed.');
       return false;
     }
   }

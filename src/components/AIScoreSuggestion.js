@@ -89,7 +89,8 @@ Be specific and reference the observation text in your rationale.`;
         provider: llmProvider
       });
     } catch (err) {
-      setError(err.message);
+      console.error('AI score suggestion error:', err);
+      setError('Failed to generate score suggestion. Please try again.');
     } finally {
       setIsLoading(false);
     }

@@ -35,7 +35,7 @@ export const getLegacyData = () => {
     const parsed = JSON.parse(legacyData);
     return parsed?.state?.data || null;
   } catch (e) {
-    console.error('Error reading legacy data:', e);
+    console.error('Error reading legacy data');
     return null;
   }
 };
@@ -90,8 +90,8 @@ export const migrateLegacyData = () => {
       const controls = controlsToCreate.map((item, index) => ({
         controlId: `CTL-${String(index + 1).padStart(3, '0')}`,
         implementationDescription: item['Implementation Description'] ||
-                                   item['Control Implementation Description'] ||
-                                   `Implementation for ${item['Subcategory ID'] || item.ID}`,
+          item['Control Implementation Description'] ||
+          `Implementation for ${item['Subcategory ID'] || item.ID}`,
         ownerId: item.ownerId || null,
         stakeholderIds: item.stakeholderIds || [],
         linkedRequirementIds: [item.ID],
@@ -181,7 +181,7 @@ export const migrateLegacyData = () => {
     console.error('Migration error:', error);
     return {
       success: false,
-      message: `Migration failed: ${error.message}`
+      message: 'Migration failed. Please check logs or contact support.'
     };
   }
 };

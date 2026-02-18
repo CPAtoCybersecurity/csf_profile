@@ -20,12 +20,14 @@ const ScoringLegend = () => {
             setLoading(false);
           },
           error: (error) => {
-            setError(`Error parsing CSV: ${error.message}`);
+            console.error('Scoring legend CSV parse error:', error);
+            setError('Unable to load scoring legend data.');
             setLoading(false);
           }
         });
       } catch (err) {
-        setError(`Error loading file: ${err.message}`);
+        console.error('Scoring legend load error:', err);
+        setError('Unable to load scoring legend data.');
         setLoading(false);
       }
     };
@@ -46,7 +48,7 @@ const ScoringLegend = () => {
     }
 
     // For other rows, use the security level
-    switch(securityLevel) {
+    switch (securityLevel) {
       case 'Not Enough':
         // For all other "Not Enough" rows except Some Security
         if (score !== '2.0-4.9') {

@@ -112,7 +112,8 @@ const Artifacts = () => {
       const count = await useArtifactStore.getState().importArtifactsCSV(text);
       toast.success(`Imported ${count} artifacts`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Artifact CSV import error:', err);
+      toast.error('Import failed. Please verify the CSV file and try again.');
     }
 
     event.target.value = '';
@@ -124,7 +125,8 @@ const Artifacts = () => {
       useArtifactStore.getState().exportForJiraCSV();
       toast.success('Artifacts exported to CSV');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Artifact CSV export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, []);
 
@@ -343,9 +345,8 @@ const Artifacts = () => {
                 return (
                   <div
                     key={artifact.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                      selectedArtifact?.id === artifact.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                    }`}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${selectedArtifact?.id === artifact.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                      }`}
                     onClick={() => handleViewDetails(artifact)}
                   >
                     {/* Checkbox */}
@@ -592,9 +593,8 @@ const Artifacts = () => {
                             subcategoryIds.map(id => (
                               <div
                                 key={id}
-                                className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm ${
-                                  formData.linkedSubcategoryIds?.includes(id) ? 'bg-blue-50 dark:bg-blue-900/30' : ''
-                                }`}
+                                className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm ${formData.linkedSubcategoryIds?.includes(id) ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                                  }`}
                                 onClick={() => handleSubcategoryIdChange(id)}
                               >
                                 {id}
