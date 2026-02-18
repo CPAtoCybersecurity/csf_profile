@@ -33,6 +33,8 @@ import useFindingsStore from '../stores/findingsStore';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
+
+// Utils
 import {
   getBackupReminderFrequency,
   setBackupReminderFrequency,
@@ -252,7 +254,7 @@ const Settings = () => {
       exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore);
       toast.success('Assessments exported as JSON');
     } catch (err) {
-      console.error('Assesments export error:', err);
+      console.error('Export assessments error:', err);
       toast.error('Export failed. Please try again.');
     }
   }, []);
@@ -287,7 +289,7 @@ const Settings = () => {
       toast.success(`Imported ${count} requirements for ${importFrameworkId}`);
     } catch (err) {
       console.error('File import error:', err);
-      toast.error('Import failed. Please try again.');
+      toast.error('Import failed. Please verify the CSV file and try again.');
     }
 
     e.target.value = '';
@@ -355,7 +357,7 @@ const Settings = () => {
       }
     } catch (err) {
       console.error('New framework import error:', err);
-      toast.error('Import failed. Please try again.');
+      toast.error('Import failed. Please verify the CSV format and try again.');
     }
 
     e.target.value = '';
