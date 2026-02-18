@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       // Check if this is an environment variable error
-      const isEnvError = this.state.error && this.state.error.message &&
+      const isEnvError = this.state.error && typeof this.state.error.message === 'string' &&
         this.state.error.message.includes('Missing required environment variables');
 
       return (
