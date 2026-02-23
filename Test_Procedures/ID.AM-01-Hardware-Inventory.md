@@ -24,5 +24,5 @@
 ## Related Artifacts
 - Hardware Inventory Spreadsheet
 
-- ## Notes
+## Notes
 This test procedure addresses the IDENTIFY function to ensure that your organization's hardware inventory is both accounted for and accurate, aligning with the requirements of ID.AM-01.
