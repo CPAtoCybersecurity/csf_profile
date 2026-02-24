@@ -68,7 +68,7 @@ Cloud environments have a built-in advantage for inventory - the pay-per-use mod
 ---
 
 
-
+```
 # Alma Security Hardware Inventory
 **Last Updated:** 2026-02-15
 **Source:** ServiceNow CMDB + Nmap Scan
@@ -84,7 +84,7 @@ Cloud environments have a built-in advantage for inventory - the pay-per-use mod
 **Reconciliation Notes:**
 - 3 devices found on network scan not in inventory (flagged for investigation)
 - 2 inventory items marked Active but not responding to scan (verify status)
-
+```
 
 
 
