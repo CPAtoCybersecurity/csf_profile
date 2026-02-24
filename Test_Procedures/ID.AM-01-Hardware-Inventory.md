@@ -67,6 +67,9 @@ Cloud environments have a built-in advantage for inventory - the pay-per-use mod
 
 ---
 
+## Assessment Artifacts
+### Artifact 1: Hardware_Inventory_Sample.md
+
 
 ```
 # Alma Security Hardware Inventory
