@@ -1,7 +1,7 @@
 # AWS Tag Compliance Report
-**Date:** 2026-02-15
-**Account:** Alma Security Production (123456789012)
-**Config Rule:** required-tags
+**Date:** 2026-02-15 <br>
+**Account:** Alma Security Production (123456789012) <br>
+**Config Rule:** required-tags 
 
 ## Compliance Summary
 - **Total Resources Evaluated:** 847
