@@ -65,5 +65,7 @@
 Cloud environments have a built-in advantage for inventory - the pay-per-use model means organizations *have* to track what's running or the bill gets ugly. AWS Config, tagging policies, and Cost Explorer become your inventory validation tools instead of Nmap.
 
 ## Linked Artifacts
-* [Alma Security Hardware Inventory](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Hardware_Inventory_Sample.md) 
+* [Alma Security Hardware Inventory](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Hardware_Inventory_Sample.md)
+* [Network Discovery Scan Results](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Nmap_Scan_Results.md)
+* [AWS Tag Compliance Report](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/AWS_Tag_Compliance_Report.md)
 
