@@ -68,4 +68,5 @@ Cloud environments have a built-in advantage for inventory - the pay-per-use mod
 * [Alma Security Hardware Inventory](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Hardware_Inventory_Sample.md)
 * [Network Discovery Scan Results](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Nmap_Scan_Results.md)
 * [AWS Tag Compliance Report](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/AWS_Tag_Compliance_Report.md)
+* [Hardware Inventory Sampling Walkthrough](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Sampling_Walkthrough.md)
 
