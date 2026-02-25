@@ -1,7 +1,7 @@
 # ID.AM-01: Hardware-Inventory Test Procedures
 
-**Assessment Scope:** Alma Security 2026 CSF Assessment
-**Control:** ID.AM-01 - Inventories of hardware managed by the organization are maintained
+**Assessment Scope:** Alma Security 2026 CSF Assessment <br>
+**Control:** ID.AM-01 - Inventories of hardware managed by the organization are maintained <br>
 **Assessor:** [Your Name]
 
 ---
