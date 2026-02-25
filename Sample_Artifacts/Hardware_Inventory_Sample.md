@@ -1,5 +1,3 @@
----
-
 # Alma Security Hardware Inventory
 **Last Updated:** 2026-02-15
 **Source:** ServiceNow CMDB + Nmap Scan
