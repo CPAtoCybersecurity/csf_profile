@@ -1,6 +1,6 @@
 # Hardware Inventory Sampling Walkthrough
-**Date:** 2026-02-15
-**Assessor:** OG
+**Date:** 2026-02-15 <br>
+**Assessor:** OG <br>
 **Sample Size:** 5 assets (random selection)
 
 | Asset ID | Hostname | Location Verified | Serial Match | Owner Current | Asset Tag Present | Notes |
