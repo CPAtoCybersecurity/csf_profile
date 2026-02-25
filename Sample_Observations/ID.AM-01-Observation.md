@@ -1,7 +1,9 @@
 # Audit Observation: ID.AM-01 Hardware Inventory
 
 **Control:** ID.AM-01 - Inventories of hardware managed by the organization are maintained
+
 **Assessment Date:** 2026-02-15
+
 **Assessor:** OG
 
 ## Current State Score: 4.5 / 10
