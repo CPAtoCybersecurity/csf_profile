@@ -1,7 +1,7 @@
 # Network Discovery Scan Results
-**Scan Date:** 2026-02-14
-**Scanner:** Nmap 7.94
-**Scope:** 10.0.0.0/16 (Alma Security internal network)
+**Scan Date:** 2026-02-14 <br>
+**Scanner:** Nmap 7.94 <br>
+**Scope:** 10.0.0.0/16 (Alma Security internal network) <br>
 
 ## Scan Command
 nmap -sn -oX scan_results.xml 10.0.0.0/16
