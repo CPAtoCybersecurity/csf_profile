@@ -22,8 +22,8 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       // Check if this is an environment variable error
-      const isEnvError = this.state.error && this.state.error.message &&
-                         this.state.error.message.includes('Missing required environment variables');
+      const isEnvError = this.state.error && typeof this.state.error.message === 'string' &&
+        this.state.error.message.includes('Missing required environment variables');
 
       return (
         <div className="min-h-screen flex items-center justify-center px-8 bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -53,7 +53,7 @@ class ErrorBoundary extends React.Component {
                     Error Details
                   </h3>
                   <div className="text-sm font-mono p-4 rounded-lg text-red-900 bg-white/80">
-                    {this.state.error.toString()}
+                    An unexpected error occurred. Please refresh the page or contact support.
                   </div>
                 </div>
               )}

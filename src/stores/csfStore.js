@@ -238,13 +238,15 @@ const useCSFStore = create(
                 resolve(processedData);
               },
               error: (error) => {
-                set({ error: `Error parsing CSV: ${error.message}`, loading: false });
+                console.error('CSV parse error:', error);
+                set({ error: 'Failed to parse CSV file.', loading: false });
                 reject(error);
               }
             });
           });
         } catch (err) {
-          set({ error: `Error loading file: ${err.message}`, loading: false });
+          console.error('CSV load error:', err);
+          set({ error: 'Failed to load CSV file.', loading: false });
           throw err;
         }
       },

@@ -117,7 +117,8 @@ Be specific and actionable. Reference SP 800-53 controls where relevant.`;
         hasHfContext: hfContext.length > 0
       });
     } catch (err) {
-      setError(err.message);
+      console.error('Guidance generation error:', err);
+      setError('Failed to generate implementation guidance. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -243,11 +244,10 @@ Be specific and actionable. Reference SP 800-53 controls where relevant.`;
               <button
                 key={tab.key}
                 onClick={() => setActiveSection(tab.key)}
-                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${
-                  activeSection === tab.key
+                className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm whitespace-nowrap transition-colors ${activeSection === tab.key
                     ? 'bg-green-600 text-white'
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
-                }`}
+                  }`}
               >
                 <span>{tab.icon}</span>
                 <span>{tab.label}</span>

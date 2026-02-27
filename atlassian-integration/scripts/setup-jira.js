@@ -48,7 +48,7 @@ async function main() {
     console.log(`ID: ${project.id}`);
     console.log(`Lead: ${project.lead?.displayName || 'N/A'}`);
   } catch (error) {
-    console.log(`Error fetching project: ${error.message}`);
+    console.log('Error fetching project information.');
   }
 
   // Get issue types
@@ -69,7 +69,7 @@ async function main() {
     console.log('Add to .env:');
     console.log('  JIRA_ASSESSMENT_ISSUE_TYPE_ID=<id from above>');
   } catch (error) {
-    console.log(`Error fetching issue types: ${error.message}`);
+    console.log('Error fetching issue types.');
   }
 
   // Get custom fields
@@ -83,7 +83,7 @@ async function main() {
 
     // Filter to likely relevant fields
     const relevantTerms = ['control', 'quarter', 'year', 'score', 'target', 'actual',
-                          'testing', 'status', 'procedure', 'observation', 'assessment'];
+      'testing', 'status', 'procedure', 'observation', 'assessment'];
 
     const relevantFields = fields.filter(f =>
       relevantTerms.some(term => f.name.toLowerCase().includes(term))
@@ -119,7 +119,7 @@ async function main() {
     console.log('  JIRA_FIELD_OBSERVATIONS=customfield_XXXXX');
 
   } catch (error) {
-    console.log(`Error fetching custom fields: ${error.message}`);
+    console.log('Error fetching custom fields.');
   }
 
   console.log('\n' + '═'.repeat(60));
@@ -130,6 +130,6 @@ async function main() {
 }
 
 main().catch(err => {
-  console.error('Fatal error:', err);
+  console.error('Fatal error occurred.');
   process.exit(1);
 });

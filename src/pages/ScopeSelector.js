@@ -205,7 +205,8 @@ Be specific, actionable, and auditor-focused.`;
       }
       setTestProcedures(prev => ({ ...prev, [controlId]: response }));
     } catch (error) {
-      setTestProcedures(prev => ({ ...prev, [controlId]: `Error: ${error.message}` }));
+      console.error("Test procedure generation failed:", error);
+      setTestProcedures(prev => ({ ...prev, [controlId]: "An error occurred while generating this test procedure. Please try again." }));
     }
 
     setIsGenerating(false);
@@ -326,9 +327,8 @@ Be specific, actionable, and auditor-focused.`;
                 filteredControls.map(control => (
                   <label
                     key={control.code}
-                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedScope.has(control.code) ? 'bg-blue-50 border border-blue-200' : 'border border-transparent'
-                    }`}
+                    className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors ${selectedScope.has(control.code) ? 'bg-blue-50 border border-blue-200' : 'border border-transparent'
+                      }`}
                   >
                     <input
                       type="checkbox"
@@ -394,13 +394,12 @@ Be specific, actionable, and auditor-focused.`;
                         {expandedControl === controlId ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
                         <span className="font-medium text-sm">{controlId}</span>
                       </div>
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        testProcedures[controlId]
+                      <span className={`text-xs px-2 py-1 rounded ${testProcedures[controlId]
                           ? 'bg-green-100 text-green-700'
                           : currentControl === controlId
                             ? 'bg-yellow-100 text-yellow-700'
                             : 'bg-gray-100 text-gray-500'
-                      }`}>
+                        }`}>
                         {testProcedures[controlId] ? '✓ Ready' : currentControl === controlId ? 'Generating...' : 'Pending'}
                       </span>
                     </button>

@@ -142,8 +142,8 @@ const Settings = () => {
         return false;
       }
     } catch (e) {
-      toast.error(`Connection test failed: ${e.message}`);
-      return false;
+      console.error('Atlassian connection test error:', e);
+      toast.error('Connection test failed. Please verify credentials and try again.');
     } finally {
       setIsTestingConnection(false);
     }
@@ -189,10 +189,12 @@ const Settings = () => {
         toast.success('Configuration saved securely to server');
       } else {
         const error = await jiraRes.json();
-        toast.error(error.error || 'Failed to save configuration');
+        console.error('Save Atlassian config error:', error);
+        toast.error('Failed to save configuration. Please try again.');
       }
     } catch (e) {
-      toast.error(`Failed to save: ${e.message}. Is the backend running?`);
+      console.error('Save Atlassian config error:', e);
+      toast.error('Failed to save configuration. Please try again.');
     } finally {
       setIsSavingConfig(false);
     }
@@ -212,7 +214,8 @@ const Settings = () => {
       setEntryIdCount(count);
       toast.success(`Harvested ${count} entry ID mappings from Confluence`);
     } catch (err) {
-      toast.error(`Harvesting failed: ${err.message}`);
+      console.error('Entry ID harvest error:', err);
+      toast.error('Harvesting failed. Please try again.');
     } finally {
       setIsHarvesting(false);
     }
@@ -241,8 +244,8 @@ const Settings = () => {
       });
       toast.success('Complete database exported as JSON');
     } catch (err) {
-      console.error('Export complete database error:', err);
-      toast.error('Unable to export database. Please try again.');
+      console.error('Complete DB export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, []);
 
@@ -398,7 +401,8 @@ const Settings = () => {
       const count = await useFindingsStore.getState().importFindingsCSV(text, useUserStore);
       toast.success(`Imported ${count} findings from Jira`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Findings import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -413,7 +417,8 @@ const Settings = () => {
       const count = await useArtifactStore.getState().importArtifactsCSV(text);
       toast.success(`Imported ${count} artifacts from Jira`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Artifacts import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -428,7 +433,8 @@ const Settings = () => {
       const count = await useAssessmentsStore.getState().importAssessmentsCSV(text, useUserStore);
       toast.success(`Imported ${count} assessment(s) from Jira`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Assessments import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -445,7 +451,8 @@ const Settings = () => {
       setEntryIdCount(Object.keys(getAllEntryIdMappings()).length);
       toast.success(`Imported ${count} entry ID mappings`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Entry Id import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -467,7 +474,8 @@ const Settings = () => {
       URL.revokeObjectURL(url);
       toast.success('Entry ID mappings exported');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Entry Id Export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, []);
 
@@ -859,7 +867,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       );
                       toast.success('Exported all assessments for Jira EVAL import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Assessment export error:', err);
+                      toast.error('Assessment export failed. Please try again.');
                     }
                   }}
                 >
@@ -897,7 +906,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       );
                       toast.success('Exported requirements for Confluence import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Requirements export error:', err);
+                      toast.error('Requirements export failed. Please try again.');
                     }
                   }}
                 >
@@ -921,7 +931,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       useFindingsStore.getState().exportForJiraCSV(useUserStore);
                       toast.success('Exported findings for Jira FND import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Findings export error:', err);
+                      toast.error('Findings export failed. Please try again.');
                     }
                   }}
                 >
@@ -955,7 +966,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       useArtifactStore.getState().exportForJiraCSV();
                       toast.success('Exported artifacts for Jira AR import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Artifacts export error::', err);
+                      toast.error('Artifacts export failed. Please try again.');
                     }
                   }}
                 >

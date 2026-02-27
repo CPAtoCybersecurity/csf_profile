@@ -228,7 +228,8 @@ const useRequirementsStore = create(
               resolve(newRequirements.length);
             },
             error: (error) => {
-              reject(new Error(`CSV parsing error: ${error.message}`));
+              console.error('Requirements CSV parse error:', error);
+              reject(new Error('Failed to import CSV file. Please verify the file format.'));
             }
           });
         });
@@ -287,13 +288,15 @@ const useRequirementsStore = create(
                 resolve(requirements);
               },
               error: (error) => {
-                set({ error: `Error parsing CSV: ${error.message}`, loading: false });
+                console.error('CSV parse error:', error);
+                set({ error: 'Failed to parse CSV file.', loading: false });
                 reject(error);
               }
             });
           });
         } catch (err) {
-          set({ error: `Error loading file: ${err.message}`, loading: false });
+          console.error('CSV load error:', err);
+          set({ error: 'Failed to load CSV file.', loading: false });
           throw err;
         }
       },
