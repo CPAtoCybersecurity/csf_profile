@@ -867,8 +867,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       );
                       toast.success('Exported all assessments for Jira EVAL import');
                     } catch (err) {
-                      console.error('Context:', err);
-                      toast.error('Export failed. Please try again.');
+                      console.error('Assessment export error:', err);
+                      toast.error('Assessment export failed. Please try again.');
                     }
                   }}
                 >
@@ -906,8 +906,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       );
                       toast.success('Exported requirements for Confluence import');
                     } catch (err) {
-                      console.error('Descriptive context message:', err);
-                      toast.error('Generic user-friendly message.');
+                      console.error('Requirements export error:', err);
+                      toast.error('Requirements export failed. Please try again.');
                     }
                   }}
                 >
@@ -931,8 +931,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       useFindingsStore.getState().exportForJiraCSV(useUserStore);
                       toast.success('Exported findings for Jira FND import');
                     } catch (err) {
-                      console.error('Descriptive context message:', err);
-                      toast.error('Generic user-friendly message.');
+                      console.error('Findings export error:', err);
+                      toast.error('Findings export failed. Please try again.');
                     }
                   }}
                 >
@@ -966,8 +966,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       useArtifactStore.getState().exportForJiraCSV();
                       toast.success('Exported artifacts for Jira AR import');
                     } catch (err) {
-                      console.error('Descriptive context message:', err);
-                      toast.error('Generic user-friendly message.');
+                      console.error('Artifacts export error::', err);
+                      toast.error('Artifacts export failed. Please try again.');
                     }
                   }}
                 >
