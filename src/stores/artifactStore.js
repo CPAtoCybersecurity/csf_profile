@@ -366,7 +366,7 @@ const useArtifactStore = create(
               resolve(newArtifacts.length);
             },
             error: (error) => {
-              reject(new Error(`CSV parsing error: ${error.message}`));
+              reject(new Error('Failed to import CSV file. Please verify the file format.'));
             }
           });
         });

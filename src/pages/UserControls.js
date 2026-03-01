@@ -367,7 +367,8 @@ const UserControls = () => {
       const count = await importControlsCSV(text, useUserStore);
       toast.success(`Imported ${count} controls`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Controls import error:', err);
+      toast.error('Import failed. Please check the file format.');
     }
 
     e.target.value = '';
@@ -613,9 +614,8 @@ const UserControls = () => {
                 {currentItems.map((control) => (
                   <tr
                     key={control.controlId}
-                    className={`hover:bg-blue-50 cursor-pointer ${
-                      selectedControlId === control.controlId ? 'bg-blue-100' : ''
-                    }`}
+                    className={`hover:bg-blue-50 cursor-pointer ${selectedControlId === control.controlId ? 'bg-blue-100' : ''
+                      }`}
                     onClick={() => handleSelectControl(control)}
                   >
                     <td className="p-3 text-sm font-medium font-mono">{control.controlId}</td>
@@ -699,11 +699,10 @@ const UserControls = () => {
                 <button
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   Previous
                 </button>
@@ -711,11 +710,10 @@ const UserControls = () => {
                 <button
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
                       ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                       : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  }`}
+                    }`}
                 >
                   Next
                 </button>
@@ -742,184 +740,183 @@ const UserControls = () => {
                 cursor: 'col-resize',
                 zIndex: 10
               }}
-              className={`transition-colors ${
-                isResizingDetailPanel ? 'bg-blue-500' : 'bg-transparent hover:bg-blue-400'
-              }`}
+              className={`transition-colors ${isResizingDetailPanel ? 'bg-blue-500' : 'bg-transparent hover:bg-blue-400'
+                }`}
               title="Drag to resize"
             />
             <div className="p-4 h-full">
-            {currentControl ? (
-              <div className="space-y-6">
-                {/* Header */}
-                <div className="flex items-center justify-between gap-2">
-                  <h2 className="text-xl font-bold font-mono">{currentControl.controlId}</h2>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setDetailPanelOpen(false)}
-                      className="p-1.5 rounded-full hover:bg-gray-200 text-gray-500"
-                      title="Close"
-                    >
-                      <X size={18} />
-                    </button>
-                    {!isCreating && (
-                      <>
-                        {editMode ? (
+              {currentControl ? (
+                <div className="space-y-6">
+                  {/* Header */}
+                  <div className="flex items-center justify-between gap-2">
+                    <h2 className="text-xl font-bold font-mono">{currentControl.controlId}</h2>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setDetailPanelOpen(false)}
+                        className="p-1.5 rounded-full hover:bg-gray-200 text-gray-500"
+                        title="Close"
+                      >
+                        <X size={18} />
+                      </button>
+                      {!isCreating && (
+                        <>
+                          {editMode ? (
+                            <button
+                              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-md"
+                              onClick={() => setEditMode(false)}
+                            >
+                              <Save size={16} />
+                              Done
+                            </button>
+                          ) : (
+                            <button
+                              className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md"
+                              onClick={() => setEditMode(true)}
+                            >
+                              <Edit size={16} />
+                              Edit
+                            </button>
+                          )}
+                        </>
+                      )}
+                      {isCreating && (
+                        <>
+                          <button
+                            className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-md"
+                            onClick={handleCancelCreate}
+                          >
+                            Cancel
+                          </button>
                           <button
                             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-md"
-                            onClick={() => setEditMode(false)}
+                            onClick={handleSaveNewControl}
                           >
                             <Save size={16} />
-                            Done
+                            Create
                           </button>
-                        ) : (
-                          <button
-                            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-1 px-3 rounded-md"
-                            onClick={() => setEditMode(true)}
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Control Details */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
+                    {/* Control ID */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Control ID</label>
+                      {editMode || isCreating ? (
+                        <input
+                          type="text"
+                          value={currentControl.controlId}
+                          onChange={(e) => handleFieldChange('controlId', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded"
+                          disabled={!isCreating} // Can only edit ID when creating
+                        />
+                      ) : (
+                        <p className="mt-1 font-mono">{currentControl.controlId}</p>
+                      )}
+                    </div>
+
+                    {/* Implementation Description */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Control Implementation Description</label>
+                      {editMode || isCreating ? (
+                        <textarea
+                          value={currentControl.implementationDescription || ''}
+                          onChange={(e) => handleFieldChange('implementationDescription', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded h-32"
+                          placeholder="Describe how this control is implemented..."
+                        />
+                      ) : (
+                        <div className="mt-1 prose prose-sm max-w-none">
+                          <ReactMarkdown>
+                            {currentControl.implementationDescription || 'No description'}
+                          </ReactMarkdown>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Control Owner */}
+                    <UserSelector
+                      label="Control Owner"
+                      selectedUsers={currentControl.ownerId}
+                      onChange={(userId) => handleFieldChange('ownerId', userId)}
+                      disabled={!editMode && !isCreating}
+                    />
+
+                    {/* Stakeholders */}
+                    <UserSelector
+                      label="Stakeholder(s)"
+                      selectedUsers={currentControl.stakeholderIds || []}
+                      onChange={(userIds) => handleFieldChange('stakeholderIds', userIds)}
+                      multiple={true}
+                      disabled={!editMode && !isCreating}
+                    />
+                  </div>
+
+                  {/* Linked Requirements */}
+                  <div className="bg-white p-4 rounded-lg shadow-sm border">
+                    <div className="flex items-center justify-between mb-3">
+                      <h3 className="font-medium text-gray-700">Linked Requirements</h3>
+                      {(editMode || isCreating) && (
+                        <button
+                          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+                          onClick={() => setReqPickerOpen(true)}
+                        >
+                          <Link size={14} />
+                          Link Requirement
+                        </button>
+                      )}
+                    </div>
+
+                    {linkedRequirements.length === 0 ? (
+                      <p className="text-gray-500 text-sm">No requirements linked</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {linkedRequirements.map((req) => (
+                          <div
+                            key={req.id}
+                            className="flex items-center justify-between p-2 bg-gray-50 rounded"
                           >
-                            <Edit size={16} />
-                            Edit
-                          </button>
-                        )}
-                      </>
-                    )}
-                    {isCreating && (
-                      <>
-                        <button
-                          className="flex items-center gap-2 bg-gray-500 hover:bg-gray-600 text-white py-1 px-3 rounded-md"
-                          onClick={handleCancelCreate}
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-1 px-3 rounded-md"
-                          onClick={handleSaveNewControl}
-                        >
-                          <Save size={16} />
-                          Create
-                        </button>
-                      </>
-                    )}
-                  </div>
-                </div>
-
-                {/* Control Details */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">
-                  {/* Control ID */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Control ID</label>
-                    {editMode || isCreating ? (
-                      <input
-                        type="text"
-                        value={currentControl.controlId}
-                        onChange={(e) => handleFieldChange('controlId', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded"
-                        disabled={!isCreating} // Can only edit ID when creating
-                      />
-                    ) : (
-                      <p className="mt-1 font-mono">{currentControl.controlId}</p>
-                    )}
-                  </div>
-
-                  {/* Implementation Description */}
-                  <div>
-                    <label className="text-sm font-medium text-gray-500">Control Implementation Description</label>
-                    {editMode || isCreating ? (
-                      <textarea
-                        value={currentControl.implementationDescription || ''}
-                        onChange={(e) => handleFieldChange('implementationDescription', e.target.value)}
-                        className="mt-1 w-full p-2 border rounded h-32"
-                        placeholder="Describe how this control is implemented..."
-                      />
-                    ) : (
-                      <div className="mt-1 prose prose-sm max-w-none">
-                        <ReactMarkdown>
-                          {currentControl.implementationDescription || 'No description'}
-                        </ReactMarkdown>
+                            <div className="flex items-center gap-2">
+                              <FrameworkBadge frameworkId={req.frameworkId} size="xs" />
+                              <div>
+                                <span className="font-medium text-sm">{req.subcategoryId || req.id}</span>
+                                <p className="text-xs text-gray-500 line-clamp-1">{req.category}</p>
+                              </div>
+                            </div>
+                            {(editMode || isCreating) && (
+                              <button
+                                className="text-red-500 hover:text-red-700"
+                                onClick={() => handleUnlinkRequirement(req.id)}
+                                title="Unlink requirement"
+                              >
+                                <X size={16} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
                       </div>
                     )}
                   </div>
 
-                  {/* Control Owner */}
-                  <UserSelector
-                    label="Control Owner"
-                    selectedUsers={currentControl.ownerId}
-                    onChange={(userId) => handleFieldChange('ownerId', userId)}
-                    disabled={!editMode && !isCreating}
-                  />
-
-                  {/* Stakeholders */}
-                  <UserSelector
-                    label="Stakeholder(s)"
-                    selectedUsers={currentControl.stakeholderIds || []}
-                    onChange={(userIds) => handleFieldChange('stakeholderIds', userIds)}
-                    multiple={true}
-                    disabled={!editMode && !isCreating}
-                  />
-                </div>
-
-                {/* Linked Requirements */}
-                <div className="bg-white p-4 rounded-lg shadow-sm border">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="font-medium text-gray-700">Linked Requirements</h3>
-                    {(editMode || isCreating) && (
-                      <button
-                        className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
-                        onClick={() => setReqPickerOpen(true)}
-                      >
-                        <Link size={14} />
-                        Link Requirement
-                      </button>
-                    )}
-                  </div>
-
-                  {linkedRequirements.length === 0 ? (
-                    <p className="text-gray-500 text-sm">No requirements linked</p>
-                  ) : (
-                    <div className="space-y-2">
-                      {linkedRequirements.map((req) => (
-                        <div
-                          key={req.id}
-                          className="flex items-center justify-between p-2 bg-gray-50 rounded"
-                        >
-                          <div className="flex items-center gap-2">
-                            <FrameworkBadge frameworkId={req.frameworkId} size="xs" />
-                            <div>
-                              <span className="font-medium text-sm">{req.subcategoryId || req.id}</span>
-                              <p className="text-xs text-gray-500 line-clamp-1">{req.category}</p>
-                            </div>
-                          </div>
-                          {(editMode || isCreating) && (
-                            <button
-                              className="text-red-500 hover:text-red-700"
-                              onClick={() => handleUnlinkRequirement(req.id)}
-                              title="Unlink requirement"
-                            >
-                              <X size={16} />
-                            </button>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                  {/* Delete button */}
+                  {!isCreating && editMode && (
+                    <button
+                      className="flex items-center gap-2 text-red-600 hover:text-red-800"
+                      onClick={handleDeleteControl}
+                    >
+                      <Trash2 size={16} />
+                      Delete Control
+                    </button>
                   )}
                 </div>
-
-                {/* Delete button */}
-                {!isCreating && editMode && (
-                  <button
-                    className="flex items-center gap-2 text-red-600 hover:text-red-800"
-                    onClick={handleDeleteControl}
-                  >
-                    <Trash2 size={16} />
-                    Delete Control
-                  </button>
-                )}
-              </div>
-            ) : (
-              <div className="flex flex-col items-center justify-center h-full text-gray-500">
-                <ChevronRight size={48} className="mb-4 opacity-50" />
-                <p>Select a control to view details</p>
-              </div>
-            )}
+              ) : (
+                <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                  <ChevronRight size={48} className="mb-4 opacity-50" />
+                  <p>Select a control to view details</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -950,9 +947,8 @@ const UserControls = () => {
                 cursor: 'col-resize',
                 zIndex: 10
               }}
-              className={`transition-colors ${
-                isResizingReqPanel ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
-              }`}
+              className={`transition-colors ${isResizingReqPanel ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
+                }`}
               title="Drag to resize"
             />
 

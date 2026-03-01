@@ -144,7 +144,8 @@ const Findings = () => {
       const count = await importFindingsCSV(text, useUserStore);
       toast.success(`Imported ${count} findings`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Findings CSV import error:', err);
+      toast.error('Import failed. Please verify the CSV file and try again.');
     }
 
     event.target.value = '';
@@ -156,7 +157,8 @@ const Findings = () => {
       exportFindingsCSV(useUserStore);
       toast.success('Findings exported to CSV');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Findings CSV export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, [exportFindingsCSV]);
 
@@ -374,9 +376,8 @@ const Findings = () => {
                 return (
                   <div
                     key={finding.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                      selectedFinding?.id === finding.id ? 'bg-amber-50 dark:bg-amber-900/30' : ''
-                    } ${overdue ? 'border-l-4 border-l-red-500' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${selectedFinding?.id === finding.id ? 'bg-amber-50 dark:bg-amber-900/30' : ''
+                      } ${overdue ? 'border-l-4 border-l-red-500' : ''}`}
                     onClick={() => handleViewDetails(finding)}
                   >
                     {/* Checkbox */}
@@ -484,9 +485,8 @@ const Findings = () => {
                 cursor: 'col-resize',
                 zIndex: 10
               }}
-              className={`transition-colors ${
-                isResizing ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
-              }`}
+              className={`transition-colors ${isResizing ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
+                }`}
               title="Drag to resize"
             />
 

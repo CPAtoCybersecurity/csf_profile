@@ -158,10 +158,10 @@ async function main() {
     } catch (error) {
       errors.push({
         summary: issue.fields.summary,
-        error: error.response?.data?.errors || error.message
+        error: 'Jira issue creation failed'
       });
-      console.log(`  ✗ Failed: ${issue.fields.summary}`);
-      console.log(`    Error: ${JSON.stringify(error.response?.data?.errors || error.message)}`);
+      console.log(`Failed: ${issue.fields.summary}`);
+      console.log(`Error: Jira issue creation failed.`);
     }
   }
 
@@ -182,7 +182,7 @@ async function main() {
   if (errors.length > 0) {
     console.log('\nFailed Issues:');
     for (const err of errors) {
-      console.log(`  ${err.summary}: ${JSON.stringify(err.error)}`);
+      console.log(`  ${err.summary}: Jira issue creation failed.`);
     }
   }
 }

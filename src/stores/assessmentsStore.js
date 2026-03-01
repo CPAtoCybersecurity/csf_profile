@@ -129,7 +129,7 @@ const useAssessmentsStore = create(
               complete: (results) => {
                 // Detect Jira format (has Issue Type and Issue key columns)
                 const isJiraFormat = results.meta.fields?.includes('Issue Type') &&
-                                     results.meta.fields?.includes('Issue key');
+                  results.meta.fields?.includes('Issue key');
 
                 if (!isJiraFormat) {
                   // Fallback to DEFAULT_ASSESSMENTS if not Jira format
@@ -292,13 +292,15 @@ const useAssessmentsStore = create(
                 resolve(newAssessments);
               },
               error: (error) => {
-                set({ error: `Error parsing CSV: ${error.message}`, loading: false });
+                console.error('Jira CSV parse error:', error);
+                set({ error: 'Failed to parse CSV file.', loading: false });
                 reject(error);
               }
             });
           });
         } catch (err) {
-          set({ error: `Error loading file: ${err.message}`, loading: false });
+          console.error('Jira CSV parse error:', err);
+          set({ error: 'Failed to parse CSV file.', loading: false });
           throw err;
         }
       },
@@ -448,12 +450,12 @@ const useAssessmentsStore = create(
             : currentObservation.testProcedures,
           remediation: observationData.remediation
             ? {
-                ...currentObservation.remediation,
-                ...observationData.remediation,
-                actionPlan: observationData.remediation.actionPlan
-                  ? sanitizeInput(observationData.remediation.actionPlan)
-                  : currentObservation.remediation.actionPlan
-              }
+              ...currentObservation.remediation,
+              ...observationData.remediation,
+              actionPlan: observationData.remediation.actionPlan
+                ? sanitizeInput(observationData.remediation.actionPlan)
+                : currentObservation.remediation.actionPlan
+            }
             : currentObservation.remediation,
           quarters: currentObservation.quarters || createDefaultQuarters()
         };
@@ -723,7 +725,7 @@ const useAssessmentsStore = create(
 
               // Detect if this is a Jira EVAL export (has Issue Type and Issue key columns)
               const isJiraFormat = results.meta.fields?.includes('Issue Type') &&
-                                   results.meta.fields?.includes('Issue key');
+                results.meta.fields?.includes('Issue key');
 
               // Group rows by assessment name
               // Carry forward assessment name from previous row if current row is blank
@@ -873,14 +875,14 @@ const useAssessmentsStore = create(
                   let itemId;
                   if (isJiraFormat) {
                     itemId = row['Custom field (Control ID)'] ||
-                             row['Custom field (Compliance Requirement)'] ||
-                             // Parse from Summary if in format "WP-AssessmentName-ControlID-Quarter"
-                             (() => {
-                               const summary = row['Summary'] || '';
-                               const match = summary.match(/^WP-.*?-(.+?)-Q\d$/);
-                               return match ? match[1] : null;
-                             })() ||
-                             row['Issue key']; // Fallback to Jira key
+                      row['Custom field (Compliance Requirement)'] ||
+                      // Parse from Summary if in format "WP-AssessmentName-ControlID-Quarter"
+                      (() => {
+                        const summary = row['Summary'] || '';
+                        const match = summary.match(/^WP-.*?-(.+?)-Q\d$/);
+                        return match ? match[1] : null;
+                      })() ||
+                      row['Issue key']; // Fallback to Jira key
                   } else {
                     itemId = row['ID'] || row['Item ID'] || row.itemId || row.id;
                   }
@@ -907,11 +909,11 @@ const useAssessmentsStore = create(
                   if (isJiraFormat) {
                     // Jira EVAL format - each row is a single quarter's observation
                     const quarter = row['Custom field (Quarter)'] ||
-                                    (() => {
-                                      const summary = row['Summary'] || '';
-                                      const match = summary.match(/Q(\d)$/);
-                                      return match ? `Q${match[1]}` : 'Q1';
-                                    })();
+                      (() => {
+                        const summary = row['Summary'] || '';
+                        const match = summary.match(/Q(\d)$/);
+                        return match ? `Q${match[1]}` : 'Q1';
+                      })();
 
                     // Parse assessment methods from custom field
                     const methodsStr = row['Custom field (Assessment Methods)'] || '';
@@ -944,15 +946,15 @@ const useAssessmentsStore = create(
                     if (['Q1', 'Q2', 'Q3', 'Q4'].includes(quarter)) {
                       existingObs.quarters[quarter] = {
                         actualScore: parseFloat(row['Custom field (Q1 Actual Score)'] ||
-                                                row['Custom field (Q2 Actual Score)'] ||
-                                                row['Custom field (Q3 Actual Score)'] ||
-                                                row['Custom field (Q4 Actual Score)'] ||
-                                                row['Custom field (Actual Score)']) || 0,
+                          row['Custom field (Q2 Actual Score)'] ||
+                          row['Custom field (Q3 Actual Score)'] ||
+                          row['Custom field (Q4 Actual Score)'] ||
+                          row['Custom field (Actual Score)']) || 0,
                         targetScore: parseFloat(row['Custom field (Q1 Target Score)'] ||
-                                                row['Custom field (Q2 Target Score)'] ||
-                                                row['Custom field (Q3 Target Score)'] ||
-                                                row['Custom field (Q4 Target Score)'] ||
-                                                row['Custom field (Target Score)']) || 0,
+                          row['Custom field (Q2 Target Score)'] ||
+                          row['Custom field (Q3 Target Score)'] ||
+                          row['Custom field (Q4 Target Score)'] ||
+                          row['Custom field (Target Score)']) || 0,
                         observations: sanitizeInput(row['Custom field (Observations)'] || row['Description'] || ''),
                         observationDate: parseDate(row['Created'] || row['Updated'] || ''),
                         testingStatus: row['Custom field (Testing Status)'] || row['Status'] || 'Not Started',
@@ -1034,7 +1036,7 @@ const useAssessmentsStore = create(
               resolve(newAssessments.length);
             },
             error: (error) => {
-              reject(new Error(`CSV parsing error: ${error.message}`));
+              reject(new Error('Failed to import CSV file. Please verify the file format.'));
             }
           });
         });
@@ -1449,10 +1451,10 @@ const useAssessmentsStore = create(
 
               // Skip empty quarters (no meaningful data)
               if (!qData ||
-                  (qData.testingStatus === 'Not Started' &&
-                   !qData.observations &&
-                   qData.actualScore === 0 &&
-                   qData.targetScore === 0)) {
+                (qData.testingStatus === 'Not Started' &&
+                  !qData.observations &&
+                  qData.actualScore === 0 &&
+                  qData.targetScore === 0)) {
                 return;
               }
 
