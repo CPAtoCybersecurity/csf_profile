@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
+import useAuditLogStore from './auditLogStore';
 
 // Default assessment for new installations
 // References control IDs from DEFAULT_CONTROLS in controlsStore.js
@@ -469,6 +470,32 @@ const useAssessmentsStore = create(
         };
 
         get().updateAssessment(assessmentId, { observations: updatedObservations });
+
+        // Audit logging: record score and status changes
+        const entityLabel = `${assessment.name} / ${itemId}`;
+        const logEntry = useAuditLogStore.getState().addEntry;
+
+        if (observationData.score !== undefined && observationData.score !== currentObservation.score) {
+          logEntry({
+            action: 'score_changed',
+            entity: entityLabel,
+            field: 'score',
+            oldValue: currentObservation.score,
+            newValue: observationData.score,
+            user: 'System'
+          });
+        }
+
+        if (observationData.testingStatus !== undefined && observationData.testingStatus !== currentObservation.testingStatus) {
+          logEntry({
+            action: 'status_changed',
+            entity: entityLabel,
+            field: 'testingStatus',
+            oldValue: currentObservation.testingStatus,
+            newValue: observationData.testingStatus,
+            user: 'System'
+          });
+        }
       },
 
       // Update quarterly observation data for a specific quarter

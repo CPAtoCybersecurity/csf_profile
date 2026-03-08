@@ -10,7 +10,8 @@ import {
   Shield,
   Settings,
   Bot,
-  AlertTriangle
+  AlertTriangle,
+  History
 } from 'lucide-react';
 
 const Navigation = () => {
@@ -108,6 +109,15 @@ const Navigation = () => {
       >
         <Bot size={16} />
         <span>AI</span>
+      </NavLink>
+
+      <NavLink
+        to="/history"
+        style={linkStyle}
+        className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+      >
+        <History size={16} />
+        <span>History</span>
       </NavLink>
 
       <NavLink
