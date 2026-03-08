@@ -31,7 +31,6 @@ const defaultFrameworks = [
     sourceUrl: 'https://www.nist.gov/cyberframework/informative-references',
     description: 'Information Security Management System',
     enabled: true,
-    comingSoon: true,
     color: '#7c3aed',
     hierarchyLabels: {
       level1: 'Clause/Annex',
@@ -51,7 +50,6 @@ const defaultFrameworks = [
     sourceUrl: 'https://www.nist.gov/cyberframework/informative-references',
     description: 'Federal Risk and Authorization Management Program',
     enabled: true,
-    comingSoon: true,
     color: '#dc2626',
     hierarchyLabels: {
       level1: 'Control Family',
@@ -197,12 +195,13 @@ const useFrameworksStore = create(
     }),
     {
       name: 'csf-frameworks-storage',
-      version: 4,
+      version: 5,
       migrate: (persistedState, version) => {
         // Version 2: Reset to new default frameworks (removed SOC2, HIPAA, PCI-DSS; updated names; added source)
         // Version 3: Shortened framework names (removed Rev from name since it's in VERSION column)
         // Version 4: Added comingSoon flag to ISO, FedRAMP, CMMC
-        if (version < 4) {
+        // Version 5: Removed comingSoon from ISO 27001 and FedRAMP (cross-framework mappings added)
+        if (version < 5) {
           return { frameworks: defaultFrameworks };
         }
         return persistedState;

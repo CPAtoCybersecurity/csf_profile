@@ -4,6 +4,7 @@ import FrameworkBadge from './FrameworkBadge';
 import CSFBadge, { SubcategoryBadge } from './CSFBadge';
 import { UserAvatar } from './UserAvatar';
 import { ArtifactBadge, FindingBadge, ControlBadge } from './BadgeSystem';
+import CrossFrameworkPanel from './CrossFrameworkPanel';
 
 /**
  * RequirementDetailPanel - Side panel for viewing requirement details
@@ -314,6 +315,11 @@ const RequirementDetailPanel = ({ requirement, onClose, onSave, controls = [], a
               </span>
             </label>
           </FieldRow>
+
+          {/* Cross-Framework Mappings */}
+          <CrossFrameworkPanel
+            categoryId={requirement.subcategoryId?.match(/^([A-Z]{2}\.[A-Z]{2})/)?.[1]}
+          />
         </div>
       </div>
     </div>
