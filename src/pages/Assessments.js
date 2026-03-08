@@ -248,13 +248,13 @@ const Assessments = () => {
     return getObservation(currentAssessmentId, selectedItemId);
   }, [currentAssessmentId, selectedItemId, getObservation, currentAssessment]);
 
-  // Helper functions
+  // Helper functions — returns semantic badge classes
   const getStatusColor = useCallback((status) => {
     switch (status) {
-      case 'Complete': return 'text-green-600 bg-green-100 dark:bg-green-600 dark:text-white';
-      case 'In Progress': return 'text-blue-600 bg-blue-100 dark:bg-blue-600 dark:text-white';
-      case 'Submitted': return 'text-orange-600 bg-orange-100 dark:bg-orange-600 dark:text-white';
-      default: return 'text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
+      case 'Complete': return 'badge badge-success';
+      case 'In Progress': return 'badge badge-info';
+      case 'Submitted': return 'badge badge-warning';
+      default: return 'badge badge-neutral';
     }
   }, []);
 
@@ -1127,17 +1127,17 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     </div>
   );
 
-  // Get status badge style (Jira-style)
+  // Get status badge style (Jira-style) — returns semantic badge variant class
   const getJiraStatusStyle = (status) => {
     switch (status) {
       case 'Complete':
-        return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+        return 'badge-success';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white';
+        return 'badge-info';
       case 'Submitted':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+        return 'badge-warning';
       default:
-        return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+        return 'badge-neutral';
     }
   };
 
