@@ -18,6 +18,8 @@ import {
   YAxis,
   CartesianGrid,
   ReferenceLine,
+  LineChart,
+  Line,
 } from 'recharts';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
@@ -380,6 +382,64 @@ const Dashboard = () => {
   const statusTotal = useMemo(() => {
     return statusChartData.reduce((sum, item) => sum + item.value, 0);
   }, [statusChartData]);
+
+  // Colors for each CSF function in the trend line chart
+  const FUNCTION_LINE_COLORS = {
+    'GOVERN (GV)': '#8b5cf6',
+    'IDENTIFY (ID)': '#3b82f6',
+    'PROTECT (PR)': '#10b981',
+    'DETECT (DE)': '#f59e0b',
+    'RESPOND (RS)': '#ef4444',
+    'RECOVER (RC)': '#6366f1',
+  };
+
+  // Calculate quarterly trend data: average actualScore per function per quarter
+  const trendChartData = useMemo(() => {
+    if (dashboardData.length === 0) return [];
+
+    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+    // Build a map: { Q1: { 'GOVERN (GV)': [scores...], ... }, Q2: {...}, ... }
+    const quarterFunctionScores = {};
+    quarters.forEach(q => {
+      quarterFunctionScores[q] = {};
+      FUNCTION_ORDER.forEach(fn => {
+        quarterFunctionScores[q][fn] = [];
+      });
+    });
+
+    dashboardData.forEach(item => {
+      const fn = item.function;
+      if (!FUNCTION_ORDER.includes(fn)) return;
+      quarters.forEach(q => {
+        const score = item.quarters[q]?.actualScore;
+        if (score !== undefined) {
+          quarterFunctionScores[q][fn].push(score);
+        }
+      });
+    });
+
+    // Build Recharts data rows, skipping quarters where ALL functions have 0 scores
+    const rows = quarters.map(q => {
+      const row = { quarter: q };
+      let allZero = true;
+      FUNCTION_ORDER.forEach(fn => {
+        const scores = quarterFunctionScores[q][fn];
+        if (scores.length > 0) {
+          const avg = +(scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+          row[fn] = avg;
+          if (avg !== 0) allZero = false;
+        }
+      });
+      row._allZero = allZero;
+      return row;
+    });
+
+    // Filter out quarters where all scores are 0
+    return rows
+      .filter(row => !row._allZero)
+      .map(({ _allZero, ...rest }) => rest);
+  }, [dashboardData]);
 
   if (assessments.length === 0) {
     return (
@@ -918,6 +978,63 @@ const Dashboard = () => {
                 </table>
               </div>
             </div>
+          </div>
+
+          {/* Quarterly Trend Line Chart */}
+          <div className="card mt-6">
+            <h2 className="text-lg font-semibold mb-4">Score Trends by Quarter</h2>
+            {trendChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={trendChartData}
+                  margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+                  <XAxis
+                    dataKey="quarter"
+                    tick={{ fontSize: 12, fill: chartColors.text }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    domain={[0, 7]}
+                    tick={{ fontSize: 11, fill: chartColors.text }}
+                    tickLine={false}
+                    axisLine={false}
+                    width={30}
+                  />
+                  <Tooltip
+                    formatter={(value, name) => [Number(value).toFixed(2), name]}
+                    contentStyle={{
+                      backgroundColor: chartColors.background,
+                      border: `1px solid ${chartColors.border}`,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      color: chartColors.text,
+                    }}
+                  />
+                  <Legend
+                    formatter={(value) => (
+                      <span style={{ color: chartColors.text, fontSize: 12 }}>{value}</span>
+                    )}
+                  />
+                  {FUNCTION_ORDER.map(fn => (
+                    <Line
+                      key={fn}
+                      type="monotone"
+                      dataKey={fn}
+                      stroke={FUNCTION_LINE_COLORS[fn]}
+                      strokeWidth={2}
+                      dot={true}
+                      activeDot={{ r: 5 }}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
+                No quarterly score data available to display trends.
+              </div>
+            )}
           </div>
         </>
       )}
