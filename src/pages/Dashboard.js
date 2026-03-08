@@ -23,6 +23,9 @@ import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useUIStore from '../stores/uiStore';
+import useFindingsStore from '../stores/findingsStore';
+import useArtifactStore from '../stores/artifactStore';
+import KPICard from '../components/KPICard';
 
 // Format number to always show one decimal place
 const formatScore = (value) => {
@@ -80,6 +83,8 @@ const Dashboard = () => {
   const getControl = useControlsStore((state) => state.getControl);
   const requirements = useRequirementsStore((state) => state.requirements);
   const darkMode = useUIStore((state) => state.darkMode);
+  const findings = useFindingsStore((state) => state.findings);
+  const artifacts = useArtifactStore((state) => state.artifacts);
 
   // Build a lookup map from requirement/control ID to Function and Category
   // This supports both requirements-based and controls-based assessments
@@ -381,6 +386,75 @@ const Dashboard = () => {
     return statusChartData.reduce((sum, item) => sum + item.value, 0);
   }, [statusChartData]);
 
+  // ── KPI Cards ──────────────────────────────────────────────────────────────
+  const kpiData = useMemo(() => {
+    const quarterKey = `Q${selectedQuarter}`;
+    const prevQuarterKey = selectedQuarter > 1 ? `Q${selectedQuarter - 1}` : null;
+
+    if (!selectedAssessment || dashboardData.length === 0) {
+      return {
+        overallScore: { value: '--', trend: null },
+        inScopeItems: { value: '--', trend: null },
+        evidenceCoverage: { value: '--', trend: null },
+        openFindings: { value: '--', trend: null },
+      };
+    }
+
+    // 1. Overall Score — average actualScore for selected quarter
+    const scoresThisQ = dashboardData
+      .map(item => item.quarters[quarterKey]?.actualScore)
+      .filter(s => s !== undefined && s !== null && s > 0);
+
+    const overallScore = scoresThisQ.length > 0
+      ? (scoresThisQ.reduce((a, b) => a + b, 0) / scoresThisQ.length).toFixed(1)
+      : '--';
+
+    let overallTrend = null;
+    if (prevQuarterKey) {
+      const scoresPrevQ = dashboardData
+        .map(item => item.quarters[prevQuarterKey]?.actualScore)
+        .filter(s => s !== undefined && s !== null && s > 0);
+      if (scoresPrevQ.length > 0 && scoresThisQ.length > 0) {
+        const prevAvg = scoresPrevQ.reduce((a, b) => a + b, 0) / scoresPrevQ.length;
+        const delta = (parseFloat(overallScore) - prevAvg).toFixed(1);
+        overallTrend = {
+          value: delta >= 0 ? `+${delta}` : `${delta}`,
+          direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral',
+        };
+      }
+    }
+
+    // 2. In-Scope Items — count of scopeIds
+    const inScopeCount = selectedAssessment.scopeIds?.length || 0;
+
+    // 3. Evidence Coverage — % of in-scope items with at least one artifact
+    const controlsWithArtifacts = new Set(
+      artifacts
+        .filter(a => a.controlId)
+        .map(a => a.controlId)
+    );
+    const scopeIds = selectedAssessment.scopeIds || [];
+    const coveredCount = scopeIds.filter(id => controlsWithArtifacts.has(id)).length;
+    const evidencePct = inScopeCount > 0
+      ? `${Math.round((coveredCount / inScopeCount) * 100)}%`
+      : '--';
+
+    // 4. Open Findings — status !== 'Resolved'
+    const openCount = findings.filter(f => f.status !== 'Resolved').length;
+
+    return {
+      overallScore: { value: overallScore, trend: overallTrend },
+      inScopeItems: { value: inScopeCount, trend: null },
+      evidenceCoverage: {
+        value: evidencePct,
+        subtitle: inScopeCount > 0 ? `${coveredCount} of ${inScopeCount} items` : null,
+        trend: null,
+      },
+      openFindings: { value: openCount, trend: null },
+    };
+  }, [selectedAssessment, dashboardData, selectedQuarter, artifacts, findings]);
+  // ── End KPI Cards ──────────────────────────────────────────────────────────
+
   if (assessments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
@@ -452,6 +526,38 @@ const Dashboard = () => {
         </div>
       ) : (
         <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <KPICard
+              title="Overall Score"
+              value={kpiData.overallScore.value}
+              subtitle="Avg actual score this quarter"
+              trend={kpiData.overallScore.trend}
+              darkMode={darkMode}
+            />
+            <KPICard
+              title="In-Scope Items"
+              value={kpiData.inScopeItems.value}
+              subtitle="Controls / requirements in scope"
+              trend={kpiData.inScopeItems.trend}
+              darkMode={darkMode}
+            />
+            <KPICard
+              title="Evidence Coverage"
+              value={kpiData.evidenceCoverage.value}
+              subtitle={kpiData.evidenceCoverage.subtitle || 'Items with linked artifacts'}
+              trend={kpiData.evidenceCoverage.trend}
+              darkMode={darkMode}
+            />
+            <KPICard
+              title="Open Findings"
+              value={kpiData.openFindings.value}
+              subtitle="Findings not yet resolved"
+              trend={kpiData.openFindings.trend}
+              darkMode={darkMode}
+            />
+          </div>
+
           {/* Pivot Table and Bar Chart Side by Side */}
           <div className="flex gap-4 mb-6">
             {/* Pivot Table: Score by Function by Quarter */}
