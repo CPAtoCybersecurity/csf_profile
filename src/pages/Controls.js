@@ -106,20 +106,20 @@ const Controls = () => {
     }
   }, [handleSelectItem, toggleItemSelection]);
 
-  // Status color mapping
+  // Status color mapping — returns semantic badge variant class
   const getStatusColor = (status) => {
     switch (status) {
       case 'Complete':
       case 'Completed':
-        return 'text-green-600';
+        return 'badge-success';
       case 'In Progress':
-        return 'text-blue-600';
+        return 'badge-info';
       case 'Not Started':
-        return 'text-gray-500';
+        return 'badge-neutral';
       case 'Submitted':
-        return 'text-orange-600';
+        return 'badge-warning';
       default:
-        return 'text-gray-500';
+        return 'badge-neutral';
     }
   };
 
@@ -387,9 +387,9 @@ const Controls = () => {
                     {(() => {
                       const qData = getQuarterData(item.ID, selectedQuarter) || { testingStatus: 'Not Started' };
                       return (
-                        <div className={getStatusColor(qData.testingStatus)}>
+                        <span className={`badge ${getStatusColor(qData.testingStatus)}`}>
                           {qData.testingStatus || 'Not Started'}
-                        </div>
+                        </span>
                       );
                     })()}
                   </td>
@@ -621,11 +621,11 @@ const Controls = () => {
                           <option value="Complete">Complete</option>
                         </select>
                       ) : (
-                        <div className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(
+                        <span className={`mt-1 badge ${getStatusColor(
                           getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'
                         )}`}>
                           {getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'}
-                        </div>
+                        </span>
                       )}
                     </div>
 
