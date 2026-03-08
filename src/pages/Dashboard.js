@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ClipboardList } from 'lucide-react';
+import EmptyState from '../components/EmptyState';
 import {
   RadarChart,
   PolarGrid,
@@ -383,10 +384,14 @@ const Dashboard = () => {
 
   if (assessments.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <ClipboardList size={48} className="mb-4 opacity-50 text-gray-400" />
-        <div className="text-xl font-semibold text-gray-600">No assessments available</div>
-        <p className="text-gray-500 mt-2">Create an assessment in the Assessments tab to see dashboard data</p>
+      <div className="p-4 bg-white dark:bg-gray-900 min-h-full flex items-center justify-center">
+        <EmptyState
+          icon={ClipboardList}
+          title="No assessment data yet"
+          description="Create your first assessment to see dashboard analytics."
+          actionLabel="Go to Assessments"
+          actionLink="/assessments"
+        />
       </div>
     );
   }
