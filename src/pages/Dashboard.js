@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, FileText } from 'lucide-react';
 import {
   RadarChart,
   PolarGrid,
@@ -23,6 +23,10 @@ import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useUIStore from '../stores/uiStore';
+import useFindingsStore from '../stores/findingsStore';
+import useArtifactStore from '../stores/artifactStore';
+import { generateExecutiveSummary } from '../utils/executiveSummaryPDF';
+import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
 const formatScore = (value) => {
@@ -80,6 +84,8 @@ const Dashboard = () => {
   const getControl = useControlsStore((state) => state.getControl);
   const requirements = useRequirementsStore((state) => state.requirements);
   const darkMode = useUIStore((state) => state.darkMode);
+  const findings = useFindingsStore((state) => state.findings);
+  const artifacts = useArtifactStore((state) => state.artifacts);
 
   // Build a lookup map from requirement/control ID to Function and Category
   // This supports both requirements-based and controls-based assessments
@@ -424,6 +430,23 @@ const Dashboard = () => {
               <option value={4}>Q4</option>
             </select>
           </div>
+          <button
+            onClick={() =>
+              generateExecutiveSummary({
+                assessment: selectedAssessment,
+                requirements,
+                findings,
+                artifacts,
+                selectedQuarter,
+              })
+            }
+            disabled={!selectedAssessment}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            title="Export Executive Summary PDF"
+          >
+            <FileText size={15} />
+            Export Summary
+          </button>
         </div>
       </div>
 
@@ -689,6 +712,11 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Evidence Completeness Tracker */}
+          <div className="mb-6">
+            <EvidenceTracker assessment={selectedAssessment} artifacts={artifacts} />
           </div>
 
           {/* Subcategory Assessment Section */}
