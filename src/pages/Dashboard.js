@@ -23,6 +23,8 @@ import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useUIStore from '../stores/uiStore';
+import useArtifactStore from '../stores/artifactStore';
+import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
 const formatScore = (value) => {
@@ -80,6 +82,7 @@ const Dashboard = () => {
   const getControl = useControlsStore((state) => state.getControl);
   const requirements = useRequirementsStore((state) => state.requirements);
   const darkMode = useUIStore((state) => state.darkMode);
+  const artifacts = useArtifactStore((state) => state.artifacts);
 
   // Build a lookup map from requirement/control ID to Function and Category
   // This supports both requirements-based and controls-based assessments
@@ -689,6 +692,11 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Evidence Completeness Tracker */}
+          <div className="mb-6">
+            <EvidenceTracker assessment={selectedAssessment} artifacts={artifacts} />
           </div>
 
           {/* Subcategory Assessment Section */}
