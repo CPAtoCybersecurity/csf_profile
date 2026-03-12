@@ -360,3 +360,8 @@ CONFLUENCE_BASE_URL=https://your-domain.atlassian.net/wiki
 * `403 Forbidden`: Missing permissions
 * `Invalid URL`: Ensure `/wiki` path is included for Confluence
 * `Rate Limits`: Reduce request frequency or batch requests
+
+
+## 🔧 Recent Fixes
+
+- Fixed issue #100: Gap Prioritization Matrix
