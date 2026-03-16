@@ -403,12 +403,11 @@ const Dashboard = () => {
 
   // Calculate top 10 priority gaps for the selected quarter
   const priorityGaps = useMemo(() => {
-    if (!filteredData || filteredData.length === 0) return [];
+    if (!dashboardData || dashboardData.length === 0) return [];
 
-    const itemsToUse = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
     const quarterKey = `Q${selectedQuarter}`;
 
-    const gaps = itemsToUse
+    const gaps = dashboardData
       .map(item => {
         const quarterData = (item.quarters || {})[quarterKey];
         if (!quarterData) return null;
@@ -416,11 +415,11 @@ const Dashboard = () => {
         const target = quarterData.targetScore ?? 0;
         const gap = target - actual;
         if (gap <= 0) return null;
-        const weight = FUNCTION_WEIGHTS[item.Function] ?? 1.0;
+        const weight = FUNCTION_WEIGHTS[item.function] ?? 1.0;
         const priorityScore = +(gap * weight).toFixed(2);
         return {
-          itemId: item.ID || '',
-          function: item.Function || 'Unknown',
+          itemId: item.itemId || '',
+          function: item.function || 'Unknown',
           actual: +actual.toFixed(1),
           target: +target.toFixed(1),
           gap: +gap.toFixed(1),
@@ -432,7 +431,7 @@ const Dashboard = () => {
       .slice(0, 10);
 
     return gaps;
-  }, [filteredData, filterInScope, selectedQuarter]);
+  }, [dashboardData, selectedQuarter]);
 
   // Colors for each CSF function in the trend line chart
   const FUNCTION_LINE_COLORS = {

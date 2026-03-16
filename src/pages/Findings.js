@@ -254,27 +254,27 @@ const Findings = () => {
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Resolved':
-        return 'badge-success';
+        return 'badge badge-success';
       case 'In Progress':
-        return 'badge-info';
+        return 'badge badge-info';
       case 'Not Started':
       default:
-        return 'badge-neutral';
+        return 'badge badge-neutral';
     }
   };
 
-  // Get priority badge style — returns semantic badge variant class
+  // Get priority badge style — returns semantic badge class
   const getPriorityStyle = (priority) => {
     switch (priority) {
       case 'Critical':
-        return 'badge-danger';
+        return 'badge badge-danger';
       case 'High':
-        return 'badge-warning';
+        return 'badge badge-warning';
       case 'Medium':
-        return 'badge-warning';
+        return 'badge badge-warning';
       case 'Low':
       default:
-        return 'badge-neutral';
+        return 'badge badge-neutral';
     }
   };
 
@@ -436,14 +436,14 @@ const Findings = () => {
 
                     {/* Status */}
                     <div className="w-24 flex-shrink-0">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusStyle(finding.status)}`}>
+                      <span className={getStatusStyle(finding.status)}>
                         {finding.status}
                       </span>
                     </div>
 
                     {/* Priority */}
                     <div className="w-20 flex-shrink-0">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getPriorityStyle(finding.priority)}`}>
+                      <span className={getPriorityStyle(finding.priority)}>
                         {finding.priority}
                       </span>
                     </div>
@@ -563,7 +563,7 @@ const Findings = () => {
                       name="status"
                       value={formData.status}
                       onChange={handleChange}
-                      className={`px-3 py-1.5 rounded text-sm font-medium ${getStatusStyle(formData.status)} border-none cursor-pointer`}
+                      className={`${getStatusStyle(formData.status)} border-none cursor-pointer`}
                     >
                       <option value="Not Started">Not Started</option>
                       <option value="In Progress">In Progress</option>
@@ -573,7 +573,7 @@ const Findings = () => {
                       name="priority"
                       value={formData.priority}
                       onChange={handleChange}
-                      className={`px-3 py-1.5 rounded text-sm font-medium ${getPriorityStyle(formData.priority)} border-none cursor-pointer`}
+                      className={`${getPriorityStyle(formData.priority)} border-none cursor-pointer`}
                     >
                       <option value="Low">Low</option>
                       <option value="Medium">Medium</option>
@@ -583,10 +583,10 @@ const Findings = () => {
                   </>
                 ) : (
                   <>
-                    <span className={`inline-flex items-center px-3 py-1.5 rounded text-sm font-medium ${getStatusStyle(selectedFinding?.status)}`}>
+                    <span className={getStatusStyle(selectedFinding?.status)}>
                       {selectedFinding?.status}
                     </span>
-                    <span className={`inline-flex items-center px-3 py-1.5 rounded text-sm font-medium ${getPriorityStyle(selectedFinding?.priority)}`}>
+                    <span className={getPriorityStyle(selectedFinding?.priority)}>
                       {selectedFinding?.priority}
                     </span>
                   </>

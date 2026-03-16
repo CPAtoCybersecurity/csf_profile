@@ -818,7 +818,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         <span>Scope: {assessment.scopeType === 'controls' ? 'Controls' : 'Requirements'}</span>
                         <span>{prog.total} items</span>
                         <button
-                          className={`${getStatusColor(assessment.status)} px-2 py-0.5 rounded hover:opacity-80 transition-opacity`}
+                          className={`${getStatusColor(assessment.status)} hover:opacity-80 transition-opacity`}
                           onClick={(e) => {
                             e.stopPropagation();
                             setCurrentAssessmentId(assessment.id);
@@ -1015,7 +1015,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           {item.type === 'control' ? item.controlId : item.subcategoryId || item.id}
                         </span>
                         {obs?.testingStatus && (
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${getStatusColor(obs.testingStatus)}`}>
+                          <span className={getStatusColor(obs.testingStatus)}>
                             {obs.testingStatus}
                           </span>
                         )}
@@ -1136,13 +1136,13 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   const getJiraStatusStyle = (status) => {
     switch (status) {
       case 'Complete':
-        return 'badge-success';
+        return 'badge badge-success';
       case 'In Progress':
-        return 'badge-info';
+        return 'badge badge-info';
       case 'Submitted':
-        return 'badge-warning';
+        return 'badge badge-warning';
       default:
-        return 'badge-neutral';
+        return 'badge badge-neutral';
     }
   };
 
@@ -1225,7 +1225,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     <option value="Complete">Complete</option>
                   </select>
                 ) : (
-                  <span className={`inline-flex items-center px-3 py-1.5 rounded text-sm font-medium ${getJiraStatusStyle(currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started')}`}>
+                  <span className={getJiraStatusStyle(currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started')}>
                     {currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started'}
                     <ChevronRight size={14} className="ml-1 rotate-90" />
                   </span>
@@ -1630,7 +1630,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
                   {/* Status column */}
                   <div className="w-24 flex-shrink-0">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium uppercase ${getJiraStatusStyle(quarterData.testingStatus || obs?.testingStatus || 'Not Started')}`}>
+                    <span className={`uppercase ${getJiraStatusStyle(quarterData.testingStatus || obs?.testingStatus || 'Not Started')}`}>
                       {quarterData.testingStatus || obs?.testingStatus || 'Not Started'}
                       <ChevronRight size={12} className="ml-1 rotate-90" />
                     </span>

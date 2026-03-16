@@ -40,9 +40,9 @@ const normalizeFunctionName = (func) => {
  * Map a maturity score (0-7 scale) to a label.
  */
 const scoreToLabel = (score) => {
-  if (score <= 1) return 'Initial';
-  if (score <= 3) return 'Developing';
-  if (score <= 5) return 'Managed';
+  if (score < 1) return 'Initial';
+  if (score < 3) return 'Developing';
+  if (score < 5) return 'Managed';
   return 'Optimized';
 };
 
@@ -189,12 +189,9 @@ export const generateExecutiveSummary = ({
     }));
 
   // Evidence coverage: items with at least one linked artifact / total items
-  const artifactSet = new Set((artifacts || []).map((a) => a.controlId).filter(Boolean));
-  // Also check observations.linkedArtifacts if present
+  // Uses same logic as EvidenceTracker component for consistency
   const itemsWithEvidence = items.filter((i) => {
-    if ((i.linkedArtifacts || []).length > 0) return true;
-    // Check if any artifact references this itemId as controlId
-    return artifactSet.has(i.itemId);
+    return (i.linkedArtifacts || []).length > 0;
   });
   const evidenceCoverage =
     items.length > 0
