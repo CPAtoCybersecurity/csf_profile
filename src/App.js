@@ -23,6 +23,7 @@ import Artifacts from './pages/Artifacts';
 import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
 import Findings from './pages/Findings';
+import AuditLog from './pages/AuditLog';
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -140,6 +141,7 @@ const AppContent = () => {
             <Route path="/artifacts" element={<Artifacts />} />
             <Route path="/findings" element={<Findings />} />
             <Route path="/users" element={<UserManagement />} />
+            <Route path="/history" element={<AuditLog />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
           </Routes>
