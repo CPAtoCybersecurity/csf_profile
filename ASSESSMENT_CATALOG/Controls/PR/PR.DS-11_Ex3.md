@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security conducts quarterly backup restoration tests to validate that critical systems can be recovered from backup within defined recovery objectives. The quarterly restore testing program covers PostgreSQL databases (RDS point-in-time recovery), S3 data restoration (versioned object recovery), and Kubernetes application state (Velero restore to a test namespace). Each test follows a documented restoration test plan that defines success criteria including data integrity verification, application functionality validation, and time-to-recovery measurement.
-
-The most recent quarterly restore test (Q4 2025) successfully restored the PostgreSQL production database to a test environment within 45 minutes, verified data integrity through row count comparison and checksum validation, and confirmed application functionality against a subset of integration tests. S3 data restoration was completed within 15 minutes for a sample dataset. Velero Kubernetes restoration was completed within 30 minutes with all persistent volumes and application configurations intact. These results are documented in a formal test report with findings, measurements, and improvement recommendations.
-
-Recovery objectives are currently defined informally based on system criticality: the continuous authentication platform has a target RTO of 1 hour and RPO of 5 minutes (supported by RDS continuous archiving), while supporting systems have a target RTO of 4 hours and RPO of 24 hours. The DR plan currently in development through the Cloud Security Optimization project ($100K) will formalize these objectives and establish a comprehensive recovery testing program that includes full-environment recovery scenarios beyond individual system restoration.
+Alma conducts quarterly backup restoration tests covering RDS point-in-time recovery, S3 versioned object recovery, and Velero Kubernetes restores to a test namespace, each validated against documented success criteria for integrity and time-to-recovery. Recovery targets are defined informally: 1-hour RTO / 5-minute RPO for the authentication platform, 4-hour RTO / 24-hour RPO for supporting systems. The Cloud Security Optimization project ($100K) is formalizing these objectives into a comprehensive DR plan with full-environment recovery scenarios.
 
 ## Evidence of Implementation
 

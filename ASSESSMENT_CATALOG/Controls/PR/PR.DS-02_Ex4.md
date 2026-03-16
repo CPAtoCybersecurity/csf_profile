@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security manages encryption keys for data-in-transit protection through AWS Certificate Manager (ACM) for TLS certificates and AWS Key Management Service (KMS) for VPN and service mesh encryption keys. ACM provides automated certificate lifecycle management for all public-facing TLS certificates, handling issuance, renewal (automatic renewal 60 days before expiration), and deployment to ALBs and CloudFront distributions. This eliminates the operational risk of manual certificate management and forgotten renewals.
-
-For the Kubernetes service mesh, internal mTLS certificates are managed by the mesh's built-in certificate authority with automated rotation on a configurable schedule (currently set to 24-hour certificate lifetimes with automatic re-issuance). This short certificate lifetime minimizes the impact window if an internal certificate is compromised. VPN authentication certificates are managed through a private Certificate Authority with a 2-year validity period, with revocation lists published to the VPN gateway for immediate effect on compromised or decommissioned certificates.
-
-The key management governance structure assigns the infrastructure team as key custodians with the security team providing oversight. KMS key usage is logged through AWS CloudTrail, providing an audit trail of all cryptographic operations. Key access policies follow least privilege, with separate IAM roles for key administration versus key usage. The current gap is the absence of a documented Key Management Plan that formalizes all key types, rotation schedules, custodianship, and incident response procedures for key compromise across both cloud and on-premises environments.
+Alma manages transit encryption keys through ACM for automated TLS certificate lifecycle (auto-renewal 60 days before expiration), the Kubernetes service mesh CA for mTLS certificates (24-hour lifetime with auto-rotation), and a private CA for VPN certificates (2-year validity with CRL). KMS key usage is logged via CloudTrail with separate IAM roles for key administration versus usage. A formal Key Management Plan covering all key types, rotation schedules, and compromise response is not yet documented.
 
 ## Evidence of Implementation
 

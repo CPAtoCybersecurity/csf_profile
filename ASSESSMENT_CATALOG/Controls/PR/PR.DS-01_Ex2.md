@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security implements data integrity protections through a combination of SentinelOne file integrity monitoring and AWS-native integrity verification features. SentinelOne's FIM capability is deployed across all endpoints and servers, monitoring critical system files, configuration files, and application binaries for unauthorized modifications. FIM alerts are configured to trigger on changes to sensitive directories, with real-time notifications routed to the security operations workflow for investigation within a 4-hour SLA.
-
-At the infrastructure level, AWS S3 provides built-in integrity verification through content-MD5 checksums and ETags for all stored objects. S3 versioning is enabled on buckets containing production data, providing both integrity verification and the ability to recover from unauthorized modifications or accidental deletions. PostgreSQL databases leverage WAL (Write-Ahead Logging) for transaction integrity, and automated integrity checks run as part of the database maintenance window.
-
-The current gap is the absence of a formal data integrity verification program that systematically validates stored data against known-good baselines on a scheduled cadence. While reactive monitoring (SentinelOne FIM) and infrastructure-level protections (S3 checksums) are in place, proactive integrity assessments of the data itself -- particularly for biometric data stores -- are not yet formalized. The data classification schema currently in development will help define integrity requirements per data sensitivity level.
+Alma implements data integrity protections through SentinelOne file integrity monitoring (FIM) on all endpoints and servers, with alerts triaged within a 4-hour SLA. AWS S3 provides content-MD5 checksums and versioning for production buckets, and PostgreSQL uses WAL for transaction integrity. Proactive integrity validation against known-good baselines is not yet formalized and is pending completion of the data classification schema.
 
 ## Evidence of Implementation
 

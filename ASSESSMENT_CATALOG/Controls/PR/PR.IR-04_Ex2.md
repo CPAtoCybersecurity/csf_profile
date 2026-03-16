@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has limited DDoS mitigation capabilities as of Q1 2026. AWS Shield Standard is automatically included with all AWS accounts and provides protection against common Layer 3/4 DDoS attacks (SYN floods, UDP reflection attacks, and similar volumetric attacks). This baseline protection operates transparently and does not require configuration by the Alma infrastructure team. However, AWS Shield Standard provides only basic volumetric protection and does not address application-layer (Layer 7) DDoS attacks.
-
-The absence of a Web Application Firewall (WAF) represents the most significant DDoS mitigation gap. Without a WAF, Alma's internet-facing SaaS platform lacks protection against application-layer attacks — HTTP floods, slowloris attacks, and sophisticated request patterns designed to overwhelm application resources while appearing as legitimate traffic. The WAF Install project ($112K budget, currently in progress) will address this gap by providing rate limiting, request filtering, and bot mitigation capabilities. Until the WAF is deployed, the Kubernetes auto-scaling configuration is the primary defense against traffic spikes, but auto-scaling as a DDoS response is both expensive and finite — attackers can sustain traffic volumes that exceed auto-scaling limits and budget thresholds.
-
-There is no documented DDoS response runbook that defines escalation procedures, traffic analysis steps, communication protocols, or decisions to engage AWS Shield Advanced or third-party DDoS mitigation services during an active attack. Rate limiting at the application or load balancer layer has not been confirmed. For a continuous authentication SaaS platform, service availability is directly tied to revenue and customer trust, making DDoS resilience a business-critical capability.
+Alma has AWS Shield Standard providing baseline Layer 3/4 DDoS protection across all accounts. No WAF is deployed for Layer 7 protection -- the WAF Install project ($112K, in progress) will add rate limiting and request filtering. No DDoS response runbook exists, rate limiting is not configured at the ALB layer, and AWS Shield Advanced has not been evaluated.
 
 ## Evidence of Implementation
 

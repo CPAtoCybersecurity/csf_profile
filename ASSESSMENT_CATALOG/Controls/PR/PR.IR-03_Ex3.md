@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has implemented high-availability components across its AWS Kubernetes production environment as a core architectural principle. The multi-AZ Kubernetes cluster ensures that control plane components and worker nodes are distributed across physically separated AWS facilities. Pod redundancy through replica sets maintains multiple running instances of each critical microservice, with Kubernetes automatically rescheduling failed pods to healthy nodes. Auto-scaling is configured to dynamically adjust pod and node counts based on resource utilization, ensuring that capacity increases in response to demand rather than requiring manual intervention.
-
-Redundant storage and compute resources are provisioned for critical systems, ensuring that the loss of individual storage volumes or compute instances does not result in service degradation. The AWS Elastic Load Balancer distributes incoming traffic across healthy targets and automatically removes unhealthy instances from the target group. Health checks and readiness probes are configured to detect application-level failures, not just infrastructure-level issues, enabling faster detection and recovery from service degradation.
-
-This is an area of relative strength for Alma Security. The combination of multi-AZ deployment, pod redundancy, auto-scaling, and validated failover testing indicates that the infrastructure team has thoughtfully designed for high availability. The primary gaps are around formalization: SLA/SLO targets for availability are not formally documented, availability metrics are not systematically reported to business stakeholders, and the high-availability architecture for the Redwood City on-premises components does not match the resilience of the cloud environment.
+Alma runs a multi-AZ Kubernetes cluster with pod replica sets, auto-scaling, health checks, readiness probes, and ALB traffic distribution across healthy targets. Redundant storage and compute are provisioned for critical systems, and failover testing has validated the architecture. SLA/SLO targets for availability are not formally documented, availability metrics are not reported to business stakeholders, and on-premises HA does not match cloud resilience levels.
 
 ## Evidence of Implementation
 

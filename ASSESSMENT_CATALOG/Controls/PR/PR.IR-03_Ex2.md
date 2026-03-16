@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's disaster recovery plan is currently in development as part of the Cloud Security Optimization project, which carries a $100K budget allocation. This project encompasses DR planning alongside broader cloud security improvements, indicating organizational commitment to addressing this gap. However, as of Q1 2026, a formal, approved DR plan does not exist.
-
-The absence of a completed DR plan means that recovery time objectives (RTO) and recovery point objectives (RPO) have not been formally defined, documented, or agreed upon by business stakeholders for critical systems. While the multi-AZ architecture and Kubernetes redundancy provide operational resilience for component-level failures, the organization lacks a documented strategy for scenarios that exceed these capabilities — such as a region-level AWS outage, a catastrophic data corruption event, a ransomware attack affecting production systems, or the simultaneous loss of the Redwood City data center.
-
-Positively, the completed failover testing demonstrates that the infrastructure team is building muscle memory for resilience validation. Backup strategies exist for critical data, though their alignment with (yet-to-be-defined) RPO targets has not been verified. The DR plan development should address scenarios specific to Alma's hybrid environment: cloud-only recovery, on-premises-only recovery, and full hybrid recovery. The plan should also define communication procedures, decision authority during a disaster, and integration with the existing incident response process.
+Alma's disaster recovery plan is in development as part of the Cloud Security Optimization project ($100K budget). As of Q1 2026, no formal approved DR plan exists -- RTO/RPO have not been defined, and backup alignment with recovery objectives is unverified. Multi-AZ architecture and Kubernetes redundancy provide component-level resilience, but no documented strategy covers region-level outages, ransomware, or full data center loss.
 
 ## Evidence of Implementation
 

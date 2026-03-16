@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security protects identity assertions through cryptographic controls at the Windows Authenticator SSO platform, which serves as the primary identity provider for both on-premises and cloud application access. SAML 2.0 assertions issued to integrated SaaS applications are digitally signed using SHA-256 with RSA-2048 certificates. The SSO signing certificate is renewed annually, with the most recent rotation completed in January 2026. For applications that support it, SAML assertions are additionally encrypted using the relying party's public certificate, though this is currently enabled for only 12 of the 35 integrated applications.
-
-OAuth 2.0 and OIDC tokens issued by the SSO platform use RS256 signing with JSON Web Keys (JWK) published at a well-known endpoint. Access tokens are configured with a 1-hour expiration, and refresh tokens expire after 24 hours of inactivity. The security team evaluated and rejected HS256 (symmetric signing) for all public-facing clients due to the shared secret risk. Token audiences are restricted to specific client IDs, preventing token reuse across applications.
-
-On-premises Kerberos authentication through Active Directory uses AES-256 encryption for ticket-granting tickets and service tickets. The security team disabled RC4 (ARCFOUR) encryption types through Group Policy in Q3 2025 after Chris Magann's vulnerability management team identified RC4 as a risk vector for Kerberoasting attacks. The Kerberos ticket lifetime is configured at 10 hours with a 7-day renewal window. AWS API calls use SigV4 (Signature Version 4) signing for all requests, which provides message integrity and authentication at the API layer.
+Alma Security protects identity assertions through cryptographic controls across the SSO platform, Active Directory, and AWS. SAML 2.0 assertions are digitally signed using SHA-256 with RSA-2048 certificates (renewed annually) and encrypted with relying party certificates for 12 of 35 integrated applications. OAuth 2.0 and OIDC tokens use RS256 signing with 1-hour access token and 24-hour refresh token expiration, with audience restrictions preventing cross-application token reuse. On-premises Kerberos uses AES-256 encryption for all tickets with RC4 disabled via GPO, and AWS API calls use SigV4 signing for message integrity.
 
 ## Evidence of Implementation
 

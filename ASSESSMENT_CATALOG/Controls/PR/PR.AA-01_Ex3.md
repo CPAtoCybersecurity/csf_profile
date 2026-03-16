@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains a service account inventory in ServiceNow CMDB that tracks approximately 45 service accounts across the on-premises Windows Domain Controller, AWS environment, and Kubernetes cluster. Each service account entry documents the owning team, business justification, creation date, last credential rotation, and associated application or service. The inventory is reviewed quarterly by Gerry's security team as part of the access recertification cycle, with service account owners required to confirm continued business need.
-
-On the Windows Domain Controller, service accounts follow a naming convention (svc-[application]-[environment]) and are placed in a dedicated OU with restricted group policy settings. Password rotation for on-premises service accounts is enforced every 90 days through Active Directory password policies, though compliance verification is manual. In AWS, IAM roles with temporary credentials are preferred over long-lived access keys for service-to-service communication. Kubernetes workloads use service account tokens scoped to specific namespaces, with the Cloud Platform team managing RBAC policies.
-
-The shared developer SSH key on port 45001 represents a significant exception to the service account management standard. This key is used by multiple developers for production system access and lacks individual accountability. The security team has documented this as a high-priority remediation item in the risk register, with a target remediation date of Q3 2026. The planned solution involves migrating to individual SSH certificates issued through a certificate authority, providing both unique identity binding and automated rotation.
+Alma Security tracks approximately 45 service accounts in ServiceNow CMDB across the Windows Domain Controller, AWS, and Kubernetes, documenting ownership, business justification, creation date, and last credential rotation for each. On-premises service accounts follow a svc-[application]-[environment] naming convention in a dedicated Active Directory OU with restricted GPO settings and 90-day password rotation enforcement. AWS workloads use IAM roles with temporary credentials, and Kubernetes workloads use namespace-scoped service account tokens. Quarterly access recertification requires service account owners to confirm continued business need.
 
 ## Evidence of Implementation
 

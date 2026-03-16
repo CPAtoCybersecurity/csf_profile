@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security operates a visitor management process at the Redwood City headquarters reception desk. Visitors are required to sign in at the front desk, present government-issued identification, and identify their host employee. The receptionist issues a temporary visitor badge that is visually distinct from employee badges (bright orange with "VISITOR" prominently displayed and the date printed). The host employee is notified and must physically meet the visitor at reception before they can proceed beyond the lobby.
-
-Visitors are escorted at all times in work areas and are prohibited from entering restricted zones (server room, security operations area) without pre-approved authorization from the zone owner. The visitor log captures name, company, host, purpose of visit, entry time, and exit time. Visitor badges include a one-day expiration and do not provide electronic access through badge readers; all doors beyond the lobby require the escort's badge for entry. Visitor badges are collected at the end of the visit and reconciled daily by the reception team.
-
-The visitor management process is documented in the Physical Security Policy, which was updated in Q2 2025 to include requirements for vendor technicians who require unescorted server room access. These technicians undergo a pre-approval process: the vendor company provides background check documentation, the visit is scheduled through ServiceNow with the infrastructure team's approval, and the technician receives a temporary badge with server room access that expires at the scheduled visit end time. Three vendor technician visits occurred in Q1 2026 (two for Palo Alto firewall maintenance and one for HVAC system servicing), all following the pre-approval process.
+Alma Security manages visitor access at the Redwood City headquarters through a reception-based process requiring sign-in, government-issued ID presentation, and host employee escort. Visitors receive a visually distinct temporary badge (one-day expiration, no electronic access) and must be escorted at all times in work areas, with restricted zones prohibited without pre-approved zone-owner authorization. The visitor log captures name, company, host, purpose, and entry/exit times, with badges collected and reconciled daily. Vendor technicians requiring unescorted server room access undergo a pre-approval process through ServiceNow including background check documentation and time-limited badge provisioning.
 
 ## Evidence of Implementation
 

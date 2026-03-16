@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security manages identity assertion lifecycles through configured policies at the Windows Authenticator SSO platform and Active Directory. SSO access tokens are issued with a 1-hour expiration for standard applications, with high-sensitivity applications (AWS Console, ServiceNow admin) configured for 30-minute token lifetimes. Refresh tokens have a 24-hour inactivity timeout and a 7-day absolute maximum lifetime, after which users must re-authenticate with full MFA. These settings were tightened in Q4 2025 from the previous 8-hour access token and 30-day refresh token configuration, based on a recommendation from Nadia Khan after reviewing industry threat intelligence on session hijacking attacks.
-
-Kerberos ticket lifetimes in Active Directory are set to 10 hours for TGTs (Ticket Granting Tickets) with a 7-day maximum renewal period. Service tickets inherit the TGT lifetime constraints. The security team reviewed these settings against CIS Benchmarks for Windows Server and confirmed alignment with recommended values.
-
-Token revocation is handled through SSO session termination. When a security incident is detected or an employee is terminated, the IT team can revoke all active SSO sessions for a specific user within minutes through the administrative console. This was tested during a tabletop exercise in February 2026, where the team demonstrated the ability to terminate all sessions for a compromised account in under 5 minutes. However, applications that cache tokens locally may continue to grant access until the cached token expires, which represents a gap for the 1-hour access token window. AWS session tokens issued through SAML federation inherit the 1-hour maximum session duration configured in the IAM trust policy.
+Alma Security manages token lifecycles through the Windows Authenticator SSO platform and Active Directory with tiered expiration policies. SSO access tokens expire after 1 hour for standard applications and 30 minutes for high-sensitivity applications (AWS Console, ServiceNow admin), with refresh tokens expiring after 24 hours of inactivity or 7 days absolute maximum. Kerberos TGTs are set to 10-hour lifetimes with 7-day renewal periods, aligned to CIS Benchmarks for Windows Server. Token revocation is handled through SSO session termination via the administrative console, with the ability to revoke all active sessions for a specific user within minutes.
 
 ## Evidence of Implementation
 

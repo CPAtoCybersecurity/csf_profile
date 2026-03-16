@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security enforces encrypted-only connections through a defense-in-depth approach spanning network security groups, application configuration, and cloud service policies. All externally-facing AWS Application Load Balancers are configured with HTTP-to-HTTPS redirect rules that return 301 permanent redirects for any plaintext HTTP connections on port 80, ensuring that client applications are automatically upgraded to encrypted connections. No services listen on plaintext protocols without corresponding redirect rules.
-
-At the network layer, AWS Security Groups and Network ACLs restrict inbound traffic to ports associated with encrypted protocols only. FTP (port 21), Telnet (port 23), and unencrypted SMTP (port 25) are blocked at the security group level for all production workloads. Internal Kubernetes network policies enforce similar restrictions, allowing only encrypted communication paths between pods. The Kubernetes ingress controller is configured to reject non-TLS connections and does not support plaintext HTTP backends.
-
-AWS S3 bucket policies enforce the aws:SecureTransport condition on all API calls, rejecting any S3 operations attempted over unencrypted HTTP. This is part of the S3 Bucket Security project hardening baseline and is being applied to all buckets. PostgreSQL database connections are configured to reject non-SSL connections by setting the rds.force_ssl parameter to 1 on all RDS instances. CloudWatch metrics and VPC Flow Logs provide monitoring for any connection attempts on plaintext protocol ports, generating alerts for investigation.
+Alma enforces encrypted-only connections through ALB HTTP-to-HTTPS 301 redirects, Security Groups blocking plaintext protocols (FTP, Telnet, unencrypted SMTP), and Kubernetes network policies restricting pods to encrypted communication paths. S3 bucket policies enforce the aws:SecureTransport condition, and RDS instances reject non-SSL connections via rds.force_ssl. VPC Flow Logs and CloudWatch monitor for plaintext protocol connection attempts.
 
 ## Evidence of Implementation
 

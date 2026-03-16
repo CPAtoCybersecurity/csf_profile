@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security manages privileged access through a combination of Active Directory tiered administration and AWS IAM role-based elevation. On the on-premises Windows Domain Controller, privileged accounts follow a naming convention (adm-[username]) and are placed in a separate OU with restrictive Group Policy settings that prevent interactive logon to standard workstations and require smart card or hardware token authentication. Domain Admin group membership is limited to 4 individuals: Gerry (CISO), the IT Manager, and two senior infrastructure engineers. The security team reviews Domain Admin membership monthly.
-
-In AWS, privileged access to the production account requires assuming an IAM role through SAML federation with the SSO, which enforces MFA re-authentication before role assumption. The production-admin role grants broad EC2, RDS, and EKS management permissions, while more scoped roles exist for database administration, network management, and security operations. CloudTrail logs all API calls made under assumed roles, and Nadia Khan's team has configured GuardDuty alerts for anomalous privileged activity patterns including off-hours access, access from new IP addresses, and bulk resource modifications.
-
-Alma does not currently have a dedicated PAM solution (such as CyberArk or HashiCorp Boundary) for session brokering and recording. Privileged sessions to production systems are not recorded, which limits forensic capability. The security team has identified this as a gap and included PAM solution evaluation in the Q3 2026 security tooling roadmap. In the interim, CloudTrail and Windows Security Event logs provide audit trails for privileged actions, though they lack the granularity of dedicated session recording.
+Alma Security manages privileged access through Active Directory tiered administration and AWS IAM role-based elevation. On-premises privileged accounts (adm-[username]) reside in a separate OU with restrictive GPO settings preventing interactive logon to standard workstations and requiring hardware token authentication, with Domain Admin membership limited to 4 individuals and reviewed monthly. AWS production privileged access requires assuming IAM roles through SAML federation with MFA re-authentication, with CloudTrail logging all API calls and GuardDuty alerting on anomalous privileged activity patterns. Audit trails for privileged actions are provided through CloudTrail and Windows Security Event logs.
 
 ## Evidence of Implementation
 

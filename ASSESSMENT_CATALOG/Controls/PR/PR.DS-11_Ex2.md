@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security protects backup confidentiality through encryption at rest for all backup data. AWS RDS automated backups are encrypted using the same KMS customer-managed key as the source database, ensuring backup data receives equivalent cryptographic protection. S3 buckets storing backup data (including Velero backup archives) are configured with SSE-KMS encryption, and bucket policies enforce the aws:SecureTransport condition to require encryption in transit for all backup operations. On-premises Windows Domain Controller backups are encrypted using Windows Server Backup's built-in encryption with a managed certificate.
-
-Backup integrity is protected through multiple mechanisms. AWS RDS backup integrity is maintained by the managed service with automated consistency checks during the backup process. Velero backup archives include checksums that are verified during restoration. S3 object integrity is verified through content-MD5 checksums at upload time. For critical compliance data, S3 Object Lock is being deployed (as part of the S3 Bucket Security project) to provide WORM protection, preventing backup deletion or modification even by administrators, which provides ransomware resilience for backup data.
-
-Access controls on backup storage follow the principle of least privilege. IAM policies restrict backup operations (create, read, delete) to separate roles, ensuring that the ability to create backups is separated from the ability to delete them. Backup bucket policies deny all cross-account access and require MFA for delete operations on versioned objects. Backup access events are logged through CloudTrail and S3 access logs, providing an audit trail for any backup data access. The security team reviews backup access logs monthly as part of the data protection monitoring program.
+Alma protects backup confidentiality through KMS encryption on RDS backups, SSE-KMS on S3 backup buckets (with SecureTransport enforced), and Windows Server Backup encryption for on-premises DC backups. Backup integrity uses RDS automated consistency checks, Velero archive checksums, and S3 content-MD5 verification, with S3 Object Lock (WORM) being deployed for compliance data. IAM policies separate backup create/read/delete roles, bucket policies require MFA for versioned object deletion, and CloudTrail logs all backup access events.
 
 ## Evidence of Implementation
 

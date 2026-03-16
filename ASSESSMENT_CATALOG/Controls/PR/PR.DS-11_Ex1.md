@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains automated backup procedures for all critical data across its hybrid infrastructure. PostgreSQL databases running on AWS RDS are configured with automated daily backups with a 35-day retention period and continuous transaction log archiving enabling point-in-time recovery to any second within the retention window. These RDS backups are managed by AWS and execute during a defined maintenance window to minimize performance impact on the continuous authentication platform.
-
-Application data stored in S3 is protected through S3 versioning, which maintains a complete history of all object versions and supports recovery from accidental deletions or overwrites. Critical application configurations and Kubernetes manifests are stored in a GitOps repository, providing version-controlled infrastructure-as-code that serves as both configuration documentation and a recovery mechanism. Kubernetes persistent volumes containing application state are backed up using a scheduled Velero backup job that runs nightly and retains backups for 30 days.
-
-On-premises Windows Domain Controller backups include Active Directory system state backups, DNS zone data, and Group Policy Objects. These backups run daily and are stored both locally and replicated to an off-site location. The backup scope is defined by a data criticality matrix that maps each system and data store to backup frequency and retention requirements based on the system's RTO and RPO targets. The current backup coverage is comprehensive for production systems, though the data classification schema in progress will refine backup requirements by data sensitivity level.
+Alma maintains automated backups across its hybrid infrastructure: RDS PostgreSQL with daily snapshots (35-day retention) and continuous WAL archiving for point-in-time recovery, S3 versioning for application data, nightly Velero backups for Kubernetes persistent volumes (30-day retention), and daily Windows DC system state/DNS/GPO backups replicated off-site. Backup scope is governed by a data criticality matrix mapping systems to RTO/RPO-based frequency and retention requirements. Infrastructure configurations are version-controlled in a GitOps repository.
 
 ## Evidence of Implementation
 

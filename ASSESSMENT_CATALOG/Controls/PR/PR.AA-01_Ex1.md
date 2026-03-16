@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security integrates identity and credential management into HR-driven lifecycle events through ServiceNow workflows. When HR initiates an onboarding ticket in Workday, an automated ServiceNow integration creates provisioning tasks for IT. The provisioning workflow creates the Active Directory account on the on-premises Windows Domain Controller, assigns role-based group memberships, enrolls the user in Windows Authenticator SSO, and triggers MFA enrollment. Each step requires completion before the next activates, ensuring credentials are issued only after manager approval and identity verification are documented.
-
-For offboarding, HR termination events in Workday trigger an automated ServiceNow incident that disables the Active Directory account, revokes SSO sessions, removes AWS IAM console access, and deactivates the physical badge. The offboarding SLA requires same-day revocation for involuntary terminations and next-business-day for voluntary departures. Role changes follow a similar workflow: the existing access is reviewed, unnecessary entitlements are removed, and new role-appropriate access is provisioned through the standard approval chain.
-
-Credential recovery procedures require the help desk to verify identity using a challenge-response protocol before resetting passwords or re-enrolling MFA devices. Nadia Khan's Detection and Response team monitors for anomalous credential activity post-recovery to detect potential social engineering attacks targeting the reset process.
+Alma Security manages identity and credential lifecycle through Workday-to-ServiceNow integration workflows covering onboarding, offboarding, role changes, and credential recovery. Provisioning creates Active Directory accounts on the Windows Domain Controller, assigns RBAC group memberships, enrolls users in Windows Authenticator SSO, and triggers MFA enrollment, with each step gated on manager approval and identity verification. Offboarding triggers same-day account disablement, SSO session revocation, AWS IAM access removal, and badge deactivation. Credential recovery requires help desk identity verification via challenge-response protocol before password resets or MFA re-enrollment.
 
 ## Evidence of Implementation
 

@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's SaaS platform is a containerized application with significant third-party dependency exposure through npm packages, container base images, and cloud service integrations. Container base images are pulled from Amazon ECR public repositories and Docker Hub, with images scanned by Amazon Inspector upon push to the private ECR registry. The scanning identifies known CVEs in OS packages and some application-level dependencies within the container image layers.
-
-The development team uses npm as the package manager for the Node.js-based application. Developers are expected to run `npm audit` periodically to check for known vulnerabilities in direct and transitive dependencies, but this practice is not enforced through tooling or policy. There is no automated software composition analysis (SCA) tool integrated into the CI/CD pipeline that systematically tracks all third-party dependencies and their vulnerability status. No software bill of materials (SBOM) is generated or maintained for the application, making it difficult to quickly assess exposure when new vulnerabilities are disclosed in popular libraries.
-
-License compliance for third-party components is not formally tracked. The engineering team generally uses permissively licensed open-source software (MIT, Apache 2.0, BSD), but there is no automated license scanning or policy enforcement to prevent introduction of copyleft or restrictively licensed components. Supply chain risk assessment for third-party dependencies is limited to the vendor security review process for commercial software; open-source dependency supply chain risks (typosquatting, compromised maintainer accounts, dependency confusion) are not systematically addressed.
+Alma scans container base images via Amazon Inspector on push to ECR, identifying known CVEs in OS packages and some application dependencies. The Node.js application uses npm, but `npm audit` is manual and unenforced -- no SCA tool or SBOM generation is integrated into the CI/CD pipeline. License compliance and open-source supply chain risks (typosquatting, dependency confusion) are not systematically tracked or mitigated.
 
 ## Evidence of Implementation
 

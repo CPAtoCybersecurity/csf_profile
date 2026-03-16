@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security implements network segmentation across both its AWS cloud environment and the Redwood City on-premises data center. In AWS, the production VPC architecture uses a multi-AZ design with distinct subnets for public-facing load balancers, application-tier Kubernetes worker nodes, and private database instances. Security Groups enforce micro-segmentation at the instance level, restricting traffic to explicitly required ports and protocols between tiers. Network ACLs provide a secondary stateless filtering layer at the subnet boundary.
-
-On-premises at the Redwood City data center, the Palo Alto firewall enforces zone-based segmentation between the corporate network, server VLAN, and management network. The Windows domain controllers are hosted on a dedicated server segment with restricted access from the general corporate VLAN. However, the segmentation model has not been formally documented as a segmentation policy, and the degree of micro-segmentation within the Kubernetes cluster (namespace-level network policies) requires further validation.
-
-Current gaps include the absence of a formal network segmentation policy document that defines trust zones, the limited enforcement of Kubernetes network policies across all namespaces, and the lack of regular segmentation testing to verify that controls prevent lateral movement as designed.
+Alma segments its AWS production VPC into distinct subnets (public ALBs, application-tier Kubernetes nodes, private databases) with Security Groups enforcing micro-segmentation and Network ACLs providing secondary filtering. On-premises at Redwood City, the Palo Alto firewall enforces zone-based segmentation between corporate, server, and management VLANs. No formal segmentation policy document exists, Kubernetes namespace-level network policies are not enforced across all namespaces, and regular segmentation testing has not been conducted.
 
 ## Evidence of Implementation
 

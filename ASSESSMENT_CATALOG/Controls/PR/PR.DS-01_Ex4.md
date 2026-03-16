@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has deployed comprehensive removable media controls across its endpoint fleet using SentinelOne's device control capabilities. The SentinelOne device control policy blocks all USB mass storage devices, external hard drives, and optical media by default on all corporate-managed endpoints. This policy is enforced at the kernel level, preventing device mounting regardless of user privilege level. The policy applies uniformly across the 300-person organization, with a documented exception process for approved business use cases requiring removable media.
-
-The removable media exception process requires approval from the employee's manager and the IT Security team, with a documented business justification. Approved exceptions are time-limited (maximum 72 hours) and require that any data transferred to removable media be encrypted using the organization's approved encryption tool. SentinelOne logs all removable media connection attempts, including blocked attempts, providing visibility into attempted policy violations. These logs are reviewed weekly as part of the DLP monitoring program managed by the security operations team.
-
-Physical removable media controls are supplemented by network-based DLP monitoring, also facilitated through SentinelOne. The DLP agent monitors for potential data exfiltration patterns including large file transfers, sensitive data pattern matching (biometric data signatures, PII patterns), and anomalous data movement. Alerts are triaged within a 4-hour SLA during business hours. This control is fully deployed and represents one of Alma's more mature data protection capabilities.
+Alma blocks all USB mass storage, external drives, and optical media on corporate endpoints via SentinelOne device control, enforced at the kernel level across all 300 employees. A documented exception process requires manager and IT Security approval with 72-hour time limits and mandatory encryption. SentinelOne DLP monitoring supplements device control by detecting exfiltration patterns including large file transfers and sensitive data movement, with weekly log review and 4-hour alert triage SLA.
 
 ## Evidence of Implementation
 

@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's primary log monitoring capability is delivered through AWS GuardDuty, which applies machine learning models and threat intelligence feeds to detect anomalous and malicious activity across CloudTrail, VPC Flow Logs, DNS logs, and EKS audit logs. GuardDuty generates findings categorized by severity (low, medium, high) that are aggregated into AWS Security Hub. The security team has tuned GuardDuty by suppressing known false positive patterns (e.g., authorized vulnerability scanner activity, approved penetration testing IP ranges) to improve signal-to-noise ratio.
-
-Additional monitoring is configured through CloudWatch Alarms and CloudWatch Logs Metric Filters for specific high-value events. Custom metric filters are configured to detect root account usage, IAM policy changes, console sign-in failures exceeding 5 attempts, security group modifications, and S3 bucket policy changes. These metric filters trigger CloudWatch Alarms that route to SNS topics feeding both Slack notifications and PagerDuty. The infrastructure team maintains approximately 25 custom CloudWatch monitoring rules.
-
-The monitoring coverage has meaningful gaps. There are no correlation rules that combine events across multiple log sources (e.g., correlating a failed authentication attempt with subsequent successful access from a different IP). Application-layer monitoring for the SaaS platform is limited to error rate and latency metrics without security-specific behavioral analysis. The absence of a SIEM limits the ability to create complex detection rules, run retrospective hunts, and maintain detection-as-code. Monitoring operates during business hours with PagerDuty on-call for critical alerts, but there is no proactive threat hunting program.
+Alma monitors logs through GuardDuty (ML-based anomaly detection across CloudTrail, VPC Flow Logs, DNS, and EKS audit logs) and approximately 25 custom CloudWatch metric filters/alarms covering root account usage, IAM changes, sign-in failures, and security group modifications. Findings are aggregated in Security Hub with alerts routed to Slack and PagerDuty. No cross-source correlation rules exist, no SIEM is deployed for complex detection or retrospective hunting, and there is no proactive threat hunting program.
 
 ## Evidence of Implementation
 

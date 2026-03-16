@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security employs several mechanisms to verify software authenticity before deployment, though coverage varies by software type. Linux packages are installed exclusively through official distribution repositories (Amazon Linux Extras, Ubuntu APT) with GPG signature verification enabled by default. The package manager configurations are locked to approved repositories through the hardened baseline, preventing addition of untrusted third-party sources without infrastructure team approval.
-
-Container images used in Alma's Kubernetes environment are stored in Amazon ECR, which serves as the sole approved image registry. The ECR repository is configured with image scanning on push using Amazon Inspector, which validates images for known vulnerabilities before they are available for deployment. However, container image signing (e.g., Sigstore Cosign, Notary) is not yet implemented, meaning there is no cryptographic verification that images have not been tampered with between build and deployment. The CI/CD pipeline builds images from source and pushes directly to ECR, but the chain of trust from build to deployment lacks formal integrity verification.
-
-For commercial software procurement, Alma's IT team verifies downloads against vendor-published checksums when available. However, this process is manual and not consistently documented. Developer-installed tools (IDEs, CLI utilities) are generally installed from vendor websites or official package managers (Homebrew, Chocolatey) without formal integrity verification tracking.
+Alma verifies Linux package authenticity through GPG-signed official repositories locked down in the hardened baseline. Container images are stored in Amazon ECR with Amazon Inspector scanning on push, but no image signing (Cosign/Notary) is implemented to verify integrity between build and deployment. Commercial software verification against vendor checksums is manual and inconsistent, and developer-installed tools lack formal integrity tracking.
 
 ## Evidence of Implementation
 

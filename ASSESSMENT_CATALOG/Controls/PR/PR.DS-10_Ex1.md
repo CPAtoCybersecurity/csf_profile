@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's continuous authentication platform processes biometric data -- the organization's highest sensitivity data classification -- in real-time, making secure memory handling a critical control. The application architecture for the biometric processing pipeline is designed to minimize the time sensitive data resides in memory. Biometric templates are loaded into memory for comparison during the authentication decision, and the application framework implements explicit memory clearing after processing completes. Authentication tokens and session keys have defined maximum memory lifetimes enforced through application-level garbage collection hints and secure buffer handling.
-
-At the infrastructure level, Kubernetes pods running the biometric processing services are configured with security contexts that disable core dumps (preventing crash dumps from containing sensitive data) and enforce read-only root filesystems. Linux kernel protections including ASLR (Address Space Layout Randomization), NX/DEP (No-Execute/Data Execution Prevention), and stack canaries are enabled across all container hosts. The container runtime is configured with seccomp profiles that restrict system calls to only those required by the application, reducing the attack surface for memory exploitation.
-
-On the on-premises Windows Domain Controller, Credential Guard is enabled to isolate credential material (NTLM hashes, Kerberos tickets) in a virtualization-based security container, preventing credential harvesting from memory even if the OS is compromised. Secure Boot ensures that the boot chain is verified, preventing boot-level memory manipulation attacks. SentinelOne provides runtime behavioral monitoring that detects memory injection techniques, process hollowing, and other in-memory attack patterns, alerting the security team for investigation.
+Alma's biometric processing pipeline implements explicit memory clearing after authentication decisions, with Kubernetes pods configured to disable core dumps and enforce read-only root filesystems. Linux kernel protections (ASLR, NX/DEP, stack canaries) and seccomp profiles are enabled across all container hosts. On the Windows DC, Credential Guard isolates credential material via virtualization-based security, and SentinelOne provides runtime detection of memory injection and process hollowing attacks.
 
 ## Evidence of Implementation
 

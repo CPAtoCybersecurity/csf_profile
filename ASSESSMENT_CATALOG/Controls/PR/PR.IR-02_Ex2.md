@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-The Redwood City data center operates HVAC monitoring that tracks ambient temperature and humidity within the server environment. This monitoring is intended to ensure that servers, networking equipment, and storage arrays operate within manufacturer-recommended environmental ranges — typically 64-80 degrees F (18-27 degrees C) and 40-60% relative humidity. The HVAC system provides cooling capacity for the current equipment load, and monitoring alerts are configured to notify operations personnel when conditions approach threshold boundaries.
-
-Power conditioning at the Redwood City facility includes uninterruptible power supply (UPS) systems that provide battery backup during utility power interruptions. The UPS systems condition incoming power to protect equipment from voltage sags, surges, and frequency variations. However, the documentation around UPS capacity planning, battery replacement schedules, and load testing is limited. It is unclear whether generator backup power is available for extended outages.
-
-For AWS-hosted infrastructure, Amazon maintains environmental controls within their data centers as part of their responsibility under the shared responsibility model. Alma's infrastructure team does not need to manage temperature, humidity, or power conditioning for cloud workloads, but should maintain awareness of AWS service health and regional capacity. The primary gap is the lack of formalized environmental monitoring reporting — while HVAC monitoring exists, there is no evidence of periodic review of environmental trends, capacity planning for cooling as equipment density changes, or integration of environmental monitoring with the IT incident management process.
+Alma operates HVAC monitoring at the Redwood City data center tracking temperature and humidity within manufacturer-specified ranges, with UPS systems providing battery backup and power conditioning. AWS cloud workloads inherit Amazon's environmental controls under the shared responsibility model. UPS capacity planning, battery replacement schedules, and load testing documentation is limited, and environmental monitoring is not integrated with the IT incident management process.
 
 ## Evidence of Implementation
 

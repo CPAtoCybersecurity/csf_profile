@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security tracks hardware end-of-life dates in the ServiceNow CMDB for on-premises equipment, with warranty expiration dates serving as the primary lifecycle trigger. The IT operations team reviews upcoming warranty expirations quarterly and flags hardware within 6 months of warranty end for replacement planning. For employee laptops, Alma follows a 4-year replacement cycle, with automatic replacement triggered by the asset age in the CMDB.
-
-For cloud infrastructure, AWS instance type deprecation and Graviton migration recommendations are tracked through AWS Health Dashboard notifications and the infrastructure team's AWS account alerts. The team monitors AWS announcements for instance family retirements and plans migrations during quarterly planning cycles.
-
-The most significant EOL hardware gap is the Windows Server 2012 R2 fileserver, which runs on aging Dell PowerEdge hardware that is past vendor warranty and no longer eligible for extended support contracts. The hardware failure risk compounds the software EOL risk, as a hardware failure would require emergency procurement and rebuilding on a new platform. Beyond this known issue, hardware EOL tracking is informal and dependent on the IT team's institutional knowledge rather than automated monitoring. There is no automated alerting system that proactively notifies owners when hardware approaches end-of-life based on vendor lifecycle data.
+Alma tracks hardware EOL via warranty expiration dates in ServiceNow CMDB, with quarterly reviews flagging hardware within 6 months of warranty end. Laptops follow a 4-year replacement cycle; cloud instance deprecations are tracked through AWS Health Dashboard. The Windows Server 2012 R2 fileserver runs on out-of-warranty Dell PowerEdge hardware, and no automated EOL alerting exists -- tracking relies on the IT team's institutional knowledge.
 
 ## Evidence of Implementation
 

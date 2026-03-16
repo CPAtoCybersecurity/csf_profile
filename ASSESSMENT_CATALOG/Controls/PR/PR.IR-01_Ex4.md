@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security does not currently operate a dedicated Network Access Control (NAC) solution for pre-admission device posture assessment on the corporate network. Device connectivity to the Redwood City on-premises network relies on physical access controls (badge access to the office and data center) and the Palo Alto firewall's zone-based policies, but there is no automated mechanism to verify device health, patch status, or compliance posture before granting network access.
-
-In the AWS Kubernetes environment, access control for workload connectivity is managed through Kubernetes network policies and AWS Security Groups rather than traditional NAC. Pod-to-pod communication is governed by namespace-level policies, and external access to the cluster passes through defined ingress controllers. Service mesh capabilities, if implemented, would provide mutual TLS authentication between services, but this has not been confirmed as part of the current architecture.
-
-The lack of NAC on the corporate network means that a compromised or non-compliant device could connect and access internal resources without posture verification. This is a particularly relevant gap given the Windows Server 2012 R2 fileserver that remains on the network — older systems increase the risk surface for devices sharing the same network segment. For a 300-person SaaS company, the absence of NAC represents a moderate risk that increases as the organization grows and device diversity expands.
+Alma does not operate a dedicated NAC solution. On-premises network access relies on physical badge access and Palo Alto zone-based policies with no automated device posture assessment. In the Kubernetes environment, workload connectivity is governed by network policies and Security Groups rather than traditional NAC. No mechanism exists to verify device health, patch status, or compliance before granting network access.
 
 ## Evidence of Implementation
 

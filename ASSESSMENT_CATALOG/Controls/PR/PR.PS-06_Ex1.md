@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's development team builds and maintains a containerized SaaS platform deployed on AWS EKS. The development process follows an agile methodology using two-week sprints, with code managed in GitLab. While the engineering team follows established software development practices, there is no formalized Secure Software Development Lifecycle (SSDLC) policy or standards document. Security considerations are addressed informally through developer judgment and code review practices rather than through structured, mandated processes.
-
-Security requirements for new features are occasionally captured in Jira stories when the feature involves sensitive data handling or authentication changes, but there is no systematic process for identifying security requirements during the design phase. Threat modeling is not practiced; the engineering team does not conduct formal threat assessments for new features or architectural changes. Design reviews focus on functionality, scalability, and code quality, with security considerations raised ad hoc by security-aware developers.
-
-The absence of a formal SSDLC is reflected in the SQL Injection Mitigation project, a $60K remediation effort that was identified through vulnerability scanning but has not yet started. This project represents a class of security debt that could have been prevented through earlier integration of security requirements into the development process. The CISO has flagged the establishment of a formal SSDLC as a priority for Q3 2026, aligned with the broader SOC 2 readiness roadmap.
+Alma develops its containerized SaaS platform on AWS EKS using agile sprints in GitLab, but has no formal Secure SDLC policy -- security is addressed ad hoc through developer judgment and code review. No threat modeling is practiced, and security requirements are not systematically identified during design. A $60K SQL Injection Mitigation project (identified via scanning, not yet started) reflects the security debt from this gap; formal SSDLC is planned for Q3 2026.
 
 ## Evidence of Implementation
 

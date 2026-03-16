@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security manages platform configurations through infrastructure-as-code (IaC) practices that govern the full lifecycle from provisioning through decommissioning. All production infrastructure is provisioned via Terraform with configuration management handled by Ansible. Changes to platform configurations require a merge request in GitLab with at least one infrastructure team reviewer and must pass automated validation (terraform plan, ansible-lint, security policy checks) before merging. The GitLab pipeline automatically applies approved changes to staging before production.
-
-Configuration changes follow Alma's change management process documented in the IT Change Management Policy. Standard changes (pre-approved, low-risk configuration updates) are deployed through the automated pipeline after peer review. Normal changes require a change ticket in ServiceNow with impact analysis, rollback plan, and approval from the infrastructure lead. Emergency changes follow an expedited process with post-implementation review required within 48 hours. The change advisory board (CAB) meets weekly to review upcoming normal changes and retroactively review emergency changes.
-
-Decommissioning follows a documented rundown procedure that includes removing the system from monitoring, revoking access credentials, updating the CMDB, and archiving the configuration state. However, the decommissioning process is not yet fully automated and relies on manual checklist completion, which has resulted in occasional stale entries in the asset inventory.
+Alma manages platform configurations through Terraform and Ansible with GitLab merge requests requiring peer review and automated validation before deployment to staging then production. Changes follow a formal IT Change Management Policy with standard, normal (ServiceNow ticket + CAB approval), and emergency change workflows. Decommissioning follows a documented rundown procedure but relies on manual checklists, resulting in occasional stale CMDB entries; on-premises Windows DC configurations are managed separately from the IaC workflow.
 
 ## Evidence of Implementation
 

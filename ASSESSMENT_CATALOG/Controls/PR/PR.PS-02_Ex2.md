@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security tracks software end-of-life (EOL) and end-of-support (EOS) dates as attributes within the ServiceNow CMDB for operating systems and major middleware components. The IT operations team maintains a forward-looking EOL calendar that is reviewed monthly during the infrastructure planning meeting. Upcoming EOL milestones within 12 months are flagged and assigned to the responsible system owner for migration planning. AWS provides lifecycle notifications for managed services and AMIs, which the infrastructure team monitors.
-
-The most significant EOL concern in Alma's environment is the Windows Server 2012 R2 fileserver, which reached end of extended support from Microsoft in October 2023. This system is still in production serving file sharing for the Redwood City office. The system has been operating without vendor security patches for over two years, creating elevated vulnerability exposure. Compensating controls include network segmentation (isolated VLAN), restricted access to authorized users only, SentinelOne endpoint protection, and enhanced monitoring. A migration project to replace this fileserver with SharePoint Online/OneDrive is planned for Q3 2026.
-
-For containerized workloads, the team monitors base image EOL status through Amazon ECR image scanning, which flags images built on deprecated or EOL base distributions. However, there is no automated mechanism to block deployment of containers built on EOL base images, and the team relies on periodic manual review of ECR scan results to identify stale images.
+Alma tracks EOL/EOS dates in the ServiceNow CMDB and maintains a forward-looking EOL calendar reviewed monthly, with 12-month milestones flagged for migration planning. The Windows Server 2012 R2 fileserver (EOL since October 2023) remains in production with compensating controls (VLAN segmentation, restricted access, SentinelOne); migration to SharePoint Online/OneDrive is planned for Q3 2026. Container base image EOL is monitored via ECR scanning, but no automated mechanism blocks deployment of EOL-based images.
 
 ## Evidence of Implementation
 
