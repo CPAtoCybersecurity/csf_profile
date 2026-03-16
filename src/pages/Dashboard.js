@@ -561,7 +561,7 @@ const Dashboard = () => {
           {/* Pivot Table and Bar Chart Side by Side */}
           <div className="flex gap-4 mb-6">
             {/* Pivot Table: Score by Function by Quarter */}
-            <div className="bg-white p-3 rounded-lg shadow-sm border flex-shrink-0">
+            <div className="card flex-shrink-0" style={{padding: '0.75rem'}}>
               <h2 className="text-base font-semibold mb-3">Function Scores by Quarter</h2>
             <div className="overflow-auto">
               <table className="min-w-full border-collapse">
@@ -719,7 +719,7 @@ const Dashboard = () => {
             </div>
 
             {/* Function Bar Chart */}
-            <div className="bg-white p-3 rounded-lg shadow-sm border flex-1">
+            <div className="card flex-1" style={{padding: '0.75rem'}}>
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-base font-semibold">Function Actual vs Target (Q{selectedQuarter})</h2>
               </div>
@@ -798,7 +798,7 @@ const Dashboard = () => {
           </div>
 
           {/* Subcategory Assessment Section */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">CSF Subcategories (Q{selectedQuarter})</h2>
             </div>
@@ -933,7 +933,7 @@ const Dashboard = () => {
           </div>
 
           {/* Assessment Status Pie Chart */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border mt-6">
+          <div className="card mt-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Assessment Status (Q{selectedQuarter})</h2>
             </div>
