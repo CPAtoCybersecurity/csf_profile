@@ -1,4 +1,5 @@
 import express from "express";
+import configAuth from "../middleware/configAuth.js";
 import {
   saveJiraConfig,
   saveConfluenceConfig,
@@ -7,6 +8,9 @@ import {
 } from "../controllers/configController.js";
 
 const router = express.Router();
+
+// All config routes require X-Config-Key authentication
+router.use(configAuth);
 
 router.post("/jira", saveJiraConfig);
 router.post("/confluence", saveConfluenceConfig);

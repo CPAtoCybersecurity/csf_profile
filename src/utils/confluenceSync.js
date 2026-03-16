@@ -6,12 +6,12 @@
  * solving the entryId GUID challenge for linking requirements to evaluations.
  */
 
-// Confluence configuration
+// Confluence configuration — loaded from environment or localStorage settings.
+// Never hardcode instance URLs or account IDs in source code.
 const CONFLUENCE_CONFIG = {
-  baseUrl: 'https://cpatocybersecurity-wiki.atlassian.net',
-  spaceKey: '~712020aeb06967d1d640ce902614e256bca90d',
-  requirementsDbId: '1146881',
-  // Add more database IDs as needed
+  baseUrl: '',
+  spaceKey: '',
+  requirementsDbId: '',
   controlsDbId: null
 };
 
