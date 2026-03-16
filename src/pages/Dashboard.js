@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, FileText } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import {
   RadarChart,
@@ -29,6 +29,7 @@ import useUIStore from '../stores/uiStore';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
 import KPICard from '../components/KPICard';
+import { generateExecutiveSummary } from '../utils/executiveSummaryPDF';
 import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
@@ -607,6 +608,23 @@ const Dashboard = () => {
               <option value={4}>Q4</option>
             </select>
           </div>
+          <button
+            onClick={() =>
+              generateExecutiveSummary({
+                assessment: selectedAssessment,
+                requirements,
+                findings,
+                artifacts,
+                selectedQuarter,
+              })
+            }
+            disabled={!selectedAssessment}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            title="Export Executive Summary PDF"
+          >
+            <FileText size={15} />
+            Export Summary
+          </button>
         </div>
       </div>
 
