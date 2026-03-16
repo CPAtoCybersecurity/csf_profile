@@ -15,6 +15,7 @@ import ArtifactSelector from '../components/ArtifactSelector';
 import FindingSelector from '../components/FindingSelector';
 import SortableHeader from '../components/SortableHeader';
 import ExportPasswordDialog from '../components/ExportPasswordDialog';
+import EmptyState from '../components/EmptyState';
 
 // Stores
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -788,10 +789,14 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
       <div className="flex-1 overflow-auto p-4">
         {assessments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <ClipboardList size={48} className="mb-4 opacity-50" />
-            <p className="text-lg">No assessments yet</p>
-            <p className="text-sm mt-2">Click "New Assessment" to create one or "Import" to import from CSV</p>
+          <div className="flex items-center justify-center h-full">
+            <EmptyState
+              icon={ClipboardList}
+              title="No assessments yet"
+              description="Create your first assessment to begin tracking your CSF posture."
+              actionLabel="Create Assessment"
+              onAction={() => setShowNewModal(true)}
+            />
           </div>
         ) : (
           <div className="grid gap-4">

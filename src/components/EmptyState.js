@@ -1,10 +1,23 @@
 import React from 'react';
-import { FileText, Search, Filter, Plus, Upload, AlertCircle } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { FileText, Search, Filter, Plus, Upload, AlertCircle, ArrowRight } from 'lucide-react';
 
 /**
  * EmptyState Component
  * Friendly empty state messages with illustrations and action buttons
  * Provides friendly messaging with action buttons
+ *
+ * Props:
+ *   icon              — string key ('file', 'search', etc.) OR Lucide icon component
+ *   title             — semibold heading text
+ *   description       — muted supporting text
+ *   action / onAction — callback for CTA button click (onAction is an alias)
+ *   actionLabel       — CTA button label
+ *   actionLink        — NavLink `to` path for CTA button (overrides action/onAction)
+ *   secondaryAction   — callback for secondary button
+ *   secondaryActionLabel — secondary button label
+ *   className         — extra CSS classes on the container
+ *   size              — 'sm' | 'md' | 'lg'
  */
 
 const ICONS = {
@@ -21,13 +34,18 @@ const EmptyState = ({
   title,
   description,
   action,
+  onAction,
   actionLabel,
+  actionLink,
   secondaryAction,
   secondaryActionLabel,
   className = '',
   size = 'md',
 }) => {
   const Icon = typeof icon === 'string' ? ICONS[icon] || FileText : icon;
+
+  // Support both `action` (legacy) and `onAction` (new) prop names
+  const primaryAction = action || onAction;
 
   const sizeClasses = {
     sm: {
@@ -52,6 +70,9 @@ const EmptyState = ({
 
   const sizes = sizeClasses[size];
 
+  const primaryBtnClass =
+    'inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
+
   return (
     <div className={`flex flex-col items-center justify-center text-center ${sizes.container} ${className}`}>
       <div className="mb-4 p-4 rounded-full bg-gray-100 dark:bg-gray-800">
@@ -63,7 +84,7 @@ const EmptyState = ({
       </div>
 
       {title && (
-        <h3 className={`font-medium text-gray-700 dark:text-gray-200 mb-2 ${sizes.title}`}>
+        <h3 className={`font-semibold text-gray-700 dark:text-gray-200 mb-2 ${sizes.title}`}>
           {title}
         </h3>
       )}
@@ -74,16 +95,24 @@ const EmptyState = ({
         </p>
       )}
 
-      {(action || secondaryAction) && (
+      {(primaryAction || actionLink || secondaryAction) && (
         <div className="flex items-center gap-3 mt-2">
-          {action && (
-            <button
-              onClick={action}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
-            >
+          {/* NavLink CTA — used when actionLink is provided */}
+          {actionLink && actionLabel && (
+            <NavLink to={actionLink} className={primaryBtnClass}>
               {actionLabel}
+              <ArrowRight size={16} aria-hidden="true" />
+            </NavLink>
+          )}
+
+          {/* Button CTA — used when onAction/action callback is provided */}
+          {!actionLink && primaryAction && actionLabel && (
+            <button onClick={primaryAction} className={primaryBtnClass}>
+              {actionLabel}
+              <ArrowRight size={16} aria-hidden="true" />
             </button>
           )}
+
           {secondaryAction && (
             <button
               onClick={secondaryAction}

@@ -7,6 +7,7 @@ import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useSort from '../hooks/useSort';
+import EmptyState from '../components/EmptyState';
 
 const Findings = () => {
   const navigate = useNavigate();
@@ -450,11 +451,17 @@ const Findings = () => {
                 );
               })
             ) : (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                <AlertTriangle size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                <p>No findings found.</p>
-                <p className="text-sm mt-1">Click "Create" to add a new finding or import from CSV.</p>
-              </div>
+              <EmptyState
+                icon={AlertTriangle}
+                title="No findings recorded"
+                description="Record findings as you discover gaps in your assessment."
+                actionLabel="Record a Finding"
+                onAction={() => {
+                  resetForm();
+                  setSelectedFinding(null);
+                  setEditMode(true);
+                }}
+              />
             )}
           </div>
         </div>
