@@ -250,31 +250,31 @@ const Findings = () => {
     setFormData({ ...finding });
   };
 
-  // Get status badge style - using colors that work in both light and dark mode
+  // Get status badge style — returns semantic badge variant class
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Resolved':
-        return 'bg-green-600 text-white';
+        return 'badge-success';
       case 'In Progress':
-        return 'bg-blue-600 text-white';
+        return 'badge-info';
       case 'Not Started':
       default:
-        return 'bg-gray-500 text-white';
+        return 'badge-neutral';
     }
   };
 
-  // Get priority badge style - using colors that work in both light and dark mode
+  // Get priority badge style — returns semantic badge variant class
   const getPriorityStyle = (priority) => {
     switch (priority) {
       case 'Critical':
-        return 'bg-red-600 text-white';
+        return 'badge-danger';
       case 'High':
-        return 'bg-orange-500 text-white';
+        return 'badge-warning';
       case 'Medium':
-        return 'bg-yellow-500 text-gray-900';
+        return 'badge-warning';
       case 'Low':
       default:
-        return 'bg-gray-400 text-gray-900 dark:bg-gray-500 dark:text-white';
+        return 'badge-neutral';
     }
   };
 
