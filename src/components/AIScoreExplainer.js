@@ -95,7 +95,8 @@ Be specific to ${controlId}. Keep each section concise (2-4 bullets or sentences
         provider: llmProvider
       });
     } catch (err) {
-      setError(err.message);
+      console.error('AI score explanation error:', err);
+      setError('Failed to generate score explanation. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -171,13 +172,11 @@ Be specific to ${controlId}. Keep each section concise (2-4 bullets or sentences
               key={score}
               onClick={() => generateExplanation(score)}
               disabled={isLoading}
-              className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center text-sm font-medium transition-all ${
-                getScoreBorderColor(score, selectedScore === score)
-              } ${
-                selectedScore === score
+              className={`w-9 h-9 rounded-lg border-2 flex items-center justify-center text-sm font-medium transition-all ${getScoreBorderColor(score, selectedScore === score)
+                } ${selectedScore === score
                   ? `${getScoreColor(score)} text-white`
                   : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600'
-              } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {score}
             </button>

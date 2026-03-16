@@ -33,6 +33,8 @@ import useFindingsStore from '../stores/findingsStore';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
+
+// Utils
 import {
   getBackupReminderFrequency,
   setBackupReminderFrequency,
@@ -140,8 +142,8 @@ const Settings = () => {
         return false;
       }
     } catch (e) {
-      toast.error(`Connection test failed: ${e.message}`);
-      return false;
+      console.error('Atlassian connection test error:', e);
+      toast.error('Connection test failed. Please verify credentials and try again.');
     } finally {
       setIsTestingConnection(false);
     }
@@ -187,10 +189,12 @@ const Settings = () => {
         toast.success('Configuration saved securely to server');
       } else {
         const error = await jiraRes.json();
-        toast.error(error.error || 'Failed to save configuration');
+        console.error('Save Atlassian config error:', error);
+        toast.error('Failed to save configuration. Please try again.');
       }
     } catch (e) {
-      toast.error(`Failed to save: ${e.message}. Is the backend running?`);
+      console.error('Save Atlassian config error:', e);
+      toast.error('Failed to save configuration. Please try again.');
     } finally {
       setIsSavingConfig(false);
     }
@@ -210,7 +214,8 @@ const Settings = () => {
       setEntryIdCount(count);
       toast.success(`Harvested ${count} entry ID mappings from Confluence`);
     } catch (err) {
-      toast.error(`Harvesting failed: ${err.message}`);
+      console.error('Entry ID harvest error:', err);
+      toast.error('Harvesting failed. Please try again.');
     } finally {
       setIsHarvesting(false);
     }
@@ -239,7 +244,8 @@ const Settings = () => {
       });
       toast.success('Complete database exported as JSON');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Complete DB export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, []);
 
@@ -248,7 +254,8 @@ const Settings = () => {
       exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore);
       toast.success('Assessments exported as JSON');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Export assessments error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, []);
 
@@ -281,7 +288,8 @@ const Settings = () => {
       markFrameworkImported(importFrameworkId);
       toast.success(`Imported ${count} requirements for ${importFrameworkId}`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('File import error:', err);
+      toast.error('Import failed. Please verify the CSV file and try again.');
     }
 
     e.target.value = '';
@@ -328,7 +336,7 @@ const Settings = () => {
             shortName: fwId.split('-')[0].toUpperCase().slice(0, 6),
             version: '',
             description: `Imported from ${file.name}`,
-            color: `#${Math.floor(Math.random()*16777215).toString(16).padStart(6, '0')}`
+            color: `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}`
           });
           newFrameworksCreated++;
         }
@@ -348,7 +356,8 @@ const Settings = () => {
         toast.success(`Imported ${totalImported} requirements`);
       }
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('New framework import error:', err);
+      toast.error('Import failed. Please verify the CSV format and try again.');
     }
 
     e.target.value = '';
@@ -392,7 +401,8 @@ const Settings = () => {
       const count = await useFindingsStore.getState().importFindingsCSV(text, useUserStore);
       toast.success(`Imported ${count} findings from Jira`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Findings import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -407,7 +417,8 @@ const Settings = () => {
       const count = await useArtifactStore.getState().importArtifactsCSV(text);
       toast.success(`Imported ${count} artifacts from Jira`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Artifacts import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -422,7 +433,8 @@ const Settings = () => {
       const count = await useAssessmentsStore.getState().importAssessmentsCSV(text, useUserStore);
       toast.success(`Imported ${count} assessment(s) from Jira`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Assessments import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -439,7 +451,8 @@ const Settings = () => {
       setEntryIdCount(Object.keys(getAllEntryIdMappings()).length);
       toast.success(`Imported ${count} entry ID mappings`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Entry Id import error:', err);
+      toast.error('Import failed. Please try again.');
     }
 
     e.target.value = '';
@@ -461,7 +474,8 @@ const Settings = () => {
       URL.revokeObjectURL(url);
       toast.success('Entry ID mappings exported');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Entry Id Export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, []);
 
@@ -516,137 +530,137 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
               </div>
             </div>
             <div className="p-4 space-y-4">
-            {/* Data Storage Warning */}
-            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" size={20} />
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Important: Local Data Storage</h3>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                    All assessment data is stored in your browser's IndexedDB. This data can be lost if you:
-                  </p>
-                  <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1 mb-3">
-                    <li>Clear your browser cache or site data</li>
-                    <li>Uninstall or reset your browser</li>
-                    <li>Use browser cleanup utilities</li>
-                    <li>Reach browser storage limits</li>
-                  </ul>
-                  <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                    <strong>Always export your data regularly to prevent data loss.</strong>
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Last Backup Info */}
-            <div className="border-t dark:border-gray-700 pt-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Last Backup</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Last export: <strong>{getTimeSinceLastExport()}</strong>
-                  </p>
-                  {getLastExportDate() && (
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                      {getLastExportDate().toLocaleString()}
+              {/* Data Storage Warning */}
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" size={20} />
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Important: Local Data Storage</h3>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
+                      All assessment data is stored in your browser's IndexedDB. This data can be lost if you:
                     </p>
-                  )}
+                    <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1 mb-3">
+                      <li>Clear your browser cache or site data</li>
+                      <li>Uninstall or reset your browser</li>
+                      <li>Use browser cleanup utilities</li>
+                      <li>Reach browser storage limits</li>
+                    </ul>
+                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
+                      <strong>Always export your data regularly to prevent data loss.</strong>
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <button
-                    onClick={() => {
-                      exportRequirementsCSV();
-                      toast.success('Data exported successfully!');
-                    }}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 
+              </div>
+
+              {/* Last Backup Info */}
+              <div className="border-t dark:border-gray-700 pt-4">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Last Backup</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Last export: <strong>{getTimeSinceLastExport()}</strong>
+                    </p>
+                    {getLastExportDate() && (
+                      <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                        {getLastExportDate().toLocaleString()}
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <button
+                      onClick={() => {
+                        exportRequirementsCSV();
+                        toast.success('Data exported successfully!');
+                      }}
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 
                              text-white rounded-lg transition-colors font-medium inline-flex items-center gap-2"
-                  >
-                    <Download size={16} />
-                    Export Data Now
-                  </button>
+                    >
+                      <Download size={16} />
+                      Export Data Now
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Backup Reminder Frequency */}
-            <div className="border-t dark:border-gray-700 pt-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Backup Reminder Frequency</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                Configure how often you'd like to be reminded to export your data.
-              </p>
-              <div className="flex flex-wrap items-center gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="backupFrequency"
-                    value="1"
-                    checked={backupFrequency === 1}
-                    onChange={() => handleBackupFrequencyChange(1)}
-                    className="text-blue-600 dark:text-blue-500 cursor-pointer"
-                  />
-                  <span className="text-sm dark:text-gray-300">Daily</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="backupFrequency"
-                    value="7"
-                    checked={backupFrequency === 7}
-                    onChange={() => handleBackupFrequencyChange(7)}
-                    className="text-blue-600 dark:text-blue-500 cursor-pointer"
-                  />
-                  <span className="text-sm dark:text-gray-300">Weekly</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="backupFrequency"
-                    value="30"
-                    checked={backupFrequency === 30}
-                    onChange={() => handleBackupFrequencyChange(30)}
-                    className="text-blue-600 dark:text-blue-500 cursor-pointer"
-                  />
-                  <span className="text-sm dark:text-gray-300">Monthly</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="backupFrequency"
-                    value="90"
-                    checked={backupFrequency === 90}
-                    onChange={() => handleBackupFrequencyChange(90)}
-                    className="text-blue-600 dark:text-blue-500 cursor-pointer"
-                  />
-                  <span className="text-sm dark:text-gray-300">Quarterly</span>
-                </label>
+              {/* Backup Reminder Frequency */}
+              <div className="border-t dark:border-gray-700 pt-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Backup Reminder Frequency</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                  Configure how often you'd like to be reminded to export your data.
+                </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="backupFrequency"
+                      value="1"
+                      checked={backupFrequency === 1}
+                      onChange={() => handleBackupFrequencyChange(1)}
+                      className="text-blue-600 dark:text-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm dark:text-gray-300">Daily</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="backupFrequency"
+                      value="7"
+                      checked={backupFrequency === 7}
+                      onChange={() => handleBackupFrequencyChange(7)}
+                      className="text-blue-600 dark:text-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm dark:text-gray-300">Weekly</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="backupFrequency"
+                      value="30"
+                      checked={backupFrequency === 30}
+                      onChange={() => handleBackupFrequencyChange(30)}
+                      className="text-blue-600 dark:text-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm dark:text-gray-300">Monthly</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="radio"
+                      name="backupFrequency"
+                      value="90"
+                      checked={backupFrequency === 90}
+                      onChange={() => handleBackupFrequencyChange(90)}
+                      className="text-blue-600 dark:text-blue-500 cursor-pointer"
+                    />
+                    <span className="text-sm dark:text-gray-300">Quarterly</span>
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
+                  Current setting: Remind me every <strong>{backupFrequency} day{backupFrequency !== 1 ? 's' : ''}</strong>
+                </p>
               </div>
-              <p className="text-xs text-gray-500 dark:text-gray-500 mt-3">
-                Current setting: Remind me every <strong>{backupFrequency} day{backupFrequency !== 1 ? 's' : ''}</strong>
-              </p>
-            </div>
 
-            {/* Best Practices */}
-            <div className="border-t dark:border-gray-700 pt-4">
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Best Practices</h3>
-              <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">✓</span>
-                  <span>Export data at the end of each work session</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">✓</span>
-                  <span>Store exported CSV files in multiple locations (cloud storage, external drive)</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">✓</span>
-                  <span>Use descriptive filenames with dates</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-green-600 mt-0.5">✓</span>
-                  <span>Test your backups by importing them periodically</span>
-                </li>
-              </ul>
-            </div>
+              {/* Best Practices */}
+              <div className="border-t dark:border-gray-700 pt-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Best Practices</h3>
+                <ul className="text-sm text-gray-700 dark:text-gray-300 space-y-2">
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Export data at the end of each work session</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Store exported CSV files in multiple locations (cloud storage, external drive)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Use descriptive filenames with dates</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-green-600 mt-0.5">✓</span>
+                    <span>Test your backups by importing them periodically</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -853,7 +867,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       );
                       toast.success('Exported all assessments for Jira EVAL import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Assessment export error:', err);
+                      toast.error('Assessment export failed. Please try again.');
                     }
                   }}
                 >
@@ -891,7 +906,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       );
                       toast.success('Exported requirements for Confluence import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Requirements export error:', err);
+                      toast.error('Requirements export failed. Please try again.');
                     }
                   }}
                 >
@@ -915,7 +931,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       useFindingsStore.getState().exportForJiraCSV(useUserStore);
                       toast.success('Exported findings for Jira FND import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Findings export error:', err);
+                      toast.error('Findings export failed. Please try again.');
                     }
                   }}
                 >
@@ -949,7 +966,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       useArtifactStore.getState().exportForJiraCSV();
                       toast.success('Exported artifacts for Jira AR import');
                     } catch (err) {
-                      toast.error(`Export failed: ${err.message}`);
+                      console.error('Artifacts export error::', err);
+                      toast.error('Artifacts export failed. Please try again.');
                     }
                   }}
                 >

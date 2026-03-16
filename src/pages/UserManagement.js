@@ -288,8 +288,8 @@ const UserManagement = () => {
             </button>
           </div>
         </div>
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="table-professional min-w-full">
+          <thead>
             <tr>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
