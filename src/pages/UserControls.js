@@ -594,8 +594,8 @@ const UserControls = () => {
               </p>
             </div>
           ) : (
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0 z-10">
+            <table className="table-professional min-w-full">
+              <thead className="sticky top-0 z-10">
                 <tr>
                   <SortableHeader label="Control ID" sortKey="controlId" currentSort={sort} onSort={handleSort} />
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">

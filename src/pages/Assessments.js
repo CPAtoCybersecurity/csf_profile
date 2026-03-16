@@ -15,6 +15,7 @@ import ArtifactSelector from '../components/ArtifactSelector';
 import FindingSelector from '../components/FindingSelector';
 import SortableHeader from '../components/SortableHeader';
 import ExportPasswordDialog from '../components/ExportPasswordDialog';
+import EmptyState from '../components/EmptyState';
 
 // Stores
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -248,13 +249,13 @@ const Assessments = () => {
     return getObservation(currentAssessmentId, selectedItemId);
   }, [currentAssessmentId, selectedItemId, getObservation, currentAssessment]);
 
-  // Helper functions
+  // Helper functions — returns semantic badge classes
   const getStatusColor = useCallback((status) => {
     switch (status) {
-      case 'Complete': return 'text-green-600 bg-green-100 dark:bg-green-600 dark:text-white';
-      case 'In Progress': return 'text-blue-600 bg-blue-100 dark:bg-blue-600 dark:text-white';
-      case 'Submitted': return 'text-orange-600 bg-orange-100 dark:bg-orange-600 dark:text-white';
-      default: return 'text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
+      case 'Complete': return 'badge badge-success';
+      case 'In Progress': return 'badge badge-info';
+      case 'Submitted': return 'badge badge-warning';
+      default: return 'badge badge-neutral';
     }
   }, []);
 
@@ -788,10 +789,14 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
       <div className="flex-1 overflow-auto p-4">
         {assessments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <ClipboardList size={48} className="mb-4 opacity-50" />
-            <p className="text-lg">No assessments yet</p>
-            <p className="text-sm mt-2">Click "New Assessment" to create one or "Import" to import from CSV</p>
+          <div className="flex items-center justify-center h-full">
+            <EmptyState
+              icon={ClipboardList}
+              title="No assessments yet"
+              description="Create your first assessment to begin tracking your CSF posture."
+              actionLabel="Create Assessment"
+              onAction={() => setShowNewModal(true)}
+            />
           </div>
         ) : (
           <div className="grid gap-4">
@@ -1050,8 +1055,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             />
           </div>
           <div className="flex-1 overflow-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
+            <table className="table-professional min-w-full">
+              <thead className="sticky top-0">
                 <tr>
                   <th className="w-8 p-2"></th>
                   <SortableHeader
@@ -1127,17 +1132,17 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     </div>
   );
 
-  // Get status badge style (Jira-style)
+  // Get status badge style (Jira-style) — returns semantic badge variant class
   const getJiraStatusStyle = (status) => {
     switch (status) {
       case 'Complete':
-        return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+        return 'badge-success';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white';
+        return 'badge-info';
       case 'Submitted':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+        return 'badge-warning';
       default:
-        return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+        return 'badge-neutral';
     }
   };
 

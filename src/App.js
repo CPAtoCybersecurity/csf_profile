@@ -23,6 +23,7 @@ import Artifacts from './pages/Artifacts';
 import Settings from './pages/Settings';
 import AIAssistant from './pages/AIAssistant';
 import Findings from './pages/Findings';
+import AuditLog from './pages/AuditLog';
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -99,18 +100,21 @@ const AppContent = () => {
     <React.Fragment>
     <div className="flex flex-col h-screen">
       <div className="flex flex-col h-full bg-white text-gray-700">
-        {/* Header - Compact Jira-style */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-2">
+        {/* Header */}
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm px-6 py-3">
           <div className="flex justify-between items-center">
             {/* Left: Logo and title */}
             <div className="flex items-center gap-3">
               <img
                 src="/SC_SimplyCyberAcademy.png"
                 alt="Simply Cyber Academy Logo"
-                className="h-8"
+                className="h-10"
               />
               <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">CSF Profile Assessment</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">CSF Profile Assessment</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">NIST CSF 2.0 Assessment Tool</span>
+              </div>
             </div>
 
             {/* Center: Navigation */}
@@ -137,6 +141,7 @@ const AppContent = () => {
             <Route path="/artifacts" element={<Artifacts />} />
             <Route path="/findings" element={<Findings />} />
             <Route path="/users" element={<UserManagement />} />
+            <Route path="/history" element={<AuditLog />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/ai-assistant" element={<AIAssistant />} />
           </Routes>
