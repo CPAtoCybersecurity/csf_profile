@@ -10,32 +10,11 @@
 
 ## Alma Security Implementation
 
-Alma Security's disaster recovery plan is currently in development as part of the Cloud Security Optimization project, which carries a $100K budget allocation. This project encompasses DR planning alongside broader cloud security improvements, indicating organizational commitment to addressing this gap. However, as of Q1 2026, a formal, approved DR plan does not exist.
+Alma's disaster recovery plan is in development as part of the Cloud Security Optimization project ($100K budget). As of Q1 2026, no formal approved DR plan exists -- RTO/RPO have not been defined, and backup alignment with recovery objectives is unverified. Multi-AZ architecture and Kubernetes redundancy provide component-level resilience, but no documented strategy covers region-level outages, ransomware, or full data center loss.
 
-The absence of a completed DR plan means that recovery time objectives (RTO) and recovery point objectives (RPO) have not been formally defined, documented, or agreed upon by business stakeholders for critical systems. While the multi-AZ architecture and Kubernetes redundancy provide operational resilience for component-level failures, the organization lacks a documented strategy for scenarios that exceed these capabilities — such as a region-level AWS outage, a catastrophic data corruption event, a ransomware attack affecting production systems, or the simultaneous loss of the Redwood City data center.
+## Artifacts
 
-Positively, the completed failover testing demonstrates that the infrastructure team is building muscle memory for resilience validation. Backup strategies exist for critical data, though their alignment with (yet-to-be-defined) RPO targets has not been verified. The DR plan development should address scenarios specific to Alma's hybrid environment: cloud-only recovery, on-premises-only recovery, and full hybrid recovery. The plan should also define communication procedures, decision authority during a disaster, and integration with the existing incident response process.
-
-## Evidence of Implementation
-
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| Cloud Security Optimization project charter | Project management system | 2026-03-01 |
-| DR plan draft (in progress) | Infrastructure team documentation | 2026-03-10 |
-| Backup configuration documentation | AWS Backup / infrastructure team | 2026-02-15 |
-| Failover testing results (component-level) | Infrastructure team documentation | 2026-02-15 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 3 | 6 | Behind Target |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| No approved DR plan | Organization cannot execute coordinated recovery from major disruption | Complete DR plan development as part of Cloud Security Optimization project | Tigan Wang | 2026-07-31 |
-| RTO/RPO not defined for critical systems | Recovery priorities unclear; no basis for measuring DR readiness | Define and gain business stakeholder agreement on RTO/RPO for all Tier 1 systems | Tigan Wang | 2026-06-15 |
-| No DR tabletop exercise conducted | DR procedures untested at the coordination level | Conduct DR tabletop exercise after plan completion | Tigan Wang | 2026-09-30 |
-| Backup alignment with RPO unverified | Backup frequency may not meet business requirements | Validate backup schedules against defined RPOs once established | Tigan Wang | 2026-08-31 |
+- [Backup and Restore Procedure](../../Artifacts/Procedures/PROC-backup-restore.md)
+- [Backup Restore Test Report](../../Artifacts/Reports/RPT-backup-restore-test.md)
+- [Incident Response Playbook](../../Artifacts/Procedures/PROC-incident-response-playbook.md)
+- [Information Security Policy](../../Artifacts/Policies/POL-information-security.md)

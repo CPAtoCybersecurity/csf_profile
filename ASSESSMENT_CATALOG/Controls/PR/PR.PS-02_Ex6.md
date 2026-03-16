@@ -10,32 +10,10 @@
 
 ## Alma Security Implementation
 
-Alma Security relies on SentinelOne's endpoint detection and response (EDR) capabilities to identify unauthorized software on workstations and laptops. SentinelOne's application inventory feature provides visibility into installed applications, and the security team periodically reviews the inventory against the approved software catalog to identify unauthorized installations. When unauthorized software is identified, the IT helpdesk creates a ticket to contact the user, explain the policy violation, and arrange for removal.
+Alma uses SentinelOne application inventory on endpoints and AWS Systems Manager Inventory on servers to detect unauthorized software, with periodic reviews against the approved catalog. Unauthorized installations are remediated via IT helpdesk tickets (endpoints) or Ansible baseline enforcement (servers). Detection and removal is reactive -- SentinelOne application control operates in detection-only mode for unrecognized executables, and no automated real-time blocking is configured.
 
-On server infrastructure, unauthorized software detection is handled through AWS Systems Manager Inventory, which collects installed package data and compares it against the hardened baseline's expected software list. Packages not in the approved list generate compliance findings that are reviewed during the weekly infrastructure team meeting. The Ansible baseline enforcement can remediate unauthorized packages during the next scheduled compliance run, but this is reactive rather than preventive.
+## Artifacts
 
-The unauthorized software removal process is primarily reactive and manual. There is no automated mechanism to immediately block or quarantine unauthorized software upon detection on endpoints. The reliance on periodic review cycles means unauthorized software can exist in the environment for days to weeks before detection. The SentinelOne application control feature provides real-time blocking capabilities on workstations, but enforcement policies are not yet configured to automatically block unrecognized applications --- they currently operate in detection mode for newly observed executables.
-
-## Evidence of Implementation
-
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| SentinelOne application inventory report | SentinelOne Console | 2026-03-14 |
-| Unauthorized software removal tickets (sample) | ServiceNow / IT helpdesk | 2026-03-10 |
-| AWS Systems Manager Inventory compliance findings | AWS Console | 2026-03-14 |
-| Ansible baseline enforcement logs showing package remediation | Ansible Tower / AWX | 2026-03-10 |
-| SentinelOne application control policy configuration | SentinelOne Console | 2026-03-14 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 3 | 5 | At Risk |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| No automated real-time blocking of unauthorized software on endpoints | Medium --- unauthorized software can persist for days before detection and removal | Transition SentinelOne application control from detection to enforcement mode for new executables | Chris Magann | Q2 2026 |
-| Server-side unauthorized software detection is periodic, not real-time | Medium --- gap between installation and detection on servers | Implement real-time file integrity monitoring or package installation alerting | Tigan Wang | Q3 2026 |
-| Removal process is manual with no verification of complete uninstallation | Low --- residual configurations may persist after removal | Add post-removal verification step to the unauthorized software remediation workflow | Chris Magann | Q3 2026 |
+- [SentinelOne App Control Evidence](../../Artifacts/Evidence/EVD-sentinelone-app-control.md)
+- [Software Inventory](../../Artifacts/Inventories/INV-software-inventory.md)
+- [Acceptable Use Policy](../../Artifacts/Policies/POL-acceptable-use.md)

@@ -1,6 +1,8 @@
 # Controls (Implementation Descriptions)
 
-One file per CSF implementation example, organized by function. Each file describes how Alma Security implements a specific implementation example, including current maturity, evidence, and gaps.
+One file per CSF implementation example, organized by function. Each file describes how Alma Security implements a specific implementation example and links to supporting artifacts.
+
+Maturity scores, gaps, and remediation plans belong in [Observations](../Observations/), not here. Controls describe *what is implemented*, observations describe *what was found*.
 
 ## Template
 
@@ -8,7 +10,6 @@ One file per CSF implementation example, organized by function. Each file descri
 # {ID}: {Implementation Example Title}
 
 **Subcategory:** {Subcategory ID} — {Subcategory Description}
-**Category:** {Category ID} — {Category Name}
 **NIST SP 800-53 Ref:** {Control references}
 
 ## Implementation Example
@@ -17,33 +18,11 @@ One file per CSF implementation example, organized by function. Each file descri
 
 ## Alma Security Implementation
 
-{Detailed narrative of how Alma Security implements this example.
-Reference specific tools, processes, teams, and infrastructure.}
+{2-4 concise sentences: what the control mechanism is, what tools are used, and the scope.}
 
-## Control Owner
+## Artifacts
 
-- **Owner:** {Name and role}
-- **Stakeholders:** {Names and roles}
-
-## Evidence of Implementation
-
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| {Document/config/log} | {Where to find it} | {Date} |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 | {Score} | {Score} | {Not Started / In Progress / Complete} |
-
-## Gaps & Remediation
-
-{Known gaps between current and target state.}
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| {Gap} | {Impact} | {Plan} | {Owner} | {Date} |
+- [{Artifact name}](../../Artifacts/{Type}/{filename}.md)
 ```
 
 ## File Naming

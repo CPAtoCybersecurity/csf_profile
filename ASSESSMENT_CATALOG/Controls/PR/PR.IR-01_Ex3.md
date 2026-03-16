@@ -10,31 +10,10 @@
 
 ## Alma Security Implementation
 
-Alma Security has deployed two primary network monitoring capabilities: VPC Flow Logs across AWS production VPCs and DNS query logging for cloud-hosted services. VPC Flow Logs capture metadata for all network traffic (accepted and rejected) flowing through VPC network interfaces, providing visibility into communication patterns, anomalous traffic volumes, and rejected connection attempts. DNS query logging captures resolution requests, which can indicate command-and-control communication, data exfiltration via DNS tunneling, or connections to known malicious domains.
+Alma monitors network integrity through VPC Flow Logs (all traffic metadata) and DNS query logging across AWS production VPCs, feeding into the centralized logging infrastructure for investigation. The Palo Alto firewall provides IPS at the on-premises perimeter, but there is no dedicated IDS/IPS for east-west traffic within AWS. Monitoring is reactive -- logs support investigation but do not automatically block suspicious traffic, and no automated threat intelligence correlation is in place.
 
-These logging capabilities feed into the centralized logging infrastructure where the Detection and Response team can investigate network anomalies. However, the current implementation is primarily detective rather than preventive — the logs support investigation and forensics but do not automatically block or quarantine suspicious traffic in real time. Network-based intrusion detection capabilities are limited to what the Palo Alto firewall provides at the on-premises perimeter; there is no dedicated network IDS/IPS for east-west traffic within the AWS environment.
+## Artifacts
 
-The absence of a WAF further limits the organization's ability to monitor and filter application-layer network traffic for integrity violations. While the existing logging provides a foundation for network visibility, the monitoring is reactive and lacks automated correlation of network events with threat intelligence feeds.
-
-## Evidence of Implementation
-
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| VPC Flow Log configuration | AWS CloudWatch Logs | 2026-02-20 |
-| DNS query logging configuration | AWS Route 53 / CloudWatch | 2026-02-20 |
-| Palo Alto IPS configuration | Firewall management console | 2026-01-10 |
-| Network monitoring alert rules | SIEM / centralized logging platform | 2026-02-28 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 4 | 5 | Approaching Target |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| No network IDS/IPS for AWS east-west traffic | Lateral movement within VPC may go undetected | Evaluate AWS-native or third-party network detection for VPC traffic | Nadia Khan | 2026-07-31 |
-| No automated threat intelligence correlation with network logs | Known malicious IPs/domains not automatically flagged | Integrate threat intelligence feeds with VPC Flow Log and DNS log analysis | Nadia Khan | 2026-06-30 |
-| Limited real-time response to network anomalies | Detection is reactive; no automated containment for network events | Define automated response playbooks for high-confidence network indicators | Nadia Khan | 2026-08-31 |
+- [Incident Response Playbook](../../Artifacts/Procedures/PROC-incident-response-playbook.md)
+- [Vulnerability Scan Summary](../../Artifacts/Reports/RPT-vulnerability-scan-summary.md)
+- [Information Security Policy](../../Artifacts/Policies/POL-information-security.md)

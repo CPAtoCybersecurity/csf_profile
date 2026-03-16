@@ -10,34 +10,10 @@
 
 ## Alma Security Implementation
 
-Alma Security centralizes cloud infrastructure logs through AWS-native services. CloudTrail captures all API activity across AWS accounts and forwards logs to a dedicated S3 bucket with CloudWatch Logs integration for near-real-time analysis. VPC Flow Logs capture network traffic metadata and are stored in CloudWatch Logs. GuardDuty aggregates findings from CloudTrail, VPC Flow Logs, and DNS logs to generate security findings that are surfaced through Security Hub. EKS audit logs and container runtime logs (stdout/stderr) are collected by Fluent Bit daemonsets and forwarded to CloudWatch Logs.
+Alma centralizes cloud logs through CloudTrail, VPC Flow Logs, GuardDuty, and Fluent Bit (EKS), with Security Hub aggregating findings and routing medium+ severity alerts to Slack and PagerDuty. CloudWatch Logs Insights serves as the primary query and analysis tool. No traditional SIEM is deployed -- on-premises systems forward to a local syslog server not integrated with CloudWatch, and there is no 24/7 SOC monitoring (business-hours coverage with on-call for critical incidents).
 
-The organization uses CloudWatch Logs Insights as the primary log query and analysis tool for cloud infrastructure. Security Hub serves as the centralized findings aggregation point, collecting alerts from GuardDuty, AWS Config, and Inspector. Security Hub findings above medium severity are forwarded to the #security-alerts Slack channel and generate PagerDuty incidents for critical findings.
+## Artifacts
 
-However, Alma does not operate a traditional SIEM platform. The current architecture relies on AWS-native tools, which provide strong coverage for AWS resources but create gaps for non-AWS log sources. On-premises systems (Windows DC, legacy fileserver) forward Windows Event Logs to a local syslog server but these logs are not integrated into the CloudWatch-based analysis workflow. Application-level logs from the SaaS platform are collected in CloudWatch but lack security-specific correlation rules. There is no 24/7 SOC monitoring; the security team reviews alerts during business hours with an on-call rotation for critical PagerDuty incidents after hours.
-
-## Evidence of Implementation
-
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| CloudTrail configuration (all accounts) | AWS Console | 2026-03-14 |
-| VPC Flow Logs configuration | AWS VPC Console | 2026-03-14 |
-| GuardDuty configuration and findings | AWS GuardDuty Console | 2026-03-14 |
-| Security Hub aggregation dashboard | AWS Security Hub | 2026-03-14 |
-| Fluent Bit daemonset configuration for EKS log collection | Kubernetes manifests / GitLab | 2026-03-10 |
-| PagerDuty alert routing for critical Security Hub findings | PagerDuty configuration | 2026-03-01 |
-| On-call rotation schedule | PagerDuty | 2026-03-14 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 4 | 6 | On Track |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| No centralized SIEM; reliance on AWS-native tools limits cross-platform correlation | High --- on-premises and application logs not correlated with cloud security events | Evaluate and implement SIEM solution (e.g., Splunk, Elastic Security, or AWS-native SIEM) | Nadia Khan | Q3 2026 |
-| On-premises system logs not integrated into central analysis workflow | Medium --- Windows DC and fileserver events not visible for correlation | Forward on-premises syslog to centralized platform or SIEM when implemented | Chris Magann | Q3 2026 |
-| No 24/7 SOC monitoring; business-hours coverage with on-call only | High --- delayed response to after-hours security events | Evaluate MDR service or establish 24/7 monitoring coverage | Nadia Khan | Q4 2026 |
+- [AWS Config Compliance Evidence](../../Artifacts/Evidence/EVD-aws-config-compliance.md)
+- [Incident Response Playbook](../../Artifacts/Procedures/PROC-incident-response-playbook.md)
+- [Vulnerability Scan Summary](../../Artifacts/Reports/RPT-vulnerability-scan-summary.md)
