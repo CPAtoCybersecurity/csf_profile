@@ -661,6 +661,7 @@ nav a:active { text-decoration: none !important; }
 .dark .text-gray-400 { color: var(--text-faint); }
 .dark .text-gray-500 { color: var(--text-muted); }
 .dark .text-gray-700 { color: var(--text-secondary); }
+.dark .text-gray-800 { color: var(--text-primary); }
 .dark .text-gray-900 { color: var(--text-primary); }
 .dark .text-red-200 { color: #fecaca; }
 .dark .text-red-300 { color: #fca5a5; }
