@@ -105,8 +105,8 @@ const AssessmentObservations = () => {
             <p className="text-sm mt-2">Document observations in the Requirements tab</p>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
+          <table className="table-professional min-w-full">
+            <thead className="sticky top-0">
               <tr>
                 <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />

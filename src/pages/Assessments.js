@@ -1050,8 +1050,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             />
           </div>
           <div className="flex-1 overflow-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
+            <table className="table-professional min-w-full">
+              <thead className="sticky top-0">
                 <tr>
                   <th className="w-8 p-2"></th>
                   <SortableHeader

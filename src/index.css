@@ -857,3 +857,53 @@ nav a:active { text-decoration: none !important; }
 .dark .card-subtitle {
   color: #9ca3af;
 }
+
+/* ==========================================================================
+   22. Component Styles — Professional Tables
+   ========================================================================== */
+
+.table-professional {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table-professional thead th {
+  background: #f9fafb;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+  padding: 0.75rem 1rem;
+  border-bottom: 2px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.table-professional tbody td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.875rem;
+}
+.table-professional tbody tr:hover {
+  background: #eef2ff;
+}
+.table-professional tbody tr.selected {
+  background: #e0e7ff;
+}
+
+/* Dark mode professional tables */
+.dark .table-professional thead th {
+  background: #1f2937;
+  color: #9ca3af;
+  border-bottom-color: #374151;
+}
+.dark .table-professional tbody td {
+  border-bottom-color: #374151;
+}
+.dark .table-professional tbody tr:hover {
+  background: #1e3a5f;
+}
+.dark .table-professional tbody tr.selected {
+  background: #1e40af;
+}

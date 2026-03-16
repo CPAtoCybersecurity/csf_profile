@@ -600,7 +600,7 @@ const Requirements = () => {
             />
           )
         ) : (
-          <table className="min-w-full bg-white dark:bg-gray-900 border-collapse" style={{ borderSpacing: 0 }}>
+          <table className="table-professional min-w-full bg-white dark:bg-gray-900" style={{ borderSpacing: 0 }}>
             <thead className="sticky top-0 z-10">
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
                 {/* Checkbox column */}

@@ -306,8 +306,8 @@ const Controls = () => {
       <div className="flex flex-1 min-h-0 relative z-0">
         {/* Data table */}
         <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto ${detailPanelOpen ? 'border-r' : ''} transition-all duration-300`}>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0 z-10">
+          <table className="table-professional min-w-full">
+            <thead className="sticky top-0 z-10">
               <tr>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-8">
                   <input
