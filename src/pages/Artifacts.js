@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield } from 'lucide-react';
+import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield, FileArchive } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
@@ -8,6 +8,7 @@ import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useSort from '../hooks/useSort';
 import { extractArtifactsFromProfile } from '../updateArtifactLinks';
+import EmptyState from '../components/EmptyState';
 
 const Artifacts = () => {
   const navigate = useNavigate();
@@ -417,10 +418,17 @@ const Artifacts = () => {
                 );
               })
             ) : (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                <p>No artifacts found.</p>
-                <p className="text-sm mt-1">Click "Create" to add a new artifact.</p>
-              </div>
+              <EmptyState
+                icon={FileArchive}
+                title="No artifacts linked"
+                description="Add artifacts to document evidence for your controls."
+                actionLabel="Add an Artifact"
+                onAction={() => {
+                  resetForm();
+                  setSelectedArtifact(null);
+                  setEditMode(true);
+                }}
+              />
             )}
           </div>
         </div>
