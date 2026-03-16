@@ -1,12 +1,6 @@
 // server/controllers/configController.js
-
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
-
-// Get directory path relative to this file (works regardless of cwd)
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const configPath = path.join(__dirname, "..", "config.json");
+// Config endpoints now read credentials from environment variables only.
+// No credentials are written to the filesystem.
 
 // Validation helper
 const validateConfigFields = (config, requiredFields) => {
@@ -14,44 +8,29 @@ const validateConfigFields = (config, requiredFields) => {
   return missing.length > 0 ? missing : null;
 };
 
-// POST /api/config/jira
-export const saveJiraConfig = (req, res) => {
-  const config = req.body;
-  if (!config || typeof config !== "object") {
-    return res.status(400).json({ error: "Missing Jira config data" });
-  }
-
-  const missingFields = validateConfigFields(config, ["baseUrl", "email", "apiToken"]);
-  if (missingFields) {
-    return res.status(400).json({
-      error: `Missing required fields: ${missingFields.join(", ")}`,
-    });
-  }
-
-  saveConfig({ jira: config }, res);
-};
-
-// POST /api/config/confluence
-export const saveConfluenceConfig = (req, res) => {
-  const config = req.body;
-  if (!config || typeof config !== "object") {
-    return res.status(400).json({ error: "Missing Confluence config data" });
-  }
-
-  const missingFields = validateConfigFields(config, ["baseUrl", "email", "apiToken"]);
-  if (missingFields) {
-    return res.status(400).json({
-      error: `Missing required fields: ${missingFields.join(", ")}`,
-    });
-  }
-
-  saveConfig({ confluence: config }, res);
-};
-
 // Helper to mask sensitive data
 const maskToken = (token) => {
   if (!token || token.length < 8) return token ? '****' : '';
   return token.slice(0, 4) + '****' + token.slice(-4);
+};
+
+const getEnvConfig = () => {
+  const config = {};
+  if (process.env.JIRA_BASE_URL || process.env.JIRA_EMAIL || process.env.JIRA_API_TOKEN) {
+    config.jira = {
+      baseUrl: process.env.JIRA_BASE_URL || '',
+      email: process.env.JIRA_EMAIL || '',
+      apiToken: process.env.JIRA_API_TOKEN || '',
+    };
+  }
+  if (process.env.CONFLUENCE_BASE_URL || process.env.CONFLUENCE_EMAIL || process.env.CONFLUENCE_API_TOKEN) {
+    config.confluence = {
+      baseUrl: process.env.CONFLUENCE_BASE_URL || '',
+      email: process.env.CONFLUENCE_EMAIL || '',
+      apiToken: process.env.CONFLUENCE_API_TOKEN || '',
+    };
+  }
+  return config;
 };
 
 const maskConfig = (config) => {
@@ -75,37 +54,61 @@ const maskConfig = (config) => {
   return masked;
 };
 
+// POST /api/config/jira — validates env var config, does not store credentials
+export const saveJiraConfig = (req, res) => {
+  const config = req.body;
+  if (!config || typeof config !== "object") {
+    return res.status(400).json({ error: "Missing Jira config data" });
+  }
+
+  const missingFields = validateConfigFields(config, ["baseUrl", "email", "apiToken"]);
+  if (missingFields) {
+    return res.status(400).json({
+      error: `Missing required fields: ${missingFields.join(", ")}`,
+    });
+  }
+
+  // Credentials must be set via environment variables, not stored on disk
+  res.json({
+    success: true,
+    message: "Jira credentials must be configured via JIRA_BASE_URL, JIRA_EMAIL, and JIRA_API_TOKEN environment variables.",
+    data: maskConfig(getEnvConfig())
+  });
+};
+
+// POST /api/config/confluence — validates env var config, does not store credentials
+export const saveConfluenceConfig = (req, res) => {
+  const config = req.body;
+  if (!config || typeof config !== "object") {
+    return res.status(400).json({ error: "Missing Confluence config data" });
+  }
+
+  const missingFields = validateConfigFields(config, ["baseUrl", "email", "apiToken"]);
+  if (missingFields) {
+    return res.status(400).json({
+      error: `Missing required fields: ${missingFields.join(", ")}`,
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Confluence credentials must be configured via CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL, and CONFLUENCE_API_TOKEN environment variables.",
+    data: maskConfig(getEnvConfig())
+  });
+};
+
 // GET /api/config/status
 export const getConfigStatus = (req, res) => {
   try {
-    const data = fs.existsSync(configPath)
-      ? JSON.parse(fs.readFileSync(configPath, "utf-8"))
-      : {};
-    // Return masked config - never expose full API tokens
-    res.json({ success: true, data: maskConfig(data) });
+    const config = getEnvConfig();
+    res.json({ success: true, data: maskConfig(config) });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: "Failed to read config" });
   }
 };
 
-// Helper to merge & save config
-const saveConfig = (newConfig, res) => {
-  try {
-    const existingConfig = fs.existsSync(configPath)
-      ? JSON.parse(fs.readFileSync(configPath, "utf-8"))
-      : {};
-    const merged = { ...existingConfig, ...newConfig };
-    fs.writeFileSync(configPath, JSON.stringify(merged, null, 2));
-    // Return masked config, not the actual tokens
-    res.json({ success: true, data: maskConfig(merged) });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ success: false, error: "Failed to save config" });
-  }
-};
-
-// POST /api/config/test - Test Atlassian connection without storing credentials
+// POST /api/config/test - Test Atlassian connection using provided credentials
 export const testConnection = async (req, res) => {
   const { service, baseUrl, email, apiToken } = req.body;
 
@@ -148,7 +151,6 @@ export const testConnection = async (req, res) => {
         }
       });
     } else {
-      const errorText = await response.text();
       res.status(response.status).json({
         success: false,
         error: "Connection failed. Please verify credentials and permissions."
