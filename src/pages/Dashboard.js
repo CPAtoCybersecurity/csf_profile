@@ -39,6 +39,16 @@ const formatScore = (value) => {
 // Define the order of functions for the pivot table
 const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'DETECT (DE)', 'RESPOND (RS)', 'RECOVER (RC)'];
 
+// Function weights for gap prioritization scoring
+const FUNCTION_WEIGHTS = {
+  'GOVERN (GV)': 1.2,
+  'IDENTIFY (ID)': 1.0,
+  'PROTECT (PR)': 1.1,
+  'DETECT (DE)': 1.1,
+  'RESPOND (RS)': 1.0,
+  'RECOVER (RC)': 0.9,
+};
+
 // Map function names to standard format
 const normalizeFunctionName = (func) => {
   if (!func) return 'Unknown';
@@ -388,6 +398,39 @@ const Dashboard = () => {
   const statusTotal = useMemo(() => {
     return statusChartData.reduce((sum, item) => sum + item.value, 0);
   }, [statusChartData]);
+
+  // Calculate top 10 priority gaps for the selected quarter
+  const priorityGaps = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return [];
+
+    const itemsToUse = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
+    const quarterKey = `Q${selectedQuarter}`;
+
+    const gaps = itemsToUse
+      .map(item => {
+        const quarterData = (item.quarters || {})[quarterKey];
+        if (!quarterData) return null;
+        const actual = quarterData.actualScore ?? 0;
+        const target = quarterData.targetScore ?? 0;
+        const gap = target - actual;
+        if (gap <= 0) return null;
+        const weight = FUNCTION_WEIGHTS[item.Function] ?? 1.0;
+        const priorityScore = +(gap * weight).toFixed(2);
+        return {
+          itemId: item.ID || '',
+          function: item.Function || 'Unknown',
+          actual: +actual.toFixed(1),
+          target: +target.toFixed(1),
+          gap: +gap.toFixed(1),
+          priorityScore,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.priorityScore - a.priorityScore)
+      .slice(0, 10);
+
+    return gaps;
+  }, [filteredData, filterInScope, selectedQuarter]);
 
   // Colors for each CSF function in the trend line chart
   const FUNCTION_LINE_COLORS = {
@@ -1124,6 +1167,7 @@ const Dashboard = () => {
                     }}
                   />
                   <Legend
+                    wrapperStyle={{ paddingTop: 20 }}
                     formatter={(value) => (
                       <span style={{ color: chartColors.text, fontSize: 12 }}>{value}</span>
                     )}
@@ -1149,6 +1193,86 @@ const Dashboard = () => {
           </div>
         </>
       )}
+
+      {/* Gap Prioritization Matrix */}
+      <div className={`card mt-6 p-4 rounded-lg shadow-sm border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className={`text-lg font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+            Priority Gaps (Q{selectedQuarter})
+          </h2>
+        </div>
+        {priorityGaps.length === 0 ? (
+          <p className={`text-sm text-center py-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            No gaps detected — all scores meet or exceed targets.
+          </p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className={`text-xs uppercase border-b ${darkMode ? 'text-gray-400 border-gray-600' : 'text-gray-500 border-gray-200'}`}>
+                <th className="text-left py-2 px-3">Rank</th>
+                <th className="text-left py-2 px-3">ID</th>
+                <th className="text-left py-2 px-3">Function</th>
+                <th className="text-right py-2 px-3">Actual</th>
+                <th className="text-right py-2 px-3">Target</th>
+                <th className="text-right py-2 px-3">Gap</th>
+                <th className="text-right py-2 px-3">Priority Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {priorityGaps.map((row, index) => {
+                let scoreClass;
+                if (row.priorityScore >= 3.0) {
+                  scoreClass = darkMode
+                    ? 'text-red-400 bg-red-900/30'
+                    : 'text-red-600 bg-red-50';
+                } else if (row.priorityScore >= 2.0) {
+                  scoreClass = darkMode
+                    ? 'text-orange-400 bg-orange-900/30'
+                    : 'text-orange-600 bg-orange-50';
+                } else if (row.priorityScore >= 1.0) {
+                  scoreClass = darkMode
+                    ? 'text-yellow-400 bg-yellow-900/30'
+                    : 'text-yellow-600 bg-yellow-50';
+                } else {
+                  scoreClass = darkMode
+                    ? 'text-green-400 bg-green-900/30'
+                    : 'text-green-600 bg-green-50';
+                }
+                return (
+                  <tr
+                    key={`${row.itemId}-${index}`}
+                    className={`border-b ${darkMode ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-gray-50'}`}
+                  >
+                    <td className={`py-2 px-3 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {index + 1}
+                    </td>
+                    <td className={`py-2 px-3 font-mono text-xs ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                      {row.itemId}
+                    </td>
+                    <td className={`py-2 px-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {row.function}
+                    </td>
+                    <td className={`py-2 px-3 text-right font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                      {formatScore(row.actual)}
+                    </td>
+                    <td className={`py-2 px-3 text-right ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {formatScore(row.target)}
+                    </td>
+                    <td className={`py-2 px-3 text-right font-semibold text-red-500 dark:text-red-400`}>
+                      {formatScore(row.gap)}
+                    </td>
+                    <td className="py-2 px-3 text-right">
+                      <span className={`inline-block px-2 py-0.5 rounded font-semibold text-xs ${scoreClass}`}>
+                        {row.priorityScore.toFixed(2)}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };
