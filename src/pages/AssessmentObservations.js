@@ -37,11 +37,12 @@ const AssessmentObservations = () => {
   // Sorting
   const { sort, sortedData, handleSort } = useSort(observationItems);
 
-  // Get user name by ID
+  // Get user name by ID - returns "name <email>" format for display
   const getUserName = (userId) => {
     if (!userId) return 'Not assigned';
     const user = users.find(u => u.id === userId);
-    return user ? user.name : 'Unknown';
+    if (!user) return 'Unknown';
+    return user.email ? `${user.name} <${user.email}>` : user.name;
   };
 
   // Status color mapping
@@ -104,8 +105,8 @@ const AssessmentObservations = () => {
             <p className="text-sm mt-2">Document observations in the Requirements tab</p>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0">
+          <table className="table-professional min-w-full">
+            <thead className="sticky top-0">
               <tr>
                 <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />

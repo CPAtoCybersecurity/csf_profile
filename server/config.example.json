@@ -1,0 +1,12 @@
+{
+  "jira": {
+    "baseUrl": "https://your-domain.atlassian.net",
+    "email": "your-email@example.com",
+    "apiToken": "your-jira-api-token"
+  },
+  "confluence": {
+    "baseUrl": "https://your-domain.atlassian.net",
+    "email": "your-email@example.com",
+    "apiToken": "your-jira-api-token"
+  }
+}

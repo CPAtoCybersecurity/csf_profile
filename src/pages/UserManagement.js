@@ -3,6 +3,7 @@ import { UserPlus, Edit, Trash2, Save, X, Upload, Download } from 'lucide-react'
 import Papa from 'papaparse';
 import toast from 'react-hot-toast';
 import useUserStore from '../stores/userStore';
+import { escapeCSVValue } from '../utils/sanitize';
 
 const UserManagement = () => {
   const users = useUserStore((state) => state.users);
@@ -73,9 +74,9 @@ const UserManagement = () => {
   // Handle CSV export
   const handleExportCSV = () => {
     const csvData = users.map(user => ({
-      'User': user.name,
-      'Title': user.title,
-      'Email': user.email
+      'User': escapeCSVValue(user.name),
+      'Title': escapeCSVValue(user.title),
+      'Email': escapeCSVValue(user.email)
     }));
 
     const csv = Papa.unparse(csvData);
@@ -287,8 +288,8 @@ const UserManagement = () => {
             </button>
           </div>
         </div>
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="table-professional min-w-full">
+          <thead>
             <tr>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
               <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>

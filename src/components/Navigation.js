@@ -1,108 +1,140 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, FileText, Award, FileArchive, ClipboardList, FileSearch } from 'lucide-react';
+import {
+  LayoutDashboard,
+  Users,
+  FileText,
+  Award,
+  FileArchive,
+  ClipboardList,
+  Shield,
+  Settings,
+  Bot,
+  AlertTriangle
+} from 'lucide-react';
 
 const Navigation = () => {
+  // Inline style to force no underline
+  const linkStyle = { textDecoration: 'none' };
+
+  // Base styles for nav items — increased padding, bottom-border active indicator
+  const baseStyles = "flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm font-semibold transition-colors border-b-[3px]";
+  const activeStyles = "border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 bg-transparent";
+  const inactiveStyles = "border-transparent text-gray-600 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700";
+
+  // Special styles for AI (success) — bottom-border variant
+  const aiActiveStyles = "border-green-600 dark:border-green-400 text-green-700 dark:text-green-300 bg-transparent";
+  const aiInactiveStyles = "border-transparent text-gray-600 dark:text-gray-100 hover:bg-green-50 dark:hover:bg-gray-700";
+
+  // Vertical divider between groups
+  const Divider = () => (
+    <div className="h-5 w-px bg-gray-300 dark:bg-gray-600 mx-2 self-center" />
+  );
+
   return (
-    <nav className="flex items-center gap-4">
-      <NavLink
-        to="/dashboard"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <LayoutDashboard size={18} />
-        <span>Dashboard</span>
-      </NavLink>
+    <nav className="flex items-center">
+      {/* Assessment group */}
+      <div className="flex items-center gap-2">
+        <NavLink
+          to="/dashboard"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <LayoutDashboard size={16} />
+          <span>Dashboard</span>
+        </NavLink>
 
-      <NavLink
-        to="/"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-        end
-      >
-        <FileText size={18} />
-        <span>Requirements</span>
-      </NavLink>
-      
-      <NavLink
-        to="/observations"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <FileSearch size={18} />
-        <span>Observations</span>
-      </NavLink>
+        <NavLink
+          to="/"
+          end
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <FileText size={16} />
+          <span>Requirements</span>
+        </NavLink>
 
-      <NavLink
-        to="/artifacts"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <FileArchive size={18} />
-        <span>Evidence</span>
-      </NavLink>
+        <NavLink
+          to="/controls"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <Shield size={16} />
+          <span>Controls</span>
+        </NavLink>
 
-      <NavLink
-        to="/remediation"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <ClipboardList size={18} />
-        <span>Remediation</span>
-      </NavLink>
+        <NavLink
+          to="/assessments"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <ClipboardList size={16} />
+          <span>Assessments</span>
+        </NavLink>
+      </div>
 
-      <NavLink
-        to="/scoring"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <Award size={18} />
-        <span>Reference</span>
-      </NavLink>
+      <Divider />
 
-      <NavLink
-        to="/users"
-        className={({ isActive }) =>
-          `flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-            isActive
-              ? 'bg-blue-800 text-white'
-              : 'text-white hover:bg-blue-800'
-          }`
-        }
-      >
-        <Users size={18} />
-        <span>User Management</span>
-      </NavLink>
+      {/* Evidence group */}
+      <div className="flex items-center gap-2">
+        <NavLink
+          to="/artifacts"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <FileArchive size={16} />
+          <span>Artifacts</span>
+        </NavLink>
+
+        <NavLink
+          to="/findings"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <AlertTriangle size={16} />
+          <span>Findings</span>
+        </NavLink>
+      </div>
+
+      <Divider />
+
+      {/* Admin group */}
+      <div className="flex items-center gap-2">
+        <NavLink
+          to="/scoring"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <Award size={16} />
+          <span>Reference</span>
+        </NavLink>
+
+        <NavLink
+          to="/users"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <Users size={16} />
+          <span>Users</span>
+        </NavLink>
+
+        <NavLink
+          to="/ai-assistant"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? aiActiveStyles : aiInactiveStyles}`}
+        >
+          <Bot size={16} />
+          <span>AI</span>
+        </NavLink>
+
+        <NavLink
+          to="/settings"
+          style={linkStyle}
+          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+        >
+          <Settings size={16} />
+        </NavLink>
+      </div>
     </nav>
   );
 };

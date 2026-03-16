@@ -32,6 +32,14 @@ A dedicated view for reviewing all documented observations across the assessment
 ![Requirements Detail Panel](public/screenshots/Observations.png)
 
 ---
+
+## Encrypted Exports (Optional Password Protection)
+
+Some exports support optional password protection. When you choose to encrypt an export, the app prompts you for a password and downloads an encrypted file with an `.enc.csv` suffix. This is intended for secure storage/backup and will not open directly in Excel or a text editor until it is decrypted.
+
+![Encrypted Export Password Dialog](public/screenshots/Encrypted_Export_Password_Dialog.png)
+
+---
 ## Scoring Legend (Reference Tab)
 
 The Scoring Legend provides guidance for evaluating security controls using the scoring system from Mastering Cyber Resilience by AKYLADE. Color-coded rows indicate security posture: yellow for "Some Security," green for "Just Right," and red for insufficient or excessive security.

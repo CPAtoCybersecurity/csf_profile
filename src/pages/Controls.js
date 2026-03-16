@@ -106,20 +106,20 @@ const Controls = () => {
     }
   }, [handleSelectItem, toggleItemSelection]);
 
-  // Status color mapping
+  // Status color mapping — returns semantic badge variant class
   const getStatusColor = (status) => {
     switch (status) {
       case 'Complete':
       case 'Completed':
-        return 'text-green-600';
+        return 'badge-success';
       case 'In Progress':
-        return 'text-blue-600';
+        return 'badge-info';
       case 'Not Started':
-        return 'text-gray-500';
+        return 'badge-neutral';
       case 'Submitted':
-        return 'text-orange-600';
+        return 'badge-warning';
       default:
-        return 'text-gray-500';
+        return 'badge-neutral';
     }
   };
 
@@ -306,8 +306,8 @@ const Controls = () => {
       <div className="flex flex-1 min-h-0 relative z-0">
         {/* Data table */}
         <div className={`${detailPanelOpen ? 'w-2/3' : 'w-full'} overflow-auto ${detailPanelOpen ? 'border-r' : ''} transition-all duration-300`}>
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50 sticky top-0 z-10">
+          <table className="table-professional min-w-full">
+            <thead className="sticky top-0 z-10">
               <tr>
                 <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-8">
                   <input
@@ -387,9 +387,9 @@ const Controls = () => {
                     {(() => {
                       const qData = getQuarterData(item.ID, selectedQuarter) || { testingStatus: 'Not Started' };
                       return (
-                        <div className={getStatusColor(qData.testingStatus)}>
+                        <span className={`badge ${getStatusColor(qData.testingStatus)}`}>
                           {qData.testingStatus || 'Not Started'}
-                        </div>
+                        </span>
                       );
                     })()}
                   </td>
@@ -539,7 +539,7 @@ const Controls = () => {
 
                 <div className="bg-white p-4 rounded-lg shadow-sm border">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-medium text-gray-700">Assessment Observations</h3>
+                    <h3 className="font-medium text-gray-700">Control Evaluations</h3>
                     <div className="flex items-center gap-1">
                       <Calendar size={14} className="text-gray-400" />
                       <div className="flex rounded-md overflow-hidden border">
@@ -621,16 +621,16 @@ const Controls = () => {
                           <option value="Complete">Complete</option>
                         </select>
                       ) : (
-                        <div className={`mt-1 px-2 py-1 inline-block rounded ${getStatusColor(
+                        <span className={`mt-1 badge ${getStatusColor(
                           getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'
                         )}`}>
                           {getQuarterData(currentItem.ID, selectedQuarter)?.testingStatus || 'Not Started'}
-                        </div>
+                        </span>
                       )}
                     </div>
 
                     <div>
-                      <span className="text-sm font-medium text-gray-500">Observation Date:</span>
+                      <span className="text-sm font-medium text-gray-500">Evaluation Date:</span>
                       {editMode ? (
                         <input
                           type="date"
@@ -673,7 +673,7 @@ const Controls = () => {
                     </div>
 
                     <div>
-                      <span className="text-sm font-medium text-gray-500">Observations:</span>
+                      <span className="text-sm font-medium text-gray-500">Evaluation Notes:</span>
                       {editMode ? (
                         <textarea
                           value={getQuarterData(currentItem.ID, selectedQuarter)?.observations || ''}

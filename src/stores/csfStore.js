@@ -238,19 +238,34 @@ const useCSFStore = create(
                 resolve(processedData);
               },
               error: (error) => {
-                set({ error: `Error parsing CSV: ${error.message}`, loading: false });
+                console.error('CSV parse error:', error);
+                set({ error: 'Failed to parse CSV file.', loading: false });
                 reject(error);
               }
             });
           });
         } catch (err) {
-          set({ error: `Error loading file: ${err.message}`, loading: false });
+          console.error('CSV load error:', err);
+          set({ error: 'Failed to load CSV file.', loading: false });
           throw err;
         }
       },
     }),
     {
       name: 'csf-data-storage',
+      version: 2,
+      migrate: (persistedState, version) => {
+        // Version 2: Force re-download of CSV to get proper owner assignments
+        // Reset hasDownloaded to trigger fresh load with owner processing
+        if (version < 2) {
+          return {
+            ...persistedState,
+            hasDownloaded: false,
+            data: [],
+          };
+        }
+        return persistedState;
+      },
       partialize: (state) => ({
         data: state.data,
         hasDownloaded: state.hasDownloaded,

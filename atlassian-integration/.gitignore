@@ -1,0 +1,20 @@
+# Environment variables (contains API tokens)
+.env
+
+# Output directories
+output/
+exports/
+imports/
+
+# Node modules
+node_modules/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo

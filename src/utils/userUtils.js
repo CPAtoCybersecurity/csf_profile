@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from 'uuid';
+
 /**
  * Parse user information from strings like "John Doe <john@email.com>"
  * @param {string} userString - The string to parse
@@ -66,7 +68,7 @@ export function findOrCreateUser(userInfo, existingUsers) {
   }
 
   const newUser = {
-    id: Date.now() + Math.floor(Math.random() * 1000),
+    id: uuidv4(),
     name: userInfo.name,
     title: 'Imported User',
     email: email,
