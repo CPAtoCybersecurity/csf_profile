@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security enforces access restrictions on data at rest through a layered approach combining AWS IAM policies, Kubernetes RBAC, and application-level access controls. AWS IAM policies follow the principle of least privilege, with service-specific roles limiting access to S3 buckets, RDS instances, and KMS keys. S3 bucket policies explicitly deny public access and restrict cross-account access. Resource-based policies on KMS customer-managed keys limit decryption operations to authorized IAM principals, creating a separation between storage access and decryption capability.
-
-Within the Kubernetes environment, RBAC policies control access to secrets, ConfigMaps, and persistent volume claims. Namespace isolation ensures that workloads in different security contexts cannot access each other's storage. Kubernetes secrets are encrypted at rest using the AWS KMS envelope encryption provider, and access to secrets is audited through the Kubernetes audit log.
-
-On the on-premises Windows Domain Controller, NTFS permissions and Active Directory group policies enforce access restrictions on file shares and local storage. Administrative access to domain controller storage requires privileged access through a controlled process. Database-level access restrictions in PostgreSQL use role-based grants with separate read-only and read-write roles for application services, limiting data exposure in the event of a service compromise.
+Alma enforces access restrictions on data at rest through least-privilege AWS IAM policies for S3/RDS/KMS, Kubernetes RBAC with namespace isolation, NTFS permissions with AD group policies on the on-premises DC, and role-based PostgreSQL grants separating read-only from read-write access. S3 bucket policies deny public access, and KMS key policies separate storage access from decryption capability. Kubernetes secrets are encrypted at rest via AWS KMS envelope encryption with access audited through Kubernetes audit logs.
 
 ## Evidence of Implementation
 

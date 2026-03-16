@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has partially automated identity lifecycle management through a Workday-to-ServiceNow integration pipeline. When HR creates or modifies an employee record in Workday, the integration triggers corresponding ServiceNow catalog items for account provisioning, modification, or deprovisioning. Active Directory account creation on the Windows Domain Controller is automated for standard employee roles, including group membership assignment based on department and job title mappings maintained by IT.
-
-The automation covers approximately 80% of standard onboarding scenarios. Engineering roles require additional manual steps for AWS IAM user creation, Kubernetes namespace access grants, and GitHub organization membership, which are handled through separate ServiceNow tasks assigned to the Cloud Platform team. The MFA Rollout project ($80K budget) is extending automation to include Windows Authenticator enrollment as part of the provisioning pipeline, targeting 100% automated MFA enrollment by Q3 2026.
-
-Deprovisioning automation is more mature: the Workday termination event triggers immediate Active Directory account disablement, SSO session revocation, and email forwarding configuration. However, AWS IAM access and Kubernetes RBAC removal still require manual intervention, creating a gap of 24-48 hours where departed employees may retain cloud access. The security team, led by Nadia Khan, has flagged this as a priority remediation item and proposed an AWS Lambda-based automation to bridge the gap.
+Alma Security automates identity lifecycle management through a Workday-to-ServiceNow integration pipeline that triggers account provisioning, modification, and deprovisioning based on HR record changes. Active Directory account creation, group membership assignment, and SSO enrollment are automated for standard roles, covering approximately 80% of onboarding scenarios. Engineering roles require additional manual provisioning for AWS IAM, Kubernetes namespace access, and GitHub organization membership. Deprovisioning automation disables Active Directory accounts, revokes SSO sessions, and configures email forwarding, though AWS IAM and Kubernetes RBAC removal currently require manual intervention.
 
 ## Evidence of Implementation
 

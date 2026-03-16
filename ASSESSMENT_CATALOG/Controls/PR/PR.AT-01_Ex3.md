@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's Acceptable Use Policy and Information Security Policy both contain explicit sections detailing consequences for cybersecurity policy violations, ranging from mandatory retraining for minor infractions to disciplinary action up to and including termination for willful or repeated violations. These policies are published on the company intranet and are referenced during new hire onboarding security training via Workday.
-
-During quarterly security awareness training, the training module includes a dedicated section on policy compliance expectations and consequences. The content uses anonymized real-world examples relevant to Alma's environment, such as scenarios involving unauthorized sharing of customer data, disabling endpoint protection (SentinelOne), or circumventing Windows Authenticator SSO. Each scenario walks through the policy violation, its potential business impact to Alma's customer trust and regulatory standing, and the resulting disciplinary process. Employees are required to acknowledge the Acceptable Use Policy annually via Workday.
-
-HR and the security team maintain a documented escalation path for violations. First-time unintentional violations trigger mandatory supplemental training and a documented conversation with the employee's manager. Repeat violations or intentional policy circumvention are escalated through HR's formal disciplinary process with security team input. The CISO reviews all escalated cases quarterly to identify systemic gaps that may require policy updates or additional training.
+Alma's Acceptable Use Policy and Information Security Policy define consequences for violations ranging from mandatory retraining to termination, published on the intranet and referenced during onboarding. Quarterly Workday training includes a dedicated policy compliance section with scenario-based examples, and employees acknowledge the AUP annually. HR and the security team maintain a documented escalation path: first-time unintentional violations trigger retraining, while repeat or intentional violations follow formal HR disciplinary procedures.
 
 ## Evidence of Implementation
 

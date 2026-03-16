@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains hardened baselines for its two primary server operating systems: Amazon Linux 2 and Ubuntu. These baselines are derived from CIS Benchmark Level 2 profiles and tailored for Alma's SaaS platform requirements. The baselines are codified as infrastructure-as-code using Terraform and Ansible playbooks stored in a version-controlled repository, ensuring that every provisioned system inherits the approved configuration automatically. Approximately 95% of production systems are currently running on hardened baselines.
-
-The baselines enforce specific security configuration settings including disabled unnecessary services (Telnet, FTP, NFS), restricted SSH configurations (key-based auth only, root login disabled), kernel hardening parameters (ASLR, exec-shield), filesystem mount options (noexec on /tmp, nosuid on removable media), and audit logging configurations. Kubernetes node baselines additionally restrict host-level network access and enforce pod security standards. The remaining 5% of systems not yet on hardened baselines consist primarily of legacy development environments scheduled for migration in Q2 2026.
-
-AWS Config is deployed across all accounts to continuously monitor configuration compliance against the documented baselines. Config rules evaluate system configurations against 47 custom and managed rules aligned to the CIS benchmarks. Non-compliant resources trigger SNS notifications routed to the infrastructure team's Slack channel and PagerDuty for critical deviations. The infrastructure team reviews compliance dashboards weekly and remediates drift within defined SLAs (critical: 24 hours, high: 72 hours, medium: 7 days).
+Alma deploys CIS Benchmark Level 2 hardened baselines for Amazon Linux 2 and Ubuntu via Terraform and Ansible, covering approximately 95% of production systems. AWS Config monitors compliance against 47 rules, with non-compliant resources triggering PagerDuty (critical) or Slack alerts and remediation SLAs (critical: 24h, high: 72h, medium: 7d). The remaining 5% are legacy dev environments scheduled for Q2 2026 migration, and Kubernetes node baselines have not been independently validated against the CIS Kubernetes Benchmark.
 
 ## Evidence of Implementation
 

@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security deploys its production SaaS platform on AWS using a multi-Availability Zone architecture that distributes workloads across physically separate data center facilities within the same AWS region. This design ensures that the failure of a single AZ — whether from power loss, network disruption, or environmental incident — does not cause a complete service outage. The Kubernetes cluster spans multiple AZs, with worker nodes distributed to maintain compute capacity even if one zone becomes unavailable.
-
-Within the Kubernetes environment, pod redundancy is achieved through replica sets that maintain multiple instances of each critical service. If a pod fails health checks, Kubernetes automatically terminates it and schedules a replacement. Load balancers distribute traffic across healthy pods, and services automatically route around failed instances. The auto-scaling configuration allows the cluster to increase pod counts in response to demand, providing both performance scaling and a form of redundancy through excess capacity.
-
-Failover testing has been completed, which demonstrates that the infrastructure team has validated the architecture's resilience claims rather than relying on theoretical design alone. This is a meaningful indicator of operational maturity. However, the failover testing results should be documented with specific scenarios tested, success criteria, recovery times observed, and any issues encountered during testing. Redundant storage and compute for critical systems are provisioned, though the specific configurations and recovery characteristics should be documented in the DR plan currently under development.
+Alma deploys its production SaaS platform on AWS using a multi-AZ Kubernetes cluster with replica sets, auto-scaling, and load balancers that route around failed instances. Failover testing has been completed to validate resilience. Failover test results lack formal documentation (scenarios, criteria, recovery times), and no recurring testing cadence is defined.
 
 ## Evidence of Implementation
 

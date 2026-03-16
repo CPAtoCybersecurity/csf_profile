@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security enforces TLS 1.2 as the minimum transport encryption standard across all externally-facing services, with TLS 1.3 preferred where supported by client applications. The continuous authentication SaaS platform, Alma's core product, terminates TLS at the AWS Application Load Balancer layer with certificates managed through AWS Certificate Manager (ACM) configured for automatic renewal. HSTS (HTTP Strict Transport Security) headers are enforced on all web properties with a max-age of one year and includeSubDomains directive, preventing protocol downgrade attacks.
-
-Internal service-to-service communication within the Kubernetes cluster uses mutual TLS (mTLS) configured through the service mesh. This ensures that east-west traffic between microservices, including API calls between the authentication engine, user management, and biometric processing services, is encrypted and authenticated. PostgreSQL database connections enforce SSL mode "verify-full," requiring both encryption and certificate verification for all client connections, preventing man-in-the-middle attacks at the database layer.
-
-Remote employee access to corporate resources requires connection through a VPN using IKEv2 with AES-256 encryption and certificate-based authentication. The VPN gateway is deployed in AWS with multi-AZ redundancy. Split tunneling is disabled for all connections to internal resources handling sensitive data, ensuring that traffic to corporate systems always traverses the encrypted tunnel. Site-to-site VPN connects the AWS environment to the Redwood City on-premises Windows Domain Controller with IPsec encryption.
+Alma enforces TLS 1.2 minimum (TLS 1.3 preferred) on all external services via AWS ALB with ACM-managed certificates and HSTS headers. Internal Kubernetes service-to-service traffic uses mTLS through the service mesh, and PostgreSQL connections require SSL mode "verify-full." Remote access uses IKEv2 VPN with AES-256 encryption and certificate-based authentication, with site-to-site IPsec VPN connecting AWS to the on-premises DC.
 
 ## Evidence of Implementation
 

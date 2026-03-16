@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security protects its Redwood City on-premises data center with fire suppression and HVAC monitoring systems designed to mitigate the primary environmental threats to technology infrastructure. The fire suppression system provides automated detection and suppression capabilities to limit fire damage to servers, networking equipment, and storage arrays. HVAC monitoring tracks temperature and humidity conditions within the data center, alerting operations staff when environmental conditions deviate from acceptable thresholds.
-
-The AWS production infrastructure benefits from Amazon's well-documented physical security and environmental controls at their data center facilities. Alma's multi-AZ deployment architecture ensures that a localized environmental event affecting a single Availability Zone (fire, flood, power failure) does not result in complete service unavailability. AWS facilities include redundant power, cooling, fire detection and suppression, and water detection systems as part of the shared responsibility model — Alma inherits these protections for cloud-hosted workloads.
-
-On-premises gaps include the absence of documented environmental risk assessments specific to the Redwood City facility, limited visibility into the maintenance and testing cadence for fire suppression systems, and uncertainty about whether flood detection sensors are deployed given Northern California's increasing flood risk. The facility's environmental protection controls have not been independently verified or audited as part of the cybersecurity assessment program to date.
+Alma protects the Redwood City data center with fire suppression and HVAC monitoring systems that alert operations staff on environmental deviations. AWS production infrastructure inherits Amazon's physical and environmental controls under the shared responsibility model, with multi-AZ deployment mitigating single-zone failures. No formal environmental risk assessment exists for the Redwood City facility, fire suppression testing records have not been reviewed, and flood detection sensor deployment is unconfirmed.
 
 ## Evidence of Implementation
 

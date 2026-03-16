@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security is in the process of deploying enterprise-wide MFA through the MFA Rollout project, budgeted at $80K and currently in Phase 2 of 3. Windows Authenticator SSO serves as the primary identity provider and enforces MFA for all cloud application access and VPN connections. As of Q1 2026, MFA enrollment stands at approximately 85% of the employee population, with the remaining 15% primarily consisting of recent hires in the onboarding pipeline and a small number of users with approved temporary exceptions.
-
-The current MFA implementation supports push notifications through the Windows Authenticator mobile app and TOTP codes as a fallback. For privileged access to the on-premises Windows Domain Controller and AWS administrative consoles, the security team requires hardware security keys (FIDO2-compliant) to provide phishing-resistant authentication. Gerry has mandated that all members of the 15-person security team use hardware keys, and the policy is being extended to all IT administrators and engineering leads in Phase 3.
-
-The MFA Rollout project aligns with the Apple Passkey partnership (G8), which will introduce passkey-based authentication for Alma's own customer-facing product. The internal MFA deployment serves as both a security improvement and a proof-of-concept for the technology the company sells. SMS-based MFA has been explicitly prohibited in the authentication policy due to SIM-swapping risks, a decision driven by Nadia Khan's threat intelligence assessment of attacks targeting SaaS companies in the authentication space.
+Alma Security enforces MFA through Windows Authenticator SSO for all cloud application access and VPN connections, with enrollment at approximately 85% of the employee population as of Q1 2026. Standard MFA factors include push notifications via the Windows Authenticator mobile app and TOTP codes as fallback, while privileged access to the Windows Domain Controller and AWS administrative consoles requires FIDO2-compliant hardware security keys. SMS-based MFA is explicitly prohibited in the authentication policy. The MFA Rollout project (Phase 2 of 3) is extending phishing-resistant hardware key requirements to all IT administrators and engineering leads.
 
 ## Evidence of Implementation
 

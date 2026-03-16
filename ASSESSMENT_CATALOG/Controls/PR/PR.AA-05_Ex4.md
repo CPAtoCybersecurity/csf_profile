@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security documents separation of duties requirements in the Access Management Policy and enforces critical SoD constraints through Active Directory group membership restrictions and AWS IAM policy conditions. The most significant SoD controls prevent: (1) a single individual from both approving and provisioning access requests in ServiceNow, (2) a developer from deploying code to production without a separate approver in the CI/CD pipeline, and (3) a single person from creating and approving financial transactions in the ERP system.
-
-The CI/CD pipeline is the most technically mature SoD implementation. GitHub Actions workflows for the production environment require pull request approval from a code reviewer who is not the author, and the deployment approval step in the pipeline requires sign-off from an on-call engineer who did not write the code. This two-person integrity control for production deployments was implemented after a 2024 incident where a single developer inadvertently deployed untested code to production, causing a 2-hour service disruption.
-
-However, SoD enforcement is predominantly procedural rather than technical for administrative functions. Active Directory does not technically prevent a Domain Admin from also holding application owner privileges, which would allow them to both manage the identity infrastructure and approve access grants. The security team relies on monthly privileged access reviews to detect such conflicts rather than automated technical controls. The SoD matrix was last updated in Q3 2025 and does not yet reflect the ERP module expansion completed in Q4 2025, which introduced new financial approval workflows that require SoD analysis.
+Alma Security enforces separation of duties through Active Directory group membership restrictions, AWS IAM policy conditions, and CI/CD pipeline controls documented in the Access Management Policy. Key SoD controls prevent a single individual from both approving and provisioning access requests in ServiceNow, require separate code reviewer and deployment approver in GitHub Actions production workflows, and enforce dual authorization for financial transactions in the ERP system. Administrative SoD enforcement relies primarily on monthly privileged access reviews to detect conflicting role assignments. The SoD matrix defines incompatible role combinations across identity management, application ownership, and financial approval functions.
 
 ## Evidence of Implementation
 

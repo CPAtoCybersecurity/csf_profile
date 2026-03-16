@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security currently uses phishing simulations as the primary mechanism for periodically assessing employee understanding of cybersecurity awareness topics. Quarterly phishing campaigns serve as practical tests of whether employees can identify and correctly respond to social engineering attempts. Click rates, report rates, and time-to-report metrics are tracked per department and trended over time by the security team.
-
-Beyond phishing simulations, the quarterly Workday training modules include completion-tracked assessments. However, these assessments are currently structured as acknowledgment-based checkpoints rather than scored knowledge tests. Employees complete the module and confirm understanding, but there is no pass/fail threshold or scored quiz component that would provide a quantitative measure of comprehension. The security team has identified this as a maturity gap and has planned the implementation of scored assessments for Q2 2026.
-
-The D&R team informally assesses understanding during incident response activities by evaluating whether employees follow reporting procedures correctly when real or simulated incidents occur. Nadia Khan's team tracks whether employees use the correct reporting channels (phishing@almasecurity.com or #security-alerts Slack) versus ad-hoc methods. This behavioral data supplements the simulation results but is not yet formalized into a structured assessment framework.
+Alma uses quarterly phishing simulations as the primary mechanism for assessing employee security understanding, tracking click rates, report rates, and time-to-report per department. Workday training modules include completion-tracked assessments, but these are currently acknowledgment-based checkpoints rather than scored knowledge tests with pass/fail thresholds. Scored quiz assessments are planned for Q2 2026.
 
 ## Evidence of Implementation
 

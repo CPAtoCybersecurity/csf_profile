@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has defined logging requirements through its Logging and Monitoring Policy, which specifies event categories that must be logged across different system types. The policy mandates logging of authentication events (success and failure), authorization decisions, administrative actions, configuration changes, data access events for sensitive data stores, system errors and exceptions, and network connection events. Log record content requirements include timestamp (UTC), source system identifier, user or service identity, event type, outcome (success/failure), and source IP address.
-
-Retention periods are defined by log category: security logs are retained for 12 months online and 24 months in archive storage, operational logs for 6 months, and debug/application logs for 30 days. These retention periods are aligned with Alma's SOC 2 requirements and incident investigation needs. Cloud-native logging services are configured with retention policies that match these requirements: CloudTrail logs are retained in S3 with lifecycle policies, VPC Flow Logs are retained for 12 months, and EKS audit logs are retained for 90 days in CloudWatch with archival to S3 for the remainder of the retention period.
-
-However, the logging policy has gaps in specificity. While it defines what event categories must be logged, it does not provide system-specific logging configuration standards (e.g., specific Windows event IDs, specific Linux auditd rules, specific Kubernetes audit policy levels). The implementation of the policy varies by platform, with AWS-native services having strong logging coverage while on-premises systems and application-layer logging are less consistently configured.
+Alma's Logging and Monitoring Policy defines required event categories (authentication, authorization, admin actions, config changes, data access) with retention periods of 12 months online / 24 months archive for security logs, aligned to SOC 2 requirements. CloudTrail, VPC Flow Logs, and EKS audit logs are configured with matching retention policies in S3 and CloudWatch. The policy lacks platform-specific configuration standards (e.g., auditd rules, Windows event IDs, K8s audit levels), and on-premises/application-layer logging is less consistently configured.
 
 ## Evidence of Implementation
 

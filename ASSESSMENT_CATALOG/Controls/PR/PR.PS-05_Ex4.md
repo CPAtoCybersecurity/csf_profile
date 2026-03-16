@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains an approved software catalog in the ServiceNow application catalog, which serves as the authoritative list of software approved for use across the organization. The catalog includes standard business applications (Microsoft 365, Slack, Zoom, Salesforce), security tools (SentinelOne, Okta), development tools (JetBrains IDEs, VS Code, Docker Desktop), and IT operations tools. Each entry includes the application name, approved version range, business justification, data classification, security review status, and the responsible department.
-
-The ServiceNow self-service portal allows employees to request software from the approved catalog through a streamlined workflow. Software not in the catalog triggers the full procurement and security review process before approval and addition to the catalog. The IT security team reviews the catalog semi-annually to remove software that is no longer in use, verify that approved versions remain current, and confirm that vendor security assessments are still valid.
-
-The approved software list has coverage gaps that limit its effectiveness as an enforcement mechanism. The catalog primarily covers commercial software and major development tools but does not comprehensively cover open-source command-line tools, browser extensions, or developer libraries and frameworks. There is no mechanism to automatically synchronize the approved software list with SentinelOne's application control allowlist, requiring manual updates when the catalog changes. The semi-annual review cadence means the catalog can be out of date with respect to newly adopted or deprecated tools.
+Alma maintains an approved software catalog in ServiceNow covering business, security, and development tools, with self-service provisioning for listed applications and full security review required for unlisted software. The catalog is reviewed semi-annually to verify currency and vendor security posture. Coverage gaps exist for open-source CLI tools, browser extensions, and developer libraries; no automated sync exists between the catalog and SentinelOne's allowlist.
 
 ## Evidence of Implementation
 

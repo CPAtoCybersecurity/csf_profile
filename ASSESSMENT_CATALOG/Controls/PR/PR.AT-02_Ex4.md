@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security does not yet have a formal annual refresher requirement specifically designated for specialized roles. While the general quarterly awareness training program applies to all employees including those in specialized roles, there is no additional annual refresher requirement that covers role-specific content such as updated tool configurations, emerging threat techniques relevant to their function, or changes to internal procedures. The distinction between general awareness refreshers and specialized role refreshers has not been formally established in policy.
-
-In practice, some specialized role refresher activity occurs organically. The D&R team receives updated SentinelOne training when major platform versions are released, and Nadia Khan coordinates informal knowledge-sharing sessions when new threat techniques are observed in the wild. The VM team attends annual vendor conferences and webinars that serve as de facto refreshers on vulnerability management practices. Network administrators receive Palo Alto firewall update training tied to firmware upgrades. However, none of these activities are mandated by policy, tracked centrally in Workday, or enforced through compliance mechanisms.
-
-The CISO has acknowledged this gap and has included the establishment of formal annual specialized role refresher requirements in the Q2 2026 training program improvement roadmap. The plan calls for role-specific refresher modules developed in collaboration with team leads (Nadia Khan for D&R, Chris Magann for VM) and delivered through Workday to enable centralized tracking and compliance enforcement. Until this is implemented, Alma relies on team-level initiative and vendor-driven update training.
+Alma does not yet have a formal annual refresher requirement for specialized roles distinct from general awareness training. Specialized refresher activity occurs ad hoc through vendor platform update training (SentinelOne, Palo Alto), conference attendance, and informal team knowledge-sharing, but none is mandated by policy or tracked in Workday. Formal annual specialized role refresher requirements delivered through Workday are planned for Q2 2026.
 
 ## Evidence of Implementation
 

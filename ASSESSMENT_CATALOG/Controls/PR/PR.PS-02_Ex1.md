@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains a software inventory tracked through a combination of automated discovery tools and manual CMDB entries in ServiceNow. SentinelOne's endpoint agent provides real-time visibility into installed software on workstations and laptops, while AWS Systems Manager Inventory collects software package data from EC2 instances. Container image versions are tracked through the organization's Amazon ECR registry, which serves as the authoritative source for deployed container images.
-
-The software inventory covers operating systems (Amazon Linux 2, Ubuntu 22.04, Windows Server 2012 R2, Windows 10/11), middleware and runtime components (Java, Node.js, Python), database engines (PostgreSQL, Redis), and application-layer software. Each software component in the CMDB has a designated owner from the responsible engineering or IT team, current version, vendor support status, and next scheduled update date. The inventory is reconciled quarterly by the IT operations team comparing automated discovery results against CMDB records.
-
-However, the software inventory has known coverage gaps. Developer-installed tools and packages on local workstations are not consistently tracked beyond what SentinelOne detects. Kubernetes-deployed microservice dependencies (npm packages, pip libraries) are cataloged at the container image level but not at the individual dependency level. There is no formal software bill of materials (SBOM) for Alma's SaaS platform, which limits visibility into transitive dependencies.
+Alma tracks software inventory through ServiceNow CMDB, SentinelOne endpoint discovery, AWS Systems Manager Inventory, and Amazon ECR for container images, reconciling quarterly. Each CMDB entry includes owner, version, vendor support status, and next update date. No SBOM exists for the SaaS platform, developer workstation software is not comprehensively tracked, and container-level dependencies are not inventoried at the individual package level.
 
 ## Evidence of Implementation
 

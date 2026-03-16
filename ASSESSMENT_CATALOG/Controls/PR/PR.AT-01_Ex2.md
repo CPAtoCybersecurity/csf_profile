@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security operates a mature social engineering awareness program anchored by quarterly phishing simulations and dedicated Workday training modules on social engineering tactics. The phishing simulation program sends realistic campaigns to all 300 employees on a quarterly cadence, using templates that mirror actual threats observed in the wild, including credential harvesting, business email compromise, and pretexting scenarios targeting Alma's SaaS customer base.
-
-When an employee clicks a simulated phishing link, they are immediately redirected to an educational landing page explaining the indicators they missed and reinforcing correct behavior. Employees who click on two or more simulated phishing emails within a rolling 12-month period are automatically enrolled in supplemental Workday training focused on social engineering recognition. The D&R team tracks click rates across departments and reports trends to leadership monthly.
-
-Reporting mechanisms are clearly communicated during onboarding and reinforced in every quarterly training cycle. Employees are instructed to forward suspicious emails to the dedicated phishing report inbox (phishing@almasecurity.com) and to post in the #security-alerts Slack channel for time-sensitive concerns. The D&R team, led by Nadia Khan, triages reported emails and provides feedback to reporters, reinforcing the reporting behavior. Alma's average phishing simulation click rate has trended down from 18% to approximately 7% over the past four quarters.
+Alma runs quarterly phishing simulations against all 300 employees covering credential harvesting, BEC, and pretexting scenarios, with repeat clickers auto-enrolled in supplemental Workday training. Employees report suspicious emails to phishing@almasecurity.com and the #security-alerts Slack channel, with the D&R team triaging all reports. The simulation click rate has decreased from 18% to approximately 7% over the past four quarters.
 
 ## Evidence of Implementation
 

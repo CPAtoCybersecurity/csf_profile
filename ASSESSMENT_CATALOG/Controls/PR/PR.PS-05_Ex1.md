@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has deployed SentinelOne across all workstations and laptops (approximately 300 endpoints) as its primary endpoint detection and response (EDR) platform, which includes application control capabilities. The SentinelOne agent is configured with an application control policy that maintains an inventory of known applications and alerts on execution of unrecognized executables. The policy currently operates in a hybrid mode: known malicious applications are blocked in real-time, known-good applications are allowed, and unrecognized applications trigger an alert for security team review without blocking execution.
-
-The SentinelOne deployment achieves 98%+ coverage across the endpoint fleet, with the remaining devices being new hires in the provisioning pipeline or temporary loaner devices. The security team reviews application control alerts daily during business hours. Unrecognized applications that are determined to be unauthorized are added to the blocklist and pushed to all endpoints. Applications confirmed as legitimate are added to the allowlist with a business justification recorded in the SentinelOne console notes.
-
-The current hybrid enforcement mode represents a deliberate balance between security and operational disruption. Full enforcement (block-by-default for unrecognized applications) has not been enabled due to concerns about impacting developer productivity, as developers frequently use command-line tools, package managers, and locally compiled binaries that would not be on the pre-approved list. The security team is working with engineering leadership to define a developer workstation policy that enables full application control while accommodating legitimate development workflows.
+Alma deploys SentinelOne with application control across approximately 300 endpoints (98%+ coverage), operating in hybrid mode: known-malicious blocked, known-good allowed, unrecognized executables alerted but not blocked. The security team reviews application control alerts daily and maintains blocklist/allowlist updates. Full enforcement (block-by-default) is not enabled due to developer productivity concerns; server-side and Kubernetes node application control is limited to baseline enforcement only.
 
 ## Evidence of Implementation
 

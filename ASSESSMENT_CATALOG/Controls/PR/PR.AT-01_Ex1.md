@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security delivers mandatory cybersecurity awareness training to all 300 employees through Workday, the organization's HR and learning management platform. The training program covers foundational topics including password hygiene, device security, data classification and handling, acceptable use policies, and recognizing common attack vectors. All training modules are assigned automatically upon hire and on a quarterly recurring schedule.
-
-New hire onboarding at Alma includes a mandatory security training module that must be completed within the first 14 days of employment. System access provisioning through ServiceNow is gated on training completion confirmation from Workday, ensuring no employee receives credentials or access to production systems before completing baseline awareness training. The security team coordinates with HR to ensure the Workday enrollment workflow is triggered by the onboarding checklist.
-
-The training content is reviewed and updated semi-annually by the security team to reflect the current threat landscape, with the most recent update incorporating lessons from real phishing attempts observed in Alma's environment. Training completion dashboards are available to managers via Workday, and the security team sends Slack reminders to the #security-alerts channel when quarterly training windows open.
+Alma delivers mandatory cybersecurity awareness training to all 300 employees through Workday on a quarterly cadence, covering password hygiene, device security, data classification, acceptable use, and common attack vectors. New hire onboarding requires completion of the security training module within 14 days, with ServiceNow access provisioning gated on Workday training confirmation. Training content is reviewed semi-annually by the security team, and completion dashboards are available to managers via Workday.
 
 ## Evidence of Implementation
 

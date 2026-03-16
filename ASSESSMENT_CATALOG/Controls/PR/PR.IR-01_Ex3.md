@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security has deployed two primary network monitoring capabilities: VPC Flow Logs across AWS production VPCs and DNS query logging for cloud-hosted services. VPC Flow Logs capture metadata for all network traffic (accepted and rejected) flowing through VPC network interfaces, providing visibility into communication patterns, anomalous traffic volumes, and rejected connection attempts. DNS query logging captures resolution requests, which can indicate command-and-control communication, data exfiltration via DNS tunneling, or connections to known malicious domains.
-
-These logging capabilities feed into the centralized logging infrastructure where the Detection and Response team can investigate network anomalies. However, the current implementation is primarily detective rather than preventive — the logs support investigation and forensics but do not automatically block or quarantine suspicious traffic in real time. Network-based intrusion detection capabilities are limited to what the Palo Alto firewall provides at the on-premises perimeter; there is no dedicated network IDS/IPS for east-west traffic within the AWS environment.
-
-The absence of a WAF further limits the organization's ability to monitor and filter application-layer network traffic for integrity violations. While the existing logging provides a foundation for network visibility, the monitoring is reactive and lacks automated correlation of network events with threat intelligence feeds.
+Alma monitors network integrity through VPC Flow Logs (all traffic metadata) and DNS query logging across AWS production VPCs, feeding into the centralized logging infrastructure for investigation. The Palo Alto firewall provides IPS at the on-premises perimeter, but there is no dedicated IDS/IPS for east-west traffic within AWS. Monitoring is reactive -- logs support investigation but do not automatically block suspicious traffic, and no automated threat intelligence correlation is in place.
 
 ## Evidence of Implementation
 

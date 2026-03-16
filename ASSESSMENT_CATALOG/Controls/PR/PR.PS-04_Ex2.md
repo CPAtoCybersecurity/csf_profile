@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security centralizes cloud infrastructure logs through AWS-native services. CloudTrail captures all API activity across AWS accounts and forwards logs to a dedicated S3 bucket with CloudWatch Logs integration for near-real-time analysis. VPC Flow Logs capture network traffic metadata and are stored in CloudWatch Logs. GuardDuty aggregates findings from CloudTrail, VPC Flow Logs, and DNS logs to generate security findings that are surfaced through Security Hub. EKS audit logs and container runtime logs (stdout/stderr) are collected by Fluent Bit daemonsets and forwarded to CloudWatch Logs.
-
-The organization uses CloudWatch Logs Insights as the primary log query and analysis tool for cloud infrastructure. Security Hub serves as the centralized findings aggregation point, collecting alerts from GuardDuty, AWS Config, and Inspector. Security Hub findings above medium severity are forwarded to the #security-alerts Slack channel and generate PagerDuty incidents for critical findings.
-
-However, Alma does not operate a traditional SIEM platform. The current architecture relies on AWS-native tools, which provide strong coverage for AWS resources but create gaps for non-AWS log sources. On-premises systems (Windows DC, legacy fileserver) forward Windows Event Logs to a local syslog server but these logs are not integrated into the CloudWatch-based analysis workflow. Application-level logs from the SaaS platform are collected in CloudWatch but lack security-specific correlation rules. There is no 24/7 SOC monitoring; the security team reviews alerts during business hours with an on-call rotation for critical PagerDuty incidents after hours.
+Alma centralizes cloud logs through CloudTrail, VPC Flow Logs, GuardDuty, and Fluent Bit (EKS), with Security Hub aggregating findings and routing medium+ severity alerts to Slack and PagerDuty. CloudWatch Logs Insights serves as the primary query and analysis tool. No traditional SIEM is deployed -- on-premises systems forward to a local syslog server not integrated with CloudWatch, and there is no 24/7 SOC monitoring (business-hours coverage with on-call for critical incidents).
 
 ## Evidence of Implementation
 

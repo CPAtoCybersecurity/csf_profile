@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security performs identity proofing as part of the HR onboarding process before any system credentials are issued. New employees are required to present government-issued photo identification (driver's license or passport) during their first day at the Redwood City office. HR validates the identification against the offer letter and background check results conducted by the third-party screening provider. Only after HR marks the identity verification step as complete in Workday does the ServiceNow provisioning workflow activate, creating the Active Directory account and initiating Windows Authenticator SSO enrollment.
-
-For remote employees who cannot appear in person on day one, Alma uses a video verification call conducted by HR with the hiring manager present. The remote employee must display their government-issued ID on camera, and HR captures a screenshot for the personnel file. This process was formalized in Q4 2025 after the security team identified that three remote hires in 2025 had received credentials before completing identity verification, a finding that prompted the workflow gate in ServiceNow.
-
-Contractor identity proofing follows a similar but separate path. The contracting company provides identification documentation, which is verified by the Procurement team before the contractor's sponsor (typically an engineering manager) submits the access request in ServiceNow. Contractor accounts are provisioned with time-bound credentials aligned to the contract end date, and the SSO configuration restricts contractor access to explicitly authorized applications only.
+Alma Security requires identity proofing before any credential issuance, gated through a Workday verification step that must complete before the ServiceNow provisioning workflow activates. On-site employees present government-issued photo ID validated by HR against offer letter and background check results. Remote employees complete video verification with HR and the hiring manager, presenting government-issued ID on camera. Contractors undergo identity verification through the Procurement team before sponsor-submitted ServiceNow access requests, receiving time-bound credentials aligned to contract end dates with SSO access restricted to explicitly authorized applications.
 
 ## Evidence of Implementation
 

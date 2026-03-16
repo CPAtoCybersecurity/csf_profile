@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security provides role-based training to specialized security personnel, though the program is inconsistently structured across teams. The D&R team under Nadia Khan receives the most structured specialized training, including SentinelOne EDR console training provided by the vendor, internal incident response procedure walkthroughs, and participation in tabletop exercises. Nadia Khan coordinates training schedules for her team and tracks completion informally via shared spreadsheets rather than through the centralized Workday platform.
-
-The vulnerability management team, specifically Chris Magann and Tigan Wang, receives training primarily through vendor-provided resources for their scanning tools, supplemented by attendance at external webinars and conferences on vulnerability management practices. Chris Magann has pursued GIAC certifications independently, which Alma partially funds through the professional development budget. However, there is no formal VM-specific training curriculum that maps to the team's day-to-day responsibilities with Alma's AWS and on-premises Windows domain controller infrastructure.
-
-System and network administrators receive Palo Alto firewall training and AWS security services training on an as-needed basis, typically when new features or configurations are deployed. Developer security training is limited to optional lunch-and-learn sessions organized by the security team. The overall gap is that while specialized training occurs, it is driven by individual initiative and team-level decisions rather than a centralized, role-mapped training program managed through Workday. The security team recognizes this gap and is planning a formalized role-based training catalog for Q2-Q3 2026.
+Alma provides role-based training to specialized personnel including SentinelOne EDR training for D&R analysts, vendor and conference-based training for the VM team, and Palo Alto/AWS training for network administrators. Training is tracked informally at the team level via spreadsheets rather than centralized in Workday. A formalized role-based training catalog managed through Workday is planned for Q2-Q3 2026.
 
 ## Evidence of Implementation
 

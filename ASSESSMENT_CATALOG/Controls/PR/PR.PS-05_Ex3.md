@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's runtime execution controls are layered across different platform types. On workstations and laptops, SentinelOne provides the primary execution control capability. The agent monitors all process execution and applies its behavioral AI engine along with the organization's application control policy to identify and respond to unauthorized or malicious executables. Known malicious executables are blocked and quarantined in real-time. SentinelOne's Static AI analysis evaluates unknown executables before allowing execution, providing an additional layer of protection beyond signature-based detection.
-
-On Linux servers, execution control relies on the hardened baseline configuration rather than a dedicated application control agent. The baselines restrict executable permissions, disable unnecessary interpreters, and configure filesystem mount options (noexec on /tmp and /var/tmp). However, these controls do not provide allowlist-level enforcement --- any executable with appropriate filesystem permissions can run. SELinux is not enabled on Amazon Linux 2 instances (it is available but was not included in the baseline due to application compatibility concerns).
-
-In the Kubernetes environment, container execution is constrained by container isolation boundaries and namespace resource policies. Pod security standards are partially enforced through a custom admission webhook, but the enforcement is not comprehensive. There is no runtime execution control within containers beyond what the container image provides. The shared SSH key issue (developers accessing Kubernetes nodes via port 45001 with root access) creates a significant gap where authorized users could execute arbitrary code directly on cluster nodes, bypassing all container-level controls.
+Alma uses SentinelOne behavioral AI on endpoints to block known-malicious executables and evaluate unknowns at runtime. Linux servers rely on hardened baselines (noexec mounts, restricted permissions) without dedicated application control; SELinux is not enabled. Kubernetes pod security is partially enforced via a custom admission webhook, but a shared SSH key provides root access to cluster nodes on port 45001, bypassing container isolation controls.
 
 ## Evidence of Implementation
 

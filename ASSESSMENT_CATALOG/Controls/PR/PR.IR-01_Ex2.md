@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security employs a Palo Alto next-generation firewall as the primary perimeter gateway for the Redwood City on-premises data center. The firewall enforces deny-by-default policies, with explicit allow rules for authorized traffic flows between network zones. Administrative access to the firewall requires two-factor authentication through Windows Authenticator, reducing the risk of unauthorized configuration changes. The firewall provides application-layer inspection, URL filtering, and intrusion prevention capabilities at the network boundary.
-
-In the AWS environment, internet-facing traffic is routed through Application Load Balancers (ALBs) with Security Groups restricting inbound traffic to required ports (443, 80). However, Alma Security does not currently have a Web Application Firewall (WAF) deployed. This is a recognized gap with an approved remediation project — the WAF Install project has a $112K budget and is currently in progress. Until the WAF is operational, the organization lacks application-layer filtering for web traffic, leaving exposure to OWASP Top 10 threats such as SQL injection, cross-site scripting, and request smuggling at the gateway.
-
-VPC Flow Logs and DNS query logging provide visibility into traffic patterns but are monitoring controls rather than gateway filtering controls. The combination of a strong on-premises perimeter (Palo Alto) and a gap in cloud application-layer filtering (no WAF) creates an asymmetric security posture across the hybrid environment.
+Alma uses a Palo Alto next-generation firewall with deny-by-default policies, 2FA-protected admin access, application-layer inspection, and IPS at the Redwood City perimeter. In AWS, ALBs with Security Groups restrict inbound traffic to ports 443/80, but no WAF is deployed -- the WAF Install project ($112K budget) is in progress. VPC Flow Logs and DNS query logging provide traffic visibility but do not filter at the gateway layer.
 
 ## Evidence of Implementation
 

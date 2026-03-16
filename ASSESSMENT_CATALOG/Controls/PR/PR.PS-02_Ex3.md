@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security operates a patch management program that covers operating systems, container base images, and critical application components. Linux server patching for Amazon Linux 2 and Ubuntu is automated through AWS Systems Manager Patch Manager, which applies approved patches on a defined schedule. Critical and high-severity patches are applied within 14 days of release, with emergency patches (actively exploited CVEs) applied within 72 hours. Medium and low patches follow a 30-day cycle. Windows workstation patching is managed through WSUS with similar SLA targets.
-
-Container base images are rebuilt weekly by the CI/CD pipeline using the latest patched upstream images. When a critical vulnerability is identified in a base image, the engineering team triggers an out-of-cycle rebuild and redeployment of affected containers. The automated vulnerability scanning pipeline (weekly cadence, daily for crown jewel systems) identifies missing patches and generates tickets for the responsible team. Patch compliance is tracked through AWS Systems Manager compliance dashboards and reported monthly to the CISO.
-
-The most significant patch management gap is the Windows Server 2012 R2 fileserver, which cannot receive patches due to its EOL status. Additionally, Kubernetes node patching requires coordination with workload scheduling to avoid service disruption, which has occasionally caused delays beyond the defined SLA. The infrastructure team is implementing automated node draining and rolling updates to address this gap.
+Alma automates Linux patching via AWS Systems Manager Patch Manager (critical/high: 14 days, emergency: 72 hours, medium/low: 30 days) and manages Windows workstation patching through WSUS. Container base images are rebuilt weekly with out-of-cycle rebuilds for critical CVEs, and patch compliance is reported monthly to the CISO. The Windows Server 2012 R2 fileserver cannot be patched due to EOL, and Kubernetes node patching occasionally exceeds SLAs due to workload coordination delays.
 
 ## Evidence of Implementation
 

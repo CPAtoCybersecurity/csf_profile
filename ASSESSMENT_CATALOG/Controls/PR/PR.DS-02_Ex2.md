@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains a transport encryption standard that defines approved cryptographic algorithms and cipher suites for all data in transit. The standard mandates AES-256-GCM as the preferred symmetric cipher, with AES-128-GCM as the minimum acceptable. RSA key exchange requires 2048-bit minimum key lengths, with ECDHE (Elliptic Curve Diffie-Hellman Ephemeral) preferred for forward secrecy. Weak or deprecated algorithms (RC4, 3DES, MD5, SHA-1 for signatures) are explicitly prohibited and blocked at the infrastructure layer.
-
-The encryption policy is enforced technically through AWS ALB security policies that restrict cipher suites to approved configurations. The TLS security policy (ELBSecurityPolicy-TLS13-1-2-2021-06 or equivalent) is applied across all load balancers, ensuring that clients cannot negotiate deprecated protocols or weak ciphers. Within the Kubernetes environment, the service mesh enforces cipher suite restrictions for internal mTLS connections, matching the external-facing standards. Regular SSL/TLS scans using automated tooling (SSL Labs API integration) validate that all public-facing endpoints conform to the encryption policy.
-
-Policy compliance is monitored through AWS Config rules that detect non-compliant TLS configurations on load balancers, CloudFront distributions, and API Gateway endpoints. Non-compliant resources trigger automated alerts to the infrastructure team for remediation within a 48-hour SLA. Quarterly encryption compliance reports are generated summarizing the state of transport encryption across all environments, including any exceptions and their business justifications.
+Alma maintains a transport encryption standard mandating AES-256-GCM (AES-128-GCM minimum), ECDHE for forward secrecy, and 2048-bit minimum RSA keys, with deprecated algorithms (RC4, 3DES, MD5, SHA-1) explicitly blocked. AWS ALB security policies and Kubernetes service mesh enforce approved cipher suites, validated by automated SSL Labs scans. AWS Config rules monitor TLS compliance across ALBs, CloudFront, and API Gateway with 48-hour remediation SLA and quarterly compliance reporting.
 
 ## Evidence of Implementation
 

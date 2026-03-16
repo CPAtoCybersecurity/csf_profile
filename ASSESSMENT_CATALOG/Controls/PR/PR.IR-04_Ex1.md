@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security relies primarily on Kubernetes auto-scaling as its capacity management mechanism for cloud-hosted production workloads. Horizontal Pod Autoscalers (HPAs) are configured to scale pod counts based on CPU and memory utilization thresholds, and AWS node auto-scaling adds worker nodes to the Kubernetes cluster when pod scheduling demand exceeds available capacity. This reactive auto-scaling provides effective real-time capacity management for incremental demand changes and predictable traffic patterns.
-
-However, Alma Security does not maintain a formal capacity planning process that projects future resource requirements based on business growth forecasts, product roadmap changes, or seasonal traffic patterns. Capacity decisions are made reactively — auto-scaling handles immediate demand, and the infrastructure team provisions additional baseline capacity when monitoring indicates sustained growth. There is no documented capacity model that correlates customer count growth (currently targeting 10,000 customers), feature deployment impact, or data volume growth with infrastructure resource requirements.
-
-For the Redwood City on-premises data center, capacity planning is even less formalized. Physical constraints — rack space, power capacity, cooling capacity, network port availability — require longer lead times than cloud resources and cannot be addressed through auto-scaling. The Windows Server 2012 R2 fileserver, scheduled for Q3 upgrade, represents a capacity constraint both in terms of the server's aging hardware limitations and the storage capacity available on the platform. Log storage capacity and retention policies should also be evaluated to ensure adequate capacity for audit and investigation needs per AU-04 requirements.
+Alma uses Kubernetes Horizontal Pod Autoscalers and AWS node auto-scaling to manage cloud capacity reactively based on CPU/memory thresholds. No formal capacity planning process exists to project future requirements from business growth, roadmap changes, or seasonal patterns. On-premises capacity at the Redwood City data center is not formally documented, and log storage capacity has not been assessed against retention requirements.
 
 ## Evidence of Implementation
 

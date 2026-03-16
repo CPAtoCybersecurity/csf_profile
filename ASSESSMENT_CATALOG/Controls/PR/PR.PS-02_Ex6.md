@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security relies on SentinelOne's endpoint detection and response (EDR) capabilities to identify unauthorized software on workstations and laptops. SentinelOne's application inventory feature provides visibility into installed applications, and the security team periodically reviews the inventory against the approved software catalog to identify unauthorized installations. When unauthorized software is identified, the IT helpdesk creates a ticket to contact the user, explain the policy violation, and arrange for removal.
-
-On server infrastructure, unauthorized software detection is handled through AWS Systems Manager Inventory, which collects installed package data and compares it against the hardened baseline's expected software list. Packages not in the approved list generate compliance findings that are reviewed during the weekly infrastructure team meeting. The Ansible baseline enforcement can remediate unauthorized packages during the next scheduled compliance run, but this is reactive rather than preventive.
-
-The unauthorized software removal process is primarily reactive and manual. There is no automated mechanism to immediately block or quarantine unauthorized software upon detection on endpoints. The reliance on periodic review cycles means unauthorized software can exist in the environment for days to weeks before detection. The SentinelOne application control feature provides real-time blocking capabilities on workstations, but enforcement policies are not yet configured to automatically block unrecognized applications --- they currently operate in detection mode for newly observed executables.
+Alma uses SentinelOne application inventory on endpoints and AWS Systems Manager Inventory on servers to detect unauthorized software, with periodic reviews against the approved catalog. Unauthorized installations are remediated via IT helpdesk tickets (endpoints) or Ansible baseline enforcement (servers). Detection and removal is reactive -- SentinelOne application control operates in detection-only mode for unrecognized executables, and no automated real-time blocking is configured.
 
 ## Evidence of Implementation
 

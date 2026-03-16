@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security mandates annual cybersecurity awareness refresher training for all employees as a baseline policy requirement, with the actual training cadence exceeding this minimum at quarterly intervals. The Information Security Policy specifies that every employee must complete at least one comprehensive security awareness refresher per calendar year, with Workday configured to automatically assign the annual refresher module and track compliance. Employees who do not complete the annual refresher within the designated window are flagged in Workday, and their managers receive automated escalation notifications.
-
-The quarterly training cadence effectively means Alma employees complete four awareness touchpoints per year, each covering different focus areas while reinforcing core principles. The Q1 module typically covers the annual refresher content, including updated policy acknowledgments, current threat landscape briefings, and review of any security incidents or near-misses from the prior year. Q2 through Q4 modules are shorter and more targeted, focusing on seasonal or emerging threats. This quarterly rhythm exceeds the annual refresher requirement and keeps security awareness top-of-mind throughout the year.
-
-The security team reviews annual completion rates at year-end and reports to the CISO. For 2025, the annual refresher completion rate was 94% across all employees, with the remaining 6% attributed to employees on extended leave who were enrolled upon return. The team is targeting 97% completion for 2026 by implementing earlier escalation triggers and working with HR to incorporate training compliance into performance review considerations.
+Alma mandates annual cybersecurity awareness refresher training per the Information Security Policy, with Workday auto-assigning modules and escalating non-completion to managers. The actual cadence exceeds this at quarterly intervals -- Q1 covers the comprehensive annual refresher while Q2-Q4 modules target seasonal and emerging threats. The 2025 annual completion rate was 94%, with a 97% target for 2026.
 
 ## Evidence of Implementation
 

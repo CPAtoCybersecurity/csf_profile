@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's approach to assessing specialized role competency is currently informal and operationally embedded rather than structured through dedicated testing mechanisms. The primary means of assessing D&R team capabilities is through incident response performance. Nadia Khan evaluates her team's effectiveness during real incidents and tabletop exercises, tracking metrics like mean time to detect (MTTD), mean time to respond (MTTR), and quality of incident documentation. These operational performance indicators serve as proxy assessments of whether the team possesses the required skills, but they are not structured as formal competency evaluations.
-
-For the vulnerability management team, Chris Magann and Tigan Wang are assessed indirectly through the quality and timeliness of their vulnerability scan analysis, patch prioritization accuracy, and remediation tracking. Chris Magann's GIAC certification provides external validation of specialized knowledge. However, there is no formal periodic testing mechanism such as role-specific quizzes, practical examinations, or scenario-based evaluations administered on a defined schedule.
-
-The security team conducted one tabletop exercise in Q4 2025 that tested D&R analysts' incident handling procedures and communication protocols. The exercise revealed gaps in escalation procedures for cloud-specific incidents (AWS) that were subsequently addressed through targeted training. This type of exercise-based assessment is valuable but occurs irregularly. The CISO has identified the need for a structured semi-annual assessment program for all specialized roles as part of the Q2-Q3 2026 training maturity improvement initiative.
+Alma assesses specialized role competency informally through operational performance metrics (MTTD, MTTR, remediation quality) and periodic tabletop exercises rather than structured testing. The D&R team and VM team are evaluated through incident response performance and vulnerability management output respectively. A structured semi-annual competency assessment program for all specialized roles is planned for Q2-Q3 2026.
 
 ## Evidence of Implementation
 

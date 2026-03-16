@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security enforces AES-256 encryption as the standard for all data at rest across its hybrid infrastructure. On the AWS side, all S3 buckets are configured with server-side encryption (SSE-KMS) using AWS Key Management Service with customer-managed keys. PostgreSQL databases running on AWS RDS utilize encryption at rest through the RDS encryption feature, which encrypts the underlying storage, automated backups, read replicas, and snapshots. The Data Encryption Upgrade project ($95K, currently in progress) is standardizing encryption configurations across all storage services and remediating any gaps identified during the initial audit.
-
-On-premises infrastructure, specifically the Windows Domain Controller environment, leverages BitLocker Drive Encryption for full-disk encryption on all server volumes. Kubernetes persistent volumes in the AWS multi-AZ deployment are encrypted using EBS encryption with KMS-managed keys. The S3 Bucket Security project ($70K) is hardening bucket-level encryption policies and deploying S3 Bucket Key to reduce KMS API costs while maintaining encryption coverage.
-
-Biometric data, classified as Alma's highest sensitivity data category, receives additional protection through application-level encryption before storage, ensuring double-layer encryption (application + infrastructure). Key rotation is configured on a 365-day cycle through AWS KMS, though the Data Encryption Upgrade project is evaluating reducing this to 90 days for keys protecting biometric data.
+Alma enforces AES-256 encryption for all data at rest via S3 SSE-KMS with customer-managed keys, RDS encryption for PostgreSQL databases, BitLocker on on-premises Windows DC servers, and EBS encryption for Kubernetes persistent volumes. Biometric data receives additional application-level encryption before storage. The Data Encryption Upgrade project ($95K) and S3 Bucket Security project ($70K) are standardizing encryption configurations and hardening bucket-level policies across remaining data stores.
 
 ## Evidence of Implementation
 

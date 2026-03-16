@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security conducts quarterly access recertification campaigns through ServiceNow. The IAM team generates access review tasks assigned to managers, who must review and certify (or revoke) the access entitlements for each direct report within a 2-week completion window. The campaign covers Active Directory group memberships, SSO application assignments, and AWS IAM role mappings. The Q4 2025 campaign, the most recently completed cycle, achieved a 95% completion rate across 280 user reviews.
-
-The recertification workflow operates in three phases. First, the IAM team extracts current entitlements from Active Directory and the SSO platform, generating a per-user access report. Second, managers receive their team's access reports in ServiceNow with approve/revoke options for each entitlement. Third, revocation decisions trigger automated deprovisioning tasks for the IT team. However, the remediation phase has proven to be the weakest link: the Q4 2025 campaign identified 43 entitlements requiring revocation, but only 31 (72%) were actually removed by the close of Q1 2026. The remaining 12 revocations are pending due to dependency concerns raised by application owners.
-
-Privileged access receives additional scrutiny through monthly reviews conducted by Gerry's security team. The monthly review covers Domain Admin membership, AWS production role assignments, and Kubernetes cluster-admin bindings. This dual-frequency approach (monthly for privileged, quarterly for standard) reflects the higher risk associated with administrative access. Third-party and contractor access is included in the quarterly campaign, with the additional requirement that contractor access expiration dates are validated against current contract terms.
+Alma Security conducts quarterly access recertification campaigns through ServiceNow, where managers review and certify or revoke entitlements for each direct report within a 2-week completion window covering Active Directory group memberships, SSO application assignments, and AWS IAM role mappings. The three-phase workflow extracts current entitlements, presents approve/revoke options to managers, and triggers automated deprovisioning tasks for approved revocations. Privileged access receives additional monthly reviews covering Domain Admin membership, AWS production role assignments, and Kubernetes cluster-admin bindings. Contractor access recertification includes validation of access expiration dates against current contract terms.
 
 ## Evidence of Implementation
 

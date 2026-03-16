@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's CI/CD pipeline is built on GitLab CI and deploys containerized applications to AWS EKS. The pipeline includes basic automated testing (unit tests, integration tests) but has limited security-specific testing integration. Container image scanning is performed by Amazon ECR's built-in scanning (powered by Amazon Inspector) on push to the registry, which identifies known CVEs in OS packages and application dependencies within the container image. Scan findings are visible in the ECR console and surfaced through AWS Security Hub.
-
-However, the pipeline does not include SAST tooling to analyze source code for security vulnerabilities during the build process. There is no DAST integration that tests the running application for vulnerabilities such as SQL injection, cross-site scripting, or authentication bypass. Dependency vulnerability scanning beyond container image scanning is not automated; developers are expected to monitor for dependency vulnerabilities manually using `npm audit` or equivalent tools, but this is not enforced or tracked.
-
-Critically, there are no security quality gates in the pipeline. Container images with known critical vulnerabilities can be deployed to production because ECR scanning results are advisory and do not block deployment. The pipeline does not enforce a minimum security threshold that must be met before code can proceed to production. This gap is directly related to the SQL Injection Mitigation project --- the application contains known SQL injection vulnerabilities that were identified through manual assessment rather than automated pipeline scanning.
+Alma's GitLab CI/CD pipeline includes unit/integration tests and Amazon ECR image scanning (Inspector) for container CVEs, with findings surfaced through Security Hub. No SAST, DAST, or automated dependency scanning is integrated into the pipeline. No security quality gates exist -- container images with known critical CVEs can deploy to production, and dependency scanning relies on manual developer execution of `npm audit`.
 
 ## Evidence of Implementation
 

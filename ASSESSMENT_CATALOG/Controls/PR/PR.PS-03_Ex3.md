@@ -10,11 +10,7 @@
 
 ## Alma Security Implementation
 
-Alma Security follows a defined lifecycle replacement policy for employee endpoints: laptops are replaced on a 4-year cycle managed through ServiceNow asset workflows. When a laptop reaches its 4-year anniversary, the IT helpdesk initiates a replacement ticket, procures the replacement device, migrates the user, and processes the retired device for secure disposal. Approximately 75 laptop replacements occur annually across the 300-person organization. The process is well-established for endpoints and runs smoothly with minimal disruption.
-
-For server and infrastructure hardware, replacement decisions are made on a case-by-case basis rather than through a standardized lifecycle policy. On-premises hardware replacement is driven primarily by hardware failures or capacity needs rather than proactive lifecycle planning. The organization's cloud-first strategy means new infrastructure is provisioned in AWS rather than on-premises, which reduces the physical hardware replacement burden. However, the remaining on-premises systems (Windows DC, legacy fileserver, network equipment) lack a formal replacement roadmap beyond the Windows 2012 R2 migration planned for Q3 2026.
-
-Secure disposal of retired hardware follows NIST SP 800-88 guidelines for media sanitization. Retired laptops undergo disk wiping using a certified erasure tool, and certificates of destruction are retained in the CMDB. Physical destruction of storage media is used for devices that cannot be reliably wiped. However, the disposal process documentation has not been updated since 2024, and there is no periodic audit of the disposal vendor's practices.
+Alma replaces employee laptops on a 4-year cycle managed through ServiceNow workflows (~75 replacements/year), with secure disposal following NIST SP 800-88 guidelines and certificates of destruction retained in the CMDB. Server and infrastructure hardware is replaced reactively rather than through a standardized lifecycle policy. Disposal documentation has not been updated since 2024, and on-premises systems beyond the Windows 2012 R2 fileserver lack a formal replacement roadmap.
 
 ## Evidence of Implementation
 
