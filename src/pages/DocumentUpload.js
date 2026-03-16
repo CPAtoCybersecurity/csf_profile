@@ -174,10 +174,12 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
           setDocumentAnalysis({ raw: response, error: 'Could not parse JSON response' });
         }
       } catch (e) {
-        setDocumentAnalysis({ raw: response, error: e.message });
+        console.error("Document analysis parse error:", e);
+        setDocumentAnalysis({ error: true });
       }
     } catch (error) {
-      setDocumentAnalysis({ error: error.message });
+      console.error("AI analysis failed:", error);
+      setDocumentAnalysis({ error: true });
     }
 
     setIsAnalyzing(false);
@@ -349,7 +351,9 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
               </div>
             ) : documentAnalysis.error && !documentAnalysis.findings ? (
               <div className="bg-red-50 rounded-lg p-4">
-                <p className="text-red-700 text-sm font-medium">Error: {documentAnalysis.error}</p>
+                <p className="text-red-700 text-sm font-medium">
+                  An error occurred while analyzing documents. Please try again.
+                </p>
                 {documentAnalysis.raw && (
                   <pre className="mt-2 text-xs whitespace-pre-wrap max-h-48 overflow-y-auto text-gray-600">
                     {documentAnalysis.raw}

@@ -15,6 +15,7 @@ import ArtifactSelector from '../components/ArtifactSelector';
 import FindingSelector from '../components/FindingSelector';
 import SortableHeader from '../components/SortableHeader';
 import ExportPasswordDialog from '../components/ExportPasswordDialog';
+import EmptyState from '../components/EmptyState';
 
 // Stores
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -248,13 +249,13 @@ const Assessments = () => {
     return getObservation(currentAssessmentId, selectedItemId);
   }, [currentAssessmentId, selectedItemId, getObservation, currentAssessment]);
 
-  // Helper functions
+  // Helper functions — returns semantic badge classes
   const getStatusColor = useCallback((status) => {
     switch (status) {
-      case 'Complete': return 'text-green-600 bg-green-100 dark:bg-green-600 dark:text-white';
-      case 'In Progress': return 'text-blue-600 bg-blue-100 dark:bg-blue-600 dark:text-white';
-      case 'Submitted': return 'text-orange-600 bg-orange-100 dark:bg-orange-600 dark:text-white';
-      default: return 'text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300';
+      case 'Complete': return 'badge badge-success';
+      case 'In Progress': return 'badge badge-info';
+      case 'Submitted': return 'badge badge-warning';
+      default: return 'badge badge-neutral';
     }
   }, []);
 
@@ -351,7 +352,8 @@ Format as a numbered list. Be specific and actionable.`;
         }
         procedures[itemId] = response;
       } catch (error) {
-        procedures[itemId] = `Error generating: ${error.message}`;
+        console.error('Test procedure generation error:', error);
+        procedures[itemId] = 'Failed to generate test procedures. Please try again.';
       }
     }
 
@@ -453,7 +455,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
         setEvidenceAnalysis({ raw: response, error: 'Could not parse JSON' });
       }
     } catch (error) {
-      setEvidenceAnalysis({ error: error.message });
+      console.error('Evidence analysis error:', error);
+      setEvidenceAnalysis({ error: 'Failed to analyze evidence. Please try again.' });
     }
 
     setIsAnalyzingEvidence(false);
@@ -606,7 +609,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       );
       toast.success(trimmed ? 'Assessment exported (encrypted)' : 'Assessment exported');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Assessment export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, [currentAssessmentId, exportAssessmentCSV]);
 
@@ -630,7 +634,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       const count = await importAssessmentsCSV(text, useUserStore);
       toast.success(`Imported ${count} assessment(s)`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Assessment import error:', err);
+      toast.error('Import failed. Please verify the file and try again.');
     }
 
     e.target.value = '';
@@ -653,7 +658,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       });
       toast.success(trimmed ? 'Assessments exported (encrypted)' : 'Assessments exported');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Assessment export error:', err);
+      toast.error('Export failed. Please verify the file and try again.');
     }
   }, [exportAllAssessmentsCSV]);
 
@@ -783,10 +789,14 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
       <div className="flex-1 overflow-auto p-4">
         {assessments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-gray-500">
-            <ClipboardList size={48} className="mb-4 opacity-50" />
-            <p className="text-lg">No assessments yet</p>
-            <p className="text-sm mt-2">Click "New Assessment" to create one or "Import" to import from CSV</p>
+          <div className="flex items-center justify-center h-full">
+            <EmptyState
+              icon={ClipboardList}
+              title="No assessments yet"
+              description="Create your first assessment to begin tracking your CSF posture."
+              actionLabel="Create Assessment"
+              onAction={() => setShowNewModal(true)}
+            />
           </div>
         ) : (
           <div className="grid gap-4">
@@ -849,22 +859,20 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   <div className="mt-3">
                     <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
                       <div
-                        className={`h-full transition-all duration-300 ${
-                          prog.percentage === 100 ? 'bg-green-500' :
-                          prog.percentage >= 75 ? 'bg-emerald-500' :
-                          prog.percentage >= 50 ? 'bg-blue-500' :
-                          prog.percentage >= 25 ? 'bg-amber-500' :
-                          'bg-red-400'
-                        }`}
+                        className={`h-full transition-all duration-300 ${prog.percentage === 100 ? 'bg-green-500' :
+                            prog.percentage >= 75 ? 'bg-emerald-500' :
+                              prog.percentage >= 50 ? 'bg-blue-500' :
+                                prog.percentage >= 25 ? 'bg-amber-500' :
+                                  'bg-red-400'
+                          }`}
                         style={{ width: `${prog.percentage}%` }}
                       />
                     </div>
                     <div className="flex justify-between items-center mt-1">
-                      <p className={`text-xs font-medium ${
-                        prog.percentage === 100 ? 'text-green-600 dark:text-green-400' :
-                        prog.percentage >= 50 ? 'text-blue-600 dark:text-blue-400' :
-                        'text-gray-500 dark:text-gray-400'
-                      }`}>
+                      <p className={`text-xs font-medium ${prog.percentage === 100 ? 'text-green-600 dark:text-green-400' :
+                          prog.percentage >= 50 ? 'text-blue-600 dark:text-blue-400' :
+                            'text-gray-500 dark:text-gray-400'
+                        }`}>
                         {prog.percentage}% complete
                       </p>
                       {prog.percentage === 100 && (
@@ -994,9 +1002,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 return (
                   <div
                     key={item.itemId}
-                    className={`p-3 flex items-center justify-between hover:bg-blue-50 cursor-pointer ${
-                      selectedItemId === item.itemId ? 'bg-blue-100' : ''
-                    }`}
+                    className={`p-3 flex items-center justify-between hover:bg-blue-50 cursor-pointer ${selectedItemId === item.itemId ? 'bg-blue-100' : ''
+                      }`}
                     onClick={() => handleSelectItem(item.itemId)}
                   >
                     <div className="flex-1">
@@ -1048,8 +1055,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             />
           </div>
           <div className="flex-1 overflow-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50 sticky top-0">
+            <table className="table-professional min-w-full">
+              <thead className="sticky top-0">
                 <tr>
                   <th className="w-8 p-2"></th>
                   <SortableHeader
@@ -1125,17 +1132,17 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     </div>
   );
 
-  // Get status badge style (Jira-style)
+  // Get status badge style (Jira-style) — returns semantic badge variant class
   const getJiraStatusStyle = (status) => {
     switch (status) {
       case 'Complete':
-        return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+        return 'badge-success';
       case 'In Progress':
-        return 'bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-white';
+        return 'badge-info';
       case 'Submitted':
-        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+        return 'badge-warning';
       default:
-        return 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300';
+        return 'badge-neutral';
     }
   };
 
@@ -1375,13 +1382,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           <button
                             key={q}
                             onClick={() => setSelectedQuarter(q)}
-                            className={`px-2 py-0.5 text-xs font-medium rounded transition-colors ${
-                              selectedQuarter === q
+                            className={`px-2 py-0.5 text-xs font-medium rounded transition-colors ${selectedQuarter === q
                                 ? 'bg-blue-600 dark:bg-blue-500 text-white'
                                 : hasData
-                                ? 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white'
-                                : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                            }`}
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white'
+                                  : 'bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                              }`}
                           >
                             {q}
                           </button>
@@ -1480,11 +1486,10 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   <button
                     key={q}
                     onClick={() => setSelectedQuarter(q)}
-                    className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${
-                      selectedQuarter === q
+                    className={`px-2.5 py-1 text-xs font-medium rounded transition-colors ${selectedQuarter === q
                         ? 'bg-white dark:bg-gray-600 text-blue-600 dark:text-blue-400 shadow-sm'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                      }`}
                   >
                     {q}
                   </button>
@@ -1559,11 +1564,10 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   <div className="w-28 flex-shrink-0 flex items-center">
                     {auditor ? (
                       <div className="flex items-center gap-1.5" title={auditor.name}>
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium ${
-                          ['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'][
-                            auditor.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 5
+                        <div className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-medium ${['bg-blue-500', 'bg-green-500', 'bg-purple-500', 'bg-pink-500', 'bg-indigo-500'][
+                          auditor.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) % 5
                           ]
-                        }`}>
+                          }`}>
                           {auditor.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                         </div>
                         <span className="text-sm text-gray-700 dark:text-gray-300 truncate">
@@ -1696,10 +1700,9 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 ].map((step, idx) => (
                   <React.Fragment key={step.num}>
                     <div className={`flex items-center gap-2 ${wizardStep === step.num ? 'text-blue-600' : wizardStep > step.num ? 'text-green-600' : 'text-gray-400'}`}>
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 ${
-                        wizardStep === step.num ? 'border-blue-600 bg-blue-50' :
-                        wizardStep > step.num ? 'border-green-600 bg-green-50' : 'border-gray-300'
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 ${wizardStep === step.num ? 'border-blue-600 bg-blue-50' :
+                          wizardStep > step.num ? 'border-green-600 bg-green-50' : 'border-gray-300'
+                        }`}>
                         {wizardStep > step.num ? <CheckCircle size={16} /> : step.num}
                       </div>
                       <span className="text-sm font-medium hidden sm:inline">{step.label}</span>
@@ -1841,9 +1844,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                             {wizardScopeItems.slice(0, 100).map(item => (
                               <label
                                 key={item.id}
-                                className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 ${
-                                  selectedScopeItems.has(item.id) ? 'bg-blue-50' : ''
-                                }`}
+                                className={`flex items-start gap-3 p-3 cursor-pointer hover:bg-gray-50 ${selectedScopeItems.has(item.id) ? 'bg-blue-50' : ''
+                                  }`}
                               >
                                 <input
                                   type="checkbox"

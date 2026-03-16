@@ -98,15 +98,19 @@ export function useCSFData() {
           toast.success('Data loaded successfully');
         },
         error: (parseError) => {
-          currentState.setError(`Error parsing CSV: ${parseError.message}`);
+          console.error('CSV parse error:', parseError);
+
+          currentState.setError('Failed to parse CSV file.');
           currentState.setLoading(false);
-          toast.error(`Error parsing CSV: ${parseError.message}`);
+          toast.error('Failed to parse CSV file.');
         }
       });
     } catch (err) {
-      useCSFStore.getState().setError(`Error loading file: ${err.message}`);
+      console.error('CSV file loading error:', err);
+
+      useCSFStore.getState().setError('Failed to load CSV file. Please try again.');
       useCSFStore.getState().setLoading(false);
-      toast.error(`Error loading file: ${err.message}`);
+      toast.error('Failed to load CSV file. Please try again.');
     }
   }, []); // Empty deps - uses store.getState() for current values
 
@@ -159,7 +163,8 @@ export function useCSFData() {
             toast.success('CSV imported successfully!');
           },
           error: (parseError) => {
-            toast.error(`Error parsing CSV: ${parseError.message}`);
+            console.error('CSV import parse error:', parseError);
+            toast.error('Failed to parse CSV file.');
           }
         });
       };
@@ -451,7 +456,7 @@ function exportDataAsCSV(data, users, filenamePrefix) {
   URL.revokeObjectURL(url);
 
   toast.success(`Exported ${data.length} items to CSV`);
-  
+
   // Track export for backup reminder system
   const { updateLastExportDate } = require('../utils/backupTracking');
   updateLastExportDate();

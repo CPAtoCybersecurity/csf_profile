@@ -224,7 +224,7 @@ const useAIStore = create(
                 description: control?.description || '',
                 function: controlId.split('.')[0],
                 severity: (q1.targetScore - q1.actualScore) >= 3 ? 'critical' :
-                         (q1.targetScore - q1.actualScore) >= 2 ? 'high' : 'medium'
+                  (q1.targetScore - q1.actualScore) >= 2 ? 'high' : 'medium'
               });
             }
           }
@@ -284,7 +284,7 @@ Be specific, actionable, and reference NIST publications where applicable.`;
           return result;
         } catch (error) {
           console.error('Analysis error:', error);
-          set({ analysisError: error.message, isAnalyzing: false });
+          set({ analysisError: 'Analysis failed. Please try again.', isAnalyzing: false });
           throw error;
         }
       },
@@ -342,7 +342,7 @@ Be specific and practical for GRC professionals.`;
         } catch (error) {
           console.error('Deep dive error:', error);
           set({
-            deepDiveContent: `Error generating guidance: ${error.message}`,
+            deepDiveContent: `Error generating guidance. Please try again.`,
             isLoadingDeepDive: false
           });
           throw error;

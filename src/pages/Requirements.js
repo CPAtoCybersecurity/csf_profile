@@ -250,7 +250,8 @@ const Requirements = () => {
       markFrameworkImported(frameworkId);
       toast.success(`Imported ${count} requirements for ${frameworkId}`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Requirements CSV import error:', err);
+      toast.error('Import failed. Please verify the CSV file and try again.');
     }
 
     e.target.value = '';
@@ -599,7 +600,7 @@ const Requirements = () => {
             />
           )
         ) : (
-          <table className="min-w-full bg-white dark:bg-gray-900 border-collapse" style={{ borderSpacing: 0 }}>
+          <table className="table-professional min-w-full bg-white dark:bg-gray-900" style={{ borderSpacing: 0 }}>
             <thead className="sticky top-0 z-10">
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
                 {/* Checkbox column */}
@@ -791,11 +792,10 @@ const Requirements = () => {
             <button
               onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
               disabled={currentPage === 1}
-              className={`px-3 py-1 rounded-md text-sm ${
-                currentPage === 1
+              className={`px-3 py-1 rounded-md text-sm ${currentPage === 1
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
+                }`}
             >
               Previous
             </button>
@@ -806,11 +806,10 @@ const Requirements = () => {
             <button
               onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
               disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded-md text-sm ${
-                currentPage === totalPages
+              className={`px-3 py-1 rounded-md text-sm ${currentPage === totalPages
                   ? 'bg-gray-100 dark:bg-gray-800 text-gray-400 cursor-not-allowed'
                   : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600'
-              }`}
+                }`}
             >
               Next
             </button>

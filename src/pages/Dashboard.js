@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ClipboardList } from 'lucide-react';
+import EmptyState from '../components/EmptyState';
 import {
   RadarChart,
   PolarGrid,
@@ -18,12 +19,16 @@ import {
   YAxis,
   CartesianGrid,
   ReferenceLine,
+  LineChart,
+  Line,
 } from 'recharts';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useUIStore from '../stores/uiStore';
+import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
+import KPICard from '../components/KPICard';
 import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
@@ -34,6 +39,16 @@ const formatScore = (value) => {
 
 // Define the order of functions for the pivot table
 const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'DETECT (DE)', 'RESPOND (RS)', 'RECOVER (RC)'];
+
+// Function weights for gap prioritization scoring
+const FUNCTION_WEIGHTS = {
+  'GOVERN (GV)': 1.2,
+  'IDENTIFY (ID)': 1.0,
+  'PROTECT (PR)': 1.1,
+  'DETECT (DE)': 1.1,
+  'RESPOND (RS)': 1.0,
+  'RECOVER (RC)': 0.9,
+};
 
 // Map function names to standard format
 const normalizeFunctionName = (func) => {
@@ -82,6 +97,7 @@ const Dashboard = () => {
   const getControl = useControlsStore((state) => state.getControl);
   const requirements = useRequirementsStore((state) => state.requirements);
   const darkMode = useUIStore((state) => state.darkMode);
+  const findings = useFindingsStore((state) => state.findings);
   const artifacts = useArtifactStore((state) => state.artifacts);
 
   // Build a lookup map from requirement/control ID to Function and Category
@@ -384,12 +400,176 @@ const Dashboard = () => {
     return statusChartData.reduce((sum, item) => sum + item.value, 0);
   }, [statusChartData]);
 
+  // Calculate top 10 priority gaps for the selected quarter
+  const priorityGaps = useMemo(() => {
+    if (!filteredData || filteredData.length === 0) return [];
+
+    const itemsToUse = filterInScope !== '' ? filteredData : filteredData.filter(item => item['In Scope? '] === 'Yes');
+    const quarterKey = `Q${selectedQuarter}`;
+
+    const gaps = itemsToUse
+      .map(item => {
+        const quarterData = (item.quarters || {})[quarterKey];
+        if (!quarterData) return null;
+        const actual = quarterData.actualScore ?? 0;
+        const target = quarterData.targetScore ?? 0;
+        const gap = target - actual;
+        if (gap <= 0) return null;
+        const weight = FUNCTION_WEIGHTS[item.Function] ?? 1.0;
+        const priorityScore = +(gap * weight).toFixed(2);
+        return {
+          itemId: item.ID || '',
+          function: item.Function || 'Unknown',
+          actual: +actual.toFixed(1),
+          target: +target.toFixed(1),
+          gap: +gap.toFixed(1),
+          priorityScore,
+        };
+      })
+      .filter(Boolean)
+      .sort((a, b) => b.priorityScore - a.priorityScore)
+      .slice(0, 10);
+
+    return gaps;
+  }, [filteredData, filterInScope, selectedQuarter]);
+
+  // Colors for each CSF function in the trend line chart
+  const FUNCTION_LINE_COLORS = {
+    'GOVERN (GV)': '#8b5cf6',
+    'IDENTIFY (ID)': '#3b82f6',
+    'PROTECT (PR)': '#10b981',
+    'DETECT (DE)': '#f59e0b',
+    'RESPOND (RS)': '#ef4444',
+    'RECOVER (RC)': '#6366f1',
+  };
+
+  // Calculate quarterly trend data: average actualScore per function per quarter
+  const trendChartData = useMemo(() => {
+    if (dashboardData.length === 0) return [];
+
+    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+
+    // Build a map: { Q1: { 'GOVERN (GV)': [scores...], ... }, Q2: {...}, ... }
+    const quarterFunctionScores = {};
+    quarters.forEach(q => {
+      quarterFunctionScores[q] = {};
+      FUNCTION_ORDER.forEach(fn => {
+        quarterFunctionScores[q][fn] = [];
+      });
+    });
+
+    dashboardData.forEach(item => {
+      const fn = item.function;
+      if (!FUNCTION_ORDER.includes(fn)) return;
+      quarters.forEach(q => {
+        const score = item.quarters[q]?.actualScore;
+        if (score !== undefined) {
+          quarterFunctionScores[q][fn].push(score);
+        }
+      });
+    });
+
+    // Build Recharts data rows, skipping quarters where ALL functions have 0 scores
+    const rows = quarters.map(q => {
+      const row = { quarter: q };
+      let allZero = true;
+      FUNCTION_ORDER.forEach(fn => {
+        const scores = quarterFunctionScores[q][fn];
+        if (scores.length > 0) {
+          const avg = +(scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(2);
+          row[fn] = avg;
+          if (avg !== 0) allZero = false;
+        }
+      });
+      row._allZero = allZero;
+      return row;
+    });
+
+    // Filter out quarters where all scores are 0
+    return rows
+      .filter(row => !row._allZero)
+      .map(({ _allZero, ...rest }) => rest);
+  }, [dashboardData]);
+
+  // ── KPI Cards ──────────────────────────────────────────────────────────────
+  const kpiData = useMemo(() => {
+    const quarterKey = `Q${selectedQuarter}`;
+    const prevQuarterKey = selectedQuarter > 1 ? `Q${selectedQuarter - 1}` : null;
+
+    if (!selectedAssessment || dashboardData.length === 0) {
+      return {
+        overallScore: { value: '--', trend: null },
+        inScopeItems: { value: '--', trend: null },
+        evidenceCoverage: { value: '--', trend: null },
+        openFindings: { value: '--', trend: null },
+      };
+    }
+
+    // 1. Overall Score — average actualScore for selected quarter
+    const scoresThisQ = dashboardData
+      .map(item => item.quarters[quarterKey]?.actualScore)
+      .filter(s => s !== undefined && s !== null && s > 0);
+
+    const overallScore = scoresThisQ.length > 0
+      ? (scoresThisQ.reduce((a, b) => a + b, 0) / scoresThisQ.length).toFixed(1)
+      : '--';
+
+    let overallTrend = null;
+    if (prevQuarterKey) {
+      const scoresPrevQ = dashboardData
+        .map(item => item.quarters[prevQuarterKey]?.actualScore)
+        .filter(s => s !== undefined && s !== null && s > 0);
+      if (scoresPrevQ.length > 0 && scoresThisQ.length > 0) {
+        const prevAvg = scoresPrevQ.reduce((a, b) => a + b, 0) / scoresPrevQ.length;
+        const delta = (parseFloat(overallScore) - prevAvg).toFixed(1);
+        overallTrend = {
+          value: delta >= 0 ? `+${delta}` : `${delta}`,
+          direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral',
+        };
+      }
+    }
+
+    // 2. In-Scope Items — count of scopeIds
+    const inScopeCount = selectedAssessment.scopeIds?.length || 0;
+
+    // 3. Evidence Coverage — % of in-scope items with at least one artifact
+    const controlsWithArtifacts = new Set(
+      artifacts
+        .filter(a => a.controlId)
+        .map(a => a.controlId)
+    );
+    const scopeIds = selectedAssessment.scopeIds || [];
+    const coveredCount = scopeIds.filter(id => controlsWithArtifacts.has(id)).length;
+    const evidencePct = inScopeCount > 0
+      ? `${Math.round((coveredCount / inScopeCount) * 100)}%`
+      : '--';
+
+    // 4. Open Findings — status !== 'Resolved'
+    const openCount = findings.filter(f => f.status !== 'Resolved').length;
+
+    return {
+      overallScore: { value: overallScore, trend: overallTrend },
+      inScopeItems: { value: inScopeCount, trend: null },
+      evidenceCoverage: {
+        value: evidencePct,
+        subtitle: inScopeCount > 0 ? `${coveredCount} of ${inScopeCount} items` : null,
+        trend: null,
+      },
+      openFindings: { value: openCount, trend: null },
+    };
+  }, [selectedAssessment, dashboardData, selectedQuarter, artifacts, findings]);
+  // ── End KPI Cards ──────────────────────────────────────────────────────────
+
   if (assessments.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center h-64">
-        <ClipboardList size={48} className="mb-4 opacity-50 text-gray-400" />
-        <div className="text-xl font-semibold text-gray-600">No assessments available</div>
-        <p className="text-gray-500 mt-2">Create an assessment in the Assessments tab to see dashboard data</p>
+      <div className="p-4 bg-white dark:bg-gray-900 min-h-full flex items-center justify-center">
+        <EmptyState
+          icon={ClipboardList}
+          title="No assessment data yet"
+          description="Create your first assessment to see dashboard analytics."
+          actionLabel="Go to Assessments"
+          actionLink="/assessments"
+        />
       </div>
     );
   }
@@ -455,10 +635,42 @@ const Dashboard = () => {
         </div>
       ) : (
         <>
+          {/* KPI Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <KPICard
+              title="Overall Score"
+              value={kpiData.overallScore.value}
+              subtitle="Avg actual score this quarter"
+              trend={kpiData.overallScore.trend}
+              darkMode={darkMode}
+            />
+            <KPICard
+              title="In-Scope Items"
+              value={kpiData.inScopeItems.value}
+              subtitle="Controls / requirements in scope"
+              trend={kpiData.inScopeItems.trend}
+              darkMode={darkMode}
+            />
+            <KPICard
+              title="Evidence Coverage"
+              value={kpiData.evidenceCoverage.value}
+              subtitle={kpiData.evidenceCoverage.subtitle || 'Items with linked artifacts'}
+              trend={kpiData.evidenceCoverage.trend}
+              darkMode={darkMode}
+            />
+            <KPICard
+              title="Open Findings"
+              value={kpiData.openFindings.value}
+              subtitle="Findings not yet resolved"
+              trend={kpiData.openFindings.trend}
+              darkMode={darkMode}
+            />
+          </div>
+
           {/* Pivot Table and Bar Chart Side by Side */}
           <div className="flex gap-4 mb-6">
             {/* Pivot Table: Score by Function by Quarter */}
-            <div className="bg-white p-3 rounded-lg shadow-sm border flex-shrink-0">
+            <div className="card flex-shrink-0" style={{padding: '0.75rem'}}>
               <h2 className="text-base font-semibold mb-3">Function Scores by Quarter</h2>
             <div className="overflow-auto">
               <table className="min-w-full border-collapse">
@@ -616,7 +828,7 @@ const Dashboard = () => {
             </div>
 
             {/* Function Bar Chart */}
-            <div className="bg-white p-3 rounded-lg shadow-sm border flex-1">
+            <div className="card flex-1" style={{padding: '0.75rem'}}>
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-base font-semibold">Function Actual vs Target (Q{selectedQuarter})</h2>
               </div>
@@ -700,7 +912,7 @@ const Dashboard = () => {
           </div>
 
           {/* Subcategory Assessment Section */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border">
+          <div className="card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">CSF Subcategories (Q{selectedQuarter})</h2>
             </div>
@@ -835,7 +1047,7 @@ const Dashboard = () => {
           </div>
 
           {/* Assessment Status Pie Chart */}
-          <div className="bg-white p-4 rounded-lg shadow-sm border mt-6">
+          <div className="card mt-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold">Assessment Status (Q{selectedQuarter})</h2>
             </div>
@@ -927,8 +1139,146 @@ const Dashboard = () => {
               </div>
             </div>
           </div>
+
+          {/* Quarterly Trend Line Chart */}
+          <div className="card mt-6">
+            <h2 className="text-lg font-semibold mb-4">Score Trends by Quarter</h2>
+            {trendChartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart
+                  data={trendChartData}
+                  margin={{ top: 10, right: 30, left: 10, bottom: 10 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+                  <XAxis
+                    dataKey="quarter"
+                    tick={{ fontSize: 12, fill: chartColors.text }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    domain={[0, 7]}
+                    tick={{ fontSize: 11, fill: chartColors.text }}
+                    tickLine={false}
+                    axisLine={false}
+                    width={30}
+                  />
+                  <Tooltip
+                    formatter={(value, name) => [Number(value).toFixed(2), name]}
+                    contentStyle={{
+                      backgroundColor: chartColors.background,
+                      border: `1px solid ${chartColors.border}`,
+                      borderRadius: 6,
+                      fontSize: 12,
+                      color: chartColors.text,
+                    }}
+                  />
+                  <Legend
+                    wrapperStyle={{ paddingTop: 20 }}
+                    formatter={(value) => (
+                      <span style={{ color: chartColors.text, fontSize: 12 }}>{value}</span>
+                    )}
+                  />
+                  {FUNCTION_ORDER.map(fn => (
+                    <Line
+                      key={fn}
+                      type="monotone"
+                      dataKey={fn}
+                      stroke={FUNCTION_LINE_COLORS[fn]}
+                      strokeWidth={2}
+                      dot={true}
+                      activeDot={{ r: 5 }}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
+                No quarterly score data available to display trends.
+              </div>
+            )}
+          </div>
         </>
       )}
+
+      {/* Gap Prioritization Matrix */}
+      <div className={`card mt-6 p-4 rounded-lg shadow-sm border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className={`text-lg font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+            Priority Gaps (Q{selectedQuarter})
+          </h2>
+        </div>
+        {priorityGaps.length === 0 ? (
+          <p className={`text-sm text-center py-6 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            No gaps detected — all scores meet or exceed targets.
+          </p>
+        ) : (
+          <table className="w-full text-sm">
+            <thead>
+              <tr className={`text-xs uppercase border-b ${darkMode ? 'text-gray-400 border-gray-600' : 'text-gray-500 border-gray-200'}`}>
+                <th className="text-left py-2 px-3">Rank</th>
+                <th className="text-left py-2 px-3">ID</th>
+                <th className="text-left py-2 px-3">Function</th>
+                <th className="text-right py-2 px-3">Actual</th>
+                <th className="text-right py-2 px-3">Target</th>
+                <th className="text-right py-2 px-3">Gap</th>
+                <th className="text-right py-2 px-3">Priority Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {priorityGaps.map((row, index) => {
+                let scoreClass;
+                if (row.priorityScore >= 3.0) {
+                  scoreClass = darkMode
+                    ? 'text-red-400 bg-red-900/30'
+                    : 'text-red-600 bg-red-50';
+                } else if (row.priorityScore >= 2.0) {
+                  scoreClass = darkMode
+                    ? 'text-orange-400 bg-orange-900/30'
+                    : 'text-orange-600 bg-orange-50';
+                } else if (row.priorityScore >= 1.0) {
+                  scoreClass = darkMode
+                    ? 'text-yellow-400 bg-yellow-900/30'
+                    : 'text-yellow-600 bg-yellow-50';
+                } else {
+                  scoreClass = darkMode
+                    ? 'text-green-400 bg-green-900/30'
+                    : 'text-green-600 bg-green-50';
+                }
+                return (
+                  <tr
+                    key={`${row.itemId}-${index}`}
+                    className={`border-b ${darkMode ? 'border-gray-700 hover:bg-gray-700/50' : 'border-gray-100 hover:bg-gray-50'}`}
+                  >
+                    <td className={`py-2 px-3 font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {index + 1}
+                    </td>
+                    <td className={`py-2 px-3 font-mono text-xs ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                      {row.itemId}
+                    </td>
+                    <td className={`py-2 px-3 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      {row.function}
+                    </td>
+                    <td className={`py-2 px-3 text-right font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                      {formatScore(row.actual)}
+                    </td>
+                    <td className={`py-2 px-3 text-right ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {formatScore(row.target)}
+                    </td>
+                    <td className={`py-2 px-3 text-right font-semibold text-red-500 dark:text-red-400`}>
+                      {formatScore(row.gap)}
+                    </td>
+                    <td className="py-2 px-3 text-right">
+                      <span className={`inline-block px-2 py-0.5 rounded font-semibold text-xs ${scoreClass}`}>
+                        {row.priorityScore.toFixed(2)}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };

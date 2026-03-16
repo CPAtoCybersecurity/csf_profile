@@ -7,6 +7,7 @@ import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useSort from '../hooks/useSort';
+import EmptyState from '../components/EmptyState';
 
 const Findings = () => {
   const navigate = useNavigate();
@@ -144,7 +145,8 @@ const Findings = () => {
       const count = await importFindingsCSV(text, useUserStore);
       toast.success(`Imported ${count} findings`);
     } catch (err) {
-      toast.error(`Import failed: ${err.message}`);
+      console.error('Findings CSV import error:', err);
+      toast.error('Import failed. Please verify the CSV file and try again.');
     }
 
     event.target.value = '';
@@ -156,7 +158,8 @@ const Findings = () => {
       exportFindingsCSV(useUserStore);
       toast.success('Findings exported to CSV');
     } catch (err) {
-      toast.error(`Export failed: ${err.message}`);
+      console.error('Findings CSV export error:', err);
+      toast.error('Export failed. Please try again.');
     }
   }, [exportFindingsCSV]);
 
@@ -247,31 +250,31 @@ const Findings = () => {
     setFormData({ ...finding });
   };
 
-  // Get status badge style - using colors that work in both light and dark mode
+  // Get status badge style — returns semantic badge variant class
   const getStatusStyle = (status) => {
     switch (status) {
       case 'Resolved':
-        return 'bg-green-600 text-white';
+        return 'badge-success';
       case 'In Progress':
-        return 'bg-blue-600 text-white';
+        return 'badge-info';
       case 'Not Started':
       default:
-        return 'bg-gray-500 text-white';
+        return 'badge-neutral';
     }
   };
 
-  // Get priority badge style - using colors that work in both light and dark mode
+  // Get priority badge style — returns semantic badge variant class
   const getPriorityStyle = (priority) => {
     switch (priority) {
       case 'Critical':
-        return 'bg-red-600 text-white';
+        return 'badge-danger';
       case 'High':
-        return 'bg-orange-500 text-white';
+        return 'badge-warning';
       case 'Medium':
-        return 'bg-yellow-500 text-gray-900';
+        return 'badge-warning';
       case 'Low':
       default:
-        return 'bg-gray-400 text-gray-900 dark:bg-gray-500 dark:text-white';
+        return 'badge-neutral';
     }
   };
 
@@ -374,9 +377,8 @@ const Findings = () => {
                 return (
                   <div
                     key={finding.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${
-                      selectedFinding?.id === finding.id ? 'bg-amber-50 dark:bg-amber-900/30' : ''
-                    } ${overdue ? 'border-l-4 border-l-red-500' : ''}`}
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${selectedFinding?.id === finding.id ? 'bg-amber-50 dark:bg-amber-900/30' : ''
+                      } ${overdue ? 'border-l-4 border-l-red-500' : ''}`}
                     onClick={() => handleViewDetails(finding)}
                   >
                     {/* Checkbox */}
@@ -449,11 +451,17 @@ const Findings = () => {
                 );
               })
             ) : (
-              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-                <AlertTriangle size={48} className="mx-auto mb-4 text-gray-300 dark:text-gray-600" />
-                <p>No findings found.</p>
-                <p className="text-sm mt-1">Click "Create" to add a new finding or import from CSV.</p>
-              </div>
+              <EmptyState
+                icon={AlertTriangle}
+                title="No findings recorded"
+                description="Record findings as you discover gaps in your assessment."
+                actionLabel="Record a Finding"
+                onAction={() => {
+                  resetForm();
+                  setSelectedFinding(null);
+                  setEditMode(true);
+                }}
+              />
             )}
           </div>
         </div>
@@ -484,9 +492,8 @@ const Findings = () => {
                 cursor: 'col-resize',
                 zIndex: 10
               }}
-              className={`transition-colors ${
-                isResizing ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
-              }`}
+              className={`transition-colors ${isResizing ? 'bg-blue-500' : 'bg-gray-300 hover:bg-blue-400 dark:bg-gray-500 dark:hover:bg-blue-500'
+                }`}
               title="Drag to resize"
             />
 

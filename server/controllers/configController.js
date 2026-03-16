@@ -151,14 +151,13 @@ export const testConnection = async (req, res) => {
       const errorText = await response.text();
       res.status(response.status).json({
         success: false,
-        error: `Connection failed: ${response.status} ${response.statusText}`,
-        details: errorText.substring(0, 200)
+        error: "Connection failed. Please verify credentials and permissions."
       });
     }
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: `Connection error: ${error.message}`
+      error: "Connection error. Please try again."
     });
   }
 };
