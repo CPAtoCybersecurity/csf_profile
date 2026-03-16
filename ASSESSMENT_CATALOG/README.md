@@ -6,14 +6,14 @@ Comprehensive NIST CSF 2.0 assessment reference materials for the **Alma Securit
 
 ```
 Assessment_Catalog/
-├── Case_Study/          Alma Security business context, financials, and master data
-├── Test_Procedures/     How to assess each subcategory (1 file per subcategory)
+├── 1_Case_Study/          Alma Security business context, financials, and master data
+├── 3_Test_Procedures/     How to assess each subcategory (1 file per subcategory)
 │   └── {GV,ID,PR,DE,RS,RC}/
-├── Controls/            Control implementation descriptions (1 file per implementation example)
+├── 2_Controls/            Control implementation descriptions (1 file per implementation example)
 │   └── {GV,ID,PR,DE,RS,RC}/
-├── Observations/        Assessment findings per subcategory per quarter
+├── 4_Observations/        Assessment findings per subcategory per quarter
 │   └── {GV,ID,PR,DE,RS,RC}/
-└── Artifacts/           Evidence documents organized by type
+└── 5_Artifacts/           Evidence documents organized by type
     ├── Policies/        POL-  Governance and policy documents
     ├── Procedures/      PROC- Operational procedures
     ├── Reports/         RPT-  Scan results, compliance reports
@@ -49,7 +49,7 @@ CSF IDs use **official NIST dot notation** (e.g., `PR.AA-01`, not `PR-AA-01`).
 
 1. Pick a subcategory that needs coverage (check the function subdirectory for gaps)
 2. Use the template in the relevant README (each content type has its own)
-3. Ground all content in the [Alma Security case study](Case_Study/)
+3. Ground all content in the [Alma Security case study](1_Case_Study/)
 4. Reference NIST SP 800-53 Rev 5 and SP 800-171 mappings where applicable
 5. Submit a PR with your additions
 
