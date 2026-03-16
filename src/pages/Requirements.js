@@ -35,8 +35,6 @@ const Requirements = () => {
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
   const updateRequirement = useRequirementsStore((state) => state.updateRequirement);
 
-  const frameworks = useFrameworksStore((state) => state.frameworks);
-  const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
   const markFrameworkImported = useFrameworksStore((state) => state.markFrameworkImported);
 
   // Controls, artifacts, and findings for the detail panel and table display
@@ -105,7 +103,6 @@ const Requirements = () => {
   // Local state
   const [selectedRequirement, setSelectedRequirement] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterFramework, setFilterFramework] = useState('');
   const [filterFunction, setFilterFunction] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,12 +112,10 @@ const Requirements = () => {
   const [showCheckboxes, setShowCheckboxes] = useState(true);
 
   // Dropdown states
-  const [frameworkDropdownOpen, setFrameworkDropdownOpen] = useState(false);
   const [functionDropdownOpen, setFunctionDropdownOpen] = useState(false);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
 
   // Refs for dropdowns
-  const frameworkTriggerRef = useRef(null);
   const functionTriggerRef = useRef(null);
   const categoryTriggerRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -133,26 +128,17 @@ const Requirements = () => {
   }, [requirements.length, loadInitialData]);
 
   // Get unique values for filters
-  const enabledFrameworks = useMemo(() => getEnabledFrameworks(), [frameworks]);
-
   const functions = useMemo(() => {
-    let reqs = requirements;
-    if (filterFramework) {
-      reqs = reqs.filter(r => r.frameworkId === filterFramework);
-    }
-    return [...new Set(reqs.map(r => r.function))].filter(Boolean).sort();
-  }, [requirements, filterFramework]);
+    return [...new Set(requirements.map(r => r.function))].filter(Boolean).sort();
+  }, [requirements]);
 
   const categories = useMemo(() => {
     let reqs = requirements;
-    if (filterFramework) {
-      reqs = reqs.filter(r => r.frameworkId === filterFramework);
-    }
     if (filterFunction) {
       reqs = reqs.filter(r => r.function === filterFunction);
     }
     return [...new Set(reqs.map(r => r.category))].filter(Boolean).sort();
-  }, [requirements, filterFramework, filterFunction]);
+  }, [requirements, filterFunction]);
 
   // Filter and sort data
   const filteredData = useMemo(() => {
@@ -172,10 +158,6 @@ const Requirements = () => {
       );
     }
 
-    if (filterFramework) {
-      result = result.filter(r => r.frameworkId === filterFramework);
-    }
-
     if (filterFunction) {
       result = result.filter(r => r.function === filterFunction);
     }
@@ -192,7 +174,7 @@ const Requirements = () => {
     });
 
     return result;
-  }, [requirements, searchTerm, filterFramework, filterFunction, filterCategory, sort]);
+  }, [requirements, searchTerm, filterFunction, filterCategory, sort]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -204,7 +186,7 @@ const Requirements = () => {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterFramework, filterFunction, filterCategory]);
+  }, [searchTerm, filterFunction, filterCategory]);
 
   // Selection state
   const allCurrentItemsSelected = currentItems.length > 0 && currentItems.every(item => selectedItemIds.includes(item.id));
@@ -258,9 +240,9 @@ const Requirements = () => {
   }, [importRequirementsCSV, markFrameworkImported]);
 
   const handleExport = useCallback(() => {
-    exportRequirementsCSV(filterFramework || null);
+    exportRequirementsCSV(null);
     toast.success('Requirements exported');
-  }, [exportRequirementsCSV, filterFramework]);
+  }, [exportRequirementsCSV]);
 
   const handleSaveRequirement = useCallback((updatedRequirement) => {
     updateRequirement(updatedRequirement.id, { inScope: updatedRequirement.inScope });
@@ -270,18 +252,12 @@ const Requirements = () => {
 
   const handleClearFilters = useCallback(() => {
     setSearchTerm('');
-    setFilterFramework('');
     setFilterFunction('');
     setFilterCategory('');
   }, []);
 
   const handleRemoveFilter = useCallback((filterKey) => {
     switch (filterKey) {
-      case 'framework':
-        setFilterFramework('');
-        setFilterFunction('');
-        setFilterCategory('');
-        break;
       case 'function':
         setFilterFunction('');
         setFilterCategory('');
@@ -297,16 +273,6 @@ const Requirements = () => {
   // Active filters for chips
   const activeFilters = useMemo(() => {
     const filters = [];
-    if (filterFramework) {
-      const fw = enabledFrameworks.find(f => f.id === filterFramework);
-      filters.push({
-        key: 'framework',
-        label: 'Framework',
-        value: filterFramework,
-        displayValue: fw?.shortName || filterFramework,
-        color: 'blue'
-      });
-    }
     if (filterFunction) {
       filters.push({
         key: 'function',
@@ -326,7 +292,7 @@ const Requirements = () => {
       });
     }
     return filters;
-  }, [filterFramework, filterFunction, filterCategory, enabledFrameworks]);
+  }, [filterFunction, filterCategory]);
 
   // Loading state
   if (loading) {
@@ -350,7 +316,7 @@ const Requirements = () => {
   return (
     <div className="flex flex-col h-full">
       {/* Toolbar */}
-      <div className="bg-gray-100 dark:bg-gray-800 p-3 flex flex-wrap items-center gap-3 border-b border-gray-200 dark:border-gray-700 relative z-50">
+      <div className="bg-gray-100 dark:bg-gray-800 p-3 flex flex-wrap items-center gap-4 border-b border-gray-200 dark:border-gray-700 relative z-50">
         {/* Search */}
         <div className="relative w-40">
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
@@ -365,62 +331,8 @@ const Requirements = () => {
           />
         </div>
 
-        {/* Framework filter */}
-        <div className="w-40">
-          <div
-            ref={frameworkTriggerRef}
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex items-center justify-between text-sm"
-            onClick={() => setFrameworkDropdownOpen(!frameworkDropdownOpen)}
-          >
-            <span className="truncate">
-              {filterFramework
-                ? enabledFrameworks.find(f => f.id === filterFramework)?.shortName || filterFramework
-                : 'All Frameworks'}
-            </span>
-            <Filter size={14} className="text-gray-400 flex-shrink-0" />
-          </div>
-          <DropdownPortal
-            isOpen={frameworkDropdownOpen}
-            onClose={() => setFrameworkDropdownOpen(false)}
-            triggerRef={frameworkTriggerRef}
-            className="max-h-60 overflow-auto"
-          >
-            <div className="p-2">
-              <label className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
-                <input
-                  type="radio"
-                  className="mr-2"
-                  checked={filterFramework === ''}
-                  onChange={() => {
-                    setFilterFramework('');
-                    setFrameworkDropdownOpen(false);
-                  }}
-                />
-                <span>All Frameworks</span>
-              </label>
-              {enabledFrameworks.map((fw) => (
-                <label key={fw.id} className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded cursor-pointer text-sm">
-                  <input
-                    type="radio"
-                    className="mr-2"
-                    checked={filterFramework === fw.id}
-                    onChange={() => {
-                      setFilterFramework(fw.id);
-                      setFilterFunction('');
-                      setFilterCategory('');
-                      setFrameworkDropdownOpen(false);
-                    }}
-                  />
-                  <FrameworkBadge frameworkId={fw.id} />
-                  <span className="ml-2">{fw.name}</span>
-                </label>
-              ))}
-            </div>
-          </DropdownPortal>
-        </div>
-
         {/* CSF Function filter */}
-        <div className="w-40">
+        <div className="w-40 ml-2">
           <div
             ref={functionTriggerRef}
             className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex items-center justify-between text-sm"
@@ -469,7 +381,7 @@ const Requirements = () => {
         </div>
 
         {/* Category filter */}
-        <div className="w-40">
+        <div className="w-40 ml-2">
           <div
             ref={categoryTriggerRef}
             className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 cursor-pointer flex items-center justify-between text-sm"
