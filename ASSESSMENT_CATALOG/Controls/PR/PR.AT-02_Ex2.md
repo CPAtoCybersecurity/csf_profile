@@ -12,27 +12,8 @@
 
 Alma provides role-based training to specialized personnel including SentinelOne EDR training for D&R analysts, vendor and conference-based training for the VM team, and Palo Alto/AWS training for network administrators. Training is tracked informally at the team level via spreadsheets rather than centralized in Workday. A formalized role-based training catalog managed through Workday is planned for Q2-Q3 2026.
 
-## Evidence of Implementation
+## Artifacts
 
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| SentinelOne vendor training completion records for D&R team | Nadia Khan / Vendor portal | 2026-03-05 |
-| Incident response tabletop exercise records | Security team documentation | 2026-02-15 |
-| VM team vendor training and conference attendance records | Chris Magann / Expense reports | 2026-03-01 |
-| GIAC certification records (Chris Magann) | GIAC portal | 2026-01-20 |
-| Palo Alto firewall training records for network admin | Training vendor records | 2026-02-10 |
-| Developer security lunch-and-learn attendance | Security team records | 2026-03-08 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 3 | 5 | Gap |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| Specialized training is tracked outside Workday in team-level spreadsheets | High — no centralized visibility into who has completed what; audit trail is fragmented | Migrate all specialized training tracking into Workday Learning with role-based curricula | Security Team + HR | Q3 2026 |
-| No formal training curriculum for VM team mapped to their tools and responsibilities | Medium — training is ad-hoc and dependent on individual motivation | Develop VM-specific training plan covering scanning tools, CVSS scoring, AWS security, and patch management | Chris Magann + CISO | Q2 2026 |
-| Developer security training is optional and unstructured | Medium — developers with production access or security-adjacent code lack mandatory skill-building | Establish mandatory developer security training track (OWASP Top 10, secure coding, dependency scanning) | Security Team + Engineering Lead | Q3 2026 |
+- [Training Completion Evidence Q1](../../Artifacts/Evidence/EVD-training-completion-q1.md)
+- [Phishing Simulation Report Q1](../../Artifacts/Reports/RPT-phishing-simulation-q1.md)
+- [Acceptable Use Policy](../../Artifacts/Policies/POL-acceptable-use.md)

@@ -12,26 +12,8 @@
 
 Alma uses SentinelOne application inventory on endpoints and AWS Systems Manager Inventory on servers to detect unauthorized software, with periodic reviews against the approved catalog. Unauthorized installations are remediated via IT helpdesk tickets (endpoints) or Ansible baseline enforcement (servers). Detection and removal is reactive -- SentinelOne application control operates in detection-only mode for unrecognized executables, and no automated real-time blocking is configured.
 
-## Evidence of Implementation
+## Artifacts
 
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| SentinelOne application inventory report | SentinelOne Console | 2026-03-14 |
-| Unauthorized software removal tickets (sample) | ServiceNow / IT helpdesk | 2026-03-10 |
-| AWS Systems Manager Inventory compliance findings | AWS Console | 2026-03-14 |
-| Ansible baseline enforcement logs showing package remediation | Ansible Tower / AWX | 2026-03-10 |
-| SentinelOne application control policy configuration | SentinelOne Console | 2026-03-14 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 3 | 5 | At Risk |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| No automated real-time blocking of unauthorized software on endpoints | Medium --- unauthorized software can persist for days before detection and removal | Transition SentinelOne application control from detection to enforcement mode for new executables | Chris Magann | Q2 2026 |
-| Server-side unauthorized software detection is periodic, not real-time | Medium --- gap between installation and detection on servers | Implement real-time file integrity monitoring or package installation alerting | Tigan Wang | Q3 2026 |
-| Removal process is manual with no verification of complete uninstallation | Low --- residual configurations may persist after removal | Add post-removal verification step to the unauthorized software remediation workflow | Chris Magann | Q3 2026 |
+- [SentinelOne App Control Evidence](../../Artifacts/Evidence/EVD-sentinelone-app-control.md)
+- [Software Inventory](../../Artifacts/Inventories/INV-software-inventory.md)
+- [Acceptable Use Policy](../../Artifacts/Policies/POL-acceptable-use.md)

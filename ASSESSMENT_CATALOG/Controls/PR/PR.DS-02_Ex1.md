@@ -12,28 +12,8 @@
 
 Alma enforces TLS 1.2 minimum (TLS 1.3 preferred) on all external services via AWS ALB with ACM-managed certificates and HSTS headers. Internal Kubernetes service-to-service traffic uses mTLS through the service mesh, and PostgreSQL connections require SSL mode "verify-full." Remote access uses IKEv2 VPN with AES-256 encryption and certificate-based authentication, with site-to-site IPsec VPN connecting AWS to the on-premises DC.
 
-## Evidence of Implementation
+## Artifacts
 
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| TLS configuration on AWS ALB (minimum TLS 1.2 policy) | AWS ALB Console / Terraform | 2026-03-01 |
-| ACM certificate inventory and auto-renewal status | AWS Certificate Manager | 2026-03-01 |
-| HSTS header configuration on web properties | Web application configuration / SSL Labs scan | 2026-03-05 |
-| Service mesh mTLS configuration | Kubernetes service mesh config / GitOps | 2026-02-20 |
-| PostgreSQL SSL mode "verify-full" configuration | RDS parameter group | 2026-02-20 |
-| VPN configuration (IKEv2, AES-256, cert-based auth) | VPN gateway configuration | 2026-02-15 |
-| Site-to-site VPN IPsec configuration | AWS VPN Console | 2026-02-15 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 5 | 7 | On Track - TLS enforced externally and internally, VPN operational |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| TLS 1.3 not yet default on all endpoints | Missing performance and security benefits of latest protocol | Upgrade ALB security policy to TLS 1.3 default where client compatibility allows | Tigan Wang | 2026-06-30 |
-| No automated TLS certificate expiration monitoring | Expired certificates could cause service outages | Deploy certificate monitoring with alerting 30/14/7 days before expiration | Tigan Wang | 2026-05-15 |
-| VPN split tunnel exceptions not fully documented | Unclear which traffic bypasses encrypted tunnel | Audit and document all VPN split tunnel exceptions with business justification | Chris Magann | 2026-05-31 |
+- [Encryption Standards Policy](../../Artifacts/Policies/POL-encryption-standards.md)
+- [AWS Config Compliance Evidence](../../Artifacts/Evidence/EVD-aws-config-compliance.md)
+- [Vulnerability Scan Summary](../../Artifacts/Reports/RPT-vulnerability-scan-summary.md)

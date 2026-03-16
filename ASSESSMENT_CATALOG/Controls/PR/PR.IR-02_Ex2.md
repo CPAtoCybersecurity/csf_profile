@@ -12,25 +12,8 @@
 
 Alma operates HVAC monitoring at the Redwood City data center tracking temperature and humidity within manufacturer-specified ranges, with UPS systems providing battery backup and power conditioning. AWS cloud workloads inherit Amazon's environmental controls under the shared responsibility model. UPS capacity planning, battery replacement schedules, and load testing documentation is limited, and environmental monitoring is not integrated with the IT incident management process.
 
-## Evidence of Implementation
+## Artifacts
 
-| Evidence | Location/Source | Last Verified |
-|----------|----------------|---------------|
-| HVAC monitoring dashboards | Building management system | 2026-02-10 |
-| UPS configuration documentation | Redwood City DC facilities records | 2025-11-15 |
-| Temperature/humidity alert thresholds | HVAC monitoring system | 2026-02-10 |
-| AWS service health monitoring | AWS Health Dashboard | 2026-03-01 |
-
-## Maturity Assessment
-
-| Quarter | Actual | Target | Status |
-|---------|--------|--------|--------|
-| Q1 2026 | 4 | 6 | Behind Target |
-
-## Gaps & Remediation
-
-| Gap | Impact | Remediation | Owner | Due Date |
-|-----|--------|-------------|-------|----------|
-| UPS capacity planning and testing documentation gaps | Cannot confirm adequate power backup for current load | Document UPS capacity, establish load testing schedule, verify battery replacement dates | Tigan Wang | 2026-06-30 |
-| No environmental trend reporting | Gradual degradation or capacity issues not proactively identified | Implement monthly environmental monitoring reports with trend analysis | Tigan Wang | 2026-07-31 |
-| Environmental monitoring not integrated with IT incident management | Environmental events may not trigger appropriate IT response | Create escalation procedures linking environmental alerts to IT incident management | Tigan Wang | 2026-05-31 |
+- [Physical Security Policy](../../Artifacts/Policies/POL-physical-security.md)
+- [Incident Response Playbook](../../Artifacts/Procedures/PROC-incident-response-playbook.md)
+- [Backup Restore Test Report](../../Artifacts/Reports/RPT-backup-restore-test.md)
