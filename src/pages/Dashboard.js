@@ -29,6 +29,7 @@ import useUIStore from '../stores/uiStore';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
 import KPICard from '../components/KPICard';
+import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
 const formatScore = (value) => {
@@ -903,6 +904,11 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Evidence Completeness Tracker */}
+          <div className="mb-6">
+            <EvidenceTracker assessment={selectedAssessment} artifacts={artifacts} />
           </div>
 
           {/* Subcategory Assessment Section */}
