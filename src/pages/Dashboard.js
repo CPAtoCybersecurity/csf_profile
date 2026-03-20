@@ -569,7 +569,7 @@ const Dashboard = () => {
       inScopeItems: { value: inScopeCount, trend: null },
       evidenceCoverage: {
         value: evidencePct,
-        subtitle: inScopeCount > 0 ? `${coveredCount} of ${inScopeCount} items` : null,
+        subtitle: inScopeCount > 0 ? `${coveredCount} of ${inScopeCount} in-scope items` : null,
         trend: null,
       },
       openFindings: { value: openCount, trend: null },
@@ -644,7 +644,8 @@ const Dashboard = () => {
           <button
             onClick={() => setShowAuditModal(true)}
             disabled={!selectedAssessment}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
             title="Export Audit Report as Markdown"
           >
             <ClipboardList size={15} />
@@ -697,7 +698,7 @@ const Dashboard = () => {
             <KPICard
               title="Evidence Coverage"
               value={kpiData.evidenceCoverage.value}
-              subtitle={kpiData.evidenceCoverage.subtitle || 'Items with linked artifacts'}
+              subtitle={kpiData.evidenceCoverage.subtitle || 'In-scope items with artifact records linked'}
               trend={kpiData.evidenceCoverage.trend}
               darkMode={darkMode}
             />
@@ -1253,7 +1254,7 @@ const Dashboard = () => {
       {showAuditModal && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div style={{ background: '#fff', borderRadius: 8, padding: 24, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Audit Report Settings</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16, color: '#111827' }}>Audit Report Settings</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
               {[
                 ['organizationName', 'Organization Name'],
@@ -1273,7 +1274,7 @@ const Dashboard = () => {
                     type="text"
                     value={auditMetadata[key]}
                     onChange={(e) => setAuditMetadata(prev => ({ ...prev, [key]: e.target.value }))}
-                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 14, boxSizing: 'border-box' }}
+                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 14, boxSizing: 'border-box', color: '#111827', backgroundColor: '#fff' }}
                   />
                 </div>
               ))}

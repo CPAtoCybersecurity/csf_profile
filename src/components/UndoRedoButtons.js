@@ -20,24 +20,24 @@ export function UndoRedoButtons() {
         disabled={!canUndo}
         className={`p-2 rounded transition-colors ${
           canUndo
-            ? 'hover:bg-blue-600 text-white'
-            : 'text-blue-300 cursor-not-allowed'
+            ? 'hover:bg-blue-600 text-black bg-gray-200'
+            : 'text-gray-400 cursor-not-allowed'
         }`}
         title="Undo (Ctrl+Z)"
       >
-        <Undo2 size={18} />
+        <Undo2 size={20} />
       </button>
       <button
         onClick={redo}
         disabled={!canRedo}
         className={`p-2 rounded transition-colors ${
           canRedo
-            ? 'hover:bg-blue-600 text-white'
-            : 'text-blue-300 cursor-not-allowed'
+            ? 'hover:bg-blue-600 text-black bg-gray-200'
+            : 'text-gray-400 cursor-not-allowed'
         }`}
         title="Redo (Ctrl+Shift+Z)"
       >
-        <Redo2 size={18} />
+        <Redo2 size={20} />
       </button>
     </div>
   );

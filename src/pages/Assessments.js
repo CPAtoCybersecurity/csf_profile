@@ -839,11 +839,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     </div>
                     <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button
-                        className="p-2 hover:bg-gray-100 rounded"
+                        className="p-2 rounded"
+                        style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
                         onClick={() => handleCloneAssessment(assessment.id)}
                         title="Clone assessment"
                       >
-                        <Copy size={16} className="text-gray-500" />
+                        <Copy size={16} />
                       </button>
                       <button
                         className="p-2 hover:bg-gray-100 rounded"
@@ -911,7 +912,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
           <div className="flex items-center gap-2">
             {currentAssessment?.scopeType === 'requirements' && (
               <button
-                className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg"
+                className="flex items-center gap-2 py-2 px-4 rounded-lg"
+                style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
                 onClick={handleAddAllInScope}
               >
                 <CheckCircle size={16} />
@@ -919,7 +921,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
               </button>
             )}
             <button
-              className="flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white py-2 px-4 rounded-lg"
+              className="flex items-center gap-2 py-2 px-4 rounded-lg"
+              style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
               onClick={() => {
                 if (scopedItems.length > 0) {
                   setSelectedItemId(scopedItems[0].itemId);

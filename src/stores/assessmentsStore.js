@@ -33,8 +33,8 @@ const DEFAULT_ASSESSMENTS = [
   },
   {
     id: 'ASM-audit-2025-alma',
-    name: 'Alma Security Internal Audit (CMMI)',
-    description: 'Internal Audit Report IA-2025-003 — NIST CSF 2.0 cybersecurity program assessment. Original CMMI 0-5 scores scaled to 1-10.',
+    name: '2026 Alma Security CSF',
+    description: 'Internal Audit Report IA-2026-001.',
     scopeType: 'requirements',
     frameworkFilter: null,
     createdDate: '2025-04-30T00:00:00.000Z',
@@ -48,8 +48,8 @@ const DEFAULT_ASSESSMENTS = [
       'PR.IR-02 Ex1', 'PR.IR-03 Ex3', 'PR.PS-01 Ex1', 'PR.PS-05 Ex1',
       'DE.AE-02 Ex1', 'DE.AE-02 Ex3', 'DE.AE-03 Ex2', 'DE.AE-06 Ex1',
       'DE.AE-08 Ex1', 'DE.CM-01 Ex1', 'DE.CM-03 Ex2', 'DE.CM-09 Ex1',
-      'RS.MA-03 Ex2', 'RS.MI-01 Ex1', 'RS.MI-02 Ex2',
-      'RC.RP-03 Ex1'
+      'RS.AN-03 Ex2', 'RS.MA-03 Ex2', 'RS.MI-01 Ex1', 'RS.MI-02 Ex2',
+      'RC.RP-03 Ex1', 'RC.RP-05 Ex1'
     ],
     observations: ALMA_AUDIT_OBSERVATIONS
   }
@@ -1563,7 +1563,7 @@ const useAssessmentsStore = create(
     }),
     {
       name: 'csf-assessments-storage',
-      version: 6,
+      version: 7,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -1674,7 +1674,16 @@ const useAssessmentsStore = create(
               assessments: [...assessments, DEFAULT_ASSESSMENTS[1]]
             };
           }
-          return persistedState;
+        }
+        // Version 7: Rename second assessment
+        if (version < 7) {
+          const assessments = (persistedState?.assessments || []).map(a => {
+            if (a.id === 'ASM-audit-2025-alma') {
+              return { ...a, name: '2026 Alma Security CSF', description: 'Internal Audit Report IA-2026-001.' };
+            }
+            return a;
+          });
+          return { ...persistedState, assessments };
         }
         return persistedState;
       },

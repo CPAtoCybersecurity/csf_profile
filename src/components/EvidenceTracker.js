@@ -112,7 +112,7 @@ const EvidenceTracker = ({ assessment, artifacts }) => {
         />
       </div>
       <p className="text-sm text-gray-600 dark:text-gray-400 mb-5">
-        {withEvidence} of {total} items have linked evidence
+        {withEvidence} of {total} in-scope items with evidence documented
       </p>
 
       {/* Per-function breakdown */}

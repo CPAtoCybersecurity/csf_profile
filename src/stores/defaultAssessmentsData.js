@@ -468,11 +468,11 @@ export const UPDATED_OBSERVATIONS = {
 export const ALMA_AUDIT_OBSERVATIONS = {
   'GV.OC-01 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review mission alignment documentation\n2. Interview CISO on mission-risk linkage\n3. Examine strategic planning artifacts\n4. Cross-reference with non-security leadership',
+    linkedArtifacts: ['Security Governance Charter', 'Board Briefing Materials'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -480,11 +480,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.OC-02 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review stakeholder identification documentation\n2. Validate customer-facing security expectations\n3. Interview Gerry on stakeholder engagement\n4. Review investor and Board expectations',
+    linkedArtifacts: ['Security Service Catalog'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -492,11 +492,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.OV-01 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review Board reporting on strategy outcomes\n2. Examine KPI dashboard and trend analysis\n3. Interview CISO on strategy adjustment process\n4. Validate that outcomes inform investment decisions',
+    linkedArtifacts: ['KPI Dashboard', 'Board Reports'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 10, targetScore: 8, observations: 'Comprehensive KPI framework operational with Board quarterly review', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Comprehensive KPI framework operational with Board quarterly review', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -504,11 +504,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.RM-01 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Document review: Risk register\n2. Interview: CISO on risk management objectives\n3. Interview: non-security stakeholder\n4. Board/committee reporting review',
+    linkedArtifacts: ['Risk Register', 'Board Approval Documentation'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 10, targetScore: 8, observations: 'Risk management objectives documented with Board approval', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Risk management objectives documented with Board approval', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -516,11 +516,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.RR-01 Ex4': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review leadership accountability documentation\n2. Examine security culture initiatives\n3. Validate ethical security practices\n4. Interview CEO or Board member on cybersecurity governance',
+    linkedArtifacts: ['Security Governance Charter'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -528,11 +528,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.RR-02 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review documented roles and responsibilities\n2. Validate job descriptions include security responsibilities\n3. Examine responsibility communication\n4. Interview team leads on role clarity',
+    linkedArtifacts: ['Information Security Policy', 'RACI Matrix'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -540,11 +540,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.SC-01 Ex3': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review SCRM program documentation\n2. Validate program maturity against objectives\n3. Examine stakeholder agreement\n4. Interview Gerry on C-SCRM program execution',
+    linkedArtifacts: ['Vendor Management Policy', 'SCRM Strategy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -552,11 +552,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.SC-02 Ex7': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review C-SCRM role assignments\n2. Validate supplier and partner role communication\n3. Examine internal C-SCRM role communication\n4. Interview procurement and security personnel',
+    linkedArtifacts: ['RACI Matrix', 'RFP Templates'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -564,11 +564,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.SC-04 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review supplier inventory in ServiceNow\n2. Verify criticality ratings against documented criteria\n3. Interview procurement team on tiering process\n4. Sample quarterly review documentation',
+    linkedArtifacts: ['Third Party Risk Management Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -576,11 +576,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.SC-06 Ex3': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review due diligence process documentation\n2. Validate supplier risk assessment execution\n3. Examine product and technology assessment\n4. Interview procurement team on due diligence practices',
+    linkedArtifacts: ['Vendor Assessment Template'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -588,11 +588,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.SC-09 Ex5': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review supply chain security integration in policies\n2. Validate provenance and integrity practices\n3. Examine risk reporting on supply chain security\n4. Interview Chris Magann on supply chain vulnerability management',
+    linkedArtifacts: ['Change Management Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -600,11 +600,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'GV.SC-10 Ex3': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review supplier termination procedures\n2. Validate access deactivation practices\n3. Examine end-of-life and obsolescence planning\n4. Interview Gerry on supplier offboarding process',
+    linkedArtifacts: ['Vendor Offboarding Checklist'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -612,11 +612,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'ID.AM-02 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Obtain software inventory records\n2. Validate inventory completeness\n3. Sample verification\n4. Assess container and cloud service coverage\n5. Review update processes',
+    linkedArtifacts: ['Asset Inventory'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Software inventory only 70% complete', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Software inventory only 70% complete', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -624,11 +624,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'ID.AM-07 Ex3': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review data classification policy\n2. Validate data discovery results\n3. Assess metadata and tagging\n4. Review data inventory completeness\n5. Assess ongoing discovery process',
+    linkedArtifacts: ['Data Classification Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Data classification policy approved but not applied across all data stores', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Data classification policy approved but not applied across all data stores', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -636,11 +636,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'ID.IM-01 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review self-assessment program\n2. Validate improvement identification\n3. Assess automated compliance monitoring\n4. Review third-party assessment history\n5. Evaluate assessment cadence and coverage',
+    linkedArtifacts: ['Self-Assessment Reports'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Self-assessment program exists but not producing actionable improvement plans', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Self-assessment program exists but not producing actionable improvement plans', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -648,11 +648,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'ID.RA-01 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review vulnerability scanning program\n2. Validate scanning coverage\n3. Assess triage and remediation process\n4. Review vulnerability recording\n5. Assess non-technical vulnerability identification',
+    linkedArtifacts: ['Vulnerability Management Program'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'Asset vulnerability identification partially operational', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'Asset vulnerability identification partially operational', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -660,11 +660,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'ID.RA-07 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review change management process\n2. Validate change risk assessment\n3. Assess change compliance\n4. Review exception management\n5. Evaluate change tracking and reporting',
+    linkedArtifacts: ['Change Management Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 0, targetScore: 8, observations: 'Change management risk assessment process not enforced; 15% non-compliance', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Change management risk assessment process not enforced; 15% non-compliance', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -672,11 +672,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'ID.RA-08 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review disclosure intake process\n2. Validate disclosure handling\n3. Assess supplier vulnerability sharing\n4. Review disclosure response\n5. Evaluate program maturity',
+    linkedArtifacts: ['Vulnerability Disclosure Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'Vulnerability disclosure management partially implemented', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Vulnerability disclosure management partially implemented', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -684,11 +684,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.AA-02 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review identity proofing policy and standards\n2. Examine employee onboarding identity verification\n3. Assess credential uniqueness and binding controls\n4. Evaluate remote identity proofing procedures\n5. Test credential lifecycle binding integrity',
+    linkedArtifacts: ['Information Security Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'MFA rollout ongoing but not yet full coverage', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'MFA rollout ongoing but not yet full coverage', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -696,11 +696,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.AT-01 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review training program documentation\n2. Verify Workday training records\n3. Examine phishing simulation results\n4. Assess new hire onboarding process',
+    linkedArtifacts: ['Security Awareness Program'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 6, targetScore: 8, observations: 'Quarterly security awareness training delivered; phishing simulations conducted', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Quarterly security awareness training delivered; phishing simulations conducted', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -708,11 +708,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.DS-01 Ex4': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review data-at-rest encryption policy and standards\n2. Assess encryption implementation across storage systems\n3. Evaluate data integrity controls\n4. Test access restrictions on data-at-rest\n5. Examine removable media controls\n6. Validate secure storage infrastructure',
+    linkedArtifacts: ['Encryption Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'Encryption upgrade project in progress', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Encryption upgrade project in progress', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -720,11 +720,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.DS-10 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review data-in-use protection policies and standards\n2. Assess memory handling for sensitive data\n3. Evaluate process isolation controls\n4. Test unauthorized data-in-use access prevention',
+    linkedArtifacts: ['Data Handling Procedures'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'Data-in-use protections exist but have coverage gaps', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'Data-in-use protections exist but have coverage gaps', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -732,11 +732,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.IR-02 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review physical environmental protection controls at Redwood City data center\n2. Assess AWS infrastructure environmental resilience\n3. Evaluate environmental monitoring and alerting\n4. Examine environmental controls maintenance program',
+    linkedArtifacts: ['Environmental Threat Assessment'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 0, targetScore: 8, observations: 'Physical environmental controls documented but not independently validated', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Physical environmental controls documented but not independently validated', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -744,11 +744,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.IR-03 Ex3': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review redundancy and failover architecture\n2. Assess disaster recovery planning and testing\n3. Evaluate high-availability component implementation\n4. Test failover capabilities\n5. Review resilience monitoring and incident response integration',
+    linkedArtifacts: ['DR Plan'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'Multi-AZ AWS deployment; DR exercises not conducted for on-premises', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 4, targetScore: 5, observations: 'Multi-AZ AWS deployment; DR exercises not conducted for on-premises', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -756,11 +756,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.PS-01 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review configuration management policy and standards\n2. Examine hardened baseline documentation and enforcement\n3. Validate automated configuration compliance monitoring\n4. Test configuration drift detection and remediation\n5. Assess lifecycle management of baseline configurations',
+    linkedArtifacts: ['Hardening Standards'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 4, targetScore: 8, observations: 'Hardening standards documented but inconsistently applied', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Hardening standards documented but inconsistently applied', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -768,11 +768,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'PR.PS-05 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review application control policy and standards\n2. Examine application control deployment and coverage\n3. Validate the authorized software inventory\n4. Test application control enforcement effectiveness\n5. Assess administrative privilege restrictions for software installation',
+    linkedArtifacts: ['Application Control Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'SentinelOne provides endpoint application control; server-side incomplete', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 7, targetScore: 5, observations: 'SentinelOne provides endpoint application control; server-side incomplete', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -780,11 +780,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.AE-02 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review CloudTrail and GuardDuty configuration\n2. Examine detection rule tuning\n3. Verify TTD metrics\n4. Assess 24/7 monitoring gaps',
+    linkedArtifacts: ['SIEM Configuration'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -792,11 +792,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.AE-02 Ex3': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review CloudTrail and GuardDuty configuration\n2. Examine detection rule tuning\n3. Verify TTD metrics\n4. Assess 24/7 monitoring gaps',
+    linkedArtifacts: ['Log Review Procedures', 'SIEM console screenshots'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -804,11 +804,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.AE-03 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Assess log aggregation architecture\n2. Evaluate event correlation capabilities\n3. Test threat intelligence integration in correlation\n4. Review correlation effectiveness',
+    linkedArtifacts: ['Event Correlation Architecture'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -816,11 +816,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.AE-06 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Verify automated alert routing\n2. Assess on-demand access to security findings\n3. Review automated ticket creation workflow\n4. Evaluate manual reporting and escalation',
+    linkedArtifacts: ['SOC Procedures'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -828,11 +828,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.AE-08 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review incident declaration criteria\n2. Evaluate false positive management\n3. Test incident declaration accuracy\n4. Assess declaration timeliness',
+    linkedArtifacts: ['Incident Declaration Criteria', 'SOC-Ticket-1001'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -840,11 +840,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.CM-01 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Verify network traffic monitoring coverage\n2. Evaluate network anomaly detection\n3. Test unauthorized endpoint detection\n4. Assess rogue wireless monitoring',
+    linkedArtifacts: ['Network Monitoring Architecture', 'SOC-Ticket-1004'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 4, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -852,11 +852,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.CM-03 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Assess user behavior analytics capabilities\n2. Verify logical access monitoring\n3. Evaluate technology usage monitoring\n4. Assess deception technology posture',
+    linkedArtifacts: ['IAM Monitoring Configuration', 'SOC-Ticket-1005'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -864,11 +864,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'DE.CM-09 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Verify common attack vector monitoring\n2. Assess authentication attack detection\n3. Evaluate configuration drift monitoring\n4. Test endpoint health and integrity monitoring',
+    linkedArtifacts: ['System Monitoring Policy'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -876,11 +876,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'RS.MA-03 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review categorization and prioritization framework\n2. Examine categorization and prioritization for recent incidents\n3. Validate prioritization decision-making\n4. Test categorization consistency',
+    linkedArtifacts: ['Incident Priority Matrix'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -888,11 +888,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'RS.MI-01 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review containment procedures and capabilities\n2. Examine automated containment capabilities\n3. Validate manual containment procedures for complex scenarios\n4. Test containment effectiveness through recent incidents',
+    linkedArtifacts: ['Containment Playbooks'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 4, targetScore: 5, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -900,11 +900,11 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'RS.MI-02 Ex2': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review eradication procedures and capabilities\n2. Examine automated eradication capabilities\n3. Validate manual eradication procedures for complex scenarios\n4. Test eradication effectiveness through recent incidents',
+    linkedArtifacts: ['Incident Response Playbooks'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
@@ -912,11 +912,35 @@ export const ALMA_AUDIT_OBSERVATIONS = {
   },
   'RC.RP-03 Ex1': {
     auditorId: null,
-    testProcedures: '',
-    linkedArtifacts: [],
+    testProcedures: '1. Review automated backup verification procedures\n2. Evaluate backup integrity testing during quarterly restore tests\n3. Assess backup security controls\n4. Test restoration asset inventory and currency',
+    linkedArtifacts: ['Backup Procedures'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 2, targetScore: 8, observations: 'Backup verification procedures documented but DR exercises not conducted', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 5, targetScore: 5, observations: 'Backup verification procedures documented but DR exercises not conducted', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'RS.AN-03 Ex2': {
+    auditorId: null,
+    testProcedures: '1. Review incident analysis methodology and procedures\n2. Examine completed incident analysis reports\n3. Validate analysis tooling and capabilities\n4. Test analyst competency and process adherence',
+    linkedArtifacts: ['Incident Response Playbooks', 'SOC-Ticket-1001'],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Incident analysis procedures documented but root cause analysis inconsistently performed; SOC relies on SentinelOne telemetry with limited cross-source correlation', observationDate: '2026-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'RC.RP-05 Ex1': {
+    auditorId: null,
+    testProcedures: '1. Review restored asset integrity verification procedures\n2. Evaluate restoration correctness validation\n3. Assess normal operating status confirmation\n4. Test post-restoration security validation',
+    linkedArtifacts: ['Backup Procedures', 'DR Plan'],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 3, targetScore: 5, observations: 'Quarterly restore tests conducted but post-restoration IOC scanning not performed; functional testing limited to basic health checks without full security validation', observationDate: '2026-03-31', testingStatus: 'Complete', examine: true, interview: true, test: true },
       Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
       Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
