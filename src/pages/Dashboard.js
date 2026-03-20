@@ -30,6 +30,7 @@ import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
 import KPICard from '../components/KPICard';
 import { generateExecutiveSummary } from '../utils/executiveSummaryPDF';
+import { generateAuditReportMarkdown } from '../utils/auditReportMarkdown';
 import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
@@ -124,6 +125,21 @@ const Dashboard = () => {
   // Selected assessment (default to first assessment)
   const [selectedAssessmentId, setSelectedAssessmentId] = useState(null);
   const [selectedQuarter, setSelectedQuarter] = useState(1); // 1-4 for Q1-Q4 - unified quarter for all dashboard components
+
+  // Audit report modal state
+  const [showAuditModal, setShowAuditModal] = useState(false);
+  const [auditMetadata, setAuditMetadata] = useState({
+    reportNumber: 'IA-2025-001',
+    engagementType: 'Cybersecurity Program Assessment (NIST CSF 2.0)',
+    assessmentPeriod: '',
+    reportDate: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }),
+    classification: 'Confidential',
+    preparedFor: 'Board of Directors and Audit Committee',
+    preparedBy: 'Internal Audit Department',
+    leadAssessor: '',
+    qualityReviewer: '',
+    organizationName: '',
+  });
 
   // Set default assessment on load
   useEffect(() => {
@@ -447,7 +463,8 @@ const Dashboard = () => {
   const trendChartData = useMemo(() => {
     if (dashboardData.length === 0) return [];
 
-    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+    // Only include quarters up to and including the selected quarter
+    const quarters = ['Q1', 'Q2', 'Q3', 'Q4'].slice(0, selectedQuarter);
 
     // Build a map: { Q1: { 'GOVERN (GV)': [scores...], ... }, Q2: {...}, ... }
     const quarterFunctionScores = {};
@@ -489,7 +506,7 @@ const Dashboard = () => {
     return rows
       .filter(row => !row._allZero)
       .map(({ _allZero, ...rest }) => rest);
-  }, [dashboardData]);
+  }, [dashboardData, selectedQuarter]);
 
   // ── KPI Cards ──────────────────────────────────────────────────────────────
   const kpiData = useMemo(() => {
@@ -623,6 +640,15 @@ const Dashboard = () => {
           >
             <FileText size={15} />
             Export Summary
+          </button>
+          <button
+            onClick={() => setShowAuditModal(true)}
+            disabled={!selectedAssessment}
+            className="flex items-center gap-2 px-3 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            title="Export Audit Report as Markdown"
+          >
+            <ClipboardList size={15} />
+            Audit Report
           </button>
         </div>
       </div>
@@ -851,6 +877,7 @@ const Dashboard = () => {
               </div>
 
               {functionBarChartData.data.length > 0 ? (
+                <div id="audit-chart-bar">
                 <ResponsiveContainer width="100%" height={320}>
                   <ComposedChart
                     data={functionBarChartData.data}
@@ -915,6 +942,7 @@ const Dashboard = () => {
                     />
                   </ComposedChart>
                 </ResponsiveContainer>
+                </div>
               ) : (
                 <div className="flex items-center justify-center h-64 text-gray-500 text-sm">
                   No data for Q{selectedQuarter}.
@@ -1014,6 +1042,7 @@ const Dashboard = () => {
                   <h3 className="text-base font-semibold text-gray-700">CSF Subcategories; Q{selectedQuarter}</h3>
                 </div>
                 {radarChartData.length > 0 ? (
+                  <div id="audit-chart-radar">
                   <ResponsiveContainer width="100%" height={500}>
                     <RadarChart data={radarChartData} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
                       <PolarGrid gridType="polygon" stroke={chartColors.grid} />
@@ -1054,6 +1083,7 @@ const Dashboard = () => {
                       />
                     </RadarChart>
                   </ResponsiveContainer>
+                  </div>
                 ) : (
                   <div className="flex items-center justify-center h-96 text-gray-500">
                     No data available for radar chart.
@@ -1161,6 +1191,7 @@ const Dashboard = () => {
           <div className="card mt-6">
             <h2 className="text-lg font-semibold mb-4">Score Trends by Quarter</h2>
             {trendChartData.length > 0 ? (
+              <div id="audit-chart-trend">
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart
                   data={trendChartData}
@@ -1208,6 +1239,7 @@ const Dashboard = () => {
                   ))}
                 </LineChart>
               </ResponsiveContainer>
+              </div>
             ) : (
               <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
                 No quarterly score data available to display trends.
@@ -1215,6 +1247,63 @@ const Dashboard = () => {
             )}
           </div>
         </>
+      )}
+
+      {/* Audit Report Metadata Modal */}
+      {showAuditModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
+          <div style={{ background: '#fff', borderRadius: 8, padding: 24, width: '100%', maxWidth: 520, maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 16 }}>Audit Report Settings</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              {[
+                ['organizationName', 'Organization Name'],
+                ['reportNumber', 'Report Number'],
+                ['engagementType', 'Engagement Type'],
+                ['assessmentPeriod', 'Assessment Period'],
+                ['reportDate', 'Report Date'],
+                ['classification', 'Classification'],
+                ['preparedFor', 'Prepared For'],
+                ['preparedBy', 'Prepared By'],
+                ['leadAssessor', 'Lead Assessor'],
+                ['qualityReviewer', 'Quality Reviewer'],
+              ].map(([key, label]) => (
+                <div key={key}>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 500, color: '#374151', marginBottom: 4 }}>{label}</label>
+                  <input
+                    type="text"
+                    value={auditMetadata[key]}
+                    onChange={(e) => setAuditMetadata(prev => ({ ...prev, [key]: e.target.value }))}
+                    style={{ width: '100%', padding: '8px 10px', border: '1px solid #d1d5db', borderRadius: 6, fontSize: 14, boxSizing: 'border-box' }}
+                  />
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 12, marginTop: 20 }}>
+              <button
+                onClick={() => setShowAuditModal(false)}
+                style={{ padding: '8px 16px', fontSize: 14, color: '#6b7280', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  generateAuditReportMarkdown({
+                    assessment: selectedAssessment,
+                    requirements,
+                    findings,
+                    artifacts,
+                    selectedQuarter,
+                    reportMetadata: auditMetadata,
+                  });
+                  setShowAuditModal(false);
+                }}
+                style={{ padding: '8px 16px', backgroundColor: '#374151', color: '#fff', fontSize: 14, fontWeight: 600, border: 'none', borderRadius: 6, cursor: 'pointer' }}
+              >
+                Generate Markdown Report
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Gap Prioritization Matrix */}

@@ -4,7 +4,7 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
-import { UPDATED_OBSERVATIONS } from './defaultAssessmentsData';
+import { UPDATED_OBSERVATIONS, ALMA_AUDIT_OBSERVATIONS } from './defaultAssessmentsData';
 import useAuditLogStore from './auditLogStore';
 
 // Default assessment for new installations
@@ -30,6 +30,28 @@ const DEFAULT_ASSESSMENTS = [
       'ID.RA-08 Ex1', 'PR.AA-02 Ex2', 'PR.DS-10 Ex1'
     ],
     observations: UPDATED_OBSERVATIONS
+  },
+  {
+    id: 'ASM-audit-2025-alma',
+    name: 'Alma Security Internal Audit (CMMI)',
+    description: 'Internal Audit Report IA-2025-003 — NIST CSF 2.0 cybersecurity program assessment. Original CMMI 0-5 scores scaled to 1-10.',
+    scopeType: 'requirements',
+    frameworkFilter: null,
+    createdDate: '2025-04-30T00:00:00.000Z',
+    scopeIds: [
+      'GV.OC-01 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2', 'GV.RM-01 Ex2',
+      'GV.RR-01 Ex4', 'GV.RR-02 Ex1', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7',
+      'GV.SC-04 Ex1', 'GV.SC-06 Ex3', 'GV.SC-09 Ex5', 'GV.SC-10 Ex3',
+      'ID.AM-02 Ex2', 'ID.AM-07 Ex3', 'ID.IM-01 Ex1', 'ID.RA-01 Ex1',
+      'ID.RA-07 Ex1', 'ID.RA-08 Ex1',
+      'PR.AA-02 Ex2', 'PR.AT-01 Ex2', 'PR.DS-01 Ex4', 'PR.DS-10 Ex1',
+      'PR.IR-02 Ex1', 'PR.IR-03 Ex3', 'PR.PS-01 Ex1', 'PR.PS-05 Ex1',
+      'DE.AE-02 Ex1', 'DE.AE-02 Ex3', 'DE.AE-03 Ex2', 'DE.AE-06 Ex1',
+      'DE.AE-08 Ex1', 'DE.CM-01 Ex1', 'DE.CM-03 Ex2', 'DE.CM-09 Ex1',
+      'RS.MA-03 Ex2', 'RS.MI-01 Ex1', 'RS.MI-02 Ex2',
+      'RC.RP-03 Ex1'
+    ],
+    observations: ALMA_AUDIT_OBSERVATIONS
   }
 ];
 
@@ -1541,7 +1563,7 @@ const useAssessmentsStore = create(
     }),
     {
       name: 'csf-assessments-storage',
-      version: 5,
+      version: 6,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -1641,6 +1663,18 @@ const useAssessmentsStore = create(
             ...persistedState,
             assessments: updatedAssessments
           };
+        }
+        // Version 6: Add Alma Security Internal Audit as second default assessment
+        if (version < 6) {
+          const assessments = persistedState?.assessments || [];
+          const hasAlmaAudit = assessments.some(a => a.id === 'ASM-audit-2025-alma');
+          if (!hasAlmaAudit) {
+            return {
+              ...persistedState,
+              assessments: [...assessments, DEFAULT_ASSESSMENTS[1]]
+            };
+          }
+          return persistedState;
         }
         return persistedState;
       },

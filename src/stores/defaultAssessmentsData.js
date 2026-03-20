@@ -460,3 +460,466 @@ export const UPDATED_OBSERVATIONS = {
     }
   }
 };
+
+
+// Alma Security Internal Audit Report - Q1 2025 Assessment
+// Source: Internal Audit Report IA-2025-003, NIST CSF 2.0 Assessment
+// Original scores on CMMI 0-5 scale, converted to app 1-10 scale (x2)
+export const ALMA_AUDIT_OBSERVATIONS = {
+  'GV.OC-01 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.OC-02 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.OV-01 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 10, targetScore: 8, observations: 'Comprehensive KPI framework operational with Board quarterly review', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.RM-01 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 10, targetScore: 8, observations: 'Risk management objectives documented with Board approval', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.RR-01 Ex4': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.RR-02 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.SC-01 Ex3': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.SC-02 Ex7': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.SC-04 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.SC-06 Ex3': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.SC-09 Ex5': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'GV.SC-10 Ex3': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 8, targetScore: 8, observations: 'Policy foundations, organizational structures, and Board oversight meet or exceed targets', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'ID.AM-02 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Software inventory only 70% complete', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'ID.AM-07 Ex3': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Data classification policy approved but not applied across all data stores', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'ID.IM-01 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Self-assessment program exists but not producing actionable improvement plans', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'ID.RA-01 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'Asset vulnerability identification partially operational', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'ID.RA-07 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 0, targetScore: 8, observations: 'Change management risk assessment process not enforced; 15% non-compliance', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'ID.RA-08 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'Vulnerability disclosure management partially implemented', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.AA-02 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'MFA rollout ongoing but not yet full coverage', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.AT-01 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 6, targetScore: 8, observations: 'Quarterly security awareness training delivered; phishing simulations conducted', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.DS-01 Ex4': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'Encryption upgrade project in progress', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.DS-10 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'Data-in-use protections exist but have coverage gaps', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.IR-02 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 0, targetScore: 8, observations: 'Physical environmental controls documented but not independently validated', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.IR-03 Ex3': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'Multi-AZ AWS deployment; DR exercises not conducted for on-premises', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.PS-01 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 4, targetScore: 8, observations: 'Hardening standards documented but inconsistently applied', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'PR.PS-05 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'SentinelOne provides endpoint application control; server-side incomplete', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.AE-02 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.AE-02 Ex3': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.AE-03 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.AE-06 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.AE-08 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.CM-01 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.CM-03 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'DE.CM-09 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'All DETECT controls at Initial maturity; 9-hour TTD, no 24/7 monitoring', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'RS.MA-03 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'RS.MI-01 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'RS.MI-02 Ex2': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Incident containment relies on automated tools; manual capability immature', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  },
+  'RC.RP-03 Ex1': {
+    auditorId: null,
+    testProcedures: '',
+    linkedArtifacts: [],
+    remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+    quarters: {
+      Q1: { actualScore: 2, targetScore: 8, observations: 'Backup verification procedures documented but DR exercises not conducted', observationDate: '2025-03-31', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q2: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q3: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false },
+      Q4: { actualScore: 0, targetScore: 0, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }
+    }
+  }
+};
