@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alma Security — NIST CSF 2.0 Cybersecurity Program Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700&family=JetBrains+Mono:wght@400;500;600&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #fafaf9;
+    --surface: #ffffff;
+    --text: #1c1917;
+    --text-muted: #78716c;
+    --border: #e7e5e4;
+    --accent: #1e3a5f;
+    --accent-light: #e8eef4;
+    --red: #b91c1c;
+    --red-bg: #fef2f2;
+    --red-border: #fecaca;
+    --green: #15803d;
+    --green-bg: #f0fdf4;
+    --green-border: #bbf7d0;
+    --amber: #a16207;
+    --amber-bg: #fffbeb;
+    --amber-border: #fde68a;
+    --blue: #1e40af;
+    --blue-bg: #eff6ff;
+    --blue-border: #bfdbfe;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  .page-wrapper {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 40px 24px;
+  }
+
+  /* ── Cover / Header ── */
+  .report-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1e40af 100%);
+    border-radius: 16px;
+    padding: 56px 48px;
+    color: #fff;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .report-header::before {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .report-header::after {
+    content: '';
+    position: absolute;
+    bottom: -20%;
+    left: -5%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(96,165,250,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .report-header .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-bottom: 16px;
+  }
+  .report-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 800;
+    line-height: 1.15;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .report-header .subtitle {
+    font-size: 18px;
+    font-weight: 400;
+    opacity: 0.75;
+    margin-bottom: 32px;
+  }
+  .header-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px 32px;
+    font-size: 13px;
+    opacity: 0.7;
+    position: relative;
+  }
+  .header-meta span { display: block; }
+  .header-meta strong { opacity: 1; font-weight: 600; }
+
+  .classification-badge {
+    display: inline-block;
+    background: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: #fca5a5;
+    padding: 4px 14px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  /* ── Overall Rating Banner ── */
+  .rating-banner {
+    background: var(--red-bg);
+    border: 2px solid var(--red-border);
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .rating-banner .rating-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+  .rating-banner .rating-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--red);
+  }
+
+  /* ── Sections ── */
+  .section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 36px 40px;
+    margin-bottom: 24px;
+  }
+
+  .section-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.6;
+    margin-bottom: 6px;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 20px;
+    line-height: 1.3;
+  }
+
+  h3 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 28px 0 14px;
+  }
+
+  h4 {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin: 20px 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  p { margin-bottom: 14px; }
+
+  /* ── Stats Grid ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .stat-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    text-align: center;
+  }
+  .stat-card .stat-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1.2;
+  }
+  .stat-card .stat-value.red { color: var(--red); }
+  .stat-card .stat-value.green { color: var(--green); }
+  .stat-card .stat-label {
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* ── Tables ── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 14px;
+  }
+  thead th {
+    background: var(--accent);
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  thead th:first-child { border-radius: 8px 0 0 0; }
+  thead th:last-child { border-radius: 0 8px 0 0; }
+  tbody td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr:nth-child(even) { background: #fafaf9; }
+  tbody tr:hover { background: var(--accent-light); }
+
+  .text-center { text-align: center; }
+  .text-right { text-align: right; }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+  .fw-600 { font-weight: 600; }
+  .fw-700 { font-weight: 700; }
+
+  /* ── Badges ── */
+  .badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  .badge-sat { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .badge-unsat { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .badge-needs { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .badge-high { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+  .badge-medium { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .badge-low { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .badge-status { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+
+  /* ── Gap indicators ── */
+  .gap-red { color: var(--red); font-weight: 700; }
+  .gap-green { color: var(--green); font-weight: 700; }
+  .gap-amber { color: var(--amber); font-weight: 700; }
+  .score-red { color: var(--red); font-weight: 600; }
+  .score-green { color: var(--green); font-weight: 600; }
+  .score-amber { color: var(--amber); font-weight: 600; }
+
+  /* ── Finding Cards ── */
+  .finding-card {
+    border-radius: 10px;
+    padding: 24px 28px;
+    margin: 18px 0;
+    border-left: 5px solid;
+  }
+  .finding-card.high {
+    background: var(--red-bg);
+    border-color: var(--red);
+  }
+  .finding-card.medium {
+    background: var(--amber-bg);
+    border-color: var(--amber);
+  }
+  .finding-card .finding-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .finding-card .finding-controls {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+  .finding-card p { font-size: 14px; margin-bottom: 10px; }
+  .finding-card p:last-child { margin-bottom: 0; }
+  .finding-card strong { font-weight: 600; }
+
+  /* ── Bar chart (CSS-only) ── */
+  .bar-chart {
+    margin: 24px 0;
+  }
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    gap: 12px;
+  }
+  .bar-label {
+    width: 130px;
+    font-size: 13px;
+    font-weight: 600;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .bar-track {
+    flex: 1;
+    height: 28px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    position: relative;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.6s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    min-width: 40px;
+  }
+  .bar-fill.actual { background: #60a5fa; }
+  .bar-fill.target-line {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 2px;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 0;
+    padding: 0;
+  }
+  .bar-value {
+    width: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  /* ── Radar-like visual (CSS polygons) ── */
+  .maturity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .maturity-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+  }
+  .maturity-ring {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    flex-shrink: 0;
+  }
+  .maturity-ring.sat { background: linear-gradient(135deg, #16a34a, #22c55e); }
+  .maturity-ring.unsat { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+  .maturity-info .maturity-name { font-weight: 700; font-size: 14px; }
+  .maturity-info .maturity-detail { font-size: 12px; color: var(--text-muted); }
+
+  /* ── Priority Gaps ── */
+  .priority-gaps {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .priority-gap-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: var(--red-bg);
+    border: 1px solid var(--red-border);
+    border-radius: 8px;
+    padding: 12px 18px;
+  }
+  .priority-gap-rank {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--red);
+    width: 28px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+  .priority-gap-id {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 120px;
+  }
+  .priority-gap-bar {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mini-bar {
+    flex: 1;
+    height: 8px;
+    background: var(--red-border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .mini-bar-fill {
+    height: 100%;
+    background: var(--red);
+    border-radius: 4px;
+  }
+  .priority-gap-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 600;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  /* ── Action plan ── */
+  .action-plan {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 14px 0;
+  }
+  .action-plan .action-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .action-plan .action-title { font-weight: 700; font-size: 14px; }
+  .action-plan .action-body { font-size: 14px; color: var(--text-muted); }
+  .action-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 12px;
+  }
+  .action-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* ── TOC ── */
+  .toc {
+    columns: 2;
+    column-gap: 32px;
+    list-style: none;
+    margin: 16px 0;
+  }
+  .toc li {
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    break-inside: avoid;
+  }
+  .toc li a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .toc li a:hover { text-decoration: underline; }
+
+  /* ── Scoring Scale ── */
+  .scoring-scale {
+    display: grid;
+    grid-template-columns: 80px 150px 1fr;
+    gap: 0;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .scoring-scale > div {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── Footer ── */
+  .report-footer {
+    text-align: center;
+    padding: 32px 0 16px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 700px) {
+    .report-header { padding: 32px 24px; }
+    .report-header h1 { font-size: 28px; }
+    .section { padding: 24px 20px; }
+    .header-meta { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .maturity-grid { grid-template-columns: 1fr; }
+    .toc { columns: 1; }
+    .bar-label { width: 90px; font-size: 11px; }
+  }
+
+  /* ── Disclaimer ── */
+  .disclaimer {
+    background: var(--amber-bg);
+    border: 1px solid var(--amber-border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  /* ── Function section headers ── */
+  .function-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 28px 0 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border);
+  }
+  .function-header h3 { margin: 0; }
+
+  /* ── Average row in tables ── */
+  .avg-row td {
+    background: var(--accent-light) !important;
+    font-weight: 700 !important;
+    border-top: 2px solid var(--accent);
+  }
+
+  /* ── Horizontal divider ── */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 28px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <!-- ════════════════ HEADER ════════════════ -->
+  <header class="report-header">
+    <div class="label">Internal Audit Report &middot; IA-2025-001</div>
+    <h1>Cybersecurity Program Assessment</h1>
+    <div class="subtitle">NIST CSF 2.0 &mdash; Alma Security</div>
+    <div class="classification-badge">Confidential</div>
+    <div class="header-meta">
+      <span><strong>Assessment Period:</strong> Q1 FY26</span>
+      <span><strong>Report Date:</strong> March 19, 2026</span>
+      <span><strong>Prepared For:</strong> Board of Directors &amp; Audit Committee</span>
+      <span><strong>Prepared By:</strong> Internal Audit Department</span>
+      <span><strong>Lead Assessor:</strong> John Doe</span>
+      <span><strong>Quality Reviewer:</strong> Jane Doe</span>
+      <span><strong>Report Status:</strong> Final</span>
+      <span><strong>Engagement:</strong> Cybersecurity Program Assessment</span>
+    </div>
+  </header>
+
+  <div class="disclaimer">
+    <strong>Educational Example:</strong> This document is a fictional example created for educational and demonstration purposes only in
+    <a href="https://academy.simplycyber.io" style="color: var(--amber);">Simply Cyber Academy</a>, for
+    <a href="https://academy.simplycyber.io/p/accrp" style="color: var(--amber);">AKYLADE Cyber Risk Management Practitioner (A/CCRP)</a>.
+    All company names, individuals, findings, scores, and data are entirely fictitious.
+  </div>
+
+  <!-- ════════════════ TABLE OF CONTENTS ════════════════ -->
+  <div class="section">
+    <div class="section-number">Navigation</div>
+    <h2>Table of Contents</h2>
+    <ul class="toc">
+      <li><a href="#s1">1. Independent Assessment Opinion</a></li>
+      <li><a href="#s2">2. Executive Summary</a></li>
+      <li><a href="#s3">3. Scope and Methodology</a></li>
+      <li><a href="#s4">4. Overall Maturity Assessment</a></li>
+      <li><a href="#s5">5. Risk-Rated Findings</a></li>
+      <li><a href="#s6">6. Management Response &amp; Action Plans</a></li>
+      <li><a href="#s7">7. Conclusion</a></li>
+      <li><a href="#appA">Appendix A: CSF Function Scoring Detail</a></li>
+      <li><a href="#appB">Appendix B: Assessment Criteria &amp; Ratings</a></li>
+      <li><a href="#appC">Appendix C: Distribution List</a></li>
+    </ul>
+  </div>
+
+  <!-- ════════════════ 1. OPINION ════════════════ -->
+  <div class="section" id="s1">
+    <div class="section-number">Section 01</div>
+    <h2>Independent Assessment Opinion</h2>
+
+    <div class="rating-banner">
+      <div class="rating-label">Overall Assessment Rating</div>
+      <div class="rating-value">UNSATISFACTORY</div>
+    </div>
+
+    <p>Based on our assessment of 38 control implementations across all six NIST CSF 2.0 functions, we conclude that Alma Security's cybersecurity program <strong>requires significant improvement</strong> to meet target maturity levels. The majority of assessed functions (5 of 6) fall below their target scores, indicating systemic gaps in the cybersecurity program.</p>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">38</div>
+        <div class="stat-label">Controls Assessed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value red">26</div>
+        <div class="stat-label">Below Target</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">3.2</div>
+        <div class="stat-label">Overall Score / 10</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value red">0%</div>
+        <div class="stat-label">Evidence Coverage</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ 2. EXECUTIVE SUMMARY ════════════════ -->
+  <div class="section" id="s2">
+    <div class="section-number">Section 02</div>
+    <h2>Executive Summary</h2>
+
+    <h3>Key Results</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">3.2</div>
+        <div class="stat-label">Maturity Score / 10</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value green">12</div>
+        <div class="stat-label">Meeting Target</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value red">26</div>
+        <div class="stat-label">Below Target</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value red">3</div>
+        <div class="stat-label">High Findings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" style="color: var(--amber);">1</div>
+        <div class="stat-label">Medium Findings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value green">0</div>
+        <div class="stat-label">Critical Findings</div>
+      </div>
+    </div>
+
+    <h3>Assessment Rating by Function</h3>
+
+    <!-- Function Summary Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Function</th>
+          <th class="text-center">Avg Score</th>
+          <th class="text-center">Target</th>
+          <th class="text-center">Gap</th>
+          <th class="text-center">Rating</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="fw-600">Govern (GV)</td>
+          <td class="text-center score-green">5.2</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center gap-green">−0.2</td>
+          <td class="text-center"><span class="badge badge-sat">Satisfactory</span></td>
+        </tr>
+        <tr>
+          <td class="fw-600">Identify (ID)</td>
+          <td class="text-center score-red">2.2</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center gap-red">2.8</td>
+          <td class="text-center"><span class="badge badge-unsat">Unsatisfactory</span></td>
+        </tr>
+        <tr>
+          <td class="fw-600">Protect (PR)</td>
+          <td class="text-center score-red">2.8</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center gap-red">2.3</td>
+          <td class="text-center"><span class="badge badge-unsat">Unsatisfactory</span></td>
+        </tr>
+        <tr>
+          <td class="fw-600">Detect (DE)</td>
+          <td class="text-center score-red">2.0</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center gap-red">3.0</td>
+          <td class="text-center"><span class="badge badge-unsat">Unsatisfactory</span></td>
+        </tr>
+        <tr>
+          <td class="fw-600">Respond (RS)</td>
+          <td class="text-center score-red">2.0</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center gap-red">3.0</td>
+          <td class="text-center"><span class="badge badge-unsat">Unsatisfactory</span></td>
+        </tr>
+        <tr>
+          <td class="fw-600">Recover (RC)</td>
+          <td class="text-center score-red">2.0</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center gap-red">3.0</td>
+          <td class="text-center"><span class="badge badge-unsat">Unsatisfactory</span></td>
+        </tr>
+        <tr class="avg-row">
+          <td>Overall</td>
+          <td class="text-center">3.2</td>
+          <td class="text-center">5.0</td>
+          <td class="text-center">1.8</td>
+          <td class="text-center"><span class="badge badge-unsat">Unsatisfactory</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Function Actual vs Target</h3>
+    <div class="bar-chart">
+      <div class="bar-row">
+        <div class="bar-label">Govern (GV)</div>
+        <div class="bar-track">
+          <div class="bar-fill actual" style="width: 52%;">5.2</div>
+          <div class="bar-fill target-line" style="left: 50%;"></div>
+        </div>
+        <div class="bar-value score-green">5.2</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Identify (ID)</div>
+        <div class="bar-track">
+          <div class="bar-fill actual" style="width: 22%; background: #f87171;">2.2</div>
+          <div class="bar-fill target-line" style="left: 50%;"></div>
+        </div>
+        <div class="bar-value score-red">2.2</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Protect (PR)</div>
+        <div class="bar-track">
+          <div class="bar-fill actual" style="width: 28%; background: #f87171;">2.8</div>
+          <div class="bar-fill target-line" style="left: 50%;"></div>
+        </div>
+        <div class="bar-value score-red">2.8</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Detect (DE)</div>
+        <div class="bar-track">
+          <div class="bar-fill actual" style="width: 20%; background: #f87171;">2.0</div>
+          <div class="bar-fill target-line" style="left: 50%;"></div>
+        </div>
+        <div class="bar-value score-red">2.0</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Respond (RS)</div>
+        <div class="bar-track">
+          <div class="bar-fill actual" style="width: 20%; background: #f87171;">2.0</div>
+          <div class="bar-fill target-line" style="left: 50%;"></div>
+        </div>
+        <div class="bar-value score-red">2.0</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-label">Recover (RC)</div>
+        <div class="bar-track">
+          <div class="bar-fill actual" style="width: 20%; background: #f87171;">2.0</div>
+          <div class="bar-fill target-line" style="left: 50%;"></div>
+        </div>
+        <div class="bar-value score-red">2.0</div>
+      </div>
+      <div style="font-size: 11px; color: var(--text-muted); text-align: right; margin-top: 4px;">
+        <span style="display: inline-block; width: 10px; height: 2px; background: var(--accent); vertical-align: middle;"></span> Target (5.0)
+      </div>
+    </div>
+
+    <h3>Top 3 Priority Gaps</h3>
+    <div class="priority-gaps">
+      <div class="priority-gap-item">
+        <div class="priority-gap-rank">1</div>
+        <div class="priority-gap-id">ID.RA-07 Ex1</div>
+        <div class="priority-gap-bar">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width: 10%;"></div></div>
+        </div>
+        <div class="priority-gap-score">Gap: 4.0 (1.0 → 5.0)</div>
+      </div>
+      <div class="priority-gap-item">
+        <div class="priority-gap-rank">2</div>
+        <div class="priority-gap-id">PR.IR-02 Ex1</div>
+        <div class="priority-gap-bar">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width: 10%;"></div></div>
+        </div>
+        <div class="priority-gap-score">Gap: 4.0 (1.0 → 5.0)</div>
+      </div>
+      <div class="priority-gap-item">
+        <div class="priority-gap-rank">3</div>
+        <div class="priority-gap-id">RS.MI-02 Ex2</div>
+        <div class="priority-gap-bar">
+          <div class="mini-bar"><div class="mini-bar-fill" style="width: 20%;"></div></div>
+        </div>
+        <div class="priority-gap-score">Gap: 3.0 (2.0 → 5.0)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ 3. SCOPE ════════════════ -->
+  <div class="section" id="s3">
+    <div class="section-number">Section 03</div>
+    <h2>Scope and Methodology</h2>
+
+    <h3>Assessment Scope</h3>
+    <p>This assessment evaluated Alma Security's implementation of the NIST Cybersecurity Framework (CSF) 2.0 across the following functions:</p>
+
+    <table>
+      <thead>
+        <tr><th>Function</th><th class="text-center">Controls Assessed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Govern (GV)</td><td class="text-center">12</td></tr>
+        <tr><td>Identify (ID)</td><td class="text-center">6</td></tr>
+        <tr><td>Protect (PR)</td><td class="text-center">8</td></tr>
+        <tr><td>Detect (DE)</td><td class="text-center">8</td></tr>
+        <tr><td>Respond (RS)</td><td class="text-center">3</td></tr>
+        <tr><td>Recover (RC)</td><td class="text-center">1</td></tr>
+        <tr class="avg-row"><td><strong>Total</strong></td><td class="text-center"><strong>38</strong></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Scoring Framework</h3>
+    <p>Controls were evaluated on a 1–10 scale. See <a href="#appB" style="color: var(--accent);">Appendix B</a> for full scoring definitions.</p>
+
+    <h3>Methodology</h3>
+    <p>Assessment procedures included:</p>
+    <table>
+      <thead><tr><th>Method</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td class="fw-600">Examine</td><td>Review of policies, procedures, and technical documentation</td></tr>
+        <tr><td class="fw-600">Interview</td><td>Discussions with control owners and subject matter experts</td></tr>
+        <tr><td class="fw-600">Test</td><td>Technical validation through sampling, inspection, and tool-based verification</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════════════ 4. MATURITY ════════════════ -->
+  <div class="section" id="s4">
+    <div class="section-number">Section 04</div>
+    <h2>Overall Maturity Assessment</h2>
+
+    <h3>Current Maturity Profile</h3>
+    <p>The organization's overall cybersecurity maturity is assessed at <strong>Some Security</strong> (3.2 / 10.0).</p>
+
+    <div class="maturity-grid">
+      <div class="maturity-item">
+        <div class="maturity-ring sat">5.2</div>
+        <div class="maturity-info">
+          <div class="maturity-name">Governance (GV)</div>
+          <div class="maturity-detail">Minimally Acceptable</div>
+        </div>
+      </div>
+      <div class="maturity-item">
+        <div class="maturity-ring unsat">2.3</div>
+        <div class="maturity-info">
+          <div class="maturity-name">Operations (ID, PR, DE, RS, RC)</div>
+          <div class="maturity-detail">Some Security</div>
+        </div>
+      </div>
+      <div class="maturity-item" style="grid-column: 1 / -1;">
+        <div class="maturity-ring unsat">3.2</div>
+        <div class="maturity-info">
+          <div class="maturity-name">Overall</div>
+          <div class="maturity-detail">Some Security</div>
+        </div>
+      </div>
+    </div>
+
+    <h3>Governance vs Operations Gap</h3>
+    <p>Governance maturity (5.2) exceeds operational maturity (2.3) by <strong>2.9 points</strong>, suggesting that policies and frameworks are more mature than their technical implementation.</p>
+  </div>
+
+  <!-- ════════════════ 5. FINDINGS ════════════════ -->
+  <div class="section" id="s5">
+    <div class="section-number">Section 05</div>
+    <h2>Risk-Rated Findings</h2>
+    <p>A total of <strong>4</strong> findings were identified during the assessment.</p>
+
+    <div class="finding-card high">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <div class="finding-title">Finding 1: Change Management Enforcement Gap — 85% Compliance</div>
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="finding-controls">Affected Controls: DE.CM-01 Ex1</div>
+      <p><strong>Condition:</strong> Change management policy exists but lacks automated enforcement. Teams have varying levels of training and awareness. Exception documentation process established but not consistently followed.</p>
+      <p><strong>Recommendation:</strong> Implement automated change management enforcement in ServiceNow. Extend mandatory risk impact assessments to all systems (not just crown jewels). Conduct training for all teams on change documentation requirements. Target 95% compliance.</p>
+    </div>
+
+    <div class="finding-card high">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <div class="finding-title">Finding 2: 24/7 SOC Monitoring Coverage Gap</div>
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="finding-controls">Affected Controls: PR.IR-03 Ex2</div>
+      <p><strong>Condition:</strong> Staffing constraints limit coverage to business hours. Current team of 3 security professionals cannot sustain 24/7 operations. STS1 hiring strategy approved but not yet implemented.</p>
+      <p><strong>Recommendation:</strong> Complete Incident Response Enhancement project deliverables for 24/7 monitoring. Add additional SIEM use cases for non-AWS systems. Implement log analysis automation to reduce manual review burden. Hire additional SOC staff per STS1 strategy.</p>
+    </div>
+
+    <div class="finding-card high">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <div class="finding-title">Finding 3: Shared Developer SSH Key on Kubernetes Nodes</div>
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="finding-controls">Affected Controls: PR.IR-03 Ex2</div>
+      <p><strong>Condition:</strong> Legacy configuration from early infrastructure setup. Individual key deployment was deprioritized during rapid growth phase. SentinelOne application control deployed on workstations but server-side controls still being expanded.</p>
+      <p><strong>Recommendation:</strong> Remediate shared developer SSH key on Kubernetes nodes — issue individual keys per developer. Expand server-side application control deployment. Complete app control policy exception review.</p>
+    </div>
+
+    <div class="finding-card medium">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+        <div class="finding-title">Finding 4: External Attack Surface Monitoring Gap</div>
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="finding-controls">Affected Controls: PR.IR-03 Ex2</div>
+      <p><strong>Condition:</strong> ASM vendor selection was delayed due to budget constraints. Risk register item R2 identifies this as a known gap. DNS/BGP monitoring operational but external asset discovery limited.</p>
+      <p><strong>Recommendation:</strong> Complete ASM solution deployment and integration. Expand DNS/BGP monitoring coverage to all network segments. Deploy network service monitoring dashboards to SOC. Address R2 risk register item.</p>
+    </div>
+  </div>
+
+  <!-- ════════════════ 6. MANAGEMENT RESPONSE ════════════════ -->
+  <div class="section" id="s6">
+    <div class="section-number">Section 06</div>
+    <h2>Management Response &amp; Action Plans</h2>
+
+    <div class="action-plan">
+      <div class="action-header">
+        <div class="action-title">Finding 1: Change Management Enforcement Gap — 85% Compliance</div>
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="action-body">Implement automated change management enforcement in ServiceNow. Extend mandatory risk impact assessments to all systems. Conduct training for all teams. Target 95% compliance.</div>
+      <div class="action-meta">
+        <span><span class="badge badge-status">In Progress</span></span>
+        <span><strong>Due:</strong> 2026-09-30</span>
+      </div>
+    </div>
+
+    <div class="action-plan">
+      <div class="action-header">
+        <div class="action-title">Finding 2: 24/7 SOC Monitoring Coverage Gap</div>
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="action-body">Complete IR Enhancement project deliverables for 24/7 monitoring. Add additional SIEM use cases for non-AWS systems. Implement log analysis automation. Hire additional SOC staff per STS1 strategy.</div>
+      <div class="action-meta">
+        <span><span class="badge badge-status">In Progress</span></span>
+        <span><strong>Due:</strong> 2026-08-31</span>
+      </div>
+    </div>
+
+    <div class="action-plan">
+      <div class="action-header">
+        <div class="action-title">Finding 3: Shared Developer SSH Key on Kubernetes Nodes</div>
+        <span class="badge badge-high">High</span>
+      </div>
+      <div class="action-body">Remediate shared developer SSH key — issue individual keys per developer. Expand server-side application control deployment. Complete app control policy exception review.</div>
+      <div class="action-meta">
+        <span><span class="badge badge-unsat">Not Started</span></span>
+        <span><strong>Due:</strong> 2026-08-15</span>
+      </div>
+    </div>
+
+    <div class="action-plan">
+      <div class="action-header">
+        <div class="action-title">Finding 4: External Attack Surface Monitoring Gap</div>
+        <span class="badge badge-medium">Medium</span>
+      </div>
+      <div class="action-body">Complete ASM solution deployment and integration. Expand DNS/BGP monitoring coverage. Deploy network service monitoring dashboards to SOC. Address R2 risk register item.</div>
+      <div class="action-meta">
+        <span><span class="badge badge-status">In Progress</span></span>
+        <span><strong>Due:</strong> 2026-08-31</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════ 7. CONCLUSION ════════════════ -->
+  <div class="section" id="s7">
+    <div class="section-number">Section 07</div>
+    <h2>Conclusion</h2>
+    <p>This assessment evaluated 38 control implementations across the six NIST CSF 2.0 functions for Alma Security. Of the 38 controls assessed, <strong>12 (32%) meet or exceed</strong> target maturity levels, while <strong>26 controls require improvement</strong> to reach their target scores.</p>
+    <p>4 findings were identified, of which <strong>3 are rated High priority</strong> and require immediate management attention.</p>
+    <p>Management should prioritize remediation of identified findings in accordance with the action plans outlined in Section 6 and monitor progress through the quarterly assessment cycle.</p>
+  </div>
+
+  <!-- ════════════════ APPENDIX A ════════════════ -->
+  <div class="section" id="appA">
+    <div class="section-number">Appendix A</div>
+    <h2>CSF Function Scoring Detail</h2>
+
+    <!-- GOVERN -->
+    <div class="function-header">
+      <h3>Govern (GV)</h3>
+      <span class="badge badge-sat">Satisfactory</span>
+    </div>
+    <table>
+      <thead><tr><th>Control ID</th><th class="text-center">Q1 Score</th><th class="text-center">Target</th><th class="text-center">Gap</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">GV.OC-01 Ex1</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.OC-02 Ex1</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.OV-01 Ex2</td><td class="text-center score-green">6.0</td><td class="text-center">5.0</td><td class="text-center gap-green">−1.0</td></tr>
+        <tr><td class="mono">GV.RM-01 Ex2</td><td class="text-center score-green">6.0</td><td class="text-center">5.0</td><td class="text-center gap-green">−1.0</td></tr>
+        <tr><td class="mono">GV.RR-01 Ex4</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.RR-02 Ex1</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.SC-01 Ex3</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.SC-02 Ex7</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.SC-04 Ex1</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.SC-06 Ex3</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.SC-09 Ex5</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr><td class="mono">GV.SC-10 Ex3</td><td class="text-center score-green">5.0</td><td class="text-center">5.0</td><td class="text-center gap-green">0.0</td></tr>
+        <tr class="avg-row"><td><strong>Average</strong></td><td class="text-center"><strong>5.2</strong></td><td class="text-center"><strong>5.0</strong></td><td class="text-center"><strong>−0.2</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- IDENTIFY -->
+    <div class="function-header">
+      <h3>Identify (ID)</h3>
+      <span class="badge badge-unsat">Unsatisfactory</span>
+    </div>
+    <table>
+      <thead><tr><th>Control ID</th><th class="text-center">Q1 Score</th><th class="text-center">Target</th><th class="text-center">Gap</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">ID.AM-02 Ex2</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">ID.AM-07 Ex3</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">ID.IM-01 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">ID.RA-01 Ex1</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr><td class="mono">ID.RA-07 Ex1</td><td class="text-center score-red">1.0</td><td class="text-center">5.0</td><td class="text-center gap-red">4.0</td></tr>
+        <tr><td class="mono">ID.RA-08 Ex1</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr class="avg-row"><td><strong>Average</strong></td><td class="text-center"><strong>2.2</strong></td><td class="text-center"><strong>5.0</strong></td><td class="text-center"><strong>2.8</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- PROTECT -->
+    <div class="function-header">
+      <h3>Protect (PR)</h3>
+      <span class="badge badge-unsat">Unsatisfactory</span>
+    </div>
+    <table>
+      <thead><tr><th>Control ID</th><th class="text-center">Q1 Score</th><th class="text-center">Target</th><th class="text-center">Gap</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">PR.AA-02 Ex2</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr><td class="mono">PR.AT-01 Ex2</td><td class="text-center score-amber">4.0</td><td class="text-center">5.0</td><td class="text-center gap-amber">1.0</td></tr>
+        <tr><td class="mono">PR.DS-01 Ex4</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr><td class="mono">PR.DS-10 Ex1</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr><td class="mono">PR.IR-02 Ex1</td><td class="text-center score-red">1.0</td><td class="text-center">5.0</td><td class="text-center gap-red">4.0</td></tr>
+        <tr><td class="mono">PR.IR-03 Ex3</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr><td class="mono">PR.PS-01 Ex1</td><td class="text-center score-red">3.0</td><td class="text-center">5.0</td><td class="text-center gap-red">2.0</td></tr>
+        <tr><td class="mono">PR.PS-05 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr class="avg-row"><td><strong>Average</strong></td><td class="text-center"><strong>2.8</strong></td><td class="text-center"><strong>5.0</strong></td><td class="text-center"><strong>2.3</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- DETECT -->
+    <div class="function-header">
+      <h3>Detect (DE)</h3>
+      <span class="badge badge-unsat">Unsatisfactory</span>
+    </div>
+    <table>
+      <thead><tr><th>Control ID</th><th class="text-center">Q1 Score</th><th class="text-center">Target</th><th class="text-center">Gap</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">DE.AE-02 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.AE-02 Ex3</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.AE-03 Ex2</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.AE-06 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.AE-08 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.CM-01 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.CM-03 Ex2</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">DE.CM-09 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr class="avg-row"><td><strong>Average</strong></td><td class="text-center"><strong>2.0</strong></td><td class="text-center"><strong>5.0</strong></td><td class="text-center"><strong>3.0</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- RESPOND -->
+    <div class="function-header">
+      <h3>Respond (RS)</h3>
+      <span class="badge badge-unsat">Unsatisfactory</span>
+    </div>
+    <table>
+      <thead><tr><th>Control ID</th><th class="text-center">Q1 Score</th><th class="text-center">Target</th><th class="text-center">Gap</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">RS.MA-03 Ex2</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">RS.MI-01 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr><td class="mono">RS.MI-02 Ex2</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr class="avg-row"><td><strong>Average</strong></td><td class="text-center"><strong>2.0</strong></td><td class="text-center"><strong>5.0</strong></td><td class="text-center"><strong>3.0</strong></td></tr>
+      </tbody>
+    </table>
+
+    <!-- RECOVER -->
+    <div class="function-header">
+      <h3>Recover (RC)</h3>
+      <span class="badge badge-unsat">Unsatisfactory</span>
+    </div>
+    <table>
+      <thead><tr><th>Control ID</th><th class="text-center">Q1 Score</th><th class="text-center">Target</th><th class="text-center">Gap</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">RC.RP-03 Ex1</td><td class="text-center score-red">2.0</td><td class="text-center">5.0</td><td class="text-center gap-red">3.0</td></tr>
+        <tr class="avg-row"><td><strong>Average</strong></td><td class="text-center"><strong>2.0</strong></td><td class="text-center"><strong>5.0</strong></td><td class="text-center"><strong>3.0</strong></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════════════ APPENDIX B ════════════════ -->
+  <div class="section" id="appB">
+    <div class="section-number">Appendix B</div>
+    <h2>Assessment Criteria &amp; Rating Definitions</h2>
+
+    <h3>Finding Risk Ratings</h3>
+    <table>
+      <thead><tr><th>Rating</th><th>Definition</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-unsat">Critical</span></td><td>Immediate risk to the organization requiring urgent remediation. Significant control failures or gaps that could lead to material security incidents.</td></tr>
+        <tr><td><span class="badge badge-high">High</span></td><td>Significant risk requiring prompt remediation. Control deficiencies that materially reduce the effectiveness of the cybersecurity program.</td></tr>
+        <tr><td><span class="badge badge-medium">Medium</span></td><td>Moderate risk requiring planned remediation. Control gaps that may reduce program effectiveness if not addressed within a reasonable timeframe.</td></tr>
+        <tr><td><span class="badge badge-low">Low</span></td><td>Minor risk for inclusion in ongoing improvement plans. Opportunities to enhance controls beyond current baseline requirements.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Function Assessment Ratings</h3>
+    <table>
+      <thead><tr><th>Rating</th><th>Criteria</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-sat">Satisfactory</span></td><td>Function average score meets or exceeds the target. Controls are operating effectively.</td></tr>
+        <tr><td><span class="badge badge-needs">Needs Improvement</span></td><td>Function average is at least 70% of target but below full target. Controls are partially effective with identified gaps.</td></tr>
+        <tr><td><span class="badge badge-unsat">Unsatisfactory</span></td><td>Function average is below 70% of target. Controls have significant deficiencies requiring immediate attention.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Scoring Scale (1–10)</h3>
+    <table>
+      <thead><tr><th>Score</th><th>Level</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">0 – 1.9</td><td class="fw-600">Insecurity</td><td>Organization rarely or never does this. Not enough security.</td></tr>
+        <tr><td class="mono">2.0 – 4.9</td><td class="fw-600">Some Security</td><td>Organization sometimes does this, but unreliably. Rework is common.</td></tr>
+        <tr><td class="mono">5.0 – 5.9</td><td class="fw-600">Minimally Acceptable</td><td>Organization does this consistently, with some minor flaws. Just right.</td></tr>
+        <tr><td class="mono">6.0 – 6.9</td><td class="fw-600">Optimized</td><td>Organization does this consistently, with great effectiveness and quality.</td></tr>
+        <tr><td class="mono">7.0 – 7.9</td><td class="fw-600">Fully Optimized</td><td>Organization does this consistently, with fully optimized effectiveness.</td></tr>
+        <tr><td class="mono">8.0 – 10.0</td><td class="fw-600">Too Much Security</td><td>Organization does this at excessive cost. People can't easily get their work done.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════════════ APPENDIX C ════════════════ -->
+  <div class="section" id="appC">
+    <div class="section-number">Appendix C</div>
+    <h2>Distribution List</h2>
+    <table>
+      <thead><tr><th>Role</th><th>Name</th></tr></thead>
+      <tbody>
+        <tr><td class="fw-600">Prepared For</td><td>Board of Directors and Audit Committee</td></tr>
+        <tr><td class="fw-600">Prepared By</td><td>Internal Audit Department</td></tr>
+        <tr><td class="fw-600">Lead Assessor</td><td>John Doe</td></tr>
+        <tr><td class="fw-600">Quality Reviewer</td><td>Jane Doe</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ════════════════ FOOTER ════════════════ -->
+  <div class="report-footer">
+    This report was generated from the NIST CSF 2.0 Profile Assessment Database.<br>
+    Confidential — Distribution restricted to authorized recipients.
+  </div>
+
+</div>
+
+</body>
+</html>
