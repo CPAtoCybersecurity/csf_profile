@@ -447,7 +447,7 @@ const Settings = () => {
 
     try {
       const text = await file.text();
-      const count = importEntryIdsFromCSV(text);
+      const count = await importEntryIdsFromCSV(text);
       setEntryIdCount(Object.keys(getAllEntryIdMappings()).length);
       toast.success(`Imported ${count} entry ID mappings`);
     } catch (err) {

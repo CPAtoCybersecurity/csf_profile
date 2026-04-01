@@ -36,3 +36,25 @@ export const validateConfluence = async (req, res) => {
     res.status(getErrorStatus(error)).json(sanitizeErrorResponse(error, 'Confluence validateConfluence'));
   }
 };
+
+
+let entryIdMappings = {};
+
+// GET mappings
+export const getMappings = (req, res) => {
+  res.json(entryIdMappings);
+};
+
+// POST mappings
+export const saveMappings = (req, res) => {
+  if (typeof req.body !== 'object') {
+    return res.status(400).json({ error: 'Invalid mappings format' });
+  }
+  
+  entryIdMappings = {
+    ...entryIdMappings,
+    ...req.body
+  };
+
+  res.status(200).json({ success: true });
+};

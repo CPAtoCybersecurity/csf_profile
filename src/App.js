@@ -36,6 +36,7 @@ import useAssessmentsStore from './stores/assessmentsStore';
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
 import { checkEnvironmentVariables } from './utils/envValidation';
+import { initializeEntryIdMappings } from './utils/confluenceSync';
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
@@ -43,6 +44,10 @@ const AppContent = () => {
   const exportRequirementsCSV = useRequirementsStore((state) => state.exportRequirementsCSV);
   const [showBackupReminder, setShowBackupReminder] = useState(false);
   const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
+
+  useEffect(() => {
+    initializeEntryIdMappings();
+  }, []);
 
   // Initialize keyboard navigation
   useKeyboardNavigation();
