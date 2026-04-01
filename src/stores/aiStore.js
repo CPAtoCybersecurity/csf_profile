@@ -13,12 +13,14 @@ const NIST_MODEL = "etgohome/hackidle-nist-coder";
 const HF_API_BASE = "https://datasets-server.huggingface.co";
 const HF_DATASET = "ethanolivertroy/nist-cybersecurity-training";
 
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+const INTERNAL_API_KEY = process.env.REACT_APP_INTERNAL_API_KEY;
+
 const useAIStore = create(
   persist(
     (set, get) => ({
       // Provider configuration
       llmProvider: 'ollama', // 'ollama' or 'claude'
-      claudeApiKey: '',
       dataMode: 'hybrid', // 'lightweight', 'hybrid', 'full'
 
       // Ollama status
@@ -49,7 +51,6 @@ const useAIStore = create(
 
       // Actions
       setLlmProvider: (provider) => set({ llmProvider: provider }),
-      setClaudeApiKey: (key) => set({ claudeApiKey: key }),
       setDataMode: (mode) => set({ dataMode: mode }),
 
       // Check Ollama availability
@@ -106,26 +107,23 @@ const useAIStore = create(
 
       // Generate with Claude
       generateWithClaude: async (prompt, maxTokens = 2500) => {
-        const { claudeApiKey } = get();
-        if (!claudeApiKey) throw new Error('Claude API key not configured');
-
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
+        const response = await fetch(`${API_BASE_URL}/api/ai/claude`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "x-api-key": claudeApiKey,
-            "anthropic-version": "2023-06-01",
-            "anthropic-dangerous-direct-browser-access": "true"
+            "Authorization": `Bearer ${INTERNAL_API_KEY}`
           },
           body: JSON.stringify({
-            model: "claude-sonnet-4-20250514",
-            max_tokens: maxTokens,
-            messages: [{ role: "user", content: prompt }]
+            prompt, maxTokens
           })
         });
 
+        if(!response.ok) {
+          const errText = await response.text();
+          throw new Error(errText || "Claude backend error");
+        }
         const data = await response.json();
-        return data.content?.[0]?.text || data.error?.message || 'Analysis failed';
+        return data.result;
       },
 
       // Search HuggingFace dataset
@@ -426,7 +424,6 @@ Format as an actionable plan that can be imported into a remediation tracker.`;
       name: 'csf-ai-storage',
       partialize: (state) => ({
         llmProvider: state.llmProvider,
-        claudeApiKey: state.claudeApiKey,
         dataMode: state.dataMode,
         analysisResult: state.analysisResult,
         chatHistory: state.chatHistory
