@@ -36,3 +36,26 @@ export const validateConfluence = async (req, res) => {
     res.status(getErrorStatus(error)).json(sanitizeErrorResponse(error, 'Confluence validateConfluence'));
   }
 };
+
+let entryIdMappings = {};
+
+// GET mappings
+export const getMappings = (req, res) => {
+  res.json(entryIdMappings);
+};
+
+// POST mappings
+export const saveMappings = (req, res) => {
+  entryIdMappings = {
+    ...entryIdMappings,
+    ...req.body
+  };
+
+  res.status(200).json({ success: true });
+};
+
+// DELETE mappings
+export const clearMappings = (req, res) => {
+  entryIdMappings = {};
+  res.status(200).json({ success: true });
+};

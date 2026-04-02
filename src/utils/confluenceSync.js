@@ -4,10 +4,18 @@
  *
  * Smart-Embed URLs allow embedding Confluence database entries into Jira issues,
  * solving the entryId GUID challenge for linking requirements to evaluations.
+ * 
+ * SECURITY UPDATE:
+ * - Removed use of localStorage (CWE-922)
+ * - Mappings are now stored server-side and accessed via API
+ * - Prevents exposure via XSS attacks
  */
 
-// Confluence configuration — loaded from environment or localStorage settings.
-// Never hardcode instance URLs or account IDs in source code.
+// Use environment-based API URL
+const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+let isInitialized = false;
+
+// Confluence configuration (should be injected via config APIs ideally)
 const CONFLUENCE_CONFIG = {
   baseUrl: '',
   spaceKey: '',
@@ -16,35 +24,62 @@ const CONFLUENCE_CONFIG = {
 };
 
 /**
- * Store for entryId mappings (requirementId -> confluenceEntryId)
- * This should be persisted to localStorage or a store
+ * Frontend cache (source of truth is backend)
  */
 let entryIdMappings = {};
 
 /**
- * Load entry ID mappings from localStorage
+ * Load entry ID mappings from backend
+ * Must be called once at app startup
  */
-export function loadEntryIdMappings() {
+export async function initializeEntryIdMappings() {
   try {
-    const stored = localStorage.getItem('confluence-entry-mappings');
-    if (stored) {
-      entryIdMappings = JSON.parse(stored);
+    const res = await fetch(`${API_BASE_URL}/api/confluence/mappings`, {
+      credentials: 'include'
+    });
+
+    if (!res.ok) throw new Error(`Failed to load mappings: ${res.status}`);
+
+    const data = await res.json();
+
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
+      throw new Error("Invalid mappings format");
     }
+    for (const val of Object.values(data)) {
+      if (typeof val !== 'string') {
+        throw new Error("Invalid mapping values");
+      }
+    }
+    
+    entryIdMappings = data;
+    isInitialized = true;
   } catch (e) {
-    console.error('Failed to load Confluence entry mappings:', e);
+    console.error('Failed to initialize Confluence entry mappings:', e);
   }
-  return entryIdMappings;
 }
 
 /**
- * Save entry ID mappings to localStorage
+ * Save mappings to backend
  */
-export function saveEntryIdMappings(mappings) {
+export async function saveEntryIdMappings(mappings) {
   try {
+    const res = await fetch(`${API_BASE_URL}/api/confluence/mappings`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(mappings)
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to save mappings: ${res.status}`);
+    }
+
+    // Update local cache only after successful save
     entryIdMappings = { ...entryIdMappings, ...mappings };
-    localStorage.setItem('confluence-entry-mappings', JSON.stringify(entryIdMappings));
+
   } catch (e) {
     console.error('Failed to save Confluence entry mappings:', e);
+    throw e;
   }
 }
 
@@ -52,8 +87,8 @@ export function saveEntryIdMappings(mappings) {
  * Get entryId for a requirement
  */
 export function getEntryId(requirementId) {
-  if (Object.keys(entryIdMappings).length === 0) {
-    loadEntryIdMappings();
+  if (!isInitialized) {
+    console.warn("Mappings not initialized yet");
   }
   return entryIdMappings[requirementId] || null;
 }
@@ -61,9 +96,8 @@ export function getEntryId(requirementId) {
 /**
  * Set entryId for a requirement
  */
-export function setEntryId(requirementId, entryId) {
-  entryIdMappings[requirementId] = entryId;
-  saveEntryIdMappings(entryIdMappings);
+export async function setEntryId(requirementId, entryId) {
+  await saveEntryIdMappings({ [requirementId]: entryId });
 }
 
 /**
@@ -82,6 +116,10 @@ export function setEntryId(requirementId, entryId) {
 export function generateSmartEmbedUrl(entryId, databaseId = CONFLUENCE_CONFIG.requirementsDbId) {
   if (!entryId) return null;
 
+  if (!CONFLUENCE_CONFIG.baseUrl || !CONFLUENCE_CONFIG.spaceKey || !databaseId) {
+    console.warn("Confluence config incomplete");
+    return null;
+  }
   return `${CONFLUENCE_CONFIG.baseUrl}/wiki/spaces/${CONFLUENCE_CONFIG.spaceKey}/database/${databaseId}/entry/${entryId}`;
 }
 
@@ -226,7 +264,7 @@ export async function harvestEntryIds(apiToken, email) {
     const mappings = parseConfluenceEntriesResponse(data);
 
     // Save mappings
-    saveEntryIdMappings(mappings);
+    await saveEntryIdMappings(mappings);
 
     return mappings;
   } catch (error) {
@@ -242,7 +280,7 @@ export async function harvestEntryIds(apiToken, email) {
  * @param {string} csvContent - CSV file content
  * @returns {number} Number of mappings imported
  */
-export function importEntryIdsFromCSV(csvContent) {
+export async function importEntryIdsFromCSV(csvContent) {
   const lines = csvContent.split('\n').filter(line => line.trim());
   if (lines.length < 2) return 0;
 
@@ -266,7 +304,7 @@ export function importEntryIdsFromCSV(csvContent) {
     }
   }
 
-  saveEntryIdMappings(mappings);
+  await saveEntryIdMappings(mappings);
   return Object.keys(mappings).length;
 }
 
@@ -276,8 +314,6 @@ export function importEntryIdsFromCSV(csvContent) {
  * @returns {string} CSV content
  */
 export function exportEntryIdsToCSV() {
-  loadEntryIdMappings();
-
   const rows = [['Requirement ID', 'Entry ID']];
   for (const [reqId, entryId] of Object.entries(entryIdMappings)) {
     rows.push([reqId, entryId]);
@@ -287,19 +323,30 @@ export function exportEntryIdsToCSV() {
 }
 
 /**
- * Get all stored entry ID mappings
+ * Get all mappings (from cache)
  */
 export function getAllEntryIdMappings() {
-  loadEntryIdMappings();
   return { ...entryIdMappings };
 }
 
 /**
- * Clear all entry ID mappings
+ * Clear mappings (backend + local cache)
  */
-export function clearEntryIdMappings() {
-  entryIdMappings = {};
-  localStorage.removeItem('confluence-entry-mappings');
+export async function clearEntryIdMappings() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/confluence/mappings`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to clear mappings: ${res.status}`);
+    }
+
+    entryIdMappings = {};
+  } catch (e) {
+    console.error('Failed to clear Confluence entry mappings:', e);
+  }
 }
 
 /**
@@ -317,6 +364,7 @@ export function updateConfluenceConfig(updates) {
 }
 
 export default {
+  initializeEntryIdMappings,
   generateSmartEmbedUrl,
   getSmartEmbedUrlForRequirement,
   generateAdfEmbedBlock,
