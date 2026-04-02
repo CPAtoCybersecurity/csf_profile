@@ -11,10 +11,9 @@
  * - Prevents exposure via XSS attacks
  */
 
-
-// to add await wherever we are calling them!
 // Use environment-based API URL
 const API_BASE_URL = process.env.REACT_APP_API_URL || '';
+let isInitialized = false;
 
 // Confluence configuration (should be injected via config APIs ideally)
 const CONFLUENCE_CONFIG = {
@@ -43,11 +42,17 @@ export async function initializeEntryIdMappings() {
 
     const data = await res.json();
 
-    if (typeof data !== 'object') {
+    if (!data || typeof data !== 'object' || Array.isArray(data)) {
       throw new Error("Invalid mappings format");
     }
-
+    for (const val of Object.values(data)) {
+      if (typeof val !== 'string') {
+        throw new Error("Invalid mapping values");
+      }
+    }
+    
     entryIdMappings = data;
+    isInitialized = true;
   } catch (e) {
     console.error('Failed to initialize Confluence entry mappings:', e);
   }
@@ -82,6 +87,9 @@ export async function saveEntryIdMappings(mappings) {
  * Get entryId for a requirement
  */
 export function getEntryId(requirementId) {
+  if (!isInitialized) {
+    console.warn("Mappings not initialized yet");
+  }
   return entryIdMappings[requirementId] || null;
 }
 
@@ -89,11 +97,7 @@ export function getEntryId(requirementId) {
  * Set entryId for a requirement
  */
 export async function setEntryId(requirementId, entryId) {
-  try {
-    await saveEntryIdMappings({ [requirementId]: entryId });
-  } catch (e) {
-    console.error("Failed to set entry ID:", e);
-  }
+  await saveEntryIdMappings({ [requirementId]: entryId });
 }
 
 /**
@@ -331,10 +335,8 @@ export function getAllEntryIdMappings() {
 export async function clearEntryIdMappings() {
   try {
     const res = await fetch(`${API_BASE_URL}/api/confluence/mappings`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({})
+      method: 'DELETE',
+      credentials: 'include'
     });
 
     if (!res.ok) {
@@ -342,7 +344,6 @@ export async function clearEntryIdMappings() {
     }
 
     entryIdMappings = {};
-
   } catch (e) {
     console.error('Failed to clear Confluence entry mappings:', e);
   }

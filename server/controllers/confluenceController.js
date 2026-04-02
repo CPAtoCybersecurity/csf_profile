@@ -37,7 +37,6 @@ export const validateConfluence = async (req, res) => {
   }
 };
 
-
 let entryIdMappings = {};
 
 // GET mappings
@@ -47,14 +46,16 @@ export const getMappings = (req, res) => {
 
 // POST mappings
 export const saveMappings = (req, res) => {
-  if (typeof req.body !== 'object') {
-    return res.status(400).json({ error: 'Invalid mappings format' });
-  }
-  
   entryIdMappings = {
     ...entryIdMappings,
     ...req.body
   };
 
+  res.status(200).json({ success: true });
+};
+
+// DELETE mappings
+export const clearMappings = (req, res) => {
+  entryIdMappings = {};
   res.status(200).json({ success: true });
 };
