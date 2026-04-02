@@ -5,6 +5,7 @@ import {
   saveConfluenceConfig,
   getConfigStatus,
   testConnection,
+  saveAIConfig,
 } from "../controllers/configController.js";
 
 const router = express.Router();
@@ -16,5 +17,6 @@ router.post("/jira", saveJiraConfig);
 router.post("/confluence", saveConfluenceConfig);
 router.get("/status", getConfigStatus);
 router.post("/test", testConnection);
+router.post("/ai", saveAIConfig);
 
-export default router;
+export default router;  

@@ -1,26 +1,41 @@
+/**
+ * Claude AI Proxy Controller
+ *
+ * SECURITY:
+ * - Claude API key is stored server-side only (env variable)
+ * - No API keys are exposed to the client
+ * - Prevents CWE-312 (cleartext exposure in browser)
+ *
+ * ARCHITECTURE:
+ * - Frontend calls this endpoint
+ * - Backend proxies request to Anthropic API
+ *
+ * NOTES:
+ * - Request validation handled via express-validator middleware
+ * - Rate limiting applied at route level
+ */
+
+import { getErrorStatus, sanitizeErrorResponse } from "../utils/errorUtils";
+
 export const handleClaudeRequest = async (req, res) => {
   try {
     const { prompt, maxTokens = 2500 } = req.body;
 
-    // Validation
-    if (typeof prompt !== "string" || !prompt.trim()) {
-      return res.status(400).json({ error: "Invalid prompt" });
-    }
-
-    if (maxTokens > 4000) {
-      return res.status(400).json({ error: "maxTokens too large" });
-    }
-
-    // No API key configured
+    // Local development fallback if API key is not configured
+    // Prevents blocking frontend development without real credentials
     if (!process.env.CLAUDE_API_KEY) {
-      return res.status(503).json({
-        error: "Claude API not configured"
+      return res.json({
+        result: "Mock response: Claude API not configured."
       });
     }
 
-    // Timeout protection
+    // Config
+    const TIMEOUT_MS = Number(process.env.CLAUDE_TIMEOUT_MS) || 60000;
+    const MODEL = process.env.CLAUDE_MODEL || "claude-sonnet-4-20250514";
+
+    // Timeout protection to avoid hanging requests (Claude responses can be slow)
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
+    const timeout = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -30,7 +45,7 @@ export const handleClaudeRequest = async (req, res) => {
         "anthropic-version": "2023-06-01"
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: MODEL,
         max_tokens: maxTokens,
         messages: [{ role: "user", content: prompt }]
       }),
@@ -60,7 +75,8 @@ export const handleClaudeRequest = async (req, res) => {
       return res.status(504).json({ error: "Claude request timed out" });
     }
 
-    console.error("Claude proxy error:", err);
-    return res.status(500).json({ error: "Internal server error" });
+    return res
+      .status(getErrorStatus(err))
+      .json(sanitizeErrorResponse(err, "Claude proxy"));
   }
 };

@@ -7,6 +7,11 @@
   "confluence": {
     "baseUrl": "https://your-domain.atlassian.net",
     "email": "your-email@example.com",
-    "apiToken": "your-jira-api-token"
+    "apiToken": "your-confluence-api-token"
+  },
+  "ai": {
+    "claudeApiKey": "your-claude-api-key",
+    "claudeModel": "claude-sonnet-4-20250514",
+    "claudeTimeoutMs": 60000
   }
 }

@@ -14,7 +14,6 @@ const HF_API_BASE = "https://datasets-server.huggingface.co";
 const HF_DATASET = "ethanolivertroy/nist-cybersecurity-training";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || '';
-const INTERNAL_API_KEY = process.env.REACT_APP_INTERNAL_API_KEY;
 
 const useAIStore = create(
   persist(
@@ -110,15 +109,12 @@ const useAIStore = create(
         const response = await fetch(`${API_BASE_URL}/api/ai/claude`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${INTERNAL_API_KEY}`
+            "Content-Type": "application/json"
           },
-          body: JSON.stringify({
-            prompt, maxTokens
-          })
+          body: JSON.stringify({ prompt, maxTokens })
         });
 
-        if(!response.ok) {
+        if (!response.ok) {
           const errText = await response.text();
           throw new Error(errText || "Claude backend error");
         }
