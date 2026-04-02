@@ -7,6 +7,7 @@ import bodyParser from "body-parser";
 import jiraRoutes from "./routes/jira.js";
 import confluenceRoutes from "./routes/confluence.js";
 import configRoutes from "./routes/config.js";
+import aiRoutes from "./routes/ai.js";
 import { apiLimiter, strictLimiter, authLimiter } from "./utils/rateLimiter.js";
 
 const app = express();
@@ -76,6 +77,7 @@ app.use("/api", apiLimiter);
 app.use("/api/jira", jiraRoutes);
 app.use("/api/confluence", confluenceRoutes);
 app.use("/api/config", configRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);

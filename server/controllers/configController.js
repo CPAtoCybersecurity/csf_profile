@@ -30,6 +30,13 @@ const getEnvConfig = () => {
       apiToken: process.env.CONFLUENCE_API_TOKEN || '',
     };
   }
+  if (process.env.CLAUDE_API_KEY) {
+    config.ai = {
+      provider: "claude",
+      apiKey: process.env.CLAUDE_API_KEY,
+      model: process.env.CLAUDE_MODEL || "claude-sonnet-4-20250514"
+    };
+  }
   return config;
 };
 
@@ -49,6 +56,14 @@ const maskConfig = (config) => {
       email: config.confluence.email || '',
       apiToken: maskToken(config.confluence.apiToken),
       configured: !!(config.confluence.baseUrl && config.confluence.email && config.confluence.apiToken)
+    };
+  }
+  if (config.ai) {
+    masked.ai = {
+      provider: config.ai.provider,
+      model: config.ai.model,
+      apiKey: maskToken(config.ai.apiKey),
+      configured: !!config.ai.apiKey
     };
   }
   return masked;
@@ -93,6 +108,27 @@ export const saveConfluenceConfig = (req, res) => {
   res.json({
     success: true,
     message: "Confluence credentials must be configured via CONFLUENCE_BASE_URL, CONFLUENCE_EMAIL, and CONFLUENCE_API_TOKEN environment variables.",
+    data: maskConfig(getEnvConfig())
+  });
+};
+
+// POST /api/config/ai
+export const saveAIConfig = (req, res) => {
+  const config = req.body;
+
+  if (!config || typeof config !== "object") {
+    return res.status(400).json({ error: "Missing AI config data" });
+  }
+
+  if (!process.env.CLAUDE_API_KEY) {
+    return res.status(400).json({
+      error: "Claude API key must be set via CLAUDE_API_KEY environment variable"
+    });
+  }
+
+  res.json({
+    success: true,
+    message: "Claude configuration is managed via environment variables.",
     data: maskConfig(getEnvConfig())
   });
 };

@@ -40,5 +40,18 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Dedicated limiter for AI endpoints
+// Stricter than general APIs to control cost and prevent abuse
+// Since no auth is implemented yet, IP-based limiting is used
+export const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 10, // 10 requests per window
+  message: {
+    error: "Too many AI requests. Please try again later."
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 // Export default for backwards compatibility
 export default apiLimiter;
