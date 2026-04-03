@@ -36,7 +36,7 @@ import useAssessmentsStore from './stores/assessmentsStore';
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
 import { checkEnvironmentVariables } from './utils/envValidation';
-import { initializeEntryIdMappings } from './utils/confluenceSync';
+import { initializeEntryIdMappings, loadConfluenceConfig } from './utils/confluenceSync';
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
@@ -46,6 +46,7 @@ const AppContent = () => {
   const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
 
   useEffect(() => {
+    loadConfluenceConfig();
     initializeEntryIdMappings();
   }, []);
 
