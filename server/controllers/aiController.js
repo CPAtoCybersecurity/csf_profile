@@ -15,7 +15,7 @@
  * - Rate limiting applied at route level
  */
 
-import { getErrorStatus, sanitizeErrorResponse } from "../utils/errorUtils";
+import { getErrorStatus, sanitizeErrorResponse } from "../utils/errorUtils.js";
 
 export const handleClaudeRequest = async (req, res) => {
   try {

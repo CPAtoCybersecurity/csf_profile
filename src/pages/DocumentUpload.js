@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import useAIStore from '../stores/aiStore';
 import { Upload, FileText, Trash2, ArrowLeft, Loader2, CheckCircle, AlertCircle, ArrowRight } from 'lucide-react';
+import { analysisSchema } from "../utils/aiResponseSchema";
 
 // File upload security configuration
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -163,19 +164,29 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
       } else {
         response = await generateWithClaude(prompt, 3000);
       }
-
+      
       // Try to parse JSON from response
       try {
         const jsonMatch = response.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]);
-          setDocumentAnalysis(parsed);
-        } else {
-          setDocumentAnalysis({ raw: response, error: 'Could not parse JSON response' });
+
+        if (!jsonMatch) {
+          throw new Error("No JSON found in response");
         }
-      } catch (e) {
-        console.error("Document analysis parse error:", e);
-        setDocumentAnalysis({ error: true });
+
+        const rawParsed = JSON.parse(jsonMatch[0]);
+
+        // Validate + sanitize
+        const validated = analysisSchema.parse(rawParsed);
+
+        setDocumentAnalysis(validated);
+
+      } catch (err) {
+        console.error("Document analysis validation error:", err);
+
+        setDocumentAnalysis({
+          error: true,
+          message: "Invalid or unsafe AI response"
+        });
       }
     } catch (error) {
       console.error("AI analysis failed:", error);
@@ -352,7 +363,7 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
             ) : documentAnalysis.error && !documentAnalysis.findings ? (
               <div className="bg-red-50 rounded-lg p-4">
                 <p className="text-red-700 text-sm font-medium">
-                  An error occurred while analyzing documents. Please try again.
+                  {documentAnalysis.message || "An error occurred while analyzing documents. Please try again."}
                 </p>
                 {documentAnalysis.raw && (
                   <pre className="mt-2 text-xs whitespace-pre-wrap max-h-48 overflow-y-auto text-gray-600">
