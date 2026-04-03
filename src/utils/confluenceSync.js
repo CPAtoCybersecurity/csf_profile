@@ -15,13 +15,8 @@
 const API_BASE_URL = process.env.REACT_APP_API_URL || '';
 let isInitialized = false;
 
-// Confluence configuration (should be injected via config APIs ideally)
-const CONFLUENCE_CONFIG = {
-  baseUrl: '',
-  spaceKey: '',
-  requirementsDbId: '',
-  controlsDbId: null
-};
+// Confluence configuration
+let confluenceConfig=undefined;
 
 /**
  * Frontend cache (source of truth is backend)
@@ -100,6 +95,56 @@ export async function setEntryId(requirementId, entryId) {
   await saveEntryIdMappings({ [requirementId]: entryId });
 }
 
+/** 
+ * Ensures Confluence config is available before usage
+ * Prevents runtime errors when app initializes slowly or API call fails
+ */ 
+const ensureConfigLoaded = () => {
+  if (!confluenceConfig) {
+    console.warn("Confluence config not loaded yet. Call loadConfluenceConfig() before using Confluence utilities.");
+    return false;
+  }
+  return true;
+};
+
+// Load Confluence configuration from backend (env-backed config)
+export async function loadConfluenceConfig() {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/config/status`, {
+      credentials: "include"
+    });
+
+    if (!res.ok) throw new Error("Failed to load config");
+
+    const data = await res.json();
+    const cfg = data?.data?.confluenceMeta;
+
+    if (!cfg || typeof cfg !== "object") {
+      throw new Error("Invalid config format");
+    }
+
+    const { baseUrl, spaceKey, requirementsDbId, controlsDbId } = cfg;
+
+    if (!baseUrl || !spaceKey || !requirementsDbId) {
+      throw new Error("Missing required Confluence config fields");
+    }
+
+    if (typeof baseUrl !== "string" || typeof spaceKey !== "string" || typeof requirementsDbId !== "string") {
+      throw new Error("Invalid Confluence config types");
+    }
+
+    confluenceConfig = {
+      baseUrl,
+      spaceKey,
+      requirementsDbId,
+      controlsDbId: controlsDbId || null
+    };
+    console.log(confluenceConfig)
+  } catch (err) {
+    console.error("Failed to load Confluence config:", err);
+  }
+}
+
 /**
  * Generate Smart-Embed URL for a Confluence database entry
  *
@@ -113,14 +158,17 @@ export async function setEntryId(requirementId, entryId) {
  * @param {string} databaseId - The database ID (defaults to requirements DB)
  * @returns {string} The Smart-Embed URL
  */
-export function generateSmartEmbedUrl(entryId, databaseId = CONFLUENCE_CONFIG.requirementsDbId) {
+export function generateSmartEmbedUrl(entryId, databaseId = confluenceConfig?.requirementsDbId) {
   if (!entryId) return null;
+  if (!ensureConfigLoaded()) {
+    throw new Error("Confluence config not loaded");
+  }
 
-  if (!CONFLUENCE_CONFIG.baseUrl || !CONFLUENCE_CONFIG.spaceKey || !databaseId) {
+  if (!confluenceConfig?.baseUrl || !confluenceConfig?.spaceKey || !databaseId) {
     console.warn("Confluence config incomplete");
     return null;
   }
-  return `${CONFLUENCE_CONFIG.baseUrl}/wiki/spaces/${CONFLUENCE_CONFIG.spaceKey}/database/${databaseId}/entry/${entryId}`;
+  return `${confluenceConfig.baseUrl}/wiki/spaces/${confluenceConfig.spaceKey}/database/${databaseId}/entry/${entryId}`;
 }
 
 /**
@@ -242,12 +290,15 @@ export function parseConfluenceEntriesResponse(apiResponse) {
  * @returns {Promise<object>} Mapping of requirementId -> entryId
  */
 export async function harvestEntryIds(apiToken, email) {
+  if (!ensureConfigLoaded()) {
+    throw new Error("Confluence config not loaded");
+  }
   const auth = btoa(`${email}:${apiToken}`);
 
   try {
     // Note: The exact API endpoint may vary based on Confluence version
     const response = await fetch(
-      `${CONFLUENCE_CONFIG.baseUrl}/wiki/api/v2/databases/${CONFLUENCE_CONFIG.requirementsDbId}/entries?limit=250`,
+      `${confluenceConfig?.baseUrl}/wiki/api/v2/databases/${confluenceConfig?.requirementsDbId}/entries?limit=250`,
       {
         headers: {
           'Authorization': `Basic ${auth}`,
@@ -353,14 +404,10 @@ export async function clearEntryIdMappings() {
  * Get Confluence configuration
  */
 export function getConfluenceConfig() {
-  return { ...CONFLUENCE_CONFIG };
-}
-
-/**
- * Update Confluence configuration
- */
-export function updateConfluenceConfig(updates) {
-  Object.assign(CONFLUENCE_CONFIG, updates);
+  if (!ensureConfigLoaded()) {
+    throw new Error("Confluence config not loaded");
+  }
+  return { ...confluenceConfig};
 }
 
 export default {
@@ -377,5 +424,5 @@ export default {
   getAllEntryIdMappings,
   clearEntryIdMappings,
   getConfluenceConfig,
-  updateConfluenceConfig
+  loadConfluenceConfig
 };

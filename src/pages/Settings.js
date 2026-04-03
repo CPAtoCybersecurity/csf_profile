@@ -45,8 +45,7 @@ import {
   harvestEntryIds,
   getAllEntryIdMappings,
   importEntryIdsFromCSV,
-  exportEntryIdsToCSV,
-  updateConfluenceConfig
+  exportEntryIdsToCSV
 } from '../utils/confluenceSync';
 
 const Settings = () => {
@@ -184,7 +183,8 @@ const Settings = () => {
         setConfigStatus({ jira: true, confluence: true });
 
         // Update Confluence config with new base URL for local operations
-        updateConfluenceConfig({ baseUrl: atlassianSiteUrl.replace(/\/$/, '') });
+        // Removed for Now
+        // updateConfluenceConfig({ baseUrl: atlassianSiteUrl.replace(/\/$/, '') });
 
         toast.success('Configuration saved securely to server');
       } else {
