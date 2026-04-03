@@ -37,6 +37,14 @@ const getEnvConfig = () => {
       model: process.env.CLAUDE_MODEL || "claude-sonnet-4-20250514"
     };
   }
+  if (process.env.CONFLUENCE_BASE_URL || process.env.CONFLUENCE_SPACE_KEY || process.env.CONFLUENCE_REQUIREMENTS_DB_ID) {
+    config.confluenceMeta = {
+      baseUrl: process.env.CONFLUENCE_BASE_URL || '',
+      spaceKey: process.env.CONFLUENCE_SPACE_KEY || '',
+      requirementsDbId: process.env.CONFLUENCE_REQUIREMENTS_DB_ID || '',
+      controlsDbId: process.env.CONFLUENCE_CONTROLS_DB_ID || ''
+    };
+  }
   return config;
 };
 
@@ -64,6 +72,15 @@ const maskConfig = (config) => {
       model: config.ai.model,
       apiKey: maskToken(config.ai.apiKey),
       configured: !!config.ai.apiKey
+    };
+  }
+  if (config.confluenceMeta) {
+    masked.confluenceMeta = {
+      baseUrl: config.confluenceMeta.baseUrl,
+      spaceKey: config.confluenceMeta.spaceKey,
+      requirementsDbId: config.confluenceMeta.requirementsDbId,
+      controlsDbId: config.confluenceMeta.controlsDbId,
+      configured: !!(config.confluenceMeta.baseUrl && config.confluenceMeta.spaceKey && config.confluenceMeta.requirementsDbId)
     };
   }
   return masked;

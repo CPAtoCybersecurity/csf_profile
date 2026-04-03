@@ -1,17 +1,17 @@
 {
-  "jira": {
-    "baseUrl": "https://your-domain.atlassian.net",
-    "email": "your-email@example.com",
-    "apiToken": "your-jira-api-token"
-  },
-  "confluence": {
-    "baseUrl": "https://your-domain.atlassian.net",
-    "email": "your-email@example.com",
-    "apiToken": "your-confluence-api-token"
-  },
-  "ai": {
-    "claudeApiKey": "your-claude-api-key",
-    "claudeModel": "claude-sonnet-4-20250514",
-    "claudeTimeoutMs": 60000
-  }
+  "JIRA_BASE_URL": "https://your-domain.atlassian.net",
+  "JIRA_EMAIL": "your-email@example.com",
+  "JIRA_API_TOKEN": "your-jira-api-token",
+
+  "CONFLUENCE_BASE_URL": "https://your-domain.atlassian.net",
+  "CONFLUENCE_EMAIL": "your-email@example.com",
+  "CONFLUENCE_API_TOKEN": "your-confluence-api-token",
+
+  "CONFLUENCE_SPACE_KEY": "your-space-key",
+  "CONFLUENCE_REQUIREMENTS_DB_ID": "your-db-id",
+  "CONFLUENCE_CONTROLS_DB_ID": "optional-db-id",
+
+  "CLAUDE_API_KEY": "your-claude-api-key",
+  "CLAUDE_MODEL": "claude-sonnet-4-20250514",
+  "CLAUDE_TIMEOUT_MS": 60000
 }
