@@ -48,6 +48,10 @@ Testing of 5 recent GuardDuty findings showed consistent application of automati
 |--------|-------|
 | Actual Score | 4 |
 | Target Score | 5 |
+| Previous Quarter | N/A |
+| Trend | N/A (first assessment of this subcategory) |
+
+**Scoring rationale:** Score of 4 (Some Security, upper range) reflects that incident declaration criteria are documented, applied consistently for auto-declared and manually-triaged events, and supported by a false positive registry with regular review. The score does not reach Minimally Acceptable (5.0) because criteria lack compound event analysis for multi-stage attacks, the criteria review cycle is undefined, and declaration threshold calibration relies on individual analyst judgment for borderline cases. Addressing the compound event gap is the highest-value improvement given Alma's position in the authentication sector.
 
 ---
 
@@ -69,3 +73,9 @@ Testing of 5 recent GuardDuty findings showed consistent application of automati
 | 2 | Establish annual incident criteria review cycle aligned with threat landscape assessment | Medium | Nadia Khan |
 | 3 | Implement false positive and missed incident rate tracking to measure criteria effectiveness | Medium | Nadia Khan |
 | 4 | Develop calibration exercises for SOC analysts to improve consistency on borderline triage decisions | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.AE-08 Test Procedures](../../3_Test_Procedures/DE/DE.AE-08.md)
+- **Controls:** [DE.AE-08_Ex1](../../2_Controls/DE/DE.AE-08_Ex1.md), [DE.AE-08_Ex2](../../2_Controls/DE/DE.AE-08_Ex2.md)
+- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [SOC Ticket 1001 Phishing](../../5_Artifacts/Tickets/TKT-SOC-1001-phishing.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md)
