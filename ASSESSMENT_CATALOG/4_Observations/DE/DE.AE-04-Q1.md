@@ -48,6 +48,10 @@ The incident response playbook defines impact categories (Negligible, Minor, Mod
 |--------|-------|
 | Actual Score | 3 |
 | Target Score | 5 |
+| Previous Quarter | N/A |
+| Trend | N/A (first assessment of this subcategory) |
+
+**Scoring rationale:** Score of 3 (Some Security) reflects that automated impact estimation exists through GuardDuty severity ratings and SentinelOne threat assessments, but manual scope estimation lacks a quantitative rubric and varies in quality across analysts. The playbook defines impact categories with criteria, which elevates this above a 2, but inconsistent scope documentation and the absence of automated blast radius mapping prevent reaching Minimally Acceptable (5.0). Addressing the scope scoring rubric gap and standardizing ticket documentation would move this toward target.
 
 ---
 
@@ -69,3 +73,9 @@ The incident response playbook defines impact categories (Negligible, Minor, Mod
 | 2 | Implement automated asset interdependency mapping to assist blast radius estimation | Medium | Nadia Khan |
 | 3 | Standardize scope documentation templates in ServiceNow with required fields | Medium | Nadia Khan |
 | 4 | Include business impact quantification (affected users, revenue exposure) in triage workflow | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.AE-04 Test Procedures](../../3_Test_Procedures/DE/DE.AE-04.md)
+- **Controls:** [DE.AE-04_Ex1](../../2_Controls/DE/DE.AE-04_Ex1.md), [DE.AE-04_Ex2](../../2_Controls/DE/DE.AE-04_Ex2.md)
+- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1001 Phishing](../../5_Artifacts/Tickets/TKT-SOC-1001-phishing.md)
