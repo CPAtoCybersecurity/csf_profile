@@ -49,6 +49,10 @@ However, Alma does not subscribe to or integrate external CTI feeds beyond what 
 |--------|-------|
 | Actual Score | 3 |
 | Target Score | 5 |
+| Previous Quarter | N/A |
+| Trend | N/A (first assessment of this subcategory) |
+
+**Scoring rationale:** Score of 3 (Some Security) reflects that automated vendor-provided threat intelligence is active and functioning (GuardDuty, SentinelOne cloud), but Alma lacks a formal CTI program, external feed subscriptions beyond vendor defaults, and a systematic vulnerability disclosure rapid assessment process. Asset context is available during triage but is not integrated into detection rule tuning. The gap between vendor-default CTI (passive consumption) and an operationalized CTI program (active integration into detection engineering) is the primary barrier to reaching Minimally Acceptable (5.0).
 
 ---
 
@@ -70,3 +74,9 @@ However, Alma does not subscribe to or integrate external CTI feeds beyond what 
 | 2 | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | High | Nadia Khan |
 | 3 | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Medium | Nadia Khan |
 | 4 | Develop lightweight threat modeling process aligned to Alma's threat landscape | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.AE-07 Test Procedures](../../3_Test_Procedures/DE/DE.AE-07.md)
+- **Controls:** [DE.AE-07_Ex1](../../2_Controls/DE/DE.AE-07_Ex1.md), [DE.AE-07_Ex2](../../2_Controls/DE/DE.AE-07_Ex2.md), [DE.AE-07_Ex3](../../2_Controls/DE/DE.AE-07_Ex3.md)
+- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [Information Security Policy](../../5_Artifacts/Policies/POL-information-security.md), [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md), [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md)

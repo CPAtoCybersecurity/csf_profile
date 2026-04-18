@@ -48,6 +48,10 @@ During testing, a simulated lateral movement scenario was detectable across indi
 |--------|-------|
 | Actual Score | 4 |
 | Target Score | 6 |
+| Previous Quarter | N/A |
+| Trend | N/A (first assessment of this subcategory) |
+
+**Scoring rationale:** Score of 4 (Some Security) reflects that within-platform correlation is automated and effective (GuardDuty multi-signal, SentinelOne Deep Visibility), but cross-platform correlation between cloud-native and endpoint sources is entirely manual and analyst-dependent. The absence of a unified SIEM or automated cross-source correlation prevents consistent, timely correlation for multi-vector incidents. Score will improve toward the target of 6 when the custom correlation scripts are deployed and cross-platform correlation becomes semi-automated.
 
 ---
 
@@ -70,3 +74,9 @@ During testing, a simulated lateral movement scenario was detectable across indi
 | 2 | Integrate third-party threat intelligence feeds beyond GuardDuty built-in lists | Medium | Nadia Khan |
 | 3 | Develop automated correlation rules for common multi-source attack patterns | Medium | Nadia Khan |
 | 4 | Establish normalized event taxonomy across all detection sources to enable consistent correlation | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.AE-03 Test Procedures](../../3_Test_Procedures/DE/DE.AE-03.md)
+- **Controls:** [DE.AE-03_Ex1](../../2_Controls/DE/DE.AE-03_Ex1.md), [DE.AE-03_Ex2](../../2_Controls/DE/DE.AE-03_Ex2.md), [DE.AE-03_Ex3](../../2_Controls/DE/DE.AE-03_Ex3.md)
+- **Artifacts:** [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1005](../../5_Artifacts/Tickets/TKT-SOC-1005.md)

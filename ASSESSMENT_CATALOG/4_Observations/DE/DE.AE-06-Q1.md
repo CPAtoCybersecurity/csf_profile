@@ -48,6 +48,10 @@ The Slack-based notification system provides effective distribution during busin
 |--------|-------|
 | Actual Score | 5 |
 | Target Score | 6 |
+| Previous Quarter | N/A |
+| Trend | N/A (first assessment of this subcategory) |
+
+**Scoring rationale:** Score of 5 (Minimally Acceptable) reflects that all four distribution mechanisms are operational: automated alerts reach SOC via Slack, PagerDuty delivers after-hours pages within 5 minutes for High/Critical findings, on-demand console access is provisioned with RBAC controls, auto-ticketing works for qualifying alerts, and manual reporting is supported. The score does not reach Optimized (6.0) because medium-severity findings lack after-hours notification, no alert acknowledgment tracking exists (MTTA is unmeasured), and business unit stakeholders are excluded from relevant alert distribution. Closing these gaps — particularly MTTA tracking — would provide the measurement foundation needed for optimization.
 
 ---
 
@@ -70,3 +74,9 @@ The Slack-based notification system provides effective distribution during busin
 | 2 | Implement daily automated detection summary report for security leadership | Medium | Nadia Khan |
 | 3 | Add alert acknowledgment tracking with mean-time-to-acknowledge KPI | Medium | Nadia Khan |
 | 4 | Configure business-unit-relevant alert routing for incidents affecting specific systems | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.AE-06 Test Procedures](../../3_Test_Procedures/DE/DE.AE-06.md)
+- **Controls:** [DE.AE-06_Ex1](../../2_Controls/DE/DE.AE-06_Ex1.md), [DE.AE-06_Ex2](../../2_Controls/DE/DE.AE-06_Ex2.md), [DE.AE-06_Ex3](../../2_Controls/DE/DE.AE-06_Ex3.md), [DE.AE-06_Ex4](../../2_Controls/DE/DE.AE-06_Ex4.md)
+- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1005](../../5_Artifacts/Tickets/TKT-SOC-1005.md)
