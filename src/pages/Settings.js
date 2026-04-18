@@ -46,7 +46,7 @@ import {
   getAllEntryIdMappings,
   importEntryIdsFromCSV,
   exportEntryIdsToCSV,
-  updateConfluenceConfig
+  loadConfluenceConfig
 } from '../utils/confluenceSync';
 
 const Settings = () => {
@@ -183,9 +183,7 @@ const Settings = () => {
         setAtlassianApiToken('');
         setConfigStatus({ jira: true, confluence: true });
 
-        // Update Confluence config with new base URL for local operations
-        updateConfluenceConfig({ baseUrl: atlassianSiteUrl.replace(/\/$/, '') });
-
+        await loadConfluenceConfig();
         toast.success('Configuration saved securely to server');
       } else {
         const error = await jiraRes.json();
