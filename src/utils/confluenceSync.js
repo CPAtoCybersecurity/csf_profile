@@ -101,10 +101,8 @@ export async function setEntryId(requirementId, entryId) {
  */ 
 const ensureConfigLoaded = () => {
   if (!confluenceConfig) {
-    console.warn("Confluence config not loaded yet. Call loadConfluenceConfig() before using Confluence utilities.");
-    return false;
+    throw new Error("Confluence config not loaded. Call loadConfluenceConfig() first.");
   }
-  return true;
 };
 
 // Load Confluence configuration from backend (env-backed config)
@@ -139,7 +137,6 @@ export async function loadConfluenceConfig() {
       requirementsDbId,
       controlsDbId: controlsDbId || null
     };
-    console.log(confluenceConfig)
   } catch (err) {
     console.error("Failed to load Confluence config:", err);
   }
@@ -160,9 +157,7 @@ export async function loadConfluenceConfig() {
  */
 export function generateSmartEmbedUrl(entryId, databaseId = confluenceConfig?.requirementsDbId) {
   if (!entryId) return null;
-  if (!ensureConfigLoaded()) {
-    throw new Error("Confluence config not loaded");
-  }
+  ensureConfigLoaded();
 
   if (!confluenceConfig?.baseUrl || !confluenceConfig?.spaceKey || !databaseId) {
     console.warn("Confluence config incomplete");
@@ -290,9 +285,7 @@ export function parseConfluenceEntriesResponse(apiResponse) {
  * @returns {Promise<object>} Mapping of requirementId -> entryId
  */
 export async function harvestEntryIds(apiToken, email) {
-  if (!ensureConfigLoaded()) {
-    throw new Error("Confluence config not loaded");
-  }
+  ensureConfigLoaded();
   const auth = btoa(`${email}:${apiToken}`);
 
   try {
@@ -404,9 +397,7 @@ export async function clearEntryIdMappings() {
  * Get Confluence configuration
  */
 export function getConfluenceConfig() {
-  if (!ensureConfigLoaded()) {
-    throw new Error("Confluence config not loaded");
-  }
+  ensureConfigLoaded();
   return { ...confluenceConfig};
 }
 
