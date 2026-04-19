@@ -164,26 +164,13 @@ export const getConfigStatus = (req, res) => {
 // POST /api/config/test - Test Atlassian connection using provided credentials
 export const testConnection = async (req, res) => {
   const { service, baseUrl, email, apiToken } = req.body;
-
-  if (!service || !baseUrl || !email || !apiToken) {
-    return res.status(400).json({
-      success: false,
-      error: "Missing required fields: service, baseUrl, email, apiToken"
-    });
-  }
-
-  if (!['jira', 'confluence'].includes(service)) {
-    return res.status(400).json({
-      success: false,
-      error: "Service must be 'jira' or 'confluence'"
-    });
-  }
+  const sanitizedBaseUrl = baseUrl.replace(/\/$/, "");
 
   try {
     const auth = Buffer.from(`${email}:${apiToken}`).toString('base64');
     const testUrl = service === 'jira'
-      ? `${baseUrl}/rest/api/3/myself`
-      : `${baseUrl}/wiki/rest/api/user/current`;
+      ? `${sanitizedBaseUrl}/rest/api/3/myself`
+      : `${sanitizedBaseUrl}/wiki/rest/api/user/current`;
 
     const response = await fetch(testUrl, {
       method: 'GET',
@@ -206,7 +193,9 @@ export const testConnection = async (req, res) => {
     } else {
       res.status(response.status).json({
         success: false,
-        error: "Connection failed. Please verify credentials and permissions."
+        error: response.status === 401
+          ? "Authentication failed. Check email/API token."
+          : "Connection failed. Verify URL and permissions."
       });
     }
   } catch (error) {
