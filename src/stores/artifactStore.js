@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
@@ -378,7 +379,7 @@ const useArtifactStore = create(
       }
     }),
     {
-      name: 'csf-artifacts-storage',
+      name: scopedKey('csf-artifacts-storage'),
       version: 5,
       migrate: (persistedState, version) => {
         // Version 2: Added link, complianceRequirement, controlId, type, jiraKey fields

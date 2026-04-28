@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 
 // Default frameworks - used for initial state and migrations
@@ -194,7 +195,7 @@ const useFrameworksStore = create(
       }
     }),
     {
-      name: 'csf-frameworks-storage',
+      name: scopedKey('csf-frameworks-storage'),
       version: 5,
       migrate: (persistedState, version) => {
         // Version 2: Reset to new default frameworks (removed SOC2, HIPAA, PCI-DSS; updated names; added source)

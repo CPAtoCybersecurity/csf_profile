@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { escapeCSVValue } from '../utils/sanitize';
@@ -418,7 +419,7 @@ const useRequirementsStore = create(
       }
     }),
     {
-      name: 'csf-requirements-storage',
+      name: scopedKey('csf-requirements-storage'),
       partialize: (state) => ({
         requirements: state.requirements
       })

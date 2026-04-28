@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
@@ -357,7 +358,7 @@ const useFindingsStore = create(
       }
     }),
     {
-      name: 'csf-findings-storage',
+      name: scopedKey('csf-findings-storage'),
       version: 3,
       migrate: (persistedState, version) => {
         // Version 2: Added default findings for new installations

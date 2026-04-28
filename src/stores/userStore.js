@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -132,7 +133,7 @@ const useUserStore = create(
       },
     }),
     {
-      name: 'csf-users-storage',
+      name: scopedKey('csf-users-storage'),
       version: 2,
       migrate: (persistedState, version) => {
         // Version 2: Ensure default users have stable IDs

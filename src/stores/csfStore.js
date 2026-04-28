@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import { parseUserInfo, findOrCreateUser } from '../utils/userUtils';
 import { sanitizeInput } from '../utils/sanitize';
@@ -252,7 +253,7 @@ const useCSFStore = create(
       },
     }),
     {
-      name: 'csf-data-storage',
+      name: scopedKey('csf-data-storage'),
       version: 2,
       migrate: (persistedState, version) => {
         // Version 2: Force re-download of CSV to get proper owner assignments
