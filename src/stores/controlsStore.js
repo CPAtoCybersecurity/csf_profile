@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
@@ -471,7 +472,7 @@ const useControlsStore = create(
       }
     }),
     {
-      name: 'csf-controls-storage',
+      name: scopedKey('csf-controls-storage'),
       version: 5,
       migrate: (persistedState, version) => {
         // Version 5: Default controls from Alma Security example data

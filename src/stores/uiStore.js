@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 
 const useUIStore = create(
@@ -103,7 +104,7 @@ const useUIStore = create(
       }),
     }),
     {
-      name: 'csf-ui-storage',
+      name: scopedKey('csf-ui-storage'),
       partialize: (state) => ({
         darkMode: state.darkMode,
         itemsPerPage: state.itemsPerPage,

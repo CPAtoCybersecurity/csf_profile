@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
@@ -1562,7 +1563,7 @@ const useAssessmentsStore = create(
       }
     }),
     {
-      name: 'csf-assessments-storage',
+      name: scopedKey('csf-assessments-storage'),
       version: 7,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure

@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -53,7 +54,7 @@ const useAuditLogStore = create(
         URL.revokeObjectURL(url);
       }
     }),
-    { name: 'csf-audit-log' }
+    { name: scopedKey('csf-audit-log') }
   )
 );
 

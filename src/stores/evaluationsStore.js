@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 import { sanitizeInput } from '../utils/sanitize';
 
@@ -453,7 +454,7 @@ const useEvaluationsStore = create(
       }
     }),
     {
-      name: 'csf-evaluations-storage',
+      name: scopedKey('csf-evaluations-storage'),
       version: 1,
       partialize: (state) => ({
         evaluations: state.evaluations,

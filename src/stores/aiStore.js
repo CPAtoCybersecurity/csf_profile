@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { scopedKey } from '../utils/visitorId';
 import { persist } from 'zustand/middleware';
 
 /**
@@ -417,7 +418,7 @@ Format as an actionable plan that can be imported into a remediation tracker.`;
       }
     }),
     {
-      name: 'csf-ai-storage',
+      name: scopedKey('csf-ai-storage'),
       partialize: (state) => ({
         llmProvider: state.llmProvider,
         dataMode: state.dataMode,
