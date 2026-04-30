@@ -5,7 +5,23 @@ import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS, ALMA_AUDIT_OBSERVATIONS } from './defaultAssessmentsData';
+import {
+  COMPREHENSIVE_ASSESSMENT_ID,
+  COMPREHENSIVE_SCOPE_IDS,
+  COMPREHENSIVE_OBSERVATIONS
+} from './comprehensiveAssessmentData';
 import useAuditLogStore from './auditLogStore';
+
+const COMPREHENSIVE_ASSESSMENT = {
+  id: COMPREHENSIVE_ASSESSMENT_ID,
+  name: '2026 Alma Security Comprehensive CSF Assessment',
+  description: `Catalog-driven assessment covering ${COMPREHENSIVE_SCOPE_IDS.length} subcategory implementation examples sourced from ASSESSMENT_CATALOG. Each requirement is linked to its test procedures, observations, and evidence artifacts from the catalog.`,
+  scopeType: 'requirements',
+  frameworkFilter: null,
+  createdDate: '2026-04-30T00:00:00.000Z',
+  scopeIds: COMPREHENSIVE_SCOPE_IDS,
+  observations: COMPREHENSIVE_OBSERVATIONS
+};
 
 // Default assessment for new installations
 // References control IDs from DEFAULT_CONTROLS in controlsStore.js
@@ -52,7 +68,8 @@ const DEFAULT_ASSESSMENTS = [
       'RC.RP-03 Ex1', 'RC.RP-05 Ex1'
     ],
     observations: ALMA_AUDIT_OBSERVATIONS
-  }
+  },
+  COMPREHENSIVE_ASSESSMENT
 ];
 
 // Helper to create default quarterly data structure
@@ -1563,7 +1580,7 @@ const useAssessmentsStore = create(
     }),
     {
       name: 'csf-assessments-storage',
-      version: 7,
+      version: 9,
       migrate: (persistedState, version) => {
         // Version 1: Migrate observations to quarterly structure
         if (version === 0 && persistedState?.assessments) {
@@ -1683,6 +1700,25 @@ const useAssessmentsStore = create(
             }
             return a;
           });
+          return { ...persistedState, assessments };
+        }
+        // Version 8: Add comprehensive catalog-driven assessment
+        if (version < 8) {
+          const assessments = persistedState?.assessments || [];
+          const exists = assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID);
+          if (!exists) {
+            return { ...persistedState, assessments: [...assessments, COMPREHENSIVE_ASSESSMENT] };
+          }
+        }
+        // Version 9: Refresh comprehensive assessment observations to include linkedFindings
+        if (version < 9) {
+          const assessments = (persistedState?.assessments || []).map(a => {
+            if (a.id === COMPREHENSIVE_ASSESSMENT_ID) return COMPREHENSIVE_ASSESSMENT;
+            return a;
+          });
+          if (!assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID)) {
+            assessments.push(COMPREHENSIVE_ASSESSMENT);
+          }
           return { ...persistedState, assessments };
         }
         return persistedState;

@@ -4,6 +4,9 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_FINDINGS } from './defaultFindingsData';
+import { COMPREHENSIVE_FINDINGS } from './comprehensiveAssessmentData';
+
+const SEEDED_FINDINGS = [...DEFAULT_FINDINGS, ...COMPREHENSIVE_FINDINGS];
 
 /**
  * Findings Store
@@ -14,7 +17,7 @@ import { DEFAULT_FINDINGS } from './defaultFindingsData';
 const useFindingsStore = create(
   persist(
     (set, get) => ({
-      findings: DEFAULT_FINDINGS,
+      findings: SEEDED_FINDINGS,
       loading: false,
       error: null,
 
@@ -358,22 +361,23 @@ const useFindingsStore = create(
     }),
     {
       name: 'csf-findings-storage',
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
-        // Version 2: Added default findings for new installations
-        // Existing users with data keep their findings, new users get defaults
         if (version < 2) {
           if (persistedState?.findings?.length > 0) {
-            // Existing user with data - keep their findings
             return persistedState;
           }
-          // New user or empty state - use defaults
-          return { findings: DEFAULT_FINDINGS };
+          return { findings: SEEDED_FINDINGS };
         }
-        // Version 3: Update controlId references to align with Controls architecture
-        // Reset to defaults with correct control links
         if (version < 3) {
-          return { findings: DEFAULT_FINDINGS };
+          return { findings: SEEDED_FINDINGS };
+        }
+        // Version 4: Merge in catalog findings for the comprehensive assessment
+        if (version < 4) {
+          const existing = persistedState?.findings || [];
+          const existingIds = new Set(existing.map(f => f.id));
+          const additions = COMPREHENSIVE_FINDINGS.filter(f => !existingIds.has(f.id));
+          return { ...persistedState, findings: [...existing, ...additions] };
         }
         return persistedState;
       },
