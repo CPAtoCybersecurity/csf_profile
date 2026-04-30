@@ -33,6 +33,15 @@ server/config.json
 
 # Internal reports and confidential documents
 _reports/
+_internal/
+
+# Safety-net globs: any file marked .internal or .scratch is ignored wherever it lives
+*.internal.md
+*.scratch.md
+SCRATCH-*.md
+
+# VS Code workspace file — personal setup, not shared
+*.code-workspace
 
 # Backup files
 *.backup

@@ -4,6 +4,19 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
+import { COMPREHENSIVE_ARTIFACTS } from './comprehensiveAssessmentData';
+
+// Merge defaults + catalog artifacts. De-dupe by artifactId; catalog wins ties.
+const SEEDED_ARTIFACTS = (() => {
+  const seen = new Set();
+  const merged = [];
+  for (const a of [...DEFAULT_ARTIFACTS, ...COMPREHENSIVE_ARTIFACTS]) {
+    if (seen.has(a.artifactId)) continue;
+    seen.add(a.artifactId);
+    merged.push(a);
+  }
+  return merged;
+})();
 
 /**
  * Artifact Store
@@ -14,7 +27,7 @@ import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
 const useArtifactStore = create(
   persist(
     (set, get) => ({
-      artifacts: DEFAULT_ARTIFACTS,
+      artifacts: SEEDED_ARTIFACTS,
 
       // Get all artifacts
       getArtifacts: () => get().artifacts,
@@ -379,7 +392,7 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 5,
+      version: 6,
       migrate: (persistedState, version) => {
         // Version 2: Added link, complianceRequirement, controlId, type, jiraKey fields
         if (version < 2 && persistedState?.artifacts) {
@@ -416,6 +429,17 @@ const useArtifactStore = create(
         if (version < 5) {
           // Use new defaults which include controlId links
           return { artifacts: DEFAULT_ARTIFACTS };
+        }
+        // Version 6: Merge in ASSESSMENT_CATALOG artifacts (Policies, Procedures,
+        // Reports, Inventories, Tickets, Evidence). De-dupe by artifactId or by name.
+        if (version < 6) {
+          const existing = persistedState?.artifacts || [];
+          const existingIds = new Set(existing.map(a => a.artifactId));
+          const existingNames = new Set(existing.map(a => (a.name || '').toLowerCase()));
+          const additions = COMPREHENSIVE_ARTIFACTS.filter(a =>
+            !existingIds.has(a.artifactId) && !existingNames.has((a.name || '').toLowerCase())
+          );
+          return { ...persistedState, artifacts: [...existing, ...additions] };
         }
         return persistedState;
       },
