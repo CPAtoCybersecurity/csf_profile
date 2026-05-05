@@ -20,7 +20,7 @@ error()   { echo -e "${RED}✖${RESET} $*" >&2; }
 die()     { error "$*"; exit 1; }
 
 # ── 1. Check Git ───────────────────────────────────────────────────────────────
-info "Checking prerequisites…"
+info "Checking prerequisites..."
 
 if ! command -v git &>/dev/null; then
   die "Git is not installed. Install it from https://git-scm.com and re-run this script."
@@ -45,7 +45,7 @@ if [ -f "$SCRIPT_DIR/package.json" ]; then
 else
   REPO_DIR="${HOME}/csf_profile"
   if [ ! -d "$REPO_DIR/.git" ]; then
-    info "Cloning CSF Profile repository…"
+    info "Cloning CSF Profile repository..."
     git clone "$REPO_URL" "$REPO_DIR"
   else
     info "Repo already cloned at $REPO_DIR"
@@ -55,7 +55,7 @@ fi
 cd "$REPO_DIR"
 
 # ── 4. Install npm dependencies ───────────────────────────────────────────────
-info "Installing dependencies (npm install)…"
+info "Installing dependencies (npm install)..."
 npm install --silent
 success "Dependencies installed."
 
@@ -67,7 +67,7 @@ if lsof -iTCP:"$INSTALLER_PORT" -sTCP:LISTEN &>/dev/null 2>&1; then
 fi
 
 # ── 6. Start installer server ─────────────────────────────────────────────────
-info "Starting installer server on port $INSTALLER_PORT…"
+info "Starting installer server on port $INSTALLER_PORT..."
 node "$REPO_DIR/installer/server.js" "$REPO_DIR" &
 SERVER_PID=$!
 sleep 1  # Brief pause to let the server bind
