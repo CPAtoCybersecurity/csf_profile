@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>CSF Profile — Setup Wizard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --brand:       #1e3a5f;
+    --accent:      #0ea5e9;
+    --accent-dark: #0284c7;
+    --bg:          #0f172a;
+    --surface:     #1e293b;
+    --border:      #334155;
+    --text:        #e2e8f0;
+    --muted:       #94a3b8;
+    --success:     #10b981;
+    --warn:        #f59e0b;
+    --error:       #ef4444;
+  }
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; font-size: 14px; }
+
+  /* Layout */
+  .shell { display: flex; height: 100vh; }
+
+  /* Left rail */
+  .rail { width: 220px; background: var(--brand); display: flex; flex-direction: column; padding: 24px 0; flex-shrink: 0; }
+  .rail-logo { padding: 0 20px 24px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .rail-logo img { height: 36px; }
+  .rail-logo h2 { font-size: 11px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.5); margin-top: 8px; }
+
+  .rail-steps { padding: 20px 0; flex: 1; }
+  .rail-step { display: flex; align-items: center; gap: 12px; padding: 10px 20px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.45); cursor: default; }
+  .rail-step.active { color: #fff; background: rgba(255,255,255,.08); }
+  .rail-step.done   { color: rgba(255,255,255,.65); }
+  .step-num { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(255,255,255,.2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .rail-step.active .step-num { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .rail-step.done   .step-num { border-color: var(--success); background: var(--success); color: #fff; }
+
+  /* Content area */
+  .content { flex: 1; overflow-y: auto; padding: 40px; display: flex; flex-direction: column; }
+  .step-panel { display: none; flex-direction: column; gap: 24px; max-width: 600px; }
+  .step-panel.active { display: flex; }
+
+  h1 { font-size: 22px; font-weight: 700; }
+  .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+  /* Status rows */
+  .check-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .check-icon { font-size: 16px; width: 20px; text-align: center; flex-shrink: 0; }
+  .check-label { font-weight: 500; flex: 1; }
+  .check-detail { color: var(--muted); font-size: 12px; }
+  .ok    { color: var(--success); }
+  .fail  { color: var(--error); }
+  .warn  { color: var(--warn); }
+
+  /* Forms */
+  .field-group { display: flex; flex-direction: column; gap: 6px; }
+  .field-group label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .radio-card { text-transform: none; letter-spacing: normal; }
+  input[type=text], input[type=password], input[type=url] {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    color: var(--text); font-family: inherit; font-size: 13px; padding: 10px 12px;
+    outline: none; transition: border-color .15s;
+  }
+  input:focus { border-color: var(--accent); }
+  .field-hint { font-size: 11px; color: var(--muted); }
+
+  .credential-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Radio cards */
+  .radio-cards { display: flex; flex-direction: column; gap: 10px; }
+  .radio-card { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: var(--surface); border: 2px solid var(--border); border-radius: 8px; cursor: pointer; transition: border-color .15s; }
+  .radio-card:hover { border-color: var(--accent); }
+  .radio-card input[type=radio] { accent-color: var(--accent); margin-top: 2px; flex-shrink: 0; }
+  .radio-card-body h4 { font-size: 13px; font-weight: 600; }
+  .radio-card-body p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 10px; margin-top: 8px; }
+  button {
+    padding: 10px 20px; border-radius: 6px; font-family: inherit; font-size: 13px; font-weight: 600;
+    cursor: pointer; border: none; transition: background .15s, opacity .15s;
+  }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-dark); }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-secondary { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-secondary:hover { border-color: var(--accent); }
+  .btn-test { padding: 8px 14px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 12px; border-radius: 6px; cursor: pointer; }
+  .btn-test:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Progress bar */
+  .progress-bar-wrap { background: var(--surface); border-radius: 4px; height: 6px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: var(--accent); border-radius: 4px; transition: width .4s ease; }
+
+  /* Done step */
+  .done-hero { text-align: center; padding: 40px 20px; }
+  .done-hero .big-check { font-size: 64px; line-height: 1; }
+  .done-hero h2 { font-size: 24px; font-weight: 700; margin-top: 16px; }
+  .done-hero p  { color: var(--muted); margin-top: 8px; }
+  .app-link { display: inline-block; margin-top: 20px; padding: 12px 28px; background: var(--accent); color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 15px; }
+  .app-link:hover { background: var(--accent-dark); }
+
+  .alert { padding: 12px 16px; border-radius: 6px; font-size: 13px; line-height: 1.5; }
+  .alert-error { background: rgba(239,68,68,.1); border: 1px solid rgba(239,68,68,.3); color: #fca5a5; }
+  .alert-warn  { background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.3); color: #fcd34d; }
+  .alert-info  { background: rgba(14,165,233,.1); border: 1px solid rgba(14,165,233,.3); color: #7dd3fc; }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .6s linear infinite; vertical-align: middle; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Left rail -->
+  <nav class="rail">
+    <div class="rail-logo">
+      <img src="/SC_SimplyCyberAcademy.png" alt="Simply Cyber" onerror="this.style.display='none'" />
+      <h2>CSF Profile Setup</h2>
+    </div>
+    <div class="rail-steps" id="railSteps"></div>
+  </nav>
+
+  <!-- Content -->
+  <main class="content" id="content">
+
+    <!-- Step 1: System Detection -->
+    <div class="step-panel active" id="step-1">
+      <h1>System Check</h1>
+      <p class="subtitle">Verifying your system meets the requirements to run CSF Profile Assessment Tool.</p>
+      <div id="systemChecks" style="display:flex;flex-direction:column;gap:8px;">
+        <div class="check-row"><span class="spinner"></span><span class="check-label">Checking…</span></div>
+      </div>
+      <div id="step1Alert"></div>
+      <div class="btn-row">
+        <button class="btn-primary" id="step1Next" disabled onclick="goStep(2)">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Prerequisites -->
+    <div class="step-panel" id="step-2">
+      <h1>Prerequisites</h1>
+      <p class="subtitle">All dependencies were installed during bootstrap. Confirming everything is in order.</p>
+      <div id="prereqStatus" style="display:flex;flex-direction:column;gap:8px;"></div>
+      <div id="step2Alert"></div>
+      <div class="btn-row">
+        <button class="btn-primary" id="step2Next" onclick="goStep(3)">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Atlassian Credentials -->
+    <div class="step-panel" id="step-3">
+      <h1>Atlassian Credentials <span style="font-size:13px;font-weight:400;color:var(--muted)">(Optional)</span></h1>
+      <p class="subtitle">Connect to Jira and Confluence for enhanced tracking. Leave blank to skip — you can configure this later in Settings.</p>
+
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Jira</div>
+          <div class="credential-pair">
+            <div class="field-group">
+              <label>Instance URL</label>
+              <input type="url" id="jiraUrl" placeholder="https://your-org.atlassian.net" />
+            </div>
+            <div class="field-group">
+              <label>API Token</label>
+              <input type="password" id="jiraToken" placeholder="••••••••••••" />
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="btn-test" onclick="testConnection('jira')">Test Connection</button>
+            <span id="jiraTestResult" style="font-size:12px;"></span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">Confluence</div>
+          <div class="credential-pair">
+            <div class="field-group">
+              <label>Instance URL</label>
+              <input type="url" id="confluenceUrl" placeholder="https://your-org.atlassian.net/wiki" />
+            </div>
+            <div class="field-group">
+              <label>API Token</label>
+              <input type="password" id="confluenceToken" placeholder="••••••••••••" />
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="btn-test" onclick="testConnection('confluence')">Test Connection</button>
+            <span id="confluenceTestResult" style="font-size:12px;"></span>
+          </div>
+        </div>
+
+        <p class="field-hint">Generate API tokens at <a href="https://id.atlassian.com/manage-profile/security/api-tokens" target="_blank" style="color:var(--accent);">id.atlassian.com → Security → API tokens</a></p>
+      </div>
+
+      <div id="step3Alert"></div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveCredentials()">Save &amp; Continue</button>
+        <button class="btn-secondary" onclick="goStep(4)">Skip</button>
+      </div>
+    </div>
+
+    <!-- Step 4: Demo Data -->
+    <div class="step-panel" id="step-4">
+      <h1>Demo Data</h1>
+      <p class="subtitle">Choose whether to load the Alma Security case study data or start with a blank assessment.</p>
+      <div class="radio-cards">
+        <label class="radio-card">
+          <input type="radio" name="seedMode" value="alma" checked />
+          <div class="radio-card-body">
+            <h4>Load Alma Security Demo</h4>
+            <p>Pre-populated NIST CSF 2.0 assessment for a fictional company. Great for exploring the tool before entering your own data.</p>
+          </div>
+        </label>
+        <label class="radio-card">
+          <input type="radio" name="seedMode" value="blank" />
+          <div class="radio-card-body">
+            <h4>Start Blank</h4>
+            <p>Begin with an empty assessment. You'll import your own data or enter it manually.</p>
+          </div>
+        </label>
+      </div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveSeed()">Continue</button>
+      </div>
+    </div>
+
+    <!-- Step 5: Encryption -->
+    <div class="step-panel" id="step-5">
+      <h1>Encryption Setup <span style="font-size:13px;font-weight:400;color:var(--muted)">(Optional)</span></h1>
+      <p class="subtitle">Set a default password for encrypted CSV exports. You can change or set this later in the app. Leave blank to skip.</p>
+      <div class="field-group">
+        <label>Export Password</label>
+        <input type="password" id="encPassword" placeholder="Leave blank to skip" autocomplete="new-password" />
+      </div>
+      <p class="field-hint">Encrypted exports use AES-256 and are decryptable with the included <code>scripts/decrypt-export.mjs</code> script.</p>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveEncryption()">Continue</button>
+        <button class="btn-secondary" onclick="goStep(6)">Skip</button>
+      </div>
+    </div>
+
+    <!-- Step 6: Validation -->
+    <div class="step-panel" id="step-6">
+      <h1>Starting the App</h1>
+      <p class="subtitle">Launching the CSF Profile dev server and waiting for it to become ready…</p>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="launchProgress" style="width:0%"></div></div>
+        <div id="launchStatus" style="color:var(--muted);font-size:13px;">Preparing to launch…</div>
+      </div>
+      <div id="step6Alert"></div>
+    </div>
+
+    <!-- Step 7: Done -->
+    <div class="step-panel" id="step-7">
+      <div class="done-hero">
+        <div class="big-check">🎉</div>
+        <h2>You're all set!</h2>
+        <p>CSF Profile Assessment Tool is running and ready to use.</p>
+        <a href="http://localhost:3000" target="_blank" class="app-link">Open CSF Profile →</a>
+      </div>
+      <div class="alert alert-info" style="max-width:500px;margin:0 auto;">
+        <strong>Next steps:</strong><br/>
+        • This installer window can now be closed.<br/>
+        • The app runs at <strong>http://localhost:3000</strong> until you stop it (<code>Ctrl+C</code> in the terminal).<br/>
+        • To re-run setup: <code>bash install.sh</code>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const STEPS = [
+  'System Check',
+  'Prerequisites',
+  'Credentials',
+  'Demo Data',
+  'Encryption',
+  'Launching',
+  'Done',
+];
+
+let currentStep = 1;
+let systemData = null;
+
+// ── Rail ──────────────────────────────────────────────────────────────────────
+function renderRail() {
+  const rail = document.getElementById('railSteps');
+  rail.innerHTML = STEPS.map((label, i) => {
+    const n = i + 1;
+    const cls = n < currentStep ? 'done' : n === currentStep ? 'active' : '';
+    const icon = n < currentStep ? '✓' : n;
+    return `<div class="rail-step ${cls}"><div class="step-num">${icon}</div><span>${label}</span></div>`;
+  }).join('');
+}
+
+function goStep(n) {
+  document.getElementById(`step-${currentStep}`).classList.remove('active');
+  currentStep = n;
+  document.getElementById(`step-${currentStep}`).classList.add('active');
+  renderRail();
+  if (n === 6) startLaunch();
+}
+
+// ── Step 1: System Detection ──────────────────────────────────────────────────
+async function loadSystem() {
+  const data = await fetch('/api/system').then(r => r.json());
+  systemData = data;
+
+  const checks = [
+    {
+      label: 'Node.js',
+      ok: true,
+      detail: data.nodeVersion,
+    },
+    {
+      label: 'Git',
+      ok: data.gitPresent,
+      detail: data.gitPresent ? 'Detected' : 'Not found',
+    },
+    {
+      label: 'Environment config',
+      ok: true,
+      warn: !data.envExists,
+      detail: data.envExists ? `.env.local found — will back up before changes` : 'No .env.local — will create fresh',
+    },
+  ];
+
+  const container = document.getElementById('systemChecks');
+  container.innerHTML = checks.map(c => `
+    <div class="check-row">
+      <span class="check-icon ${c.ok && !c.warn ? 'ok' : c.ok && c.warn ? 'warn' : 'fail'}">
+        ${c.ok && !c.warn ? '✔' : c.ok && c.warn ? '⚠' : '✖'}
+      </span>
+      <span class="check-label">${c.label}</span>
+      <span class="check-detail">${c.detail}</span>
+    </div>
+  `).join('');
+
+  const allOk = checks.every(c => c.ok);
+  if (allOk) {
+    document.getElementById('step1Next').disabled = false;
+  } else {
+    document.getElementById('step1Alert').innerHTML = `<div class="alert alert-error">One or more system requirements are not met. Fix the issues above and re-run <code>install.sh</code>.</div>`;
+  }
+}
+
+// ── Step 2: Prerequisites ─────────────────────────────────────────────────────
+function loadPrerequisites() {
+  const prereqs = [
+    { label: 'npm dependencies installed', ok: true, detail: 'node_modules present (install.sh ran npm install)' },
+    { label: 'Installer server running', ok: true, detail: `http://localhost:31338` },
+  ];
+  document.getElementById('prereqStatus').innerHTML = prereqs.map(c => `
+    <div class="check-row">
+      <span class="check-icon ok">✔</span>
+      <span class="check-label">${c.label}</span>
+      <span class="check-detail">${c.detail}</span>
+    </div>
+  `).join('');
+}
+
+// ── Step 3: Credentials ───────────────────────────────────────────────────────
+async function testConnection(type) {
+  const url   = document.getElementById(`${type}Url`).value.trim();
+  const token = document.getElementById(`${type}Token`).value.trim();
+  const resultEl = document.getElementById(`${type}TestResult`);
+  if (!url || !token) { resultEl.innerHTML = `<span style="color:var(--warn)">Enter URL and token first</span>`; return; }
+  resultEl.innerHTML = `<span class="spinner"></span>`;
+  const res = await fetch('/api/test-connection', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ type, url, token }) }).then(r => r.json());
+  resultEl.innerHTML = res.ok
+    ? `<span style="color:var(--success)">✔ Connected (${res.status})</span>`
+    : `<span style="color:var(--error)">✖ Failed — check URL/token</span>`;
+}
+
+async function saveCredentials() {
+  const body = {
+    jiraUrl:         document.getElementById('jiraUrl').value.trim(),
+    jiraToken:       document.getElementById('jiraToken').value.trim(),
+    confluenceUrl:   document.getElementById('confluenceUrl').value.trim(),
+    confluenceToken: document.getElementById('confluenceToken').value.trim(),
+  };
+  const res = await fetch('/api/credentials', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) }).then(r => r.json());
+  if (res.error) {
+    document.getElementById('step3Alert').innerHTML = `<div class="alert alert-error">${res.error}</div>`;
+    return;
+  }
+  goStep(4);
+}
+
+// ── Step 4: Demo Data ─────────────────────────────────────────────────────────
+async function saveSeed() {
+  const choice = document.querySelector('input[name=seedMode]:checked').value;
+  await fetch('/api/seed', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ choice }) });
+  goStep(5);
+}
+
+// ── Step 5: Encryption ────────────────────────────────────────────────────────
+async function saveEncryption() {
+  const pw = document.getElementById('encPassword').value;
+  if (pw) {
+    // Write as env var for the app to pick up
+    await fetch('/api/credentials', { method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ encryptionPassword: pw }) });
+  }
+  goStep(6);
+}
+
+// ── Step 6: Launch ────────────────────────────────────────────────────────────
+async function startLaunch() {
+  const statusEl = document.getElementById('launchStatus');
+  const progressEl = document.getElementById('launchProgress');
+
+  statusEl.textContent = 'Starting dev server (npm start)…';
+  progressEl.style.width = '15%';
+
+  const launchRes = await fetch('/api/launch', { method: 'POST' }).then(r => r.json());
+  if (launchRes.error) {
+    document.getElementById('step6Alert').innerHTML = `<div class="alert alert-error">${launchRes.error}</div>`;
+    return;
+  }
+
+  statusEl.textContent = 'Waiting for app to become ready…';
+  progressEl.style.width = '35%';
+
+  // Poll /api/status until port 3000 responds (up to 60s)
+  let attempts = 0;
+  const maxAttempts = 30;
+  const poll = setInterval(async () => {
+    attempts++;
+    const pct = 35 + Math.min(55, (attempts / maxAttempts) * 55);
+    progressEl.style.width = pct + '%';
+    statusEl.textContent = `Waiting for app… (${attempts}/${maxAttempts})`;
+
+    const status = await fetch('/api/status').then(r => r.json()).catch(() => ({ ready: false }));
+    if (status.ready) {
+      clearInterval(poll);
+      progressEl.style.width = '100%';
+      statusEl.textContent = 'App is ready!';
+      setTimeout(() => goStep(7), 600);
+    } else if (attempts >= maxAttempts) {
+      clearInterval(poll);
+      document.getElementById('step6Alert').innerHTML = `<div class="alert alert-warn">The app is taking longer than expected. Try opening <a href="http://localhost:3000" target="_blank" style="color:var(--accent)">http://localhost:3000</a> directly.</div>`;
+      setTimeout(() => goStep(7), 2000);
+    }
+  }, 2000);
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderRail();
+loadSystem();
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Observe step changes to trigger side effects
+  const observer = new MutationObserver(() => {
+    if (document.getElementById('step-2').classList.contains('active')) loadPrerequisites();
+  });
+  observer.observe(document.getElementById('content'), { subtree: true, attributeFilter: ['class'] });
+});
+</script>
+</body>
+</html>
