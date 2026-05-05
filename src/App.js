@@ -107,28 +107,25 @@ const AppContent = () => {
     <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 text-gray-700">
         {/* Header */}
-        <header className="app-header px-6 py-3">
-          <div className="flex justify-between items-center">
+        <header className="app-header px-4 py-2">
+          <div className="flex justify-between items-center gap-2">
             {/* Left: Logo and title */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 flex-shrink-0">
               <span className="header-brand-accent" aria-hidden="true" />
               <img
                 src="/SC_SimplyCyberAcademy.png"
                 alt="Simply Cyber Academy Logo"
-                className="h-10"
+                className="h-8"
               />
-              <div className="h-6 w-px bg-slate-600" />
-              <div className="flex flex-col">
-                <span className="text-base font-semibold text-white">CSF Profile Assessment</span>
-                <span className="text-slate-400 font-normal" style={{fontSize: '0.6875rem', letterSpacing: '0.06em', textTransform: 'uppercase'}}>NIST CSF 2.0 Assessment Tool</span>
-              </div>
+              <div className="h-5 w-px bg-slate-600" />
+              <span className="text-sm font-semibold text-white whitespace-nowrap">CSF Profile</span>
             </div>
 
             {/* Center: Navigation */}
             <Navigation />
 
             {/* Right: Utilities */}
-            <div className="flex items-center gap-2 app-header-utils">
+            <div className="flex items-center gap-1 app-header-utils flex-shrink-0">
               <LastBackupIndicator onExportClick={handleExportFromIndicator} key={lastBackupTrigger} />
               <AutoSaveIndicator />
               <UndoRedoButtons />
