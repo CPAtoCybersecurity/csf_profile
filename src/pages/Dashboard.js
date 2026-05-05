@@ -592,20 +592,31 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="h-full overflow-y-auto overflow-x-hidden" style={{background: '#f1f5f9'}}>
+    <div className="h-full overflow-y-auto overflow-x-hidden" style={{background: darkMode ? '#0f172a' : '#f1f5f9'}}>
     <div className="p-5">
 
       {/* Filter Toolbar */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-3 mb-4 flex items-center gap-3 flex-wrap">
-        <span className="text-sm font-semibold text-gray-800 mr-1">Dashboard</span>
-        <div className="h-5 w-px bg-gray-200 mx-1" />
+      <div style={{
+        background: darkMode ? '#1e293b' : '#ffffff',
+        border: `1px solid ${darkMode ? '#334155' : '#f3f4f6'}`,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        borderRadius: '0.75rem',
+        padding: '0.75rem 1.25rem',
+        marginBottom: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        flexWrap: 'wrap',
+      }}>
+        <span style={{fontSize: '0.875rem', fontWeight: 600, color: darkMode ? '#f1f5f9' : '#1f2937', marginRight: '0.25rem'}}>Dashboard</span>
+        <div style={{height: '1.25rem', width: '1px', background: darkMode ? '#334155' : '#e5e7eb', margin: '0 0.25rem'}} />
         <div className="flex items-center gap-2">
-          <ClipboardList size={13} className="text-gray-400" />
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Assessment</span>
+          <ClipboardList size={13} style={{color: darkMode ? '#64748b' : '#9ca3af'}} />
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#64748b' : '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Assessment</span>
           <select
             value={selectedAssessmentId || ''}
             onChange={(e) => setSelectedAssessmentId(e.target.value)}
-            className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 min-w-[180px]"
+            style={{fontSize: '0.875rem', background: darkMode ? '#0f172a' : '#f9fafb', border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, borderRadius: '0.5rem', padding: '0.375rem 0.625rem', fontWeight: 500, color: darkMode ? '#f1f5f9' : '#1f2937', minWidth: '180px'}}
           >
             {assessments.map(assessment => (
               <option key={assessment.id} value={assessment.id}>
@@ -615,11 +626,11 @@ const Dashboard = () => {
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">Quarter</span>
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#64748b' : '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Quarter</span>
           <select
             value={selectedQuarter}
             onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-            className="text-sm bg-gray-50 border border-gray-200 rounded-lg px-2.5 py-1.5 font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            style={{fontSize: '0.875rem', background: darkMode ? '#0f172a' : '#f9fafb', border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, borderRadius: '0.5rem', padding: '0.375rem 0.625rem', fontWeight: 500, color: darkMode ? '#f1f5f9' : '#1f2937'}}
           >
             <option value={1}>Q1</option>
             <option value={2}>Q2</option>
@@ -648,8 +659,8 @@ const Dashboard = () => {
         <button
           onClick={() => setShowAuditModal(true)}
           disabled={!selectedAssessment}
-          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors border border-gray-200 hover:bg-gray-50"
-          style={{ color: '#374151' }}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          style={{ color: darkMode ? '#e2e8f0' : '#374151', border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, background: darkMode ? '#1e293b' : 'transparent' }}
           title="Export Audit Report as Markdown"
         >
           <ClipboardList size={14} />
@@ -659,15 +670,24 @@ const Dashboard = () => {
 
       {/* Assessment Info Banner */}
       {selectedAssessment && (
-        <div className="mb-4 px-4 py-2.5 bg-blue-50 border border-blue-100 rounded-lg flex items-center justify-between">
+        <div style={{
+          marginBottom: '1rem',
+          padding: '0.625rem 1rem',
+          background: darkMode ? 'rgba(30,58,138,0.25)' : '#eff6ff',
+          border: `1px solid ${darkMode ? 'rgba(59,130,246,0.3)' : '#bfdbfe'}`,
+          borderRadius: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
           <div className="flex items-center gap-2">
-            <ClipboardList size={14} className="text-blue-400 flex-shrink-0" />
-            <span className="text-sm font-medium text-blue-900">{selectedAssessment.name}</span>
+            <ClipboardList size={14} style={{color: darkMode ? '#60a5fa' : '#60a5fa', flexShrink: 0}} />
+            <span style={{fontSize: '0.875rem', fontWeight: 500, color: darkMode ? '#93c5fd' : '#1e3a8a'}}>{selectedAssessment.name}</span>
             {selectedAssessment.description && (
-              <span className="text-sm text-blue-600">— {selectedAssessment.description}</span>
+              <span style={{fontSize: '0.875rem', color: darkMode ? '#60a5fa' : '#3b82f6'}}>— {selectedAssessment.description}</span>
             )}
           </div>
-          <span className="text-xs font-medium text-blue-500 bg-blue-100 px-2.5 py-1 rounded-full whitespace-nowrap">
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#60a5fa' : '#2563eb', background: darkMode ? 'rgba(59,130,246,0.15)' : '#dbeafe', padding: '0.25rem 0.625rem', borderRadius: '9999px', whiteSpace: 'nowrap'}}>
             {selectedAssessment.scopeIds?.length || 0} items in scope
           </span>
         </div>

@@ -75,12 +75,15 @@ const LastBackupIndicator = ({ onExportClick }) => {
   return (
     <div className="flex items-center gap-2">
       <div
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-sm font-medium ${getColorClasses()}`}
+        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border font-medium ${getColorClasses()}`}
         title={getTooltip()}
       >
         {getIcon()}
-        <span className="hidden sm:inline">Last backup:</span>
-        <span className="font-semibold">{timeSinceExport}</span>
+        <div className="flex flex-col leading-none" style={{fontSize: '0.65rem'}}>
+          <span>Last</span>
+          <span>backup</span>
+        </div>
+        <span className="font-semibold text-xs">{timeSinceExport}</span>
       </div>
       
       {warningLevel !== 'success' && (
