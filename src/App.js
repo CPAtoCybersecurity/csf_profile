@@ -105,12 +105,13 @@ const AppContent = () => {
   return (
     <React.Fragment>
     <div className="flex flex-col h-screen">
-      <div className="flex flex-col h-full bg-white text-gray-700">
+      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 text-gray-700">
         {/* Header */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm px-6 py-3">
+        <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-md px-6 py-3">
           <div className="flex justify-between items-center">
             {/* Left: Logo and title */}
             <div className="flex items-center gap-3">
+              <span className="header-brand-accent" aria-hidden="true" />
               <img
                 src="/SC_SimplyCyberAcademy.png"
                 alt="Simply Cyber Academy Logo"
@@ -118,8 +119,8 @@ const AppContent = () => {
               />
               <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">CSF Profile Assessment</span>
-                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">NIST CSF 2.0 Assessment Tool</span>
+                <span className="text-base font-semibold text-gray-800 dark:text-gray-100">CSF Profile Assessment</span>
+                <span className="text-gray-400 dark:text-gray-500 font-normal" style={{fontSize: '0.6875rem', letterSpacing: '0.06em', textTransform: 'uppercase'}}>NIST CSF 2.0 Assessment Tool</span>
               </div>
             </div>
 

@@ -687,6 +687,7 @@ const Dashboard = () => {
               subtitle="Avg actual score this quarter"
               trend={kpiData.overallScore.trend}
               darkMode={darkMode}
+              accent="#2563eb"
             />
             <KPICard
               title="In-Scope Items"
@@ -694,6 +695,7 @@ const Dashboard = () => {
               subtitle="Controls / requirements in scope"
               trend={kpiData.inScopeItems.trend}
               darkMode={darkMode}
+              accent="#7c3aed"
             />
             <KPICard
               title="Evidence Coverage"
@@ -701,6 +703,7 @@ const Dashboard = () => {
               subtitle={kpiData.evidenceCoverage.subtitle || 'In-scope items with artifact records linked'}
               trend={kpiData.evidenceCoverage.trend}
               darkMode={darkMode}
+              accent="#059669"
             />
             <KPICard
               title="Open Findings"
@@ -708,6 +711,7 @@ const Dashboard = () => {
               subtitle="Findings not yet resolved"
               trend={kpiData.openFindings.trend}
               darkMode={darkMode}
+              accent="#d97706"
             />
           </div>
 

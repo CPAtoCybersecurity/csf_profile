@@ -18,14 +18,14 @@ const Navigation = () => {
   // Inline style to force no underline
   const linkStyle = { textDecoration: 'none' };
 
-  // Base styles for nav items — increased padding, bottom-border active indicator
-  const baseStyles = "flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm font-semibold transition-colors border-b-[3px]";
-  const activeStyles = "border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 bg-transparent";
-  const inactiveStyles = "border-transparent text-gray-600 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700";
+  // Base styles for nav items
+  const baseStyles = "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 border-b-[3px]";
+  const activeStyles = "border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/25";
+  const inactiveStyles = "border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60";
 
-  // Special styles for AI (success) — bottom-border variant
-  const aiActiveStyles = "border-green-600 dark:border-green-400 text-green-700 dark:text-green-300 bg-transparent";
-  const aiInactiveStyles = "border-transparent text-gray-600 dark:text-gray-100 hover:bg-green-50 dark:hover:bg-gray-700";
+  // Special styles for AI (success)
+  const aiActiveStyles = "border-green-600 dark:border-green-400 text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20";
+  const aiInactiveStyles = "border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-green-50 dark:hover:bg-gray-700/60";
 
   // Vertical divider between groups
   const Divider = () => (
