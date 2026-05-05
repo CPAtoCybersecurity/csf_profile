@@ -612,7 +612,7 @@ const Dashboard = () => {
         <div style={{height: '1.25rem', width: '1px', background: darkMode ? '#334155' : '#e5e7eb', margin: '0 0.25rem'}} />
         <div className="flex items-center gap-2">
           <ClipboardList size={13} style={{color: darkMode ? '#64748b' : '#9ca3af'}} />
-          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#64748b' : '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Assessment</span>
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#94a3b8' : '#374151', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Assessment</span>
           <select
             value={selectedAssessmentId || ''}
             onChange={(e) => setSelectedAssessmentId(e.target.value)}
@@ -626,7 +626,7 @@ const Dashboard = () => {
           </select>
         </div>
         <div className="flex items-center gap-2">
-          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#64748b' : '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Quarter</span>
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#94a3b8' : '#374151', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Quarter</span>
           <select
             value={selectedQuarter}
             onChange={(e) => setSelectedQuarter(Number(e.target.value))}
