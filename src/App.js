@@ -104,7 +104,7 @@ const AppContent = () => {
 
   return (
     <React.Fragment>
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen overflow-hidden">
       <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 text-gray-700">
         {/* Header */}
         <header className="app-header px-6 py-3">

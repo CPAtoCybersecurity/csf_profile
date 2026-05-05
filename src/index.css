@@ -150,6 +150,7 @@ code {
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .md\:col-span-2 { grid-column: span 2 / span 2; }
@@ -834,10 +835,11 @@ nav a:active { text-decoration: none !important; }
   border-radius: 0.75rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   padding: 1.5rem;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
 }
 .card:hover {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
 }
 .card-header {
   padding-bottom: 1rem;
@@ -1377,19 +1379,6 @@ table th {
 
 .animate-slide-in-right {
   animation: slideInRight 0.2s ease forwards;
-}
-
-/* ==========================================================================
-   37. Polish — Improved Card Hover
-   ========================================================================== */
-
-.card {
-  transition: box-shadow 0.2s ease, transform 0.15s ease;
-}
-
-.card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
-  transform: translateY(-1px);
 }
 
 /* ==========================================================================
