@@ -492,6 +492,10 @@ code {
 
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+.overflow-y-hidden { overflow-y: hidden; }
 .opacity-0 { opacity: 0; }
 .opacity-80 { opacity: 0.8; }
 .pointer-events-none { pointer-events: none; }
