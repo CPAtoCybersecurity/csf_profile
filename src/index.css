@@ -942,6 +942,25 @@ nav a:active { text-decoration: none !important; }
    24. Enterprise UI — Professional Header Accent
    ========================================================================== */
 
+/* Dark app header — always dark regardless of light/dark mode toggle */
+.app-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  flex-shrink: 0;
+}
+
+/* Force utility icons (undo/redo, theme toggle, backup) to be visible on dark header */
+.app-header-utils svg,
+.app-header-utils button,
+.app-header-utils [class*="text-gray"] {
+  color: #94a3b8 !important;
+}
+.app-header-utils button:hover svg,
+.app-header-utils button:hover {
+  color: #e2e8f0 !important;
+}
+
 .header-brand-accent {
   display: block;
   width: 4px;
@@ -1067,6 +1086,23 @@ nav a:active { text-decoration: none !important; }
    ========================================================================== */
 
 .rounded-xl { border-radius: var(--radius-xl); }
+
+/* ==========================================================================
+   30b. Polish — Main content area background
+   ========================================================================== */
+
+/* Give all page content a subtle gray base so white cards pop */
+main {
+  background: #f1f5f9;
+}
+.dark main {
+  background: #0f172a;
+}
+
+/* White surface for page toolbars / filter bars */
+main > div > .bg-white {
+  background: #ffffff;
+}
 
 /* ==========================================================================
    30. Polish — Global Interactive Defaults

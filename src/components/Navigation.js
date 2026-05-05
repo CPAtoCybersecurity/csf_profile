@@ -18,18 +18,18 @@ const Navigation = () => {
   // Inline style to force no underline
   const linkStyle = { textDecoration: 'none' };
 
-  // Base styles for nav items
-  const baseStyles = "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 border-b-[3px]";
-  const activeStyles = "border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/25";
-  const inactiveStyles = "border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-700/60";
+  // Base styles for nav items — on dark header
+  const baseStyles = "flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-150 border-b-2";
+  const activeStyles = "border-sky-400 text-sky-300 bg-white/10";
+  const inactiveStyles = "border-transparent text-slate-300 hover:text-white hover:bg-white/10";
 
-  // Special styles for AI (success)
-  const aiActiveStyles = "border-green-600 dark:border-green-400 text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/20";
-  const aiInactiveStyles = "border-transparent text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-green-50 dark:hover:bg-gray-700/60";
+  // Special styles for AI
+  const aiActiveStyles = "border-emerald-400 text-emerald-300 bg-white/10";
+  const aiInactiveStyles = "border-transparent text-slate-300 hover:text-white hover:bg-white/10";
 
   // Vertical divider between groups
   const Divider = () => (
-    <div className="h-5 w-px bg-gray-300 dark:bg-gray-600 mx-2 self-center" />
+    <div className="h-5 w-px bg-slate-600 mx-2 self-center" />
   );
 
   return (
