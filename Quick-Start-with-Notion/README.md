@@ -122,9 +122,12 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 ## Notion import — step by step
 
 1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
-2. Drag `functions.csv`, `categories.csv`, and `subcategories.csv` onto the page (or use **Import → CSV**) — each becomes its own inline database. Notion uses the first column as the database title, so each database's title column will be `ID` (`GV`, `GV.SC`, `GV.SC-04`, etc.).
+2. Add indivudal new pages and select Import for `functions.csv`, `categories.csv`, and `subcategories.csv`— each becomes its own inline database. Notion uses the first column as the database title, so each database's title column will be `ID` (`GV`, `GV.SC`, `GV.SC-04`, etc.).
 3. Convert the relation columns:
-   - Open the **Categories** database. Find the `Function` column (currently text). Click the column header → **Edit property** → change type to **Relation** with target = the Functions database. Notion offers to auto-link rows whose `Function` text value matches a Function `ID` — accept.
+   - Open the **Categories** database. Find the `Function` column (currently text). Click the column header → change type to **Relation** with target = the Functions database. Notion offers to auto-link rows whose `Function` text value matches a Function `ID` — accept.
+   - 
+<img width="657" height="411" alt="Screenshot 2026-05-06 at 5 51 11 PM" src="https://github.com/user-attachments/assets/8560d5ff-56f6-4f0d-9ba9-0c5434367b96" />
+
    - Repeat for the **Subcategories** database: convert the `Category` column from text to Relation → Categories.
 4. Add the rollups:
    - On **Categories**, add a new property of type **Rollup**. Source = the Subcategories relation. Property = `Score`. Calculate = `Average`. Format → 1 decimal place.
