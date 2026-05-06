@@ -1,0 +1,7 @@
+ID,Name,Description
+DE,DETECT,Possible cybersecurity attacks and compromises are found and analyzed
+GV,GOVERN,"The organization's cybersecurity risk management strategy, expectations, and policy are established, communicated, and monitored"
+ID,IDENTIFY,The organization's current cybersecurity risks are understood
+PR,PROTECT,Safeguards to manage the organization's cybersecurity risks are used
+RC,RECOVER,Assets and operations affected by a cybersecurity incident are restored
+RS,RESPOND,Actions regarding a detected cybersecurity incident are taken

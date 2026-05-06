@@ -1,0 +1,23 @@
+ID,Name,Description,Function
+DE.AE,Adverse Event Analysis,"Anomalies, indicators of compromise, and other potentially adverse events are analyzed to characterize the events and detect cybersecurity incidents",DE
+DE.CM,Continuous Monitoring,"Assets are monitored to find anomalies, indicators of compromise, and other potentially adverse events",DE
+GV.OC,Organizational Context,"The circumstances - mission, stakeholder expectations, dependencies, and legal, regulatory, and contractual requirements - surrounding the organization's cybersecurity risk management decisions are understood",GV
+GV.OV,Oversight,"Results of organization-wide cybersecurity risk management activities and performance are used to inform, improve, and adjust the risk management strategy",GV
+GV.PO,Policy,"Organizational cybersecurity policy is established, communicated, and enforced",GV
+GV.RM,Risk Management Strategy,"The organization's priorities, constraints, risk tolerance and appetite statements, and assumptions are established, communicated, and used to support operational risk decisions",GV
+GV.RR,"Roles, Responsibilities, and Authorities","Cybersecurity roles, responsibilities, and authorities to foster accountability, performance assessment, and continuous improvement are established and communicated",GV
+GV.SC,Cybersecurity Supply Chain Risk Management,"Cyber supply chain risk management processes are identified, established, managed, monitored, and improved by organizational stakeholders",GV
+ID.AM,Asset Management,"Assets (e.g., data, hardware, software, systems, facilities, services, people) that enable the organization to achieve business purposes are identified and managed consistent with their relative importance to organizational objectives and the organization's risk strategy",ID
+ID.IM,Improvement,"Improvements to organizational cybersecurity risk management processes, procedures and activities are identified across all CSF Functions",ID
+ID.RA,Risk Assessment,"The cybersecurity risk to the organization, assets, and individuals is understood by the organization",ID
+PR.AA,"Identity Management, Authentication, and Access Control","Access to physical and logical assets is limited to authorized users, services, and hardware and  managed commensurate with the assessed risk of unauthorized access",PR
+PR.AT,Awareness and Training,The organization's personnel are provided with cybersecurity awareness and training so that they can perform their cybersecurity-related tasks,PR
+PR.DS,Data Security,"Data are managed consistent with the organization's risk strategy to protect the confidentiality, integrity, and availability of information",PR
+PR.IR,Technology Infrastructure Resilience,"Security architectures are managed with the organization's risk strategy to protect asset confidentiality, integrity, and availability, and organizational resilience",PR
+PR.PS,Platform Security,"The hardware, software (e.g., firmware, operating systems, applications), and services of physical and virtual platforms are managed consistent with the organization's risk strategy to protect their confidentiality, integrity, and availability",PR
+RC.CO,Incident Recovery Communication,Restoration activities are coordinated with internal and external parties,RC
+RC.RP,Incident Recovery Plan Execution,Restoration activities are performed to ensure operational availability of systems and services affected by cybersecurity incidents,RC
+RS.AN,Incident Analysis,Investigations are conducted to ensure effective response and support forensics and recovery activities,RS
+RS.CO,Incident Response Reporting and Communication,"Response activities are coordinated with internal and external stakeholders as required by laws, regulations, or policies",RS
+RS.MA,Incident Management,Responses to detected cybersecurity incidents are managed,RS
+RS.MI,Incident Mitigation,Activities are performed to prevent expansion of an event and mitigate its effects,RS
