@@ -128,6 +128,18 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
    - 
 <img width="657" height="411" alt="Screenshot 2026-05-06 at 5 51 11 PM" src="https://github.com/user-attachments/assets/8560d5ff-56f6-4f0d-9ba9-0c5434367b96" />
 
+   - Open the **Subcategories** database. Convert the `Category` column from text to Relation → Categories. When prompted for two-way relation, **enable it** — this creates a back-relation on Categories that the rollup in step 4 requires.
+   - While still in **Subcategories**: convert the `Score` column type from Text to **Number**. Do the same for `Target Score`. Rollups can only Average numeric fields; text fields only offer Count.
+4. Add the rollups:
+   - On **Categories**, add a new property of type **Rollup**. Source = the `subcategories.csv` back-relation. Property = `Score`. Calculate = `Average`. Decimal places = 2. If you see a warning that the target property type changed, re-select `Score` in the picker to refresh it.
+   - On **Categories**, add a second property of type **Formula**. Formula body: `prop("Rollup")`. This mirrors the rollup as a plain number — Notion does not allow one Rollup to directly target another Rollup, so the Formula is the bridge.
+   - On **Functions**, add a new property of type **Relation** pointing to the Categories database.
+   - On **Functions**, add a new property of type **Rollup**. Source = the Categories relation. Property = `Formula` (the one you just created). Calculate = `Average`. Decimal places = 2.
+5. Bulk-paste each `subcategories/{ID}.md` into the matching Subcategory page body. Two routes:
+   - **Manual:** open a Subcategory page and paste the file body — Notion converts markdown on paste.
+   - **Bulk:** Notion's **Import → Markdown & CSV** can ingest the whole `subcategories/` directory in one shot, then merge each markdown page into the matching database row by ID.
+6. Verify relation cells. The auto-link in step 3 wires rows by matching text IDs. Spot-check a few: open a Category row and confirm the `Function` relation cell shows the correct Function; open a Subcategory row and confirm `Category` shows the correct Category.
+7. Pin a top-level page view that shows the Functions database with its Rollup column visible. That's your dashboard.
    - Repeat for the **Subcategories** database: convert the `Category` column from text to Relation → Categories.
 4. Add the rollups:
    - On **Categories**, add a new property of type **Rollup**. Source = the Subcategories relation. Property = `Score`. Calculate = `Average`. Format → 1 decimal place.
