@@ -122,7 +122,7 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 ## Notion import — step by step
 
 1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
-2. Add indivudal new pages and select Import for `functions.csv`, `categories.csv`, and `subcategories.csv`— each becomes its own inline database. Notion uses the first column as the database title, so each database's title column will be `ID` (`GV`, `GV.SC`, `GV.SC-04`, etc.).
+2. Add individual new pages and select Import for `functions.csv`, `categories.csv`, and `subcategories.csv`— each becomes its own inline database. Notion uses the first column as the database title, so each database's title column will be `ID` (`GV`, `GV.SC`, `GV.SC-04`, etc.).
 3. Convert the relation columns:
    - Open the **Categories** database. Find the `Function` column (currently text). Click the column header → change type to **Relation** with target = the Functions database. Notion offers to auto-link rows whose `Function` text value matches a Function `ID` — accept.
    - 
