@@ -140,6 +140,14 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
    - **Bulk:** Notion's **Import → Markdown & CSV** can ingest the whole `subcategories/` directory in one shot, then merge each markdown page into the matching database row by ID.
 6. Verify relation cells. The auto-link in step 3 wires rows by matching text IDs. Spot-check a few: open a Category row and confirm the `Function` relation cell shows the correct Function; open a Subcategory row and confirm `Category` shows the correct Category.
 7. Pin a top-level page view that shows the Functions database with its Rollup column visible. That's your dashboard.
+   - Repeat for the **Subcategories** database: convert the `Category` column from text to Relation → Categories.
+4. Add the rollups:
+   - On **Categories**, add a new property of type **Rollup**. Source = the Subcategories relation. Property = `Score`. Calculate = `Average`. Format → 1 decimal place.
+   - On **Functions**, add a new property of type **Rollup**. Source = the Categories relation. Property = the Category rollup you just created. Calculate = `Average`. Format → 1 decimal place.
+5. Bulk-paste each `subcategories/{ID}.md` into the matching Subcategory page body. Two routes:
+   - **Manual:** open a Subcategory page and paste the file body — Notion converts markdown on paste.
+   - **Bulk:** Notion's **Import → Markdown & CSV** can ingest the whole `subcategories/` directory in one shot, then merge each markdown page into the matching database row by ID.
+6. Pin a top-level page view that shows the Functions database with its rollup column visible. That's your dashboard.
 
 After step 4 your rollups are live. Score a single Subcategory and watch the Category and Function rollups update.
 
