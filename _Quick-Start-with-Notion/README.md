@@ -121,7 +121,7 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 
 ## Notion import — step by step
 
-> **Recommended shortcut:** Use the [public Notion template](_TEMPLATE_LINK_) to skip all of steps 1–6. You get a pre-wired workspace with relations, rollups, and all 106 subcategory pages already configured — just start scoring. The manual steps below are for anyone building from the raw CSVs.
+> **Recommended shortcut:** Use the [public Notion template](https://www.notion.so/CSF-Wiki-3590e2e64c708071ace2d9ac64ae6298) to skip all of steps 1–6. You get a pre-wired workspace with relations, rollups, and all 106 subcategory pages already configured — just start scoring. The manual steps below are for anyone building from the raw CSVs.
 
 1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
 
