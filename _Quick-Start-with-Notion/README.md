@@ -121,35 +121,67 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 
 ## Notion import — step by step
 
-1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
-2. Add individual new pages and select Import for `functions.csv`, `categories.csv`, and `subcategories.csv`— each becomes its own inline database. Notion uses the first column as the database title, so each database's title column will be `ID` (`GV`, `GV.SC`, `GV.SC-04`, etc.).
-3. Convert the relation columns:
-   - Open the **Categories** database. Find the `Function` column (currently text). Click the column header → change type to **Relation** with target = the Functions database. Notion offers to auto-link rows whose `Function` text value matches a Function `ID` — accept.
-   - 
-<img width="657" height="411" alt="Screenshot 2026-05-06 at 5 51 11 PM" src="https://github.com/user-attachments/assets/8560d5ff-56f6-4f0d-9ba9-0c5434367b96" />
+> **Recommended shortcut:** Use the [public Notion template](https://www.notion.so/CSF-Wiki-3590e2e64c708071ace2d9ac64ae6298) to skip all of steps 1–6. You get a pre-wired workspace with relations, rollups, and all 106 subcategory pages already configured — just start scoring. The manual steps below are for anyone building from the raw CSVs.
 
-   - Open the **Subcategories** database. Convert the `Category` column from text to Relation → Categories. When prompted for two-way relation, **enable it** — this creates a back-relation on Categories that the rollup in step 4 requires.
-   - While still in **Subcategories**: convert the `Score` column type from Text to **Number**. Do the same for `Target Score`. Rollups can only Average numeric fields; text fields only offer Count.
+1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
+
+2. Import the three CSVs as inline databases. Inside the CSF Wiki page, type `/` then **Import** then **CSV** for each file: `functions.csv`, `categories.csv`, `subcategories.csv`. Select **Inline** (not Full Page) so all three databases live on the same page. Notion uses the first column as the title, so the title column will be `ID` (`GV`, `GV.SC`, `GV.SC-04`, etc.).
+
+3. Convert the relation columns — **read the warning below before starting this step.**
+
+   > **Warning: auto-link is unreliable in current Notion versions.** When you convert a text column to a Relation, Notion may silently wipe the cell values instead of matching them to existing rows. The auto-link prompt frequently does not appear. Note your text values before converting any column so you can recover if needed.
+
+   - Open the **Categories** database. Find the `Function` column (currently plain text). Click the column header, change type to **Relation**, set target = the Functions database. If an auto-link prompt appears, accept it.
+
+     **Sanity check:** scroll all 22 Category rows. If any `Function` cell is empty, auto-link did not fire. Go to the Recovery path section below before continuing.
+
+   - Open the **Subcategories** database. Find the `Category` column. Click the column header, change type to **Relation**, set target = the Categories database. When prompted for a two-way relation, **enable it** — this creates a back-relation on Categories that the rollup in step 4 requires.
+
+     **Sanity check:** spot-check that subcategory rows show the correct Category in the relation cell.
+
+   - While still in **Subcategories**: click the `Score` column header and change type to **Number**. Do the same for `Target Score`. Rollups can only Average numeric fields; text fields only offer Count.
+
+   > **Note on the relation picker:** when manually linking rows, the picker displays the Category's title. If your Category titles are still plain IDs (`DE.AE`), the picker shows only the ID — type a prefix (e.g. `GV.`) to filter, or use the lookup table in the Appendix below. **Optional improvement:** after step 3, rename each Category row's title from `DE.AE` to `DE.AE — Adverse Event Analysis` — the picker will then show both, eliminating the need to memorize the ID-to-name mapping.
+
 4. Add the rollups:
    - On **Categories**, add a new property of type **Rollup**. Source = the `subcategories.csv` back-relation. Property = `Score`. Calculate = `Average`. Decimal places = 2. If you see a warning that the target property type changed, re-select `Score` in the picker to refresh it.
    - On **Categories**, add a second property of type **Formula**. Formula body: `prop("Rollup")`. This mirrors the rollup as a plain number — Notion does not allow one Rollup to directly target another Rollup, so the Formula is the bridge.
-   - On **Functions**, add a new property of type **Relation** pointing to the Categories database.
+   - On **Functions**, add a new property of type **Relation** pointing to the Categories database. Link each of the 6 Function rows to its Categories manually.
    - On **Functions**, add a new property of type **Rollup**. Source = the Categories relation. Property = `Formula` (the one you just created). Calculate = `Average`. Decimal places = 2.
+
 5. Bulk-paste each `subcategories/{ID}.md` into the matching Subcategory page body. Two routes:
    - **Manual:** open a Subcategory page and paste the file body — Notion converts markdown on paste.
-   - **Bulk:** Notion's **Import → Markdown & CSV** can ingest the whole `subcategories/` directory in one shot, then merge each markdown page into the matching database row by ID.
-6. Verify relation cells. The auto-link in step 3 wires rows by matching text IDs. Spot-check a few: open a Category row and confirm the `Function` relation cell shows the correct Function; open a Subcategory row and confirm `Category` shows the correct Category.
-7. Pin a top-level page view that shows the Functions database with its Rollup column visible. That's your dashboard.
-   - Repeat for the **Subcategories** database: convert the `Category` column from text to Relation → Categories.
-4. Add the rollups:
-   - On **Categories**, add a new property of type **Rollup**. Source = the Subcategories relation. Property = `Score`. Calculate = `Average`. Format → 1 decimal place.
-   - On **Functions**, add a new property of type **Rollup**. Source = the Categories relation. Property = the Category rollup you just created. Calculate = `Average`. Format → 1 decimal place.
-5. Bulk-paste each `subcategories/{ID}.md` into the matching Subcategory page body. Two routes:
-   - **Manual:** open a Subcategory page and paste the file body — Notion converts markdown on paste.
-   - **Bulk:** Notion's **Import → Markdown & CSV** can ingest the whole `subcategories/` directory in one shot, then merge each markdown page into the matching database row by ID.
-6. Pin a top-level page view that shows the Functions database with its rollup column visible. That's your dashboard.
+   - **CSV import into existing database:** drag the CSV file directly onto the database, or use the `•••` database menu and look for **Merge with CSV** (label varies by Notion version). This is more reliable than the older Import → Markdown & CSV flow.
+
+   > **Column paste-down:** when pasting multiple values into a Notion column, you must select the destination range first (Shift+click from first to last target cell). Pasting into a single selected cell dumps all values into that one cell as a concatenated string.
+
+6. Verify relation cells. Open a Category row and confirm the `Function` relation cell shows the correct Function. Open a Subcategory row and confirm `Category` shows the correct Category. If any cells are empty, see the Recovery path below.
+
+7. Pin a top-level page view that shows the Functions database with its Rollup column visible. That is your dashboard.
 
 After step 4 your rollups are live. Score a single Subcategory and watch the Category and Function rollups update.
+
+### Recovery path — when auto-link does not fire
+
+If `Function` or `Category` Relation cells are empty after conversion:
+
+1. Delete the empty Relation column.
+2. Add a new Text property and re-paste the original values from the source CSV.
+3. Try converting to Relation again. If auto-link still does not fire, proceed to manual linking.
+4. **Manual linking:** sort the database by ID. For each row, click the Relation cell and search for the linked row. Type the ID prefix (e.g. `GV.`) to filter the picker. There are 22 Category rows and 6 Function rows — manual linking takes about 15 minutes total.
+
+### Appendix — Function to Category mapping
+
+Use this table when the relation picker shows Names instead of IDs.
+
+| Function | Categories |
+|----------|-----------|
+| GV (GOVERN) | GV.OC, GV.RM, GV.RR, GV.PO, GV.OV, GV.SC |
+| ID (IDENTIFY) | ID.AM, ID.RA, ID.IM |
+| PR (PROTECT) | PR.AA, PR.AT, PR.DS, PR.IR, PR.PS |
+| DE (DETECT) | DE.AE, DE.CM |
+| RS (RESPOND) | RS.MA, RS.AN, RS.CO, RS.MI |
+| RC (RECOVER) | RC.RP, RC.CO |
 
 ## Schema
 
