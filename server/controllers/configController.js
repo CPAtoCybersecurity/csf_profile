@@ -164,16 +164,16 @@ export const getConfigStatus = (req, res) => {
 // POST /api/config/test - Test Atlassian connection using provided credentials
 export const testConnection = async (req, res) => {
   const { service, baseUrl, email, apiToken } = req.body;
-  const sanitizedBaseUrl = baseUrl.replace(/\/$/, "");
 
   try {
     const auth = Buffer.from(`${email}:${apiToken}`).toString('base64');
     const testUrl = service === 'jira'
-      ? `${sanitizedBaseUrl}/rest/api/3/myself`
-      : `${sanitizedBaseUrl}/wiki/rest/api/user/current`;
+      ? `${baseUrl}/rest/api/3/myself`
+      : `${baseUrl}/wiki/rest/api/user/current`;
 
     const response = await fetch(testUrl, {
       method: 'GET',
+      redirect: 'error',
       headers: {
         'Authorization': `Basic ${auth}`,
         'Accept': 'application/json'

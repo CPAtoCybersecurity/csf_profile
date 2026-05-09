@@ -128,7 +128,7 @@ const Settings = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           service,
-          baseUrl: atlassianSiteUrl.replace(/\/$/, ''),
+          baseUrl: atlassianSiteUrl,
           email: atlassianEmail,
           apiToken: atlassianApiToken
         })
