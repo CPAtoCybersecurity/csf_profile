@@ -121,7 +121,7 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 
 ## Notion import — step by step
 
-> **Recommended shortcut:** Use the public duplicate link (when available) to skip all of steps 1–6. You get a pre-wired workspace with relations and rollups already configured — just start scoring. The manual steps below are for anyone building from the raw CSVs.
+> **Recommended shortcut:** Use the [public Notion template](_TEMPLATE_LINK_) to skip all of steps 1–6. You get a pre-wired workspace with relations, rollups, and all 106 subcategory pages already configured — just start scoring. The manual steps below are for anyone building from the raw CSVs.
 
 1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
 
@@ -141,7 +141,7 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 
    - While still in **Subcategories**: click the `Score` column header and change type to **Number**. Do the same for `Target Score`. Rollups can only Average numeric fields; text fields only offer Count.
 
-   > **Note on the relation picker:** when manually linking rows, the picker displays the `Name` field (`Adverse Event Analysis`) rather than the `ID` (`DE.AE`). Type the ID prefix (e.g. `GV.`) to filter, or use the lookup table in the Appendix below.
+   > **Note on the relation picker:** when manually linking rows, the picker displays the Category's title. If your Category titles are still plain IDs (`DE.AE`), the picker shows only the ID — type a prefix (e.g. `GV.`) to filter, or use the lookup table in the Appendix below. **Optional improvement:** after step 3, rename each Category row's title from `DE.AE` to `DE.AE — Adverse Event Analysis` — the picker will then show both, eliminating the need to memorize the ID-to-name mapping.
 
 4. Add the rollups:
    - On **Categories**, add a new property of type **Rollup**. Source = the `subcategories.csv` back-relation. Property = `Score`. Calculate = `Average`. Decimal places = 2. If you see a warning that the target property type changed, re-select `Score` in the picker to refresh it.
