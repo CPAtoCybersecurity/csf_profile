@@ -31,61 +31,72 @@
   --space-10: 2.5rem;    /* 40px */
   --space-12: 3rem;      /* 48px */
 
-  /* Brand Colors */
-  --brand-50: #eef2ff;
-  --brand-100: #e0e7ff;
-  --brand-500: #6366f1;
-  --brand-600: #4f46e5;
-  --brand-700: #4338ca;
-  --brand-800: #3730a3;
-  --brand-900: #312e81;
+  /* Brand Colors — slate-blue enterprise palette */
+  --brand-50: #f0f4ff;
+  --brand-100: #dbe4ff;
+  --brand-400: #4d7bff;
+  --brand-500: #2563eb;
+  --brand-600: #1e4fd8;
+  --brand-700: #1a3fbf;
+  --brand-800: #1e3a8a;
+  --brand-900: #1e3370;
+
+  /* Accent Color — teal for highlights and CTAs */
+  --accent: #0ea5e9;
+  --accent-dark: #0284c7;
+  --accent-subtle: #e0f2fe;
 
   /* Elevation (shadows) */
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 8px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.06);
+  --shadow-lg: 0 10px 20px -3px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.05);
 
   /* Border Radius */
   --radius-sm: 0.375rem;  /* 6px */
   --radius-md: 0.5rem;    /* 8px */
   --radius-lg: 0.75rem;   /* 12px */
-  --radius-xl: 1rem;      /* 16px */
+  --radius-xl: 0.875rem;  /* 14px */
 
   /* Theme Colors */
   --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
-  --bg-header: #1d4ed8;
-  --bg-nav-active: #1e40af;
-  --text-primary: #111827;
-  --text-secondary: #374151;
-  --text-muted: #6b7280;
-  --text-faint: #9ca3af;
-  --border-color: #e5e7eb;
-  --border-dark: #d1d5db;
-  --ring-color: #3b82f6;
-  --prose-color: #374151;
-  --prose-code-bg: #f3f4f6;
-  --prose-pre-bg: #1f2937;
-  --prose-pre-text: #f9fafb;
-  --prose-blockquote-border: #d1d5db;
-  --prose-blockquote-text: #6b7280;
+  --bg-secondary: #f8fafc;
+  --bg-tertiary: #f1f5f9;
+  --bg-header: #0f172a;
+  --bg-nav-active: #1e3a8a;
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+  --border-color: #e2e8f0;
+  --border-dark: #cbd5e1;
+  --ring-color: #2563eb;
+  --header-accent: #0ea5e9;
+  --prose-color: #334155;
+  --prose-code-bg: #f1f5f9;
+  --prose-pre-bg: #0f172a;
+  --prose-pre-text: #f8fafc;
+  --prose-blockquote-border: #cbd5e1;
+  --prose-blockquote-text: #64748b;
 }
 
 .dark {
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
-  --bg-tertiary: #374151;
-  --bg-header: #1e3a5f;
-  --bg-nav-active: #1e40af;
-  --text-primary: #f9fafb;
-  --text-secondary: #e5e7eb;
-  --text-muted: #9ca3af;
-  --text-faint: #6b7280;
-  --border-color: #374151;
-  --border-dark: #4b5563;
-  --ring-color: #60a5fa;
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-tertiary: #334155;
+  --bg-header: #020617;
+  --bg-nav-active: #1e3a8a;
+  --text-primary: #f8fafc;
+  --text-secondary: #e2e8f0;
+  --text-muted: #94a3b8;
+  --text-faint: #64748b;
+  --border-color: #1e293b;
+  --border-dark: #334155;
+  --ring-color: #38bdf8;
+  --header-accent: #0ea5e9;
+  --accent: #38bdf8;
+  --accent-dark: #0ea5e9;
+  --accent-subtle: #0c4a6e;
   --prose-color: #e5e7eb;
   --prose-code-bg: #374151;
   --prose-pre-bg: #0f172a;
@@ -139,6 +150,7 @@ code {
 .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
 .grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid-cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .md\:col-span-2 { grid-column: span 2 / span 2; }
@@ -480,6 +492,10 @@ code {
 
 .overflow-auto { overflow: auto; }
 .overflow-hidden { overflow: hidden; }
+.overflow-x-auto { overflow-x: auto; }
+.overflow-x-hidden { overflow-x: hidden; }
+.overflow-y-auto { overflow-y: auto; }
+.overflow-y-hidden { overflow-y: hidden; }
 .opacity-0 { opacity: 0; }
 .opacity-80 { opacity: 0.8; }
 .pointer-events-none { pointer-events: none; }
@@ -823,10 +839,11 @@ nav a:active { text-decoration: none !important; }
   border-radius: 0.75rem;
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   padding: 1.5rem;
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.15s ease;
 }
 .card:hover {
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+  transform: translateY(-1px);
 }
 .card-header {
   padding-bottom: 1rem;
@@ -887,26 +904,26 @@ nav a:active { text-decoration: none !important; }
   font-size: 0.875rem;
 }
 .table-professional tbody tr:hover {
-  background: #eef2ff;
+  background: #f0f4ff;
 }
 .table-professional tbody tr.selected {
-  background: #e0e7ff;
+  background: #dbe4ff;
 }
 
 /* Dark mode professional tables */
 .dark .table-professional thead th {
-  background: #1f2937;
-  color: #9ca3af;
-  border-bottom-color: #374151;
+  background: #1e293b;
+  color: #94a3b8;
+  border-bottom-color: #1e293b;
 }
 .dark .table-professional tbody td {
-  border-bottom-color: #374151;
+  border-bottom-color: #1e293b;
 }
 .dark .table-professional tbody tr:hover {
-  background: #1e3a5f;
+  background: #1e3a8a22;
 }
 .dark .table-professional tbody tr.selected {
-  background: #1e40af;
+  background: #1e3a8a44;
 }
 
 /* ==========================================================================
@@ -923,6 +940,471 @@ nav a:active { text-decoration: none !important; }
   100% { background-position: -200% 0; }
 }
 .dark .skeleton {
-  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
   background-size: 200% 100%;
 }
+
+/* ==========================================================================
+   24. Enterprise UI — Professional Header Accent
+   ========================================================================== */
+
+/* Dark app header — always dark regardless of light/dark mode toggle */
+.app-header {
+  background: #0f172a;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+  flex-shrink: 0;
+}
+
+/* Force utility icons (undo/redo, theme toggle, backup) to be visible on dark header */
+.app-header-utils svg,
+.app-header-utils button,
+.app-header-utils [class*="text-gray"] {
+  color: #94a3b8 !important;
+}
+.app-header-utils button:hover svg,
+.app-header-utils button:hover {
+  color: #e2e8f0 !important;
+}
+
+.header-brand-accent {
+  display: block;
+  width: 4px;
+  height: 2rem;
+  border-radius: 2px;
+  background: var(--header-accent, #0ea5e9);
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   25. Enterprise UI — KPI Card Accent Border
+   ========================================================================== */
+
+.kpi-card {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  padding: 1.25rem;
+  background: var(--bg-primary);
+  transition: box-shadow 0.15s ease;
+  overflow: hidden;
+  position: relative;
+}
+
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--kpi-accent, var(--accent, #0ea5e9));
+}
+
+.kpi-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.dark .kpi-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+.kpi-value {
+  font-size: 2.25rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.kpi-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 0.375rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  margin-top: 0.125rem;
+}
+
+/* ==========================================================================
+   26. Enterprise UI — Styled Scrollbars
+   ========================================================================== */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-dark) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-dark);
+  border-radius: 3px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-faint);
+}
+
+/* ==========================================================================
+   27. Enterprise UI — Section Headers
+   ========================================================================== */
+
+.section-header {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  margin-bottom: 0.75rem;
+}
+
+.section-subheader {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-top: 0.125rem;
+  font-weight: 400;
+}
+
+/* ==========================================================================
+   28. Enterprise UI — Focus Rings
+   ========================================================================== */
+
+.focus\:ring-accent:focus {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+/* ==========================================================================
+   29. Enterprise UI — Card Radius Upgrade
+   ========================================================================== */
+
+.rounded-xl { border-radius: var(--radius-xl); }
+
+/* ==========================================================================
+   30b. Polish — Main content area background
+   ========================================================================== */
+
+/* Give all page content a subtle gray base so white cards pop */
+main {
+  background: #f1f5f9;
+}
+.dark main {
+  background: #0f172a;
+}
+
+/* White surface for page toolbars / filter bars */
+main > div > .bg-white {
+  background: #ffffff;
+}
+
+/* ==========================================================================
+   30. Polish — Global Interactive Defaults
+   ========================================================================== */
+
+button, [role="button"], a, select, label[for] {
+  cursor: pointer;
+}
+
+a, button, [role="button"] {
+  transition: all 0.15s ease;
+}
+
+/* ==========================================================================
+   31. Polish — Button System
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4375rem 0.875rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(37,99,235,0.25), 0 1px 2px rgba(0,0,0,0.06);
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 10px rgba(37,99,235,0.35), 0 1px 3px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); box-shadow: none; }
+
+.btn-secondary {
+  background: #fff;
+  color: #374151;
+  border-color: #d1d5db;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-secondary:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+.btn-secondary:active { transform: translateY(0); box-shadow: none; }
+
+.btn-success {
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(22,163,74,0.25), 0 1px 2px rgba(0,0,0,0.06);
+}
+.btn-success:hover {
+  background: #15803d;
+  box-shadow: 0 4px 10px rgba(22,163,74,0.3);
+  transform: translateY(-1px);
+}
+.btn-success:active { transform: translateY(0); box-shadow: none; }
+
+.btn-danger {
+  background: #dc2626;
+  color: #fff;
+  box-shadow: 0 1px 3px rgba(220,38,38,0.25);
+}
+.btn-danger:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 10px rgba(220,38,38,0.3);
+  transform: translateY(-1px);
+}
+.btn-danger:active { transform: translateY(0); box-shadow: none; }
+
+.btn-sm {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.8125rem;
+  border-radius: 0.375rem;
+}
+
+.btn-lg {
+  padding: 0.625rem 1.25rem;
+  font-size: 1rem;
+}
+
+/* Dark mode buttons */
+.dark .btn-secondary {
+  background: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+.dark .btn-secondary:hover {
+  background: #334155;
+  border-color: #475569;
+}
+
+/* Boost existing Tailwind button patterns (shadow + lift) */
+button.bg-blue-600, button.bg-blue-500 {
+  box-shadow: 0 1px 3px rgba(37,99,235,0.2);
+  transition: all 0.15s ease;
+}
+button.bg-blue-600:hover, button.bg-blue-500:hover {
+  box-shadow: 0 4px 10px rgba(37,99,235,0.3);
+  transform: translateY(-1px);
+}
+button.bg-green-600, button.bg-green-500 {
+  box-shadow: 0 1px 3px rgba(22,163,74,0.2);
+  transition: all 0.15s ease;
+}
+button.bg-green-600:hover, button.bg-green-500:hover {
+  box-shadow: 0 4px 10px rgba(22,163,74,0.25);
+  transform: translateY(-1px);
+}
+button:active { transform: translateY(0) !important; }
+
+/* ==========================================================================
+   32. Polish — Input & Form Controls
+   ========================================================================== */
+
+input[type="text"],
+input[type="search"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+select,
+textarea {
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  padding: 0.4375rem 0.75rem;
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  background: #fff;
+  color: #111827;
+}
+
+input[type="text"]:focus,
+input[type="search"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent, #0ea5e9);
+  box-shadow: 0 0 0 3px rgba(14,165,233,0.15);
+}
+
+input::placeholder, textarea::placeholder {
+  color: #9ca3af;
+}
+
+/* Dark mode inputs */
+.dark input[type="text"],
+.dark input[type="search"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark select,
+.dark textarea {
+  background: #1e293b;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+.dark input[type="text"]:focus,
+.dark input[type="search"]:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: var(--accent, #38bdf8);
+  box-shadow: 0 0 0 3px rgba(56,189,248,0.15);
+}
+.dark input::placeholder, .dark textarea::placeholder {
+  color: #64748b;
+}
+
+/* ==========================================================================
+   33. Polish — Table Global Improvements
+   ========================================================================== */
+
+table tbody tr {
+  cursor: pointer;
+  transition: background-color 0.1s ease;
+}
+
+table th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #6b7280;
+}
+
+.dark table th {
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   34. Polish — Page Layout Containers
+   ========================================================================== */
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #f8fafc;
+}
+
+.dark .page-container {
+  background: #0f172a;
+}
+
+.page-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  background: #fff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.dark .page-toolbar {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+.page-content {
+  flex: 1;
+  overflow: auto;
+  background: #f8fafc;
+}
+
+.dark .page-content {
+  background: #0f172a;
+}
+
+/* ==========================================================================
+   35. Polish — Enhanced Focus Ring
+   ========================================================================== */
+
+:focus-visible {
+  outline: 2px solid var(--accent, #0ea5e9);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   36. Polish — Micro-animations
+   ========================================================================== */
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease forwards;
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.2s ease forwards;
+}
+
+/* ==========================================================================
+   38. Polish — Status Badges (pill style)
+   ========================================================================== */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.status-open     { background: #fef3c7; color: #92400e; }
+.status-closed   { background: #dcfce7; color: #166534; }
+.status-review   { background: #dbeafe; color: #1e40af; }
+.status-critical { background: #fee2e2; color: #991b1b; }
+
+.dark .status-open     { background: #78350f; color: #fde68a; }
+.dark .status-closed   { background: #14532d; color: #bbf7d0; }
+.dark .status-review   { background: #1e3a5f; color: #93c5fd; }
+.dark .status-critical { background: #450a0a; color: #fecaca; }

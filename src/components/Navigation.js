@@ -18,30 +18,30 @@ const Navigation = () => {
   // Inline style to force no underline
   const linkStyle = { textDecoration: 'none' };
 
-  // Base styles for nav items — increased padding, bottom-border active indicator
-  const baseStyles = "flex items-center gap-1.5 px-4 py-2 rounded-sm text-sm font-semibold transition-colors border-b-[3px]";
-  const activeStyles = "border-blue-600 dark:border-blue-400 text-blue-700 dark:text-blue-300 bg-transparent";
-  const inactiveStyles = "border-transparent text-gray-600 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700";
+  // Base styles for nav items — on dark header
+  const baseStyles = "flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all duration-150 border-b-2";
+  const activeStyles = "border-sky-400 text-sky-300 bg-white/10";
+  const inactiveStyles = "border-transparent text-slate-300 hover:text-white hover:bg-white/10";
 
-  // Special styles for AI (success) — bottom-border variant
-  const aiActiveStyles = "border-green-600 dark:border-green-400 text-green-700 dark:text-green-300 bg-transparent";
-  const aiInactiveStyles = "border-transparent text-gray-600 dark:text-gray-100 hover:bg-green-50 dark:hover:bg-gray-700";
+  // Special styles for AI
+  const aiActiveStyles = "border-emerald-400 text-emerald-300 bg-white/10";
+  const aiInactiveStyles = "border-transparent text-slate-300 hover:text-white hover:bg-white/10";
 
   // Vertical divider between groups
   const Divider = () => (
-    <div className="h-5 w-px bg-gray-300 dark:bg-gray-600 mx-2 self-center" />
+    <div className="h-4 w-px bg-slate-600 mx-1 self-center" />
   );
 
   return (
     <nav className="flex items-center">
       {/* Assessment group */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <NavLink
           to="/dashboard"
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <LayoutDashboard size={16} />
+          <LayoutDashboard size={14} />
           <span>Dashboard</span>
         </NavLink>
 
@@ -51,7 +51,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <FileText size={16} />
+          <FileText size={14} />
           <span>Requirements</span>
         </NavLink>
 
@@ -60,7 +60,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <Shield size={16} />
+          <Shield size={14} />
           <span>Controls</span>
         </NavLink>
 
@@ -69,7 +69,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <ClipboardList size={16} />
+          <ClipboardList size={14} />
           <span>Assessments</span>
         </NavLink>
       </div>
@@ -77,13 +77,13 @@ const Navigation = () => {
       <Divider />
 
       {/* Evidence group */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <NavLink
           to="/artifacts"
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <FileArchive size={16} />
+          <FileArchive size={14} />
           <span>Artifacts</span>
         </NavLink>
 
@@ -92,7 +92,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <AlertTriangle size={16} />
+          <AlertTriangle size={14} />
           <span>Findings</span>
         </NavLink>
       </div>
@@ -100,13 +100,13 @@ const Navigation = () => {
       <Divider />
 
       {/* Admin group */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         <NavLink
           to="/scoring"
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <Award size={16} />
+          <Award size={14} />
           <span>Reference</span>
         </NavLink>
 
@@ -115,7 +115,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <History size={16} />
+          <History size={14} />
           <span>History</span>
         </NavLink>
 
@@ -124,7 +124,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <Users size={16} />
+          <Users size={14} />
           <span>Users</span>
         </NavLink>
 
@@ -133,7 +133,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? aiActiveStyles : aiInactiveStyles}`}
         >
-          <Bot size={16} />
+          <Bot size={14} />
           <span>AI</span>
         </NavLink>
 
@@ -142,7 +142,7 @@ const Navigation = () => {
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >
-          <Settings size={16} />
+          <Settings size={14} />
         </NavLink>
       </div>
     </nav>

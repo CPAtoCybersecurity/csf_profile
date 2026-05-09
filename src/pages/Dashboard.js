@@ -592,82 +592,104 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 bg-white min-h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <ClipboardList size={16} className="text-gray-500" />
-            <span className="text-sm text-gray-600">Assessment:</span>
-            <select
-              value={selectedAssessmentId || ''}
-              onChange={(e) => setSelectedAssessmentId(e.target.value)}
-              className="p-2 border rounded-lg bg-white min-w-[200px]"
-            >
-              {assessments.map(assessment => (
-                <option key={assessment.id} value={assessment.id}>
-                  {assessment.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Quarter:</span>
-            <select
-              value={selectedQuarter}
-              onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-              className="p-2 border rounded-lg bg-white font-medium"
-            >
-              <option value={1}>Q1</option>
-              <option value={2}>Q2</option>
-              <option value={3}>Q3</option>
-              <option value={4}>Q4</option>
-            </select>
-          </div>
-          <button
-            onClick={() =>
-              generateExecutiveSummary({
-                assessment: selectedAssessment,
-                requirements,
-                findings,
-                artifacts,
-                selectedQuarter,
-              })
-            }
-            disabled={!selectedAssessment}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title="Export Executive Summary PDF"
+    <div className="h-full overflow-y-auto overflow-x-hidden" style={{background: darkMode ? '#0f172a' : '#f1f5f9'}}>
+    <div className="p-5">
+
+      {/* Filter Toolbar */}
+      <div style={{
+        background: darkMode ? '#1e293b' : '#ffffff',
+        border: `1px solid ${darkMode ? '#334155' : '#f3f4f6'}`,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
+        borderRadius: '0.75rem',
+        padding: '0.75rem 1.25rem',
+        marginBottom: '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.75rem',
+        flexWrap: 'wrap',
+      }}>
+        <span style={{fontSize: '0.875rem', fontWeight: 600, color: darkMode ? '#f1f5f9' : '#1f2937', marginRight: '0.25rem'}}>Dashboard</span>
+        <div style={{height: '1.25rem', width: '1px', background: darkMode ? '#334155' : '#e5e7eb', margin: '0 0.25rem'}} />
+        <div className="flex items-center gap-2">
+          <ClipboardList size={13} style={{color: darkMode ? '#64748b' : '#9ca3af'}} />
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#94a3b8' : '#374151', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Assessment</span>
+          <select
+            value={selectedAssessmentId || ''}
+            onChange={(e) => setSelectedAssessmentId(e.target.value)}
+            style={{fontSize: '0.875rem', background: darkMode ? '#0f172a' : '#f9fafb', border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, borderRadius: '0.5rem', padding: '0.375rem 0.625rem', fontWeight: 500, color: darkMode ? '#f1f5f9' : '#1f2937', minWidth: '180px'}}
           >
-            <FileText size={15} />
-            Export Summary
-          </button>
-          <button
-            onClick={() => setShowAuditModal(true)}
-            disabled={!selectedAssessment}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
-            title="Export Audit Report as Markdown"
-          >
-            <ClipboardList size={15} />
-            Audit Report
-          </button>
+            {assessments.map(assessment => (
+              <option key={assessment.id} value={assessment.id}>
+                {assessment.name}
+              </option>
+            ))}
+          </select>
         </div>
+        <div className="flex items-center gap-2">
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#94a3b8' : '#374151', textTransform: 'uppercase', letterSpacing: '0.05em'}}>Quarter</span>
+          <select
+            value={selectedQuarter}
+            onChange={(e) => setSelectedQuarter(Number(e.target.value))}
+            style={{fontSize: '0.875rem', background: darkMode ? '#0f172a' : '#f9fafb', border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, borderRadius: '0.5rem', padding: '0.375rem 0.625rem', fontWeight: 500, color: darkMode ? '#f1f5f9' : '#1f2937'}}
+          >
+            <option value={1}>Q1</option>
+            <option value={2}>Q2</option>
+            <option value={3}>Q3</option>
+            <option value={4}>Q4</option>
+          </select>
+        </div>
+        <div className="flex-1" />
+        <button
+          onClick={() =>
+            generateExecutiveSummary({
+              assessment: selectedAssessment,
+              requirements,
+              findings,
+              artifacts,
+              selectedQuarter,
+            })
+          }
+          disabled={!selectedAssessment}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors shadow-sm"
+          title="Export Executive Summary PDF"
+        >
+          <FileText size={14} />
+          Export Summary
+        </button>
+        <button
+          onClick={() => setShowAuditModal(true)}
+          disabled={!selectedAssessment}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          style={{ color: darkMode ? '#e2e8f0' : '#374151', border: `1px solid ${darkMode ? '#334155' : '#e5e7eb'}`, background: darkMode ? '#1e293b' : 'transparent' }}
+          title="Export Audit Report as Markdown"
+        >
+          <ClipboardList size={14} />
+          Audit Report
+        </button>
       </div>
 
-      {/* Assessment Info */}
+      {/* Assessment Info Banner */}
       {selectedAssessment && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-          <div className="flex items-center justify-between">
-            <div>
-              <span className="font-medium text-blue-900">{selectedAssessment.name}</span>
-              {selectedAssessment.description && (
-                <span className="text-blue-700 ml-2">— {selectedAssessment.description}</span>
-              )}
-            </div>
-            <div className="text-sm text-blue-600">
-              {selectedAssessment.scopeIds?.length || 0} items in scope
-            </div>
+        <div style={{
+          marginBottom: '1rem',
+          padding: '0.625rem 1rem',
+          background: darkMode ? 'rgba(30,58,138,0.25)' : '#eff6ff',
+          border: `1px solid ${darkMode ? 'rgba(59,130,246,0.3)' : '#bfdbfe'}`,
+          borderRadius: '0.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}>
+          <div className="flex items-center gap-2">
+            <ClipboardList size={14} style={{color: darkMode ? '#60a5fa' : '#60a5fa', flexShrink: 0}} />
+            <span style={{fontSize: '0.875rem', fontWeight: 500, color: darkMode ? '#93c5fd' : '#1e3a8a'}}>{selectedAssessment.name}</span>
+            {selectedAssessment.description && (
+              <span style={{fontSize: '0.875rem', color: darkMode ? '#60a5fa' : '#3b82f6'}}>— {selectedAssessment.description}</span>
+            )}
           </div>
+          <span style={{fontSize: '0.7rem', fontWeight: 500, color: darkMode ? '#60a5fa' : '#2563eb', background: darkMode ? 'rgba(59,130,246,0.15)' : '#dbeafe', padding: '0.25rem 0.625rem', borderRadius: '9999px', whiteSpace: 'nowrap'}}>
+            {selectedAssessment.scopeIds?.length || 0} items in scope
+          </span>
         </div>
       )}
 
@@ -680,13 +702,14 @@ const Dashboard = () => {
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-4 gap-4 mb-6">
             <KPICard
               title="Overall Score"
               value={kpiData.overallScore.value}
               subtitle="Avg actual score this quarter"
               trend={kpiData.overallScore.trend}
               darkMode={darkMode}
+              accent="#2563eb"
             />
             <KPICard
               title="In-Scope Items"
@@ -694,6 +717,7 @@ const Dashboard = () => {
               subtitle="Controls / requirements in scope"
               trend={kpiData.inScopeItems.trend}
               darkMode={darkMode}
+              accent="#7c3aed"
             />
             <KPICard
               title="Evidence Coverage"
@@ -701,6 +725,7 @@ const Dashboard = () => {
               subtitle={kpiData.evidenceCoverage.subtitle || 'In-scope items with artifact records linked'}
               trend={kpiData.evidenceCoverage.trend}
               darkMode={darkMode}
+              accent="#059669"
             />
             <KPICard
               title="Open Findings"
@@ -708,11 +733,13 @@ const Dashboard = () => {
               subtitle="Findings not yet resolved"
               trend={kpiData.openFindings.trend}
               darkMode={darkMode}
+              accent="#d97706"
             />
           </div>
 
           {/* Pivot Table and Bar Chart Side by Side */}
-          <div className="flex gap-4 mb-6">
+          <div className="overflow-x-auto mb-6 pb-1">
+          <div className="flex gap-4" style={{minWidth: 'max-content'}}>
             {/* Pivot Table: Score by Function by Quarter */}
             <div className="card flex-shrink-0" style={{padding: '0.75rem'}}>
               <h2 className="text-base font-semibold mb-3">Function Scores by Quarter</h2>
@@ -872,7 +899,7 @@ const Dashboard = () => {
             </div>
 
             {/* Function Bar Chart */}
-            <div className="card flex-1" style={{padding: '0.75rem'}}>
+            <div className="card" style={{padding: '0.75rem', width: '420px', flexShrink: 0}}>
               <div className="flex items-center justify-between mb-2">
                 <h2 className="text-base font-semibold">Function Actual vs Target (Q{selectedQuarter})</h2>
               </div>
@@ -950,6 +977,7 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+          </div>
           </div>
 
           {/* Evidence Completeness Tracker */}
@@ -1386,6 +1414,7 @@ const Dashboard = () => {
           </table>
         )}
       </div>
+    </div>
     </div>
   );
 };
