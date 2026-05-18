@@ -6,11 +6,32 @@ A drop-in Notion workspace for assessing maturity against the NIST Cybersecurity
 
 GRC practitioners, security teams, and consultants who want to start a CSF assessment **today** without waiting on tool procurement. You want notes, observations, owners, and evidence captured against every subcategory; live category- and function-level rollups as you score; and a clean export when the GRC platform is ready.
 
-## What you get
+## Fastest start — drag the `CSF_Wiki/` folder into Notion
+
+**Recommended for most users.** The [`CSF_Wiki/`](CSF_Wiki/) folder in this directory is a ready-to-import Notion wiki bundle. It already has the three linked databases, all 106 subcategory pages, and the cross-database relations wired up. Dummy scores are included so the rollups demonstrate themselves out of the box — clear them before you start your own assessment.
+
+1. Download or clone this repo.
+2. In Notion, open the page you want the wiki to live under.
+3. Type `/` → **Import** → **Markdown & CSV** → pick **`CSF_Wiki/`** from this directory (select the folder; Notion ingests the bundle).
+4. Wait for Notion to finish processing — relations and rollups should appear restored.
+5. Clear the dummy scores: open `subcategories` database → bulk-select Score / Actual Score / Last Reviewed → delete.
+
+If anything looks off after import (empty relation cells, missing rollups), follow the manual rebuild instructions further down this README — those steps work against the loose CSVs in this folder.
+
+## What's in this folder
 
 ```
 README.md            this file
-functions.csv        6 rows  — Functions database
+CSF_Wiki/            drag-import bundle — ready-to-upload Notion workspace
+                     ├── CSF_Wiki [hash].md  top-level index page
+                     └── CSF_Wiki/
+                         ├── functions [hash].csv      6 rows
+                         ├── categories [hash].csv     22 rows
+                         ├── subcategories [hash].csv  106 rows
+                         ├── functions/      6 markdown pages
+                         ├── categories/     22 markdown pages
+                         └── subcategories/  106 markdown pages
+functions.csv        6 rows  — Functions database (loose CSV path)
 categories.csv       22 rows — Categories database (relation → Functions)
 subcategories.csv    106 rows — Subcategories database (relation → Categories)
                                 where all scoring happens
@@ -21,6 +42,8 @@ subcategories/       106 markdown pages, one per subcategory:
                               Notes / Observations / Evidence)
 _generate.ts         re-runnable Bun TypeScript generator
 ```
+
+The `CSF_Wiki/` bundle is the simplest path. The loose CSVs + `subcategories/` markdown pages are for users who want to regenerate the bundle from source, embed the implementation-examples body into each page manually, or pipe the data into a different tool entirely.
 
 ## Scoring rubric (CMMI-style 0.0–5.0)
 
@@ -119,9 +142,9 @@ The `Target Score` column on each Subcategory is your aspirational maturity. To 
 2. Sort or color-code your Subcategory views by `Gap` to see the biggest deficits first
 3. (Optional) Add a Category-level rollup of `Average(Target Score)` so each Category shows current maturity, target maturity, and the gap between them — that gives you a per-domain investment-priority list
 
-## Notion import — step by step
+## Notion import — manual rebuild from the loose CSVs
 
-> **Recommended shortcut:** Use the [public Notion template](https://www.notion.so/CSF-Wiki-3590e2e64c708071ace2d9ac64ae6298) to skip all of steps 1–6. You get a pre-wired workspace with relations, rollups, and all 106 subcategory pages already configured — just start scoring. The manual steps below are for anyone building from the raw CSVs.
+> **Recommended shortcut:** drag the [`CSF_Wiki/`](CSF_Wiki/) bundle into Notion (see the top of this README) to skip all of steps 1–6. You get a pre-wired workspace with relations, rollups, and all 106 subcategory pages already configured — just clear the dummy scores and start scoring your own. The manual steps below are the fallback for users who want full control of the build or want to regenerate from `source/CSF-implementation-examples.csv`.
 
 1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
 
