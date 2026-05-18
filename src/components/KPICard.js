@@ -44,13 +44,15 @@ const KPICard = ({ title, value, subtitle, trend, darkMode }) => {
   const subtitleColor = darkMode ? 'text-gray-500' : 'text-gray-400';
 
   return (
-    <div className={`rounded-lg border shadow-sm p-4 ${cardBg}`}>
-      <div className={`text-3xl font-bold tracking-tight ${valueColor}`}>
+    <div className={`terminal-kpi border p-4 ${cardBg}`}>
+      <div className={`terminal-kpi-label text-xs uppercase tracking-wider mb-1 ${titleColor}`}>
+        <span className="terminal-kpi-marker">▌</span> {title}
+      </div>
+      <div className={`terminal-kpi-value text-3xl font-bold tracking-tight ${valueColor}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
         {value}
       </div>
-      <div className={`text-sm font-medium mt-1 ${titleColor}`}>{title}</div>
       {subtitle && (
-        <div className={`text-xs mt-0.5 ${subtitleColor}`}>{subtitle}</div>
+        <div className={`terminal-kpi-sub text-xs mt-1 ${subtitleColor}`}>{subtitle}</div>
       )}
       {renderTrend()}
     </div>

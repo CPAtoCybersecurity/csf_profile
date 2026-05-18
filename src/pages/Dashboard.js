@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { ClipboardList, FileText } from 'lucide-react';
+import { ClipboardList } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
 import {
   RadarChart,
@@ -29,7 +29,6 @@ import useUIStore from '../stores/uiStore';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
 import KPICard from '../components/KPICard';
-import { generateExecutiveSummary } from '../utils/executiveSummaryPDF';
 import { generateAuditReportMarkdown } from '../utils/auditReportMarkdown';
 import EvidenceTracker from '../components/EvidenceTracker';
 
@@ -122,9 +121,12 @@ const Dashboard = () => {
     return lookup;
   }, [requirements]);
 
-  // Selected assessment (default to first assessment)
-  const [selectedAssessmentId, setSelectedAssessmentId] = useState(null);
-  const [selectedQuarter, setSelectedQuarter] = useState(1); // 1-4 for Q1-Q4 - unified quarter for all dashboard components
+  // Selected assessment + quarter — sourced from the global stores so the
+  // terminal status bar selectors stay in sync with this page.
+  const selectedAssessmentId = useAssessmentsStore((state) => state.currentAssessmentId);
+  const setSelectedAssessmentId = useAssessmentsStore((state) => state.setCurrentAssessmentId);
+  const selectedQuarter = useUIStore((state) => state.selectedQuarter);
+  const setSelectedQuarter = useUIStore((state) => state.setSelectedQuarter);
 
   // Audit report modal state
   const [showAuditModal, setShowAuditModal] = useState(false);
@@ -147,6 +149,16 @@ const Dashboard = () => {
       setSelectedAssessmentId(assessments[0].id);
     }
   }, [assessments, selectedAssessmentId]);
+
+  // Honor an audit-modal request from the terminal status bar.
+  const auditModalRequested = useUIStore((state) => state.auditModalRequested);
+  const clearAuditModalRequest = useUIStore((state) => state.clearAuditModalRequest);
+  useEffect(() => {
+    if (auditModalRequested) {
+      setShowAuditModal(true);
+      clearAuditModalRequest();
+    }
+  }, [auditModalRequested, clearAuditModalRequest]);
 
   // Get selected assessment
   const selectedAssessment = useMemo(() => {
@@ -595,63 +607,6 @@ const Dashboard = () => {
     <div className="p-4 bg-white min-h-full">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Dashboard</h1>
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
-            <ClipboardList size={16} className="text-gray-500" />
-            <span className="text-sm text-gray-600">Assessment:</span>
-            <select
-              value={selectedAssessmentId || ''}
-              onChange={(e) => setSelectedAssessmentId(e.target.value)}
-              className="p-2 border rounded-lg bg-white min-w-[200px]"
-            >
-              {assessments.map(assessment => (
-                <option key={assessment.id} value={assessment.id}>
-                  {assessment.name}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-600">Quarter:</span>
-            <select
-              value={selectedQuarter}
-              onChange={(e) => setSelectedQuarter(Number(e.target.value))}
-              className="p-2 border rounded-lg bg-white font-medium"
-            >
-              <option value={1}>Q1</option>
-              <option value={2}>Q2</option>
-              <option value={3}>Q3</option>
-              <option value={4}>Q4</option>
-            </select>
-          </div>
-          <button
-            onClick={() =>
-              generateExecutiveSummary({
-                assessment: selectedAssessment,
-                requirements,
-                findings,
-                artifacts,
-                selectedQuarter,
-              })
-            }
-            disabled={!selectedAssessment}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-700 text-white text-sm font-medium rounded-lg hover:bg-blue-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            title="Export Executive Summary PDF"
-          >
-            <FileText size={15} />
-            Export Summary
-          </button>
-          <button
-            onClick={() => setShowAuditModal(true)}
-            disabled={!selectedAssessment}
-            className="flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-            style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
-            title="Export Audit Report as Markdown"
-          >
-            <ClipboardList size={15} />
-            Audit Report
-          </button>
-        </div>
       </div>
 
       {/* Assessment Info */}
