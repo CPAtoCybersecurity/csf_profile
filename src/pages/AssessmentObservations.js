@@ -11,7 +11,10 @@ const AssessmentObservations = () => {
   const data = useCSFStore((state) => state.data);
   const users = useUserStore((state) => state.users);
   const navigate = useNavigate();
-  const [selectedQuarter, setSelectedQuarter] = useState(1);
+  // Quarter sourced from global uiStore so the terminal status bar Q1–Q4
+  // buttons drive this page in addition to the local dropdown.
+  const selectedQuarter = useUIStore((state) => state.selectedQuarter);
+  const setSelectedQuarter = useUIStore((state) => state.setSelectedQuarter);
 
   // Helper to get quarterly observations
   const getQuarterObservations = (item, quarter) => {

@@ -10,7 +10,7 @@ import UndoRedoButtons from './components/UndoRedoButtons';
 import ThemeToggle from './components/ThemeToggle';
 import FirstVisitWarning from './components/FirstVisitWarning';
 import BackupReminder from './components/BackupReminder';
-import LastBackupIndicator from './components/LastBackupIndicator';
+import TerminalStatusBar from './components/TerminalStatusBar';
 
 // Pages - New Architecture
 import Requirements from './pages/Requirements';
@@ -104,29 +104,34 @@ const AppContent = () => {
 
   return (
     <React.Fragment>
-    <div className="flex flex-col h-screen overflow-hidden">
-      <div className="flex flex-col h-full bg-gray-50 dark:bg-gray-900 text-gray-700">
-        {/* Header */}
-        <header className="app-header px-4 py-2">
-          <div className="flex justify-between items-center gap-2">
+    <div className="flex flex-col h-screen">
+      <div className="flex flex-col h-full bg-white text-gray-700">
+        {/* Terminal top status bar — sticky, top of frozen panes */}
+        <TerminalStatusBar onBackupClick={handleExportFromIndicator} />
+
+        {/* Header — sticky right beneath the status bar */}
+        <header className="terminal-app-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm px-6 py-3">
+          <div className="flex justify-between items-center">
             {/* Left: Logo and title */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="header-brand-accent" aria-hidden="true" />
-              <img
-                src="/SC_SimplyCyberAcademy.png"
-                alt="Simply Cyber Academy Logo"
-                className="h-8"
-              />
-              <div className="h-5 w-px bg-slate-600" />
-              <span className="text-sm font-semibold text-white whitespace-nowrap">CSF Profile</span>
+            <div className="flex items-center gap-3">
+              <div className="terminal-logo-disc">
+                <img
+                  src="/SC_SimplyCyberAcademy.png"
+                  alt="Simply Cyber Academy Logo"
+                />
+              </div>
+              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
+              <div className="flex flex-col">
+                <span className="terminal-section-heading text-sm font-semibold">CSF_PROFILE</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal uppercase tracking-wider">NIST CSF 2.0 Assessment Tool</span>
+              </div>
             </div>
 
             {/* Center: Navigation */}
             <Navigation />
 
             {/* Right: Utilities */}
-            <div className="flex items-center gap-1 app-header-utils flex-shrink-0">
-              <LastBackupIndicator onExportClick={handleExportFromIndicator} key={lastBackupTrigger} />
+            <div className="flex items-center gap-2">
               <AutoSaveIndicator />
               <UndoRedoButtons />
               <ThemeToggle />
@@ -177,19 +182,39 @@ const App = () => {
           toastOptions={{
             duration: 3000,
             style: {
-              background: '#333',
-              color: '#fff',
+              background: '#000000',
+              color: '#33ff66',
+              border: '1px solid #33ff66',
+              borderRadius: 0,
+              fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace",
+              fontSize: '12px',
+              letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              padding: '8px 12px',
+              boxShadow: 'none',
             },
             success: {
               iconTheme: {
-                primary: '#10B981',
-                secondary: '#fff',
+                primary: '#33ff66',
+                secondary: '#000000',
               },
             },
             error: {
+              style: {
+                background: '#000000',
+                color: '#ff4444',
+                border: '1px solid #ff4444',
+                borderRadius: 0,
+                fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace",
+                fontSize: '12px',
+                letterSpacing: '0.04em',
+                textTransform: 'uppercase',
+                padding: '8px 12px',
+                boxShadow: 'none',
+              },
               iconTheme: {
-                primary: '#EF4444',
-                secondary: '#fff',
+                primary: '#ff4444',
+                secondary: '#000000',
               },
             },
           }}

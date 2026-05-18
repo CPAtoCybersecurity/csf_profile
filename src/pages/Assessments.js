@@ -24,6 +24,7 @@ import useRequirementsStore from '../stores/requirementsStore';
 import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
 import useAIStore from '../stores/aiStore';
+import useUIStore from '../stores/uiStore';
 
 // File upload security configuration
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -97,7 +98,15 @@ const Assessments = () => {
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
   const [editMode, setEditMode] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
-  const [selectedQuarter, setSelectedQuarter] = useState('Q1'); // Q1, Q2, Q3, Q4
+  // Quarter sourced from the global uiStore so the terminal status bar
+  // selectors stay in sync. Internal code keeps using 'Q1'..'Q4' strings.
+  const selectedQuarterNum = useUIStore((s) => s.selectedQuarter);
+  const setSelectedQuarterNum = useUIStore((s) => s.setSelectedQuarter);
+  const selectedQuarter = `Q${selectedQuarterNum}`;
+  const setSelectedQuarter = useCallback((q) => {
+    const n = typeof q === 'string' ? parseInt(q.replace(/^Q/i, ''), 10) : Number(q);
+    if (!Number.isNaN(n) && n >= 1 && n <= 4) setSelectedQuarterNum(n);
+  }, [setSelectedQuarterNum]);
 
   // Export (optional password protection)
   const [showExportPasswordDialog, setShowExportPasswordDialog] = useState(false);

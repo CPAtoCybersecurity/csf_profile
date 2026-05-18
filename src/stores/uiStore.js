@@ -37,6 +37,12 @@ const useUIStore = create(
       // Quarter selection (1 = Q1, 2 = Q2, 3 = Q3, 4 = Q4)
       selectedQuarter: 1,
 
+      // Audit report modal — requested from the terminal status bar,
+      // consumed by the Dashboard page which owns the modal.
+      auditModalRequested: false,
+      requestAuditModal: () => set({ auditModalRequested: true }),
+      clearAuditModalRequest: () => set({ auditModalRequested: false }),
+
       // Actions - Theme
       toggleDarkMode: () => set((state) => ({ darkMode: !state.darkMode })),
       setDarkMode: (darkMode) => set({ darkMode }),
