@@ -18,17 +18,22 @@
    - Confirm the incident response playbook includes decision trees for notification requirements
    - Check that Legal and PR coordination steps are documented for customer-impacting incidents
 
-3. **Validate notification execution for recent incidents**
+3. **Compute notification timeliness KPIs for recent incidents**
+   - For each incident in the past 12 months that required stakeholder notification, calculate time from detection to first notification
+   - For incidents with regulatory notification requirements, verify actual notification time vs. required timeline (e.g., GDPR 72-hour window)
+   - Calculate average notification time and flag any instances where required timelines were missed (Accuracy + Valuation assertions)
+
+4. **Validate notification execution for recent incidents**
    - Pull records of incidents that required stakeholder notification
    - Verify notifications were sent within required timeframes
-   - Confirm notification content met regulatory requirements (nature of breach, data affected, remediation)
+   - Confirm notification content met regulatory requirements (nature of breach, data affected, remediation steps)
    - Check that business partner and customer notifications met contractual SLA requirements
 
-4. **Test notification workflow and escalation chains**
-   - Review Slack #security-alerts channel configuration and escalation procedures
-   - Verify escalation chains include Legal, PR, and executive leadership for qualifying incidents
-   - Confirm contact information for regulatory bodies and law enforcement is current and accessible
-   - Test that notification procedures can be executed outside business hours
+5. **Reperformance: simulate incident notification trigger**
+   - Request a tabletop walkthrough of the notification workflow for a hypothetical P1 incident
+   - Verify the escalation chain is reachable by testing current phone numbers and email addresses in the contact list
+   - Confirm that notification procedures can be executed outside business hours without relying on systems that may be compromised during the incident
+   - Document any gaps in the on-call contact list or missing coverage windows (Recurrence assertion)
 
 ---
 
@@ -38,13 +43,12 @@
 - [ ] Incident communication plan with stakeholder categories
 - [ ] Notification templates (customer, regulator, law enforcement, partner)
 - [ ] Notification timeline requirements by regulation and contract
-- [ ] Records of notifications sent for recent incidents
-- [ ] Slack #security-alerts channel configuration
-- [ ] Escalation chain documentation with contact information
+- [ ] Records of notifications sent for recent incidents with timestamps
+- [ ] Escalation chain documentation with current contact information
 - [ ] Legal/PR coordination procedures for customer-impacting incidents
 
 ---
 
 ## Notes
 
-This test procedure validates that the organization has established and follows notification procedures for internal and external stakeholders when incidents occur. Given the 2024 security incidents that damaged public trust, the maturity and timeliness of notification processes is particularly critical for Alma Security. Key maturity indicators include predefined notification templates, tested escalation chains, documented Legal/PR coordination, and evidence that notifications were sent within required timeframes for past incidents. Proactive and transparent communication is essential for trust recovery.
+This test procedure validates that the organization has established and follows notification procedures for internal and external stakeholders when incidents occur. Given the 2024 security incidents that damaged public trust, the maturity and timeliness of notification processes is particularly critical for Alma Security. Step 3 is a new analytical procedure: verifying that notifications were sent is insufficient; the procedure must compute whether they were sent within required timelines. Step 5 is a new reperformance step: reviewing past records only tests what was documented; simulating a notification trigger tests what the team would actually do. Note: this procedure focuses on notification TO stakeholders. Information sharing WITH designated external parties (ISACs, regulatory bodies, threat intel platforms) is covered separately in RS.CO-03.
