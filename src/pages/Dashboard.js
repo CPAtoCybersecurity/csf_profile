@@ -28,58 +28,33 @@ import useRequirementsStore from '../stores/requirementsStore';
 import useUIStore from '../stores/uiStore';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
-import KPICard from '../components/KPICard';
+import useUserStore from '../stores/userStore';
 import { generateAuditReportMarkdown } from '../utils/auditReportMarkdown';
 import EvidenceTracker from '../components/EvidenceTracker';
+import OverallMaturityCard from '../components/OverallMaturityCard';
+import RiskExposureCard from '../components/RiskExposureCard';
+import WeakestFunctionCard from '../components/WeakestFunctionCard';
+import TopGapsPanel from '../components/TopGapsPanel';
+import InvestmentPrioritiesPanel from '../components/InvestmentPrioritiesPanel';
+import {
+  overallMaturity,
+  riskExposure,
+  weakestFunction,
+  top5Gaps,
+  investmentPriorities,
+  FUNCTION_ORDER,
+  FUNCTION_WEIGHTS,
+  CATEGORY_ORDER,
+  DEFAULT_SLA_DAYS,
+  extractCategoryId,
+  normalizeFunctionName,
+} from '../utils/dashboardMetrics';
 
 // Format number to always show one decimal place
 const formatScore = (value) => {
   if (value === null || value === undefined) return null;
   return Number(value).toFixed(1);
 };
-
-// Define the order of functions for the pivot table
-const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'DETECT (DE)', 'RESPOND (RS)', 'RECOVER (RC)'];
-
-// Function weights for gap prioritization scoring
-const FUNCTION_WEIGHTS = {
-  'GOVERN (GV)': 1.2,
-  'IDENTIFY (ID)': 1.0,
-  'PROTECT (PR)': 1.1,
-  'DETECT (DE)': 1.1,
-  'RESPOND (RS)': 1.0,
-  'RECOVER (RC)': 0.9,
-};
-
-// Map function names to standard format
-const normalizeFunctionName = (func) => {
-  if (!func) return 'Unknown';
-  const upper = func.toUpperCase();
-  if (upper.includes('GOVERN') || upper.startsWith('GV')) return 'GOVERN (GV)';
-  if (upper.includes('IDENTIFY') || upper.startsWith('ID')) return 'IDENTIFY (ID)';
-  if (upper.includes('PROTECT') || upper.startsWith('PR')) return 'PROTECT (PR)';
-  if (upper.includes('DETECT') || upper.startsWith('DE')) return 'DETECT (DE)';
-  if (upper.includes('RESPOND') || upper.startsWith('RS')) return 'RESPOND (RS)';
-  if (upper.includes('RECOVER') || upper.startsWith('RC')) return 'RECOVER (RC)';
-  return func;
-};
-
-// Extract category ID from control ID (e.g., "GV.OC-01 Ex1" -> "GV.OC")
-const extractCategoryId = (controlId) => {
-  if (!controlId) return 'Unknown';
-  const match = controlId.match(/^([A-Z]{2}\.[A-Z]{2})/);
-  return match ? match[1] : controlId.split('-')[0] || 'Unknown';
-};
-
-// Define the order of category IDs for the subcategory table
-const CATEGORY_ORDER = [
-  'GV.OC', 'GV.OV', 'GV.PO', 'GV.RM', 'GV.RR', 'GV.SC',
-  'ID.AM', 'ID.IM', 'ID.RA',
-  'PR.AA', 'PR.AT', 'PR.DS', 'PR.IR', 'PR.PS',
-  'DE.AE', 'DE.CM',
-  'RS.AN', 'RS.CO', 'RS.MA', 'RS.MI',
-  'RC.CO', 'RC.RP',
-];
 
 // Status colors for pie chart
 const STATUS_COLORS = {
@@ -100,6 +75,7 @@ const Dashboard = () => {
   const darkMode = useUIStore((state) => state.darkMode);
   const findings = useFindingsStore((state) => state.findings);
   const artifacts = useArtifactStore((state) => state.artifacts);
+  const users = useUserStore((state) => state.users); // eslint-disable-line no-unused-vars
 
   // Build a lookup map from requirement/control ID to Function and Category
   // This supports both requirements-based and controls-based assessments
@@ -520,74 +496,38 @@ const Dashboard = () => {
       .map(({ _allZero, ...rest }) => rest);
   }, [dashboardData, selectedQuarter]);
 
-  // ── KPI Cards ──────────────────────────────────────────────────────────────
-  const kpiData = useMemo(() => {
-    const quarterKey = `Q${selectedQuarter}`;
-    const prevQuarterKey = selectedQuarter > 1 ? `Q${selectedQuarter - 1}` : null;
-
-    if (!selectedAssessment || dashboardData.length === 0) {
-      return {
-        overallScore: { value: '--', trend: null },
-        inScopeItems: { value: '--', trend: null },
-        evidenceCoverage: { value: '--', trend: null },
-        openFindings: { value: '--', trend: null },
-      };
-    }
-
-    // 1. Overall Score — average actualScore for selected quarter
-    const scoresThisQ = dashboardData
-      .map(item => item.quarters[quarterKey]?.actualScore)
-      .filter(s => s !== undefined && s !== null && s > 0);
-
-    const overallScore = scoresThisQ.length > 0
-      ? (scoresThisQ.reduce((a, b) => a + b, 0) / scoresThisQ.length).toFixed(1)
-      : '--';
-
-    let overallTrend = null;
-    if (prevQuarterKey) {
-      const scoresPrevQ = dashboardData
-        .map(item => item.quarters[prevQuarterKey]?.actualScore)
-        .filter(s => s !== undefined && s !== null && s > 0);
-      if (scoresPrevQ.length > 0 && scoresThisQ.length > 0) {
-        const prevAvg = scoresPrevQ.reduce((a, b) => a + b, 0) / scoresPrevQ.length;
-        const delta = (parseFloat(overallScore) - prevAvg).toFixed(1);
-        overallTrend = {
-          value: delta >= 0 ? `+${delta}` : `${delta}`,
-          direction: delta > 0 ? 'up' : delta < 0 ? 'down' : 'neutral',
-        };
-      }
-    }
-
-    // 2. In-Scope Items — count of scopeIds
-    const inScopeCount = selectedAssessment.scopeIds?.length || 0;
-
-    // 3. Evidence Coverage — % of in-scope items with at least one artifact
-    const controlsWithArtifacts = new Set(
-      artifacts
-        .filter(a => a.controlId)
-        .map(a => a.controlId)
-    );
-    const scopeIds = selectedAssessment.scopeIds || [];
-    const coveredCount = scopeIds.filter(id => controlsWithArtifacts.has(id)).length;
-    const evidencePct = inScopeCount > 0
-      ? `${Math.round((coveredCount / inScopeCount) * 100)}%`
-      : '--';
-
-    // 4. Open Findings — status !== 'Resolved'
-    const openCount = findings.filter(f => f.status !== 'Resolved').length;
-
-    return {
-      overallScore: { value: overallScore, trend: overallTrend },
-      inScopeItems: { value: inScopeCount, trend: null },
-      evidenceCoverage: {
-        value: evidencePct,
-        subtitle: inScopeCount > 0 ? `${coveredCount} of ${inScopeCount} in-scope items` : null,
-        trend: null,
-      },
-      openFindings: { value: openCount, trend: null },
-    };
-  }, [selectedAssessment, dashboardData, selectedQuarter, artifacts, findings]);
-  // ── End KPI Cards ──────────────────────────────────────────────────────────
+  // ── Dashboard top strip metrics (issue #212) ───────────────────────────────
+  const overallMaturityData = useMemo(
+    () => overallMaturity({ dashboardData, selectedQuarter }),
+    [dashboardData, selectedQuarter]
+  );
+  const riskExposureData = useMemo(
+    () => riskExposure({
+      findings,
+      assessmentId: selectedAssessmentId,
+      slaDays: DEFAULT_SLA_DAYS,
+      reportDate: new Date(),
+    }),
+    [findings, selectedAssessmentId]
+  );
+  const weakestFunctionData = useMemo(
+    () => weakestFunction({ pivotTableData, selectedQuarter }),
+    [pivotTableData, selectedQuarter]
+  );
+  const topGapsData = useMemo(
+    () => top5Gaps({ subcategoryData }),
+    [subcategoryData]
+  );
+  const investmentPrioritiesData = useMemo(
+    () => investmentPriorities({
+      subcategoryData,
+      findings,
+      assessmentId: selectedAssessmentId,
+      functionWeights: FUNCTION_WEIGHTS,
+    }),
+    [subcategoryData, findings, selectedAssessmentId]
+  );
+  // ── End top strip metrics ──────────────────────────────────────────────────
 
   if (assessments.length === 0) {
     return (
@@ -604,7 +544,7 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 bg-white min-h-full">
+    <div className="p-4 bg-white dark:bg-gray-900 min-h-full">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-bold">Dashboard</h1>
       </div>
@@ -634,34 +574,19 @@ const Dashboard = () => {
         </div>
       ) : (
         <>
-          {/* KPI Cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <KPICard
-              title="Overall Score"
-              value={kpiData.overallScore.value}
-              subtitle="Avg actual score this quarter"
-              trend={kpiData.overallScore.trend}
-              darkMode={darkMode}
-            />
-            <KPICard
-              title="In-Scope Items"
-              value={kpiData.inScopeItems.value}
-              subtitle="Controls / requirements in scope"
-              trend={kpiData.inScopeItems.trend}
-              darkMode={darkMode}
-            />
-            <KPICard
-              title="Evidence Coverage"
-              value={kpiData.evidenceCoverage.value}
-              subtitle={kpiData.evidenceCoverage.subtitle || 'In-scope items with artifact records linked'}
-              trend={kpiData.evidenceCoverage.trend}
-              darkMode={darkMode}
-            />
-            <KPICard
-              title="Open Findings"
-              value={kpiData.openFindings.value}
-              subtitle="Findings not yet resolved"
-              trend={kpiData.openFindings.trend}
+          {/* Top strip — Issue #212: three cards + Top 5 Gaps + Investment Priorities */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <OverallMaturityCard data={overallMaturityData} darkMode={darkMode} />
+            <RiskExposureCard data={riskExposureData} darkMode={darkMode} />
+            <WeakestFunctionCard data={weakestFunctionData} darkMode={darkMode} />
+          </div>
+          <div className="mb-4">
+            <TopGapsPanel gaps={topGapsData} darkMode={darkMode} />
+          </div>
+          <div className="mb-6">
+            <InvestmentPrioritiesPanel
+              rows={investmentPrioritiesData}
+              selectedAssessmentId={selectedAssessmentId}
               darkMode={darkMode}
             />
           </div>
