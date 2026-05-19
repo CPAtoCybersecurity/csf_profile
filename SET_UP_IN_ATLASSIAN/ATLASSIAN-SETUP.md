@@ -81,7 +81,7 @@ This creates an empty project with the right workflow. Custom fields are added b
 4. Choose the **Kanban** template (recommended for assessments)
 5. Configure:
    - **Name:** `CSF Assessments`
-   - **Key:** `CSFA` (or `EVAL` if you want to match the sample CSVs in `../GET_THE_SPREADSHEETS/`)
+   - **Key:** `CSFA` (or `EVAL` if you want to match the sample CSVs in [`templates/`](templates/))
 6. Click **Create**
 
 ### 3.2 Create the assessment workflow
@@ -128,7 +128,7 @@ Save the workflow and associate it with the project's default issue type.
 
 ### 3.3 Create the issue types you'll need
 
-The sample CSVs in `../GET_THE_SPREADSHEETS/` assume three issue types. Create them under **Project settings → Issue types → + Add issue type**:
+The sample CSVs in [`templates/`](templates/) assume three issue types. Create them under **Project settings → Issue types → + Add issue type**:
 
 | Issue type | Purpose | Maps to CSV |
 |---|---|---|

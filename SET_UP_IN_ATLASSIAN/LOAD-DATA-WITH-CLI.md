@@ -67,7 +67,7 @@ node scripts/import-from-jira.js --output imports/jira-import.json
 
 ## Schema difference vs. the manual path
 
-The CLI toolkit was designed around a slightly different Jira custom-field schema than the sample CSVs in [`../GET_THE_SPREADSHEETS/`](../GET_THE_SPREADSHEETS/) use. Specifically:
+The CLI toolkit was designed around a slightly different Jira custom-field schema than the sample CSVs in [`templates/`](templates/) use. Specifically:
 
 - **CLI schema:** one issue per (control × quarter) — `Assessment Quarter` is a single-select field
 - **Manual schema:** one issue per control — Q1/Q2/Q3/Q4 fields are baked into the schema

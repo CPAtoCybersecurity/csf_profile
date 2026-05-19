@@ -1,6 +1,6 @@
 # Load Data Manually
 
-Native CSV import into Jira and Confluence — no Node, no API token, no AI subscription. You'll upload the spreadsheets from `../GET_THE_SPREADSHEETS/` straight into your Atlassian site using Atlassian's built-in importers.
+Native CSV import into Jira and Confluence — no Node, no API token, no AI subscription. You'll upload the templates from [`templates/`](templates/) straight into your Atlassian site using Atlassian's built-in importers.
 
 **Total time:** ~45 minutes for first-time setup of custom fields, ~10 minutes for re-imports after.
 **Prerequisites:** [`ATLASSIAN-SETUP.md`](ATLASSIAN-SETUP.md) completed (Confluence space + Jira project shell exist).
@@ -15,7 +15,7 @@ Native CSV import into Jira and Confluence — no Node, no API token, no AI subs
 | `JIRA-Assessments.csv` | Jira issues, type `Work paper` | Jira project (`EVAL` or `CSFA`) |
 | `JIRA-Artifacts.csv` | Jira issues, type `Assessment Artifact` | Jira project |
 | `JIRA-Findings.csv` | Jira issues, type `Task` | Jira project |
-| `yyyy-mm-dd_CSF_Profile.csv` | Reference / archive only | Keep alongside as the master ledger |
+| `../GET_THE_SPREADSHEETS/yyyy-mm-dd_CSF_Profile.csv` | Reference / archive only | Keep alongside as the master ledger |
 
 ---
 
@@ -30,7 +30,7 @@ Native CSV import into Jira and Confluence — no Node, no API token, no AI subs
 
 ### A.2 Add the columns (Confluence schema for native CSV import)
 
-The CSV in `../GET_THE_SPREADSHEETS/Confluence-Requirements.csv` has these headers — match them exactly so the importer auto-maps:
+The CSV in [`templates/Confluence-Requirements.csv`](templates/Confluence-Requirements.csv) has these headers — match them exactly so the importer auto-maps:
 
 | Column | Field type | Notes |
 |---|---|---|
@@ -54,7 +54,7 @@ The CSV in `../GET_THE_SPREADSHEETS/Confluence-Requirements.csv` has these heade
 
 1. With the `CSF Requirements` database open, click the **⋮** menu (top right)
 2. Select **Import from CSV**
-3. Upload `../GET_THE_SPREADSHEETS/Confluence-Requirements.csv`
+3. Upload [`templates/Confluence-Requirements.csv`](templates/Confluence-Requirements.csv)
 4. The mapping screen appears — verify each CSV column maps to its database column
 5. Click **Import**
 
@@ -111,7 +111,7 @@ Jira's native CSV importer handles all three issue-type files.
 
 ### C.2 For each of the three Jira CSVs
 
-Repeat the import for `JIRA-Assessments.csv`, `JIRA-Artifacts.csv`, and `JIRA-Findings.csv`. Recommended order: **Findings → Artifacts → Assessments** (so Parent links resolve correctly for Assessments, which references Artifacts as parents in the sample data).
+Repeat the import for [`templates/JIRA-Assessments.csv`](templates/JIRA-Assessments.csv), [`templates/JIRA-Artifacts.csv`](templates/JIRA-Artifacts.csv), and [`templates/JIRA-Findings.csv`](templates/JIRA-Findings.csv). Recommended order: **Findings → Artifacts → Assessments** (so Parent links resolve correctly for Assessments, which references Artifacts as parents in the sample data).
 
 1. **Setup:**
    - Upload the CSV
@@ -153,7 +153,7 @@ This is where the manual path pays off: native Atlassian Smart Links keep Conflu
 
 The schema persists. For each new cycle:
 
-1. Export updated CSVs from your CSF Profile workspace (or pull from `../GET_THE_SPREADSHEETS/`)
+1. Export updated CSVs from your CSF Profile workspace (or pull fresh templates from [`templates/`](templates/))
 2. Repeat **Part C** with the new files — Jira will offer to **update existing issues** based on `Issue key`
 3. Confluence CSV import always creates new entries (it doesn't update) — delete the old database content first or use a fresh database
 

@@ -27,7 +27,7 @@ Follow **[`ATLASSIAN-SETUP.md`](ATLASSIAN-SETUP.md)** to:
 
 | Path | File | When |
 |---|---|---|
-| **Manual native import** | [`LOAD-DATA-MANUALLY.md`](LOAD-DATA-MANUALLY.md) | You want zero AI/CLI dependencies. Upload the CSVs from `../GET_THE_SPREADSHEETS/` straight into Jira and Confluence. |
+| **Manual native import** | [`LOAD-DATA-MANUALLY.md`](LOAD-DATA-MANUALLY.md) | You want zero AI/CLI dependencies. Upload the CSV templates in [`templates/`](templates/) straight into Jira and Confluence. |
 | **Claude cowork (browser-driven)** | [`LOAD-DATA-WITH-CLAUDE-COWORK.md`](LOAD-DATA-WITH-CLAUDE-COWORK.md) | You have Claude for Chrome or claude.ai with computer use and you'd rather have Claude drive the Jira UI than click through it yourself. |
 | **CLI toolkit (power user)** | [`LOAD-DATA-WITH-CLI.md`](LOAD-DATA-WITH-CLI.md) | You want bidirectional sync, can run Node, and don't mind generating an API token. Bridges the React app's JSON export to Atlassian. |
 

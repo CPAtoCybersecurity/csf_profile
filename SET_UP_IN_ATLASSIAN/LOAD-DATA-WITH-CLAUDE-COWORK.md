@@ -58,7 +58,7 @@ Folder: SET_UP_IN_ATLASSIAN/
 CONTEXT FILES YOU SHOULD READ FIRST:
 - SET_UP_IN_ATLASSIAN/LOAD-DATA-MANUALLY.md — Part B "Jira: custom fields for the work papers"
   (it has the exact field names, types, and screen-order I want)
-- GET_THE_SPREADSHEETS/JIRA-Assessments.csv — first row has the column headers
+- SET_UP_IN_ATLASSIAN/templates/JIRA-Assessments.csv — first row has the column headers
   these custom fields must match
 
 WHAT I WANT YOU TO DO, IN ORDER:
