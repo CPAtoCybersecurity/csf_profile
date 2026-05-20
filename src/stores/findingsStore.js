@@ -5,8 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_FINDINGS } from './defaultFindingsData';
 import { COMPREHENSIVE_FINDINGS } from './comprehensiveAssessmentData';
+import { ALMA_DEMO_2026_FINDINGS } from './almaDemo2026Data';
 
-const SEEDED_FINDINGS = [...DEFAULT_FINDINGS, ...COMPREHENSIVE_FINDINGS];
+const SEEDED_FINDINGS = [...DEFAULT_FINDINGS, ...COMPREHENSIVE_FINDINGS, ...ALMA_DEMO_2026_FINDINGS];
 
 /**
  * Findings Store

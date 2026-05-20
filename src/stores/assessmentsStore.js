@@ -10,6 +10,7 @@ import {
   COMPREHENSIVE_SCOPE_IDS,
   COMPREHENSIVE_OBSERVATIONS
 } from './comprehensiveAssessmentData';
+import { ALMA_DEMO_2026_ASSESSMENT } from './almaDemo2026Data';
 import useAuditLogStore from './auditLogStore';
 
 const COMPREHENSIVE_ASSESSMENT = {
@@ -69,7 +70,8 @@ const DEFAULT_ASSESSMENTS = [
     ],
     observations: ALMA_AUDIT_OBSERVATIONS
   },
-  COMPREHENSIVE_ASSESSMENT
+  COMPREHENSIVE_ASSESSMENT,
+  ALMA_DEMO_2026_ASSESSMENT
 ];
 
 // Helper to create default quarterly data structure

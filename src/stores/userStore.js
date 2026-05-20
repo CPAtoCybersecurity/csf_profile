@@ -11,6 +11,7 @@ const DEFAULT_USERS = [
   { id: 5, name: 'Chris.Magann', title: 'Security Engineer', email: 'chris.magann@almasecurity.com' },
   { id: 6, name: 'Nadia.Khan', title: 'Site Reliability Engineer', email: 'nadia.khan@almasecurity.com' },
   { id: 7, name: 'Tigan.Wang', title: 'Vulnerability Manager', email: 'tigan.wang@almasecurity.com' },
+  { id: 8, name: 'Priya.Iyer', title: 'SOC Lead', email: 'priya.iyer@almasecurity.com' },
 ];
 
 const useUserStore = create(
