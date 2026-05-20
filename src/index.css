@@ -1512,3 +1512,97 @@ nav a:active { text-decoration: none !important; }
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* --- Issue #212 — Dashboard rich cards / gap bars / status pills --- */
+
+.terminal-card-rich {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  padding: 0.9rem 1rem;
+  transition: border-color 0.1s;
+  min-height: 130px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.terminal-card-rich:hover { border-color: var(--accent); }
+.dark .terminal-card-rich { background: var(--bg-primary); border-color: var(--border-color); }
+.dark .terminal-card-rich:hover { border-color: var(--accent); }
+
+.terminal-card-rich-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--text-primary);
+  line-height: 1;
+}
+.terminal-card-rich-secondary {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+.terminal-card-rich-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+}
+.terminal-card-rich-trend-up { color: var(--terminal-green); }
+.terminal-card-rich-trend-down { color: var(--terminal-red); }
+.terminal-card-rich-trend-neutral { color: var(--text-muted); }
+
+/* Gap bars */
+.terminal-gap-bar {
+  position: relative;
+  height: 14px;
+  background: rgba(127,127,127,0.18);
+  flex: 1;
+  min-width: 80px;
+  overflow: visible;
+}
+.terminal-gap-bar-fill {
+  height: 100%;
+  background: var(--terminal-green);
+  transition: width 0.2s;
+}
+.terminal-gap-bar-fill--red    { background: var(--terminal-red); }
+.terminal-gap-bar-fill--amber  { background: var(--terminal-amber); }
+.terminal-gap-bar-fill--green  { background: var(--terminal-green); }
+.terminal-gap-bar-target-tick {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  background: var(--text-primary);
+}
+.dark .terminal-gap-bar { background: rgba(255,255,255,0.08); }
+.dark .terminal-gap-bar-target-tick { background: var(--accent); }
+
+/* Status pills */
+.terminal-status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid currentColor;
+  border-radius: 0;
+}
+.terminal-status-pill--in-progress { color: var(--terminal-amber); }
+.terminal-status-pill--stalled     { color: var(--terminal-red); }
+.terminal-status-pill--not-started { color: var(--text-muted); }
+.terminal-status-pill--resolved    { color: var(--terminal-green); }
+.terminal-status-pill--planned     { color: var(--terminal-cyan); }
+.dark .terminal-status-pill--in-progress { color: var(--terminal-amber); }
+.dark .terminal-status-pill--stalled     { color: var(--terminal-red); }
+.dark .terminal-status-pill--not-started { color: var(--text-muted); }
+.dark .terminal-status-pill--resolved    { color: var(--terminal-green); }
+.dark .terminal-status-pill--planned     { color: var(--terminal-cyan); }
