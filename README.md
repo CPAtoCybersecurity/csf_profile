@@ -51,6 +51,12 @@ This tool is based on the NIST Cybersecurity Framework (CSF), developed by the N
 
 As a demonstration of how to conduct CSF profile assessment, fictional company "Alma Security" is used, inspired by Daniel Miessler's open source Telos project here: [https://github.com/danielmiessler/Telos/blob/main/corporate_telos.md](https://github.com/danielmiessler/Telos/blob/main/corporate_telos.md)
 
+## Related Resources
+
+While running an assessment in this tool, you may want to cross-reference a CSF subcategory against a related control in another framework (NIST 800-53, ISO 27001, PCI DSS, CMMC, and so on).
+
+* **[myctrl.tools](https://myctrl.tools)** by [Ethan Troy](https://github.com/ethanolivertroy): a free, fast search across 19,000+ security controls from 94+ frameworks including NIST CSF 2.0, NIST 800-53, NIST AI RMF, FedRAMP, CMMC, DOD STIGs, PCI DSS, ISO 27001, SOC 2, EU AI Act, and GDPR. No login required. Useful as a lookup companion while working through subcategories in this tool.
+
 ## Installation and Setup
 
 ### Walkthrough:
