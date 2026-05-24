@@ -53,9 +53,10 @@ As a demonstration of how to conduct CSF profile assessment, fictional company "
 
 ## Related Resources
 
-While running an assessment in this tool, you may want to cross-reference a CSF subcategory against a related control in another framework (NIST 800-53, ISO 27001, PCI DSS, CMMC, and so on).
+While running an assessment in this tool, you may want to cross-reference a CSF subcategory against a related control in another framework (NIST 800-53, ISO 27001, PCI DSS, CMMC, and so on). You may also want to deepen your GRC skill set as you work.
 
 * **[myctrl.tools](https://myctrl.tools)** by [Ethan Troy](https://github.com/ethanolivertroy): a free, fast search across 19,000+ security controls from 94+ frameworks including NIST CSF 2.0, NIST 800-53, NIST AI RMF, FedRAMP, CMMC, DOD STIGs, PCI DSS, ISO 27001, SOC 2, EU AI Act, and GDPR. No login required. Useful as a lookup companion while working through subcategories in this tool.
+* **[GRC Companion](https://github.com/grcengineering/companion)** by [Ayoub Fandi](https://github.com/grcengineering): a free, open-source AI learning companion for GRC engineers that installs into Claude Code, Cursor, Claude Projects, or Codex. Ships 31 knowledge cards and 14 learning skills (concept tutor, Socratic coach, recall quiz, Feynman explainer, lab builder, and more). Explicitly learning-only, so it does not approve vendors, sign off audits, write production policy, or score compliance programs. Useful for building GRC skill alongside running assessments here.
 
 ## Installation and Setup
 
