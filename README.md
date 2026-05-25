@@ -13,7 +13,11 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 
 ![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
+## 🏛️ As Seen On NIST.gov
+
 [![CSF Profile Assessment Quick Overview](https://img.youtube.com/vi/Zf-84mT17VQ/0.jpg)](https://youtube.com/shorts/Zf-84mT17VQ)
+
+> **👆 Click the image above** to view a short explainer video.
 
 ## 🎬 As Seen On CISO Tradecraft!
 
