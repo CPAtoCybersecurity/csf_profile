@@ -15,13 +15,11 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 
 [![CSF Profile Assessment Quick Overview](https://img.youtube.com/vi/Zf-84mT17VQ/0.jpg)](https://youtube.com/shorts/Zf-84mT17VQ)
 
-Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: [https://academy.simplycyber.io/p/accrp](https://academy.simplycyber.io/p/accrp)
-
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
 
 **[View Explainer Slides](public/screenshots/CSF-Profile-Assessment-Explainer-Slides.pdf)** - Learn how CSF Profile assessments work
 
-<!-- <img src="public/as_seen_on_nist.jpeg" alt="As Seen on NIST" width="340"> -->
+Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: [https://academy.simplycyber.io/p/accrp](https://academy.simplycyber.io/p/accrp)
 
 ## Disclaimer
 
