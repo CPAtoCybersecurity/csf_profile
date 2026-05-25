@@ -17,7 +17,7 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 
 ## 🎬 As Seen On CISO Tradecraft!
 
-[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/07-app-dashboard-radar.png)](https://link.excalidraw.com/readonly/Lb6jtXyNb5QpfkcdU1XM)
+[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/07-app-dashboard-radar.png)](https://app.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG)
 
 > **👆 Click the image above** to open the full interactive walkthrough on Excalidraw.
 
