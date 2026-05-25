@@ -15,6 +15,33 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 
 [![CSF Profile Assessment Quick Overview](https://img.youtube.com/vi/Zf-84mT17VQ/0.jpg)](https://youtube.com/shorts/Zf-84mT17VQ)
 
+## 🎬 As Seen On CISO Tradecraft!
+
+[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/07-app-dashboard-radar.png)](https://link.excalidraw.com/readonly/Lb6jtXyNb5QpfkcdU1XM)
+
+> **👆 Click the image above** to open the full interactive walkthrough on Excalidraw.
+
+### Tap through the tour
+
+<table>
+  <tr>
+    <td align="center" width="25%"><a href="public/screenshots/01-nist-csf-overview.png"><img src="public/screenshots/01-nist-csf-overview.png" width="100%"></a><br><sub><b>NIST CSF Overview</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/02-community-submitted-csf-resources.png"><img src="public/screenshots/02-community-submitted-csf-resources.png" width="100%"></a><br><sub><b>Community Submitted Resource</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/03-github-repo-overview.png"><img src="public/screenshots/03-github-repo-overview.png" width="100%"></a><br><sub><b>GitHub Repo</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/04-assessment-catalog.png"><img src="public/screenshots/04-assessment-catalog.png" width="100%"></a><br><sub><b>Assessment Catalog</b></sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="25%"><a href="public/screenshots/05-notion-and-excel-templates.png"><img src="public/screenshots/05-notion-and-excel-templates.png" width="100%"></a><br><sub><b>Notion &amp; Excel Templates</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/06-app-scoring-legend.png"><img src="public/screenshots/06-app-scoring-legend.png" width="100%"></a><br><sub><b>Scoring Legend</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/07-app-dashboard-radar.png"><img src="public/screenshots/07-app-dashboard-radar.png" width="100%"></a><br><sub><b>Dashboard &amp; Radar</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/08-app-investment-priorities.png"><img src="public/screenshots/08-app-investment-priorities.png" width="100%"></a><br><sub><b>Investment Priorities</b></sub></td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="https://link.excalidraw.com/readonly/Lb6jtXyNb5QpfkcdU1XM"><b>🔗 Open the full interactive walkthrough →</b></a>
+</p>
+
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
 
 **[View Explainer Slides](public/screenshots/CSF-Profile-Assessment-Explainer-Slides.pdf)** - Learn how CSF Profile assessments work
