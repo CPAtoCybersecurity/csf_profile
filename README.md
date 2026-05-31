@@ -43,7 +43,7 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 </table>
 
 <p align="center">
-  <a href="https://link.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG"><b>🔗 Open the full interactive walkthrough →</b></a>
+  <a href="https://link.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG"><b>🔗 Open the full walkthrough →</b></a>
 </p>
 
 **[View Screenshots](SCREENSHOTS.md)** - See the application in action
