@@ -60,4 +60,4 @@ Minor gaps identified:
 
 ## Linked Artifacts
 
-- [Access Management Policy](../Sample_Artifacts/Access%20Management%20Policy.md)
+- [Access Management Policy](../../5_Artifacts/Policies/POL-access-management.md)

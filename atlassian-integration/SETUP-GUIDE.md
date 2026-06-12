@@ -443,5 +443,5 @@ node scripts/export-to-jira.js --file exports/csf-export.json --dry-run
 
 - **CSF Profile issues:** main project README
 - **Atlassian API:** <https://developer.atlassian.com>
-- **Confluence Databases:** <https://support.atlassian.com/confluence-cloud/docs/what-are-databases/>
+- **Confluence Databases:** <https://community.atlassian.com/forums/Confluence-articles/Confluence-Databases-101/ba-p/2399851>
 - **Jira REST API:** <https://developer.atlassian.com/cloud/jira/platform/rest/v3/>

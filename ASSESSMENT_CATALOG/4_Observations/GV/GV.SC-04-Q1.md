@@ -54,4 +54,4 @@ No significant gaps identified. Supplier criticality framework is operational an
 
 ## Linked Artifacts
 
-- [Third Party Risk Management Policy](../Sample_Artifacts/Third%20Party%20Risk%20Management%20Policy.md)
+- [Third Party Risk Management Policy](../../5_Artifacts/Policies/POL-third-party-risk.md)
