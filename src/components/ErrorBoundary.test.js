@@ -45,9 +45,9 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('Something Went Wrong')).toBeInTheDocument();
     expect(screen.getByText(/The application encountered an unexpected error/i)).toBeInTheDocument();
 
-    // Should show error details
+    // Should show error details (sanitized — raw error messages are not rendered)
     expect(screen.getByText('Error Details')).toBeInTheDocument();
-    expect(screen.getByText(/Something went wrong with the application/i)).toBeInTheDocument();
+    expect(screen.getByText(/An unexpected error occurred/i)).toBeInTheDocument();
 
     // Should NOT show environment-specific instructions
     expect(screen.queryByText(/How to Fix This/i)).not.toBeInTheDocument();

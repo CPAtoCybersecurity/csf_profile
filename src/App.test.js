@@ -42,43 +42,25 @@ afterEach(() => {
 });
 
 describe('App Component', () => {
-  describe('Environment Variable Validation Integration', () => {
-    test('displays error page when environment variables are missing', async () => {
-      // Ensure environment variables are NOT set
+  describe('Optional Atlassian Credentials', () => {
+    test('renders the app normally when environment variables are missing (credentials are optional)', async () => {
+      // Atlassian env vars are optional — config can come from the Settings UI
       delete process.env.REACT_APP_JIRA_INSTANCE_URL;
       delete process.env.REACT_APP_JIRA_API_TOKEN;
       delete process.env.REACT_APP_CONFLUENCE_INSTANCE_URL;
       delete process.env.REACT_APP_CONFLUENCE_API_TOKEN;
 
-      // Suppress console.error for this test since we expect an error
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
       await act(async () => {
         render(<App />);
       });
 
-      // Should show the error page with "Configuration Required"
-      expect(screen.getByText('Configuration Required')).toBeInTheDocument();
-
-      // Should show the help text for environment variables
-      expect(screen.getByText(/The application needs API credentials to connect with JIRA and Confluence/i)).toBeInTheDocument();
-
-      // Should show the "How to Fix This" section
-      expect(screen.getByText(/How to Fix This/i)).toBeInTheDocument();
-
-      // Should show instructions about .env file and the copy command
-      expect(screen.getAllByText(/\.env\.example/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/cp .env.example .env/i)).toBeInTheDocument();
-
-      // Should NOT show the normal app navigation
-      expect(screen.queryByText(/CSF Profile Assessment/i)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Dashboard/i)).not.toBeInTheDocument();
-
-      consoleErrorSpy.mockRestore();
+      // App renders normally — no blocking configuration page
+      expect(screen.getByText('CSF_PROFILE')).toBeInTheDocument();
+      expect(screen.queryByText('Configuration Required')).not.toBeInTheDocument();
+      expect(screen.queryByText(/How to Fix This/i)).not.toBeInTheDocument();
     });
 
-    test('displays normal app when all environment variables are set', async () => {
-      // Set all required environment variables
+    test('renders the app normally when all environment variables are set', async () => {
       process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
       process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
       process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
@@ -88,55 +70,40 @@ describe('App Component', () => {
         render(<App />);
       });
 
-      // Should show normal app header
-      expect(screen.getByText(/CSF Profile Assessment/i)).toBeInTheDocument();
-
-      // Should show navigation links
-      expect(screen.getAllByText(/Requirements/i).length).toBeGreaterThan(0);
-      expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
-
-      // Should NOT show the error page
+      expect(screen.getByText('CSF_PROFILE')).toBeInTheDocument();
+      expect(screen.getAllByText(/Dashboard/i).length).toBeGreaterThan(0);
       expect(screen.queryByText('Configuration Required')).not.toBeInTheDocument();
-      expect(screen.queryByText(/How to Fix This/i)).not.toBeInTheDocument();
     });
   });
 
-  test('renders CSF Profile Assessment header', async () => {
-    // Set environment variables for this test
-    process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
-    process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
-    process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
-    process.env.REACT_APP_CONFLUENCE_API_TOKEN = 'test-confluence-token-456';
-
+  test('renders the app header', async () => {
     await act(async () => {
       render(<App />);
     });
 
-    const headerElement = screen.getByText(/CSF Profile Assessment/i);
-    expect(headerElement).toBeInTheDocument();
+    expect(screen.getByText('CSF_PROFILE')).toBeInTheDocument();
+    expect(screen.getByText(/NIST CSF 2.0 Assessment Tool/i)).toBeInTheDocument();
   });
 
   test('renders navigation links', async () => {
-    // Set environment variables for this test
-    process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
-    process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
-    process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
-    process.env.REACT_APP_CONFLUENCE_API_TOKEN = 'test-confluence-token-456';
-
     await act(async () => {
       render(<App />);
     });
 
-    // Requirements appears multiple times, so we check it exists at least once
-    expect(screen.getAllByText(/Requirements/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Dashboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/Reference/i)).toBeInTheDocument();
-    expect(screen.getByText(/Evidence/i)).toBeInTheDocument();
-    expect(screen.getByText('Users')).toBeInTheDocument();
-    expect(screen.getByText(/Controls/i)).toBeInTheDocument();
-    expect(screen.getByText(/Assessments/i)).toBeInTheDocument();
-    // Settings appears in multiple places (navigation + modal)
-    expect(screen.getAllByText(/Settings/i).length).toBeGreaterThan(0);
+    // Labels from src/components/Navigation.js; some may appear more than once
+    for (const label of [
+      'Dashboard',
+      'Assessments',
+      'Requirements',
+      'Controls',
+      'Artifacts',
+      'Findings',
+      'Reference',
+      'History',
+      'Users'
+    ]) {
+      expect(screen.getAllByText(label).length).toBeGreaterThan(0);
+    }
   });
 });
 
