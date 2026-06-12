@@ -2,6 +2,32 @@
 
 Thanks for contributing to the CSF Profile Assessment Database! Here's what you need to know to get started quickly.
 
+## Two Ways to Contribute
+
+| Track | Who it's for | Skills needed |
+|-------|-------------|---------------|
+| [📝 Contribute Without Code](#-contribute-without-code) | GRC practitioners, auditors, career-changers, students | GRC knowledge + Markdown. **No programming.** |
+| [💻 Contribute Code](#-contribute-code) | Developers | React / Node.js |
+
+Both tracks end the same way: a merged PR with your name in [CONTRIBUTORS.md](CONTRIBUTORS.md), on a project listed in the NIST.gov community resources.
+
+## 📝 Contribute Without Code
+
+This project needs assessment content as much as it needs code: test procedures, assessment artifacts, observations, and findings for the fictional "Alma Security" case study in [ASSESSMENT_CATALOG/](ASSESSMENT_CATALOG/). Writing these is real GRC work — the same skill you'd use on an engagement — and it makes a strong portfolio piece.
+
+**Your first contribution, step by step:**
+
+1. **Pick a subcategory.** Browse the open [`good first issue`](https://github.com/CPAtoCybersecurity/csf_profile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) issues — each covers one CSF category (e.g., GV.SC, RS.CO) and lists its subcategories. Pick ONE subcategory (e.g., RS.CO-02) and **comment on the issue to claim it** so nobody doubles up.
+2. **Read the case study.** [ASSESSMENT_CATALOG/1_Case_Study/](ASSESSMENT_CATALOG/1_Case_Study/) has Alma Security's backgrounder, business case, and financials — enough context to write realistic material.
+3. **Draft your contribution.** For your subcategory, write: a few test-procedure steps, explicit pass/fail criteria, and (optionally) example artifacts or interview questions with expected answers. Use an already-merged contribution as your template — [PR #202](https://github.com/CPAtoCybersecurity/csf_profile/pull/202) is a good model, and the existing files in [ASSESSMENT_CATALOG/3_Test_Procedures/](ASSESSMENT_CATALOG/3_Test_Procedures/) show the file structure and naming pattern.
+4. **Open a PR** referencing the issue. Format your files as Markdown, follow the folder's naming convention, and keep the PR scoped to your subcategory. A maintainer will review and give feedback — first drafts are never expected to be perfect.
+
+**Full walkthrough for first-timers** (GitHub account setup through merged PR): [Your First Contribution to the CSF Profile Assessment Database](https://www.cpatocybersecurity.com/p/your-first-contribution-to-the-simply-cyber-csf-profile-assessment-database)
+
+Other welcome no-code contributions: fixing documentation gaps, improving onramp guides ([GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/), [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/), [SET_UP_IN_ATLASSIAN/](SET_UP_IN_ATLASSIAN/)), and writing example audit reports against the case study.
+
+## 💻 Contribute Code
+
 ## Quick Setup
 
 ### Prerequisites
@@ -201,4 +227,4 @@ If you have ideas for improving CSF assessments or the tool:
 
 ## License
 
-By contributing, you agree your contributions will be licensed under the [MIT License](csf_profile/LICENSE).
+By contributing, you agree your contributions will be licensed under the [MIT License](LICENSE).

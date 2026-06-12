@@ -1,0 +1,31 @@
+name: Link Check
+
+on:
+  pull_request:
+    paths:
+      - "**/*.md"
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+jobs:
+  lychee:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check Markdown links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress
+            --accept 200,201,204,206,301,302,304,403,429
+            --exclude '^https?://localhost'
+            --exclude '^https?://127\.0\.0\.1'
+            --exclude 'your-domain\.atlassian\.net'
+            --exclude 'your-company\.atlassian\.net'
+            --exclude 'id\.atlassian\.com'
+            --exclude 'example\.com'
+            --exclude-path node_modules
+            './**/*.md'
+          fail: true
