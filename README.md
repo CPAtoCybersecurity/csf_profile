@@ -21,9 +21,14 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
 
 ## 🎬 As Seen On CISO Tradecraft!
 
+
+[![CISO Tradecraft Feature](https://img.youtube.com/vi/4uI-tsaLWaI/0.jpg)](https://www.youtube.com/watch?v=4uI-tsaLWaI&t=1808s)
+
+> **👆 Watch the overview** with G Mark Hardy.
+
 [![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/07-app-dashboard-radar.png)](https://app.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG)
 
-> **👆 Click the image above** to open the full interactive walkthrough on Excalidraw.
+> **👆 Click the image above** to check out the walkthrough on Excalidraw.
 
 ### Tap through the tour
 
@@ -46,9 +51,7 @@ This is an open source project, and improvement ideas to drive cyber risk reduct
   <a href="https://link.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG"><b>🔗 Open the full walkthrough →</b></a>
 </p>
 
-**[View Screenshots](SCREENSHOTS.md)** - See the application in action
-
-**[View Explainer Slides](public/screenshots/CSF-Profile-Assessment-Explainer-Slides.pdf)** - Learn how CSF Profile assessments work
+**[More Screenshots](SCREENSHOTS.md)** - See the application in action
 
 Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: [https://academy.simplycyber.io/p/accrp](https://academy.simplycyber.io/p/accrp)
 
