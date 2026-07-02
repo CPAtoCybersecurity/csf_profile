@@ -49,6 +49,8 @@ Review of 2 recent incidents confirmed that the response plan was activated with
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** Plan execution scores 4, in the Some Security band: the GuardDuty-to-ServiceNow auto-ticket pipeline initiates response automatically, both incidents traced activated within defined timelines, TKT-SOC-1001 showed clean lead designation, containment, and documentation, and the DFIR retainer is current with documented activation thresholds. The material weaknesses are that this evidence covers only routine, single-vector incidents: no tabletop has tested complex multi-vector execution in the past 12 months, the playbook has no BC/DR activation triggers, and time-to-activate/time-to-contain are not tracked, so consistency cannot be demonstrated beyond the two incidents that happened to occur. Minimally Acceptable (5.0) requires evidence of consistent execution across the plan's full scope — including the stressed scenarios the playbook claims to handle — not just the benign cases the quarter delivered.
+
 ---
 
 ## Evidence Reviewed
@@ -70,3 +72,8 @@ Review of 2 recent incidents confirmed that the response plan was activated with
 | 2 | Add explicit BC/DR plan activation triggers to the incident response playbook | High | Nadia Khan |
 | 3 | Implement response execution KPI tracking (time-to-activate, time-to-contain) in ServiceNow | Medium | Nadia Khan |
 | 4 | Document scaled external assistance request procedures for major incidents | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MA-01 Test Procedures](../../3_Test_Procedures/RS/RS.MA-01.md)
+- **Controls:** [RS.MA-01_Ex1](../../2_Controls/RS/RS.MA-01_Ex1.md), [RS.MA-01_Ex2](../../2_Controls/RS/RS.MA-01_Ex2.md), [RS.MA-01_Ex3](../../2_Controls/RS/RS.MA-01_Ex3.md), [RS.MA-01_Ex4](../../2_Controls/RS/RS.MA-01_Ex4.md)

@@ -50,6 +50,8 @@ Failed authentication monitoring is operational, with repeated failed logon atte
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** Personnel activity monitoring scores 3, in the **Some Security** band (2.0–4.9): the logging foundation is defined and operating — AD failed-logon and privilege-change events, CloudTrail IAM activity across all AWS accounts, SentinelOne endpoint behavioral analysis — but the control's actual objective (detecting insider threat) is unreliably served because the three sources are never correlated and no UEBA capability exists. Data exfiltration patterns, off-hours activity, and progressive access accumulation go entirely unmonitored, so a malicious insider staying below endpoint-level technical thresholds would not be detected. The target of 5 (Minimally Acceptable) requires consistent execution across the full monitoring scope, which here means cross-source correlation and exfiltration-pattern coverage — not merely more of the same siloed logs.
+
 ---
 
 ## Evidence Reviewed
@@ -70,3 +72,8 @@ Failed authentication monitoring is operational, with repeated failed logon atte
 | 2 | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | High | Nadia Khan |
 | 3 | Configure geographic and temporal anomaly alerts for user authentication events | Medium | Nadia Khan |
 | 4 | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.CM-03 Test Procedures](../../3_Test_Procedures/DE/DE.CM-03.md)
+- **Controls:** [DE.CM-03_Ex1](../../2_Controls/DE/DE.CM-03_Ex1.md), [DE.CM-03_Ex2](../../2_Controls/DE/DE.CM-03_Ex2.md), [DE.CM-03_Ex3](../../2_Controls/DE/DE.CM-03_Ex3.md)

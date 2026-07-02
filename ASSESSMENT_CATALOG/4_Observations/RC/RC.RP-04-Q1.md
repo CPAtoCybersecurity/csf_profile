@@ -45,6 +45,8 @@
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3 corresponds to the Some Security band (2.0–4.9) and specifically to the rubric's anchor 3: the practice is understood and has been performed — the 2024 incidents produced trust-rebuilding initiatives, a public trust score KPI, and post-recovery monitoring via Kubernetes health checks and CloudWatch — but execution depends on informal mechanisms rather than a reliable defined process. RTO/RPO values are not documented even for the continuous authentication platform, system owner restoration sign-off happens over Slack without acceptance criteria, and post-incident risk register updates are not systematically tracked to closure. What separates this from Minimally Acceptable at the 5.0 target is consistency and documentation: until service delivery objectives, formal sign-off, and a defined post-restoration monitoring procedure exist and operate every time, post-incident norms are re-improvised per incident rather than executed as a control.
+
 ---
 
 ## Evidence Reviewed
@@ -66,3 +68,8 @@
 | 2 | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Medium | Tigan Wang |
 | 3 | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Medium | Tigan Wang |
 | 4 | Establish a systematic process for updating the risk register after incidents, with tracking to closure | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RC.RP-04 Test Procedures](../../3_Test_Procedures/RC/RC.RP-04.md)
+- **Controls:** [RC.RP-04_Ex1](../../2_Controls/RC/RC.RP-04_Ex1.md), [RC.RP-04_Ex2](../../2_Controls/RC/RC.RP-04_Ex2.md), [RC.RP-04_Ex3](../../2_Controls/RC/RC.RP-04_Ex3.md)

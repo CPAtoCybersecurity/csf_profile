@@ -53,6 +53,8 @@
 | Actual Score | 5 |
 | Target Score | 7 |
 
+**Scoring rationale:** The 5 earns the Minimally Acceptable band: data-in-transit protection executes consistently across its full scope — TLS 1.2 minimum on all externally-facing services, A or A+ SSL Labs grades on all 8 tested public endpoints, PostgreSQL enforcing verify-full, mTLS in the service mesh, and AWS Config rules with a 48-hour remediation SLA — with only minor flaws such as undocumented VPN split-tunnel exceptions and possible plaintext debugging in dev/staging. The control does not reach Optimized (6.0) because measurement is partial: automated scanning skips internal service-mesh endpoints, third-party certificates lack expiration monitoring beyond ACM auto-renewal, and the S3 SecureTransport rollout is still in flight, so the owner cannot yet see and act on drift across the whole transport estate.
+
 ---
 
 ## Evidence Reviewed
@@ -81,3 +83,8 @@
 | 5 | Complete S3 SecureTransport condition rollout to all buckets | High | Chris Magann |
 | 6 | Enforce encrypted-only policy in dev/staging environments with documented exceptions | Low | Chris Magann |
 | 7 | Document on-premises transport encryption standards explicitly for Windows DC environment | Low | Chris Magann |
+
+## Related
+
+- **Test Procedure:** [PR.DS-02 Test Procedures](../../3_Test_Procedures/PR/PR.DS-02.md)
+- **Controls:** [PR.DS-02_Ex1](../../2_Controls/PR/PR.DS-02_Ex1.md), [PR.DS-02_Ex2](../../2_Controls/PR/PR.DS-02_Ex2.md), [PR.DS-02_Ex3](../../2_Controls/PR/PR.DS-02_Ex3.md), [PR.DS-02_Ex4](../../2_Controls/PR/PR.DS-02_Ex4.md)

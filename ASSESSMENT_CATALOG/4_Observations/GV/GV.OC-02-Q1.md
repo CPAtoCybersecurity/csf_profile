@@ -33,6 +33,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** A 6 sits in the Optimized band: stakeholder expectations are captured in a ServiceNow register spanning internal parties (Board, engineering, sales) and external ones (customer security questionnaires — a sample of 10 was examined — and SOC 2 expectations), with regulatory obligations mapped to policies and controls. That is consistent execution with an operating measurement mechanism, which meets the 6 anchor. The control does not reach Fully Optimized (7.0) because the register has not been formally updated since Q3 2025 and partner ecosystem expectations remain undocumented — the improvement-over-multiple-periods evidence the next band requires is missing.
+
 ## Evidence Reviewed
 
 - Stakeholder register in ServiceNow
@@ -46,3 +48,8 @@
 |---|----------------|----------|-------|
 | 1 | Update stakeholder register quarterly | Medium | GRC Manager |
 | 2 | Document partner ecosystem security expectations | Medium | CISO |
+
+## Related
+
+- **Test Procedure:** [GV.OC-02 Test Procedures](../../3_Test_Procedures/GV/GV.OC-02.md)
+- **Controls:** [GV.OC-02_Ex1](../../2_Controls/GV/GV.OC-02_Ex1.md), [GV.OC-02_Ex2](../../2_Controls/GV/GV.OC-02_Ex2.md)

@@ -30,6 +30,8 @@ No automated SaaS discovery tool deployed to identify shadow IT. Container runti
 | Actual Score | 3 |
 | Target Score | 6 |
 
+**Scoring rationale:** The actual score of 3 places this control in the Some Security band (2.0–4.9): a process is defined but execution is unreliable across the full software estate. Alma has real tooling — ServiceNow CMDB tracks licensed software with renewal dates, and AWS Systems Manager collects inventory across the EC2 fleet — but whole asset classes escape it: no SaaS discovery for shadow IT, no automated container runtime inventory, and no SBOM for open-source components. What separates 3 from the next band up (Minimally Acceptable, 5.0) is full-scope consistency: the inventory would need to reliably cover SaaS, containers, and OSS components with any exceptions known and tracked, not just the managed EC2 and licensed-software slices.
+
 ## Evidence Reviewed
 
 - [Software Inventory](../../5_Artifacts/Inventories/INV-software-inventory.md)
@@ -43,3 +45,8 @@ No automated SaaS discovery tool deployed to identify shadow IT. Container runti
 | 2 | Implement container runtime inventory automation | Medium | Cloud Platform |
 | 3 | Establish SBOM tracking for open-source software components | Medium | Engineering |
 | 4 | Integrate software inventory reconciliation into monthly cadence | Low | IT Operations |
+
+## Related
+
+- **Test Procedure:** [ID.AM-02 Test Procedures](../../3_Test_Procedures/ID/ID.AM-02.md)
+- **Controls:** [ID.AM-02_Ex1](../../2_Controls/ID/ID.AM-02_Ex1.md), [ID.AM-02_Ex2](../../2_Controls/ID/ID.AM-02_Ex2.md), [ID.AM-02_Ex3](../../2_Controls/ID/ID.AM-02_Ex3.md)

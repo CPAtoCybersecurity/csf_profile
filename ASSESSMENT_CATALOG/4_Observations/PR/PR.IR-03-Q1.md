@@ -49,6 +49,8 @@
 | Actual Score | 4.5 |
 | Target Score | 6 |
 
+**Scoring rationale:** At 4.5, resilience mechanisms score at the upper edge of the Some Security band: the technical machinery executes — multi-AZ distribution, Kubernetes replica sets with automatic rescheduling, Horizontal Pod Autoscalers, and failover that the infrastructure team actually tested rather than assumed — but execution is missing the evidence and repeatability the next level demands. Failover test results are not formally documented (scenarios, success criteria, and observed recovery times are largely unrecorded), no recurring test cadence exists, and the DR plan under the $100K Cloud Security Optimization project remains unapproved with RTO/RPO undefined. Minimally Acceptable (5.0) requires consistent, evidenced execution across scope; documented recurring failover tests and an approved DR plan with agreed recovery objectives are what separate this control from that floor.
+
 ---
 
 ## Evidence Reviewed
@@ -74,3 +76,8 @@
 | 4 | Conduct a DR tabletop exercise after the DR plan is completed to validate coordination procedures | Medium | Tigan Wang |
 | 5 | Validate backup schedules against defined RPOs once recovery objectives are established | Medium | Tigan Wang |
 | 6 | Assess on-premises resilience requirements and document accepted risk or remediation plan for Redwood City DC | Medium | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.IR-03 Test Procedures](../../3_Test_Procedures/PR/PR.IR-03.md)
+- **Controls:** [PR.IR-03_Ex1](../../2_Controls/PR/PR.IR-03_Ex1.md), [PR.IR-03_Ex2](../../2_Controls/PR/PR.IR-03_Ex2.md), [PR.IR-03_Ex3](../../2_Controls/PR/PR.IR-03_Ex3.md)

@@ -11,7 +11,8 @@ This directory is the **single source of truth** for the Alma Security training 
 | 1 | [Alma-Fact-Sheet.md](Alma-Fact-Sheet.md) | Every fact about the fictional company: identity, timeline, cast, financials, tool stack, the ONE risk register, threat profile, the two 2024 incidents, assessment context, and the noncanon→canonical correction table | #234 |
 | 2 | [Canonical-Schema.md](Canonical-Schema.md) | The shape of every artifact type: ID formats, risk-register columns, CSV contracts, SP 800-53 reference format, required fields for controls / test procedures / observations / artifacts | #233 |
 | 3 | [Scoring-Rubric-and-Methodology.md](Scoring-Rubric-and-Methodology.md) | The ONE 0–10 scoring scale with per-score anchors, maturity bands, rating derivation, scope statement, sampling guide, and independence statement | #235 |
-| 4 | [Instructor-Key.md](Instructor-Key.md) | Instructor-only material: SPQA lineage, compensation data, scenario design rationale | #234 |
+| 4 | [Observation-Template.md](Observation-Template.md) | The canonical structure for every `4_Observations/` file, with anti-boilerplate slot rules | #236 |
+| 5 | [Instructor-Key.md](Instructor-Key.md) | Instructor-only material: SPQA lineage, compensation data, scenario design rationale | #234 |
 
 ## For contributors
 

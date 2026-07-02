@@ -34,6 +34,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** Ongoing supplier monitoring earns a 6 in the Optimized band: the control is both consistent and instrumented — continuous monitoring covers Tier 1 vendors via the ServiceNow dashboard, security rating feeds and news monitoring flag risk profile changes (alert triggers verified for 3 Tier 1 vendors), and SOC 2 evidence is evaluated on contractual cadence. The rubric's 7 anchor demands improvement actions that close on schedule, and that is precisely where the control slips: 1 of 8 Tier 1 vendors is 45 days overdue for its annual assessment, and the vendor disruption scenario was left out of the most recent tabletop despite annually tested continuity plans. A monitored program with an open scheduling deviation is Optimized, not yet Fully Optimized.
+
 ## Evidence Reviewed
 
 - Vendor monitoring dashboard in ServiceNow
@@ -47,3 +49,8 @@
 |---|----------------|----------|-------|
 | 1 | Complete overdue Tier 1 vendor assessment within 30 days | High | Third-Party Risk Analyst |
 | 2 | Include vendor disruption scenario in next tabletop exercise | Medium | CISO |
+
+## Related
+
+- **Test Procedure:** [GV.SC-07 Test Procedures](../../3_Test_Procedures/GV/GV.SC-07.md)
+- **Controls:** [GV.SC-07_Ex1](../../2_Controls/GV/GV.SC-07_Ex1.md), [GV.SC-07_Ex2](../../2_Controls/GV/GV.SC-07_Ex2.md), [GV.SC-07_Ex3](../../2_Controls/GV/GV.SC-07_Ex3.md), [GV.SC-07_Ex4](../../2_Controls/GV/GV.SC-07_Ex4.md), [GV.SC-07_Ex5](../../2_Controls/GV/GV.SC-07_Ex5.md)

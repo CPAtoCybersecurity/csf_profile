@@ -33,6 +33,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** At 6, this control rates in the Optimized band: the BIA defines critical capabilities with RTOs and RPOs, the service catalog maps customer-facing services to supporting infrastructure, and resilience objectives are communicated to engineering and operations — consistent execution with measurable objectives, per the 6 anchor. It falls short of Fully Optimized (7.0) because the measurement loop is stale rather than improving: the BIA has not been updated since Q2 2025 and so omits recent service additions, and RTO/RPO objectives have not been validated against actual recovery capability in over six months (last DR test Q3 2025), so no multi-period effectiveness trend can be shown.
+
 ## Evidence Reviewed
 
 - Business Impact Analysis (Q2 2025)
@@ -46,3 +48,8 @@
 |---|----------------|----------|-------|
 | 1 | Update BIA to include Q3-Q4 2025 service additions | High | VP Operations |
 | 2 | Conduct DR test to validate RTO/RPO objectives | High | CISO |
+
+## Related
+
+- **Test Procedure:** [GV.OC-04 Test Procedures](../../3_Test_Procedures/GV/GV.OC-04.md)
+- **Controls:** [GV.OC-04_Ex1](../../2_Controls/GV/GV.OC-04_Ex1.md), [GV.OC-04_Ex2](../../2_Controls/GV/GV.OC-04_Ex2.md), [GV.OC-04_Ex3](../../2_Controls/GV/GV.OC-04_Ex3.md)

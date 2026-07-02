@@ -49,6 +49,8 @@ VPC Flow Logs are centralized to a single S3 bucket and retained for 90 days. Pa
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** A score of 4 places network monitoring in the **Some Security** band (2.0–4.9): the process executes regularly but with material coverage weaknesses. Production coverage is genuinely strong — Flow Logs verified on all 12 production VPCs, and GuardDuty caught the simulated port scan in 15 minutes — but Flow Logs are disabled on 3 of 5 non-production VPCs, an incomplete-scope defect that matches the rubric's level-4 anchor exactly. Reaching Minimally Acceptable (5.0) requires consistent execution across the *full* scope, which means closing the non-production blind spot; the target of 6 (Optimized) additionally demands organization-specific baselines and metrics that today exist only as GuardDuty's generic anomaly models.
+
 ---
 
 ## Evidence Reviewed
@@ -70,3 +72,8 @@ VPC Flow Logs are centralized to a single S3 bucket and retained for 90 days. Pa
 | 2 | Implement network flow baselining to detect deviations specific to Alma's traffic patterns | Medium | Nadia Khan |
 | 3 | Deploy wireless intrusion detection or rogue AP scanning for corporate office network | Medium | Nadia Khan |
 | 4 | Extend VPC Flow Log retention to 365 days to support long-duration investigation needs | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.CM-01 Test Procedures](../../3_Test_Procedures/DE/DE.CM-01.md)
+- **Controls:** [DE.CM-01_Ex1](../../2_Controls/DE/DE.CM-01_Ex1.md), [DE.CM-01_Ex2](../../2_Controls/DE/DE.CM-01_Ex2.md), [DE.CM-01_Ex3](../../2_Controls/DE/DE.CM-01_Ex3.md), [DE.CM-01_Ex4](../../2_Controls/DE/DE.CM-01_Ex4.md), [DE.CM-01_Ex5](../../2_Controls/DE/DE.CM-01_Ex5.md)

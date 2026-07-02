@@ -50,6 +50,8 @@ Review of 5 recent incident reports showed consistent preliminary triage with ap
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** Triage rates a 4, in the Some Security band: the process runs regularly and well during business hours — all 5 sampled reports showed consistent preliminary review, analysts sensibly adjust GuardDuty's pre-classified severities using the runbook's criteria, and the 15–20 findings per week are validated in about 30 minutes each. The material weakness is coverage: after-hours triage stretches to 2–4 hours (four to eight times the daytime figure), and with no calibration process or tracked metrics there is no way to show severity estimation stays accurate across analysts and shifts. What separates this from Minimally Acceptable (5.0) is precisely that gap — consistent execution across the full 24-hour scope with the after-hours deviation known, measured, and treated rather than merely observed.
+
 ---
 
 ## Evidence Reviewed
@@ -71,3 +73,8 @@ Review of 5 recent incident reports showed consistent preliminary triage with ap
 | 2 | Establish triage metrics dashboard tracking volume, time-to-triage, and severity accuracy | Medium | Nadia Khan |
 | 3 | Conduct quarterly triage calibration exercises to ensure consistency across analysts | Medium | Nadia Khan |
 | 4 | Evaluate options to reduce after-hours triage gap (extended coverage or automated triage for common patterns) | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MA-02 Test Procedures](../../3_Test_Procedures/RS/RS.MA-02.md)
+- **Controls:** [RS.MA-02_Ex1](../../2_Controls/RS/RS.MA-02_Ex1.md), [RS.MA-02_Ex2](../../2_Controls/RS/RS.MA-02_Ex2.md)

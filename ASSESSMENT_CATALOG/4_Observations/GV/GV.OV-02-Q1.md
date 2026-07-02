@@ -33,6 +33,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** A 6 is Optimized: audit findings are systematically checked against the cybersecurity strategy for coverage gaps, cybersecurity roles receive semi-annual performance oversight, and the strategy revision after the Q3 2025 incident shows the owner acting on identified drift — exactly the consistent-execution-plus-review behavior the 6 anchor demands. What separates this from Fully Optimized (7.0) is that the feedback loop is event-driven rather than systematically improving: only major incidents trigger a strategy review (no defined severity threshold exists), and performance reviews for non-security personnel with cyber responsibilities are inconsistent, so improvement cannot be evidenced across multiple periods.
+
 ## Evidence Reviewed
 
 - Internal audit reports (FY2025)
@@ -46,3 +48,8 @@
 |---|----------------|----------|-------|
 | 1 | Define incident severity threshold that triggers strategy review | Medium | CISO |
 | 2 | Standardize cybersecurity performance criteria for non-security roles | Medium | HR Director |
+
+## Related
+
+- **Test Procedure:** [GV.OV-02 Test Procedures](../../3_Test_Procedures/GV/GV.OV-02.md)
+- **Controls:** [GV.OV-02_Ex1](../../2_Controls/GV/GV.OV-02_Ex1.md), [GV.OV-02_Ex2](../../2_Controls/GV/GV.OV-02_Ex2.md), [GV.OV-02_Ex3](../../2_Controls/GV/GV.OV-02_Ex3.md)

@@ -45,6 +45,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3.5 places restored-asset verification in the Some Security band (2.0–4.9), between anchor 3 (defined but unreliable) and anchor 4 (regular with material weaknesses). Data-level integrity is verified on a real cadence — quarterly restore tests (Q4 2025, Q1 2026) confirm PostgreSQL integrity and application function in isolated environments, and Kubernetes health checks plus CloudWatch verify restored infrastructure — but security-level verification is the material hole: no IOC scanning of restored assets, no explicit checklist confirming access controls, encryption, and logging are operational post-restoration, and functional testing of the continuous authentication service is manual. Minimally Acceptable (5.0) would require verification to consistently cover the full outcome — integrity, function, *and* security state, with a defined stabilization period before declaring normal operations — rather than the data-integrity subset that runs reliably today.
+
 ---
 
 ## Evidence Reviewed
@@ -66,3 +68,8 @@
 | 2 | Develop automated end-to-end functional tests for the continuous authentication service that run after restoration | Medium | Tigan Wang |
 | 3 | Define a post-restoration stabilization observation period with monitoring criteria before declaring normal operations | Medium | Tigan Wang |
 | 4 | Create a post-restoration security control validation checklist covering access controls, encryption, and logging | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RC.RP-05 Test Procedures](../../3_Test_Procedures/RC/RC.RP-05.md)
+- **Controls:** [RC.RP-05_Ex1](../../2_Controls/RC/RC.RP-05_Ex1.md), [RC.RP-05_Ex2](../../2_Controls/RC/RC.RP-05_Ex2.md)

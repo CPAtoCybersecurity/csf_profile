@@ -50,6 +50,8 @@
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** The 4 sits in the Some Security band: encryption at rest executes regularly — all production RDS PostgreSQL instances use KMS customer-managed keys, SentinelOne removable-media controls cover the 300-endpoint fleet, and KMS rotation runs on a 365-day cycle with CloudTrail logging — but coverage of scope is incomplete. The S3 migration to SSE-KMS is only ~60% done (the 15-bucket sample showed 6 still on SSE-S3), FIM has gaps on Kubernetes worker nodes, and the unfinished data classification schema means encryption requirements cannot yet be mapped to sensitivity. Minimally Acceptable (5.0) requires consistent execution across the full scope; until the two funded projects ($95K Data Encryption Upgrade, $70K S3 Bucket Security) close the bucket and classification gaps, the control stays a step below the floor.
+
 ---
 
 ## Evidence Reviewed
@@ -78,3 +80,8 @@
 | 5 | Extend SentinelOne FIM coverage to all Kubernetes worker nodes | Medium | Tigan Wang |
 | 6 | Establish quarterly proactive data integrity validation program for critical data stores | Medium | Nadia Khan |
 | 7 | Implement centralized BitLocker compliance reporting for on-premises infrastructure | Low | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.DS-01 Test Procedures](../../3_Test_Procedures/PR/PR.DS-01.md)
+- **Controls:** [PR.DS-01_Ex1](../../2_Controls/PR/PR.DS-01_Ex1.md), [PR.DS-01_Ex2](../../2_Controls/PR/PR.DS-01_Ex2.md), [PR.DS-01_Ex3](../../2_Controls/PR/PR.DS-01_Ex3.md), [PR.DS-01_Ex4](../../2_Controls/PR/PR.DS-01_Ex4.md), [PR.DS-01_Ex5](../../2_Controls/PR/PR.DS-01_Ex5.md)

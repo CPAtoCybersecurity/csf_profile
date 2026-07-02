@@ -34,6 +34,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** The 6 lands in the Optimized band: a FAIR-aligned quantitative methodology governs high-value assessments, the ServiceNow register enforces a standardized template with consistent categories that enable aggregation and trend analysis, and Internal Audit re-performed the risk scoring calculations and found them faithful to the documented methodology — consistent execution with verified measurement, per the 6 anchor. Two findings hold it under Fully Optimized (7.0): the quantitative analysis criteria are not clearly communicated to all risk assessors, and two register entries were missing required fields (treatment plan and target date), so the methodology's application is not yet demonstrably improving across the assessor population.
+
 ## Evidence Reviewed
 
 - Risk methodology documentation
@@ -47,3 +49,8 @@
 |---|----------------|----------|-------|
 | 1 | Train all risk assessors on quantitative analysis criteria | Medium | GRC Manager |
 | 2 | Enforce required field completion in ServiceNow risk register | Low | GRC Manager |
+
+## Related
+
+- **Test Procedure:** [GV.RM-06 Test Procedures](../../3_Test_Procedures/GV/GV.RM-06.md)
+- **Controls:** [GV.RM-06_Ex1](../../2_Controls/GV/GV.RM-06_Ex1.md), [GV.RM-06_Ex2](../../2_Controls/GV/GV.RM-06_Ex2.md), [GV.RM-06_Ex3](../../2_Controls/GV/GV.RM-06_Ex3.md), [GV.RM-06_Ex4](../../2_Controls/GV/GV.RM-06_Ex4.md)

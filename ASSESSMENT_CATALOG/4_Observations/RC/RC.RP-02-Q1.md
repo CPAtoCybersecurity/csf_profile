@@ -45,6 +45,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** At 3.5 this control lands in the Some Security band (2.0–4.9). The recovery mechanisms themselves are proven — PostgreSQL automated restoration, AWS multi-AZ failover, and Kubernetes pod redeployment are each validated on a quarterly restore-test cadence, and the 2024 incident showed adaptive action selection when impact scope evolved — but *how* actions are selected rests on engineering judgment with no documented prioritization matrix tied to business impact, no multi-system coordination procedures across the AWS/Kubernetes/PostgreSQL interdependencies, and no plan for resource-constrained recovery. That is stronger than anchor 3's unreliable execution but short of anchor 4's regular full-scope process. Minimally Acceptable (5.0) demands consistent execution across the full scope of the outcome — selection *and* performance — which requires the prioritization framework and coordination procedures the undelivered Cloud Security Optimization DR plan is meant to supply.
+
 ---
 
 ## Evidence Reviewed
@@ -66,3 +68,8 @@
 | 2 | Document multi-system recovery coordination procedures addressing interdependencies between AWS, Kubernetes, and PostgreSQL | Medium | Tigan Wang |
 | 3 | Include resource constraint scenarios in recovery planning to address degraded recovery capacity | Medium | Tigan Wang |
 | 4 | Incorporate recovery action selection criteria into the DR plan deliverable from the Cloud Security Optimization project | High | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [RC.RP-02 Test Procedures](../../3_Test_Procedures/RC/RC.RP-02.md)
+- **Controls:** [RC.RP-02_Ex1](../../2_Controls/RC/RC.RP-02_Ex1.md), [RC.RP-02_Ex2](../../2_Controls/RC/RC.RP-02_Ex2.md)

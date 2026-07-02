@@ -49,6 +49,8 @@
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** Hardware lifecycle management scores 3, in the Some Security band: a process is defined and works well for one asset class — the ~300 laptops follow an automated 4-year ServiceNow replacement cycle, and disposal follows NIST SP 800-88 with certificates of destruction — but execution beyond endpoints is unreliable. Server replacement is reactive with no lifecycle policy, the 2012 R2 fileserver runs on out-of-warranty Dell hardware, CMDB records go stale on transfers and returns, network switches and access points are barely tracked, and the disposal procedure has not been updated since June 2024. Minimally Acceptable (5.0) would require the lifecycle discipline that exists for laptops to execute consistently across servers and network infrastructure too — currently the majority of the non-endpoint estate lacks it.
+
 ---
 
 ## Evidence Reviewed
@@ -74,3 +76,8 @@
 | 4 | Implement automated hardware lifecycle alerting in ServiceNow based on vendor EOL data | Medium | Tigan Wang |
 | 5 | Update hardware disposal procedures to current state and audit disposal vendor practices | Medium | Chris Magann |
 | 6 | Extend CMDB lifecycle tracking to network infrastructure (switches, access points) | Low | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.PS-03 Test Procedures](../../3_Test_Procedures/PR/PR.PS-03.md)
+- **Controls:** [PR.PS-03_Ex1](../../2_Controls/PR/PR.PS-03_Ex1.md), [PR.PS-03_Ex2](../../2_Controls/PR/PR.PS-03_Ex2.md), [PR.PS-03_Ex3](../../2_Controls/PR/PR.PS-03_Ex3.md)

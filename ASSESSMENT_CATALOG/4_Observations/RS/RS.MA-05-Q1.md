@@ -49,6 +49,8 @@ Review of 2 incidents with recovery phases showed that containment verification 
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** Recovery initiation scores 3, in the Some Security band, matching the rubric's anchor of a defined process with unreliable execution: the three-condition criteria (containment, eradication, environmental stability) and the CISO approval gate for P1/P2 incidents exist on paper, and containment verification was documented in both tickets reviewed. Execution beyond that first condition is thin — the operational disruption assessment in both cases noted only expected downtime rather than any structured business impact analysis, and the criteria themselves omit data integrity verification, system validation testing, and stakeholder readiness checkpoints. Minimally Acceptable (5.0) is two anchor steps away: the readiness determination must first cover all of its intended conditions with real depth, and then do so consistently, before recovery initiation can be called a reliably executed control rather than a containment sign-off.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ Review of 2 incidents with recovery phases showed that containment verification 
 | 2 | Develop structured operational disruption assessment template for recovery planning | High | Nadia Khan |
 | 3 | Add stakeholder readiness confirmation step before recovery initiation | Medium | Nadia Khan |
 | 4 | Implement post-recovery validation checklist to confirm systems operate correctly after restoration | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MA-05 Test Procedures](../../3_Test_Procedures/RS/RS.MA-05.md)
+- **Controls:** [RS.MA-05_Ex1](../../2_Controls/RS/RS.MA-05_Ex1.md), [RS.MA-05_Ex2](../../2_Controls/RS/RS.MA-05_Ex2.md)

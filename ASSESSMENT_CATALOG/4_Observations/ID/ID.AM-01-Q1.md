@@ -1,53 +1,80 @@
-# Audit Observation: ID.AM-01 Hardware Inventory
+# ID.AM-01: Hardware Inventory — Q1 2026 Observation
 
-**Control:** ID.AM-01 - Inventories of hardware managed by the organization are maintained <br>
-**Assessment Date:** 2026-02-15 <br>
-**Assessor:** OG <br>
+**Assessment:** 2026 Alma Security CSF Assessment
 
-## Current State Score: 4.5 / 10
-## Target State Score: 6.5 / 10
+**Assessor:** Omar Garza, Internal Audit <omar.garza@almasecurity.com>
 
-## Observation Summary
-Alma Security maintains a hardware inventory in ServiceNow CMDB, but the inventory is incomplete and not regularly reconciled with actual network assets. Cloud resource tagging exists but is not consistently enforced, resulting in approximately 6.5% of AWS resources lacking required tags. Physical sampling revealed 1 of 5 assets could not be located and 1 had stale ownership data.
+**Observation Date:** 2026-02-15
+
+**Testing Status:** Complete
+
+---
+
+## Testing Methods
+
+| Method | Performed | Notes |
+|--------|-----------|-------|
+| Examine | Yes | Reviewed ServiceNow CMDB hardware records, AWS resource tag compliance data, and network scan results against inventory entries |
+| Interview | Yes | Interviewed the IT Desktop Manager, IT Infrastructure Manager, and Cloud Platform Principal Architect on inventory maintenance and reconciliation practices |
+| Test | Yes | Compared Nmap network scan output to CMDB records; sampled 5 physical assets for location, serial, ownership, and asset-tag verification (see [Sampling Walkthrough](../../5_Artifacts/Procedures/PROC-sampling-walkthrough.md)) |
+
+---
 
 ## Findings
 
-### Finding 1: Incomplete On-Premises Inventory
-Network scanning identified 3 devices not present in the CMDB. Additionally, 2 assets marked as "Active" in inventory did not respond to network scans, suggesting possible decommissioning without inventory update.
+Alma Security maintains a hardware inventory in ServiceNow CMDB, but the inventory is incomplete and not regularly reconciled with actual network assets. Cloud resource tagging exists but is not consistently enforced: 55 of 847 AWS resources (6.5%) are missing one or more required tags (Environment, Owner, Application). Physical sampling revealed 1 of 5 assets could not be located and 1 had stale ownership data.
 
-**Risk:** Untracked assets may contain vulnerabilities, lack proper patching, or represent shadow IT introducing unauthorized risk.
+Network scanning identified 3 devices not present in the CMDB, and 2 assets marked "Active" in inventory did not respond to network scans, suggesting decommissioning without an inventory update. Reconciliation between the CMDB, network scans, and AWS Config data is performed manually on an ad-hoc basis; there is no scheduled process, so inventory drift accumulates over time. An asset that could not be physically verified (HW-007) remained unlocated at fieldwork close, and one sampled asset carried outdated owner information following an employee transfer.
 
-### Finding 2: AWS Tagging Gaps
-55 of 847 AWS resources (6.5%) are missing one or more required tags (Environment, Owner, Application). Without proper tagging, asset ownership is unclear and incident response may be delayed.
+### Strengths
 
-**Risk:** Orphaned resources may incur unnecessary cost and lack security oversight.
+- Hardware inventory is centralized in ServiceNow CMDB rather than spreadsheets
+- AWS resource tagging standard (Environment, Owner, Application) is defined and 93.5% adopted
+- Physical asset sampling was fully supportable — 4 of 5 sampled assets verified on location, serial, and asset tag
 
-### Finding 3: Physical Verification Gaps
-Sampling walkthrough revealed 1 of 5 assets (20%) could not be physically verified at the documented location. An additional asset had outdated owner information due to employee transfer.
+### Gaps
 
-**Risk:** Inventory inaccuracies reduce confidence in asset visibility and may impact incident response.
+- 3 network-discovered devices absent from the CMDB; 2 CMDB-active assets unreachable on the network (untracked assets may miss patching or represent shadow IT)
+- 55 AWS resources (6.5%) missing required tags, leaving ownership unclear and incident response slower for those resources
+- 1 of 5 physically sampled assets (20%) could not be located; ownership data not updated on employee transfer
+- No automated or scheduled reconciliation between CMDB, network scans, and AWS Config
 
-### Finding 4: No Automated Reconciliation
-Hardware inventory reconciliation is performed manually on an ad-hoc basis. There is no scheduled process to compare CMDB records against network scans or AWS Config data.
+---
 
-**Risk:** Inventory drift increases over time, reducing confidence in asset visibility.
+## Score
 
-## Recommendations
-1. Implement monthly automated reconciliation between CMDB and network scans
-2. Enable AWS Config rule enforcement (not just detection) for required tags
-3. Establish ownership identification process for the 55 non-compliant AWS resources
-4. Implement quarterly physical sampling audits (minimum 5 assets)
-5. Create process to update asset ownership on employee transfers/terminations
-6. Integrate AWS Config compliance data into CMDB or central asset repository
+| Metric | Value |
+|--------|-------|
+| Actual Score | 4.5 |
+| Target Score | 6.5 |
+| Previous Quarter | N/A |
+| Trend | N/A (first assessment of this subcategory) |
 
-## Evidence References
-- Hardware_Inventory_Sample.md
-- AWS_Tag_Compliance_Report.md
-- Nmap_Scan_Results.md
-- Sampling_Walkthrough.md
+**Scoring rationale:** Score of 4.5 (Some Security) reflects that a centralized CMDB and a defined tagging standard exist and mostly operate, but completeness cannot be demonstrated: unreconciled network-discovered devices, a 6.5% tag-compliance gap, and a failed physical-verification sample show the inventory is not yet reliable enough for Minimally Acceptable (5.0), which requires the register to be substantially complete and periodically reconciled. The distance to the 6.5 target is driven by the absence of any automated reconciliation loop — the register is maintained, but nothing proves it matches reality. This subcategory evidences register risk R4 (incomplete asset inventory).
+
+---
+
+## Evidence Reviewed
+
+- [Hardware Inventory](../../5_Artifacts/Inventories/INV-hardware-inventory.md) (ServiceNow CMDB extract)
+- [Nmap Scan Results](../../5_Artifacts/Reports/RPT-nmap-scan-results.md)
+- [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md) (tag compliance data)
+- [Sampling Walkthrough](../../5_Artifacts/Procedures/PROC-sampling-walkthrough.md) (5-asset physical verification)
 - Interview notes: IT Desktop Manager, IT Infrastructure Manager, Cloud Platform Principal Architect
 
-## Remediation Timeline
-- **30 days:** Identify owners for all non-compliant AWS resources; locate missing asset HW-007
-- **60 days:** Implement automated CMDB/network scan reconciliation
-- **90 days:** Achieve >98% AWS tag compliance; establish quarterly sampling process
+---
+
+## Recommendations
+
+| # | Recommendation | Priority | Owner |
+|---|----------------|----------|-------|
+| 1 | Identify owners for the 55 non-compliant AWS resources and locate missing asset HW-007 (30 days) | High | Marcus Lee |
+| 2 | Implement monthly automated reconciliation between CMDB, network scans, and AWS Config data (60 days) | High | Marcus Lee |
+| 3 | Enable AWS Config rule enforcement (not just detection) for required tags; target >98% compliance (90 days) | Medium | Marcus Lee |
+| 4 | Establish quarterly physical sampling audits (minimum 5 assets) and an ownership-update step in the employee transfer/termination process | Medium | Gerry Callahan |
+
+## Related
+
+- **Test Procedure:** [ID.AM-01 Test Procedures](../../3_Test_Procedures/ID/ID.AM-01.md)
+- **Controls:** [ID.AM-01_Ex1](../../2_Controls/ID/ID.AM-01_Ex1.md), [ID.AM-01_Ex2](../../2_Controls/ID/ID.AM-01_Ex2.md)
+- **Artifacts:** [Hardware Inventory](../../5_Artifacts/Inventories/INV-hardware-inventory.md), [Nmap Scan Results](../../5_Artifacts/Reports/RPT-nmap-scan-results.md), [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [Sampling Walkthrough](../../5_Artifacts/Procedures/PROC-sampling-walkthrough.md)

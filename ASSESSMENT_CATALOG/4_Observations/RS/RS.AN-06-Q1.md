@@ -49,6 +49,8 @@ ServiceNow provides built-in audit trail integrity through its platform logging,
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 4 sits in the Some Security band: investigation actions are recorded for every incident through ServiceNow work notes with timestamps, entry-author identity, and tamper-evident platform audit trails, so the mechanism itself is sound and regularly used across the 3 tickets reviewed. The material weakness is that recording quality is responder-dependent — the phishing ticket carried step-by-step notes while lower-severity incidents got only summary-level entries — and the playbook offers no template, no minimum-action checklist, and no formalized chain-of-custody beyond ServiceNow's own record integrity. Reaching Minimally Acceptable (5.0) requires the documentation to be consistently complete regardless of who responds, which is exactly what the missing template and pre-closure completeness check would enforce.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ ServiceNow provides built-in audit trail integrity through its platform logging,
 | 2 | Implement investigation documentation completeness checklist required before incident closure | Medium | Nadia Khan |
 | 3 | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Medium | Nadia Khan |
 | 4 | Add peer review step for investigation documentation quality on incidents above medium severity | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.AN-06 Test Procedures](../../3_Test_Procedures/RS/RS.AN-06.md)
+- **Controls:** [RS.AN-06_Ex1](../../2_Controls/RS/RS.AN-06_Ex1.md), [RS.AN-06_Ex2](../../2_Controls/RS/RS.AN-06_Ex2.md)

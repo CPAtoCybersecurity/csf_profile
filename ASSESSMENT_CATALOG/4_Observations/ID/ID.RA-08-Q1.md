@@ -30,6 +30,8 @@ No formal vulnerability disclosure program (VDP). No security.txt published per 
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** A 3 places disclosure management in Some Security (2.0–4.9): the practice is understood and performed — a security team contact email is published, incoming reports get triaged and tracked, and vendor advisories are monitored — but it rests on informal handling rather than a reliable, defined program. There is no formal VDP, no security.txt per RFC 9116 to make the intake channel discoverable, no defined response SLAs, and no structured vulnerability-sharing agreements with suppliers, so response quality depends on who happens to pick up the report. Reaching Minimally Acceptable (5.0) requires a formalized disclosure channel with published SLAs operating consistently through the period, with responses evidenced rather than best-effort.
+
 ## Evidence Reviewed
 
 - [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md)
@@ -43,3 +45,8 @@ No formal vulnerability disclosure program (VDP). No security.txt published per 
 | 2 | Establish formal vulnerability disclosure program (VDP) | High | Security |
 | 3 | Define disclosure response SLAs | Medium | Security |
 | 4 | Formalize vulnerability information sharing agreements with suppliers | Medium | Security |
+
+## Related
+
+- **Test Procedure:** [ID.RA-08 Test Procedures](../../3_Test_Procedures/ID/ID.RA-08.md)
+- **Controls:** [ID.RA-08_Ex1](../../2_Controls/ID/ID.RA-08_Ex1.md), [ID.RA-08_Ex2](../../2_Controls/ID/ID.RA-08_Ex2.md)

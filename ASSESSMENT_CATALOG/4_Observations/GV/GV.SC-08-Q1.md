@@ -34,6 +34,8 @@
 | Actual Score | 5 |
 | Target Score | 7 |
 
+**Scoring rationale:** Supplier incident planning scores 5, landing in the Minimally Acceptable band: the plumbing exists and operates — tiered notification timelines are contractually defined, supplier IR roles are written into the playbook, and the process proved itself with a lessons-learned session after the Q3 2025 vendor-related incident. But its flaws are exactly the "minor but real" kind the 5 anchor describes: only 2 of 8 Tier 1 vendors have ever participated in a tabletop exercise, and the crisis communication contact directory has been stale since Q3 2025 — a plan that may not connect when dialed. Optimized (6) would require defined readiness indicators, such as exercise coverage or directory currency metrics, that an owner reviews and acts on; none exist, which is why the score sits two full points below the target of 7.
+
 ## Evidence Reviewed
 
 - Vendor incident reporting protocol documentation
@@ -47,3 +49,8 @@
 |---|----------------|----------|-------|
 | 1 | Expand tabletop exercise participation to all Tier 1 vendors | High | CISO |
 | 2 | Update crisis communication contact directory quarterly | Medium | SOC Manager |
+
+## Related
+
+- **Test Procedure:** [GV.SC-08 Test Procedures](../../3_Test_Procedures/GV/GV.SC-08.md)
+- **Controls:** [GV.SC-08_Ex1](../../2_Controls/GV/GV.SC-08_Ex1.md), [GV.SC-08_Ex2](../../2_Controls/GV/GV.SC-08_Ex2.md), [GV.SC-08_Ex3](../../2_Controls/GV/GV.SC-08_Ex3.md), [GV.SC-08_Ex4](../../2_Controls/GV/GV.SC-08_Ex4.md), [GV.SC-08_Ex5](../../2_Controls/GV/GV.SC-08_Ex5.md)

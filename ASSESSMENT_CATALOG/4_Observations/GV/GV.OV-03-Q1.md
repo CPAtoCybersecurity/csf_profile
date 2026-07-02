@@ -33,6 +33,8 @@
 | Actual Score | 7 |
 | Target Score | 8 |
 
+**Scoring rationale:** The 7 lands in the Fully Optimized band — measured and improving. Quarterly KPIs are tracked with concrete values (TTD 9 hrs, TTI 14 hrs, TTR-CJC 6 days, TTR-C 12 days), KRIs for the top five risks carry automated threshold alerting in ServiceNow, and Internal Audit re-performed the KPI calculations against their data sources, confirming the trend data is real. The 8 anchor — high effectiveness with cost proportionate to risk, automation where sensible, sustained over two-plus periods — is not yet met: some KRI thresholds rest on initial estimates rather than validated operational data, and there is no formalized industry benchmarking to demonstrate the program's effectiveness is proportionate.
+
 ## Evidence Reviewed
 
 - KPI dashboard (Q4 2025, Q1 2026)
@@ -46,3 +48,8 @@
 |---|----------------|----------|-------|
 | 1 | Establish industry benchmarking for KPIs | Low | GRC Manager |
 | 2 | Validate KRI thresholds against 12 months of operational data | Medium | CISO |
+
+## Related
+
+- **Test Procedure:** [GV.OV-03 Test Procedures](../../3_Test_Procedures/GV/GV.OV-03.md)
+- **Controls:** [GV.OV-03_Ex1](../../2_Controls/GV/GV.OV-03_Ex1.md), [GV.OV-03_Ex2](../../2_Controls/GV/GV.OV-03_Ex2.md), [GV.OV-03_Ex3](../../2_Controls/GV/GV.OV-03_Ex3.md)

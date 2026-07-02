@@ -53,6 +53,8 @@ Email filtering and web content filtering provide monitoring of common attack ve
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** Hardware and software monitoring rates a 4, at the top of the **Some Security** band (2.0–4.9): the process runs regularly on multiple layers — SentinelOne EDR at 95% endpoint coverage, AWS Config compliance evaluation, GuardDuty runtime detection, and monthly vulnerability scans — but the rubric's level-4 anchor applies because known exceptions remain untreated: 3 legacy endpoints have no agent due to OS incompatibility, and on-premises systems lack the configuration-baseline enforcement that AWS Config gives the cloud side. A 5 (Minimally Acceptable) requires the legacy-endpoint exception to be remediated or formally compensated and baseline coverage to span the full estate; the target of 6 (Optimized) further expects measured operation, such as continuous patch-compliance metrics in place of the current monthly scan cycle.
+
 ---
 
 ## Evidence Reviewed
@@ -75,3 +77,8 @@ Email filtering and web content filtering provide monitoring of common attack ve
 | 2 | Deploy email sandboxing capability for advanced attachment and URL analysis | High | Nadia Khan |
 | 3 | Implement continuous patch compliance monitoring rather than monthly scanning | Medium | Nadia Khan |
 | 4 | Establish on-premises software configuration baselines with automated drift detection | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.CM-09 Test Procedures](../../3_Test_Procedures/DE/DE.CM-09.md)
+- **Controls:** [DE.CM-09_Ex1](../../2_Controls/DE/DE.CM-09_Ex1.md), [DE.CM-09_Ex2](../../2_Controls/DE/DE.CM-09_Ex2.md), [DE.CM-09_Ex3](../../2_Controls/DE/DE.CM-09_Ex3.md), [DE.CM-09_Ex4](../../2_Controls/DE/DE.CM-09_Ex4.md), [DE.CM-09_Ex5](../../2_Controls/DE/DE.CM-09_Ex5.md)

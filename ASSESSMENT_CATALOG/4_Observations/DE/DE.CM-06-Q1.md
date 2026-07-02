@@ -49,6 +49,8 @@ Monitoring of cloud-based SaaS provider activities (ServiceNow, Workday, Slack) 
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** Third-party activity monitoring earns a 3, within the **Some Security** band (2.0–4.9): where a mechanism exists it works — CloudTrail captures cross-account role assumptions, and Palo Alto VPN logs with privileged-session recording cover vendor remote administration — but coverage is inconsistent by provider type, matching the level-3 anchor of a defined process with unreliable execution. SaaS providers (ServiceNow, Workday, Slack) are monitored only through uncollected native audit logs, and AWS service-team access is visible in CloudTrail yet has no alerting rules, so much of the third-party population is logged without anyone watching. Closing the gap to the target of 5 (Minimally Acceptable) demands one program executing consistently across *all* external providers — centralized SaaS log collection and provider-access alerting — rather than strong monitoring for a subset.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ Monitoring of cloud-based SaaS provider activities (ServiceNow, Workday, Slack) 
 | 2 | Create specific alerting rules for AWS service provider access and unusual third-party role assumptions | High | Nadia Khan |
 | 3 | Establish expected activity baselines for each external service provider | Medium | Nadia Khan |
 | 4 | Implement quarterly third-party access review with activity log analysis | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.CM-06 Test Procedures](../../3_Test_Procedures/DE/DE.CM-06.md)
+- **Controls:** [DE.CM-06_Ex1](../../2_Controls/DE/DE.CM-06_Ex1.md), [DE.CM-06_Ex2](../../2_Controls/DE/DE.CM-06_Ex2.md)

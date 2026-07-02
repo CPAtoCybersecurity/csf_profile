@@ -50,6 +50,8 @@ Breach notification procedures reference applicable regulatory requirements, and
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 4 lands in the Some Security band because only half the control's scope has execution evidence: internal notification works — both incidents traced during fieldwork followed the playbook, flowing through Slack #security-alerts with executive escalation, and the CISO's external-notification authority, jurisdiction-by-jurisdiction regulatory matrix, and contractual obligations are all documented. The material weakness is the external half: the end-to-end breach notification workflow (regulatory filing, customer communication, law enforcement engagement) has never been exercised, even in tabletop form, and the templates remain unvalidated. Minimally Acceptable (5.0) demands consistent execution across the full scope, and a notification capability that exists only on paper for its highest-stakes path — with no compliance-timeline tracking and no pre-staged customer distribution mechanism — cannot yet demonstrate that.
+
 ---
 
 ## Evidence Reviewed
@@ -71,3 +73,8 @@ Breach notification procedures reference applicable regulatory requirements, and
 | 2 | Pre-stage customer notification distribution mechanism for rapid deployment during breach | Medium | Nadia Khan |
 | 3 | Implement automated notification compliance timeline tracking in ServiceNow | Medium | Nadia Khan |
 | 4 | Validate notification templates through legal review annually | Low | Gerry |
+
+## Related
+
+- **Test Procedure:** [RS.CO-02 Test Procedures](../../3_Test_Procedures/RS/RS.CO-02.md)
+- **Controls:** [RS.CO-02_Ex1](../../2_Controls/RS/RS.CO-02_Ex1.md), [RS.CO-02_Ex2](../../2_Controls/RS/RS.CO-02_Ex2.md), [RS.CO-02_Ex3](../../2_Controls/RS/RS.CO-02_Ex3.md)

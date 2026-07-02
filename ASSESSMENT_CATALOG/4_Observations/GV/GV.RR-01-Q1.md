@@ -34,6 +34,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** A 6 places this control in the Optimized band: leadership accountability executes consistently — Board, CEO, and CISO roles are formally documented in the governance framework — and the semi-annual authority and coordination reviews give the control a defined review mechanism whose owner acts on drift. What keeps the score below the target of 7 (Fully Optimized) is the absence of trend evidence that accountability effectiveness is improving across periods: the Board lacks a member with cybersecurity expertise, and culture messaging remains a quarterly CEO all-hands item rather than a measured, improving program. Until those improvement actions close and multi-period trend data exists, the score cannot cross into Fully Optimized.
+
 ## Evidence Reviewed
 
 - Board charter and committee assignments
@@ -47,3 +49,8 @@
 |---|----------------|----------|-------|
 | 1 | Recruit Board member with cybersecurity expertise | Medium | CEO |
 | 2 | Increase security culture communications to monthly cadence | Low | CISO |
+
+## Related
+
+- **Test Procedure:** [GV.RR-01 Test Procedures](../../3_Test_Procedures/GV/GV.RR-01.md)
+- **Controls:** [GV.RR-01_Ex1](../../2_Controls/GV/GV.RR-01_Ex1.md), [GV.RR-01_Ex2](../../2_Controls/GV/GV.RR-01_Ex2.md), [GV.RR-01_Ex3](../../2_Controls/GV/GV.RR-01_Ex3.md), [GV.RR-01_Ex4](../../2_Controls/GV/GV.RR-01_Ex4.md)

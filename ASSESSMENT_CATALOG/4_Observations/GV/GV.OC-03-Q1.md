@@ -33,6 +33,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** The score of 6 corresponds to the Optimized band. Legal and regulatory requirements are tracked in ServiceNow with mapped policy controls, contractual cybersecurity obligations are cataloged for major customer agreements, and the strategy is explicitly aligned to SOC 2, GDPR, and state privacy law — consistent execution with an active tracking mechanism that General Counsel and the GRC Manager review, matching the 6 anchor. Fully Optimized (7.0) is out of reach this quarter because coverage is not yet improving across the full obligation population: emerging AI regulations are unmapped and contractual tracking is incomplete for Tier 2 and Tier 3 customer agreements.
+
 ## Evidence Reviewed
 
 - Regulatory requirements tracker in ServiceNow
@@ -46,3 +48,8 @@
 |---|----------------|----------|-------|
 | 1 | Map AI regulatory requirements to existing policies | High | General Counsel |
 | 2 | Extend contractual tracking to all customer tiers | Medium | GRC Manager |
+
+## Related
+
+- **Test Procedure:** [GV.OC-03 Test Procedures](../../3_Test_Procedures/GV/GV.OC-03.md)
+- **Controls:** [GV.OC-03_Ex1](../../2_Controls/GV/GV.OC-03_Ex1.md), [GV.OC-03_Ex2](../../2_Controls/GV/GV.OC-03_Ex2.md), [GV.OC-03_Ex3](../../2_Controls/GV/GV.OC-03_Ex3.md)

@@ -33,6 +33,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** The score of 6 is in the Optimized band. The annual review cycle runs with off-cycle reviews triggered by major events, the ServiceNow regulatory change tracker maps regulatory movement to affected policies, and the recent update covering AI adoption and data classification demonstrates the owner responding to drift — meeting the 6 anchor of consistent execution with active measurement. Two shortfalls block Fully Optimized (7.0): review timelines are not formally documented for all trigger types (M&A, technology changes), and two supporting procedures are 30+ days overdue for annual review, so improvement actions are not yet closing on schedule as the 7 anchor requires.
+
 ## Evidence Reviewed
 
 - Policy revision history and change log
@@ -46,3 +48,8 @@
 |---|----------------|----------|-------|
 | 1 | Document formal review timelines for each trigger type | Medium | GRC Manager |
 | 2 | Clear overdue procedure reviews within 30 days | High | GRC Manager |
+
+## Related
+
+- **Test Procedure:** [GV.PO-02 Test Procedures](../../3_Test_Procedures/GV/GV.PO-02.md)
+- **Controls:** [GV.PO-02_Ex1](../../2_Controls/GV/GV.PO-02_Ex1.md), [GV.PO-02_Ex2](../../2_Controls/GV/GV.PO-02_Ex2.md), [GV.PO-02_Ex3](../../2_Controls/GV/GV.PO-02_Ex3.md), [GV.PO-02_Ex4](../../2_Controls/GV/GV.PO-02_Ex4.md)

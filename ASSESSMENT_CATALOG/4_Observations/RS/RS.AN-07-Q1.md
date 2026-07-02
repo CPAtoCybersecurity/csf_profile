@@ -49,6 +49,8 @@ Evidence preservation relies on the immutability of source systems (CloudTrail l
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3 falls in the Some Security band, at the rubric anchor where a process is defined but execution is unreliable: evidence collection is a required playbook step and the sources are strong (CloudTrail log integrity validation with S3 versioning, GuardDuty finding metadata), yet nothing guarantees the data actually gets preserved per incident. There is no evidence manifest or dedicated evidence locker, provenance (who collected, when, how) is undocumented, and SentinelOne Deep Visibility telemetry expires after 14 days unless someone remembers to export it — a silent-loss failure mode rather than a tracked exception. Two full anchor steps separate this from Minimally Acceptable (5.0): the collection process must first execute reliably with cataloged output for every incident, then do so consistently across the whole cloud-and-endpoint scope before it can claim consistent execution with only minor flaws.
+
 ---
 
 ## Evidence Reviewed
@@ -70,3 +72,8 @@ Evidence preservation relies on the immutability of source systems (CloudTrail l
 | 2 | Extend SentinelOne telemetry retention or implement automated export for active investigations | High | Nadia Khan |
 | 3 | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Medium | Nadia Khan |
 | 4 | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification) | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.AN-07 Test Procedures](../../3_Test_Procedures/RS/RS.AN-07.md)
+- **Controls:** [RS.AN-07_Ex1](../../2_Controls/RS/RS.AN-07_Ex1.md)

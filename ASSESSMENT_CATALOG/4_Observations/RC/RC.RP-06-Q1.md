@@ -45,6 +45,8 @@
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3 lands in the Some Security band (2.0–4.9) at the rubric's anchor 3: post-incident review is a real, understood practice — the 2024 after-action process demonstrably produced trust-rebuilding initiatives and updated response and recovery procedures — but it runs without a standard template, required sections, completion timeline, or quality review, so consistency depends on who conducts it. Recovery end is declared by informal leadership sign-off rather than against documented, measurable closure criteria, and lessons learned are captured but not tracked to closure with owners and deadlines. Closing the gap to Minimally Acceptable (5.0) requires the closure-and-documentation process to execute the same way every time — formal criteria, a templated after-action report on a deadline, tracked lessons learned, and defined retention — none of which is in place this quarter.
+
 ---
 
 ## Evidence Reviewed
@@ -65,3 +67,8 @@
 | 2 | Document measurable recovery closure criteria that must be met before declaring the end of recovery | High | Tigan Wang |
 | 3 | Implement a lessons learned tracking system with assigned owners, deadlines, and closure verification | Medium | Nadia Khan |
 | 4 | Define retention requirements for incident recovery documentation aligned with regulatory and contractual obligations | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RC.RP-06 Test Procedures](../../3_Test_Procedures/RC/RC.RP-06.md)
+- **Controls:** [RC.RP-06_Ex1](../../2_Controls/RC/RC.RP-06_Ex1.md), [RC.RP-06_Ex2](../../2_Controls/RC/RC.RP-06_Ex2.md)

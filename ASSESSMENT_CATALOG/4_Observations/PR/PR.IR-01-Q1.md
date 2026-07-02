@@ -47,6 +47,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3.5 places network protection in the Some Security band: segmentation is practiced — Palo Alto zone-based inspection with 2FA on administration, Security Group micro-segmentation across the multi-AZ VPCs, Kubernetes namespaces — but it is ungoverned and unevenly executed. There is no segmentation policy defining trust zones or review cadence, the internet-facing SaaS application has no WAF (the $112K WAF Install project is not yet operational), Kubernetes network policies do not cover all namespaces, and a Windows Server 2012 R2 fileserver remains on the network until its Q3 upgrade. The half-point above a flat 3 reflects that the deployed layers do operate regularly; Minimally Acceptable (5.0) is out of reach until segmentation is policy-governed, applied across all namespaces, and independently validated — none of which occurred this quarter.
+
 ---
 
 ## Evidence Reviewed
@@ -72,3 +74,8 @@
 | 4 | Evaluate NAC solutions for the corporate network, prioritizing integration with existing endpoint management | Medium | Tigan Wang |
 | 5 | Include segmentation validation in the next penetration test scope | Medium | Nadia Khan |
 | 6 | Isolate the Windows Server 2012 R2 fileserver on a restricted VLAN until Q3 upgrade completes | High | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.IR-01 Test Procedures](../../3_Test_Procedures/PR/PR.IR-01.md)
+- **Controls:** [PR.IR-01_Ex1](../../2_Controls/PR/PR.IR-01_Ex1.md), [PR.IR-01_Ex2](../../2_Controls/PR/PR.IR-01_Ex2.md), [PR.IR-01_Ex3](../../2_Controls/PR/PR.IR-01_Ex3.md), [PR.IR-01_Ex4](../../2_Controls/PR/PR.IR-01_Ex4.md)

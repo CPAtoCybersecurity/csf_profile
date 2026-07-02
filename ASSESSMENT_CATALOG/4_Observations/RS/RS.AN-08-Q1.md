@@ -49,6 +49,8 @@ SentinelOne's threat hunting capability allows analysts to search for IOCs (file
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** Magnitude estimation scores 3, in the Some Security band: the playbook defines it as a required investigation step and capable tooling exists — SentinelOne threat hunting can sweep file hashes, IPs, domains, and behavioral patterns across the entire endpoint fleet, and GuardDuty correlates related findings across AWS accounts — but the process itself is manual and its outcome depends entirely on individual analyst thoroughness, matching the rubric's defined-but-unreliable anchor. No IOC sweep fires automatically when an incident is declared, cross-platform scoping (cloud plus endpoint plus SaaS) is not unified, and there is no validation step confirming the estimated blast radius. Minimally Acceptable (5.0) would require scoping to happen consistently and completely for every declared incident rather than only when the assigned analyst chooses to hunt broadly.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ SentinelOne's threat hunting capability allows analysts to search for IOCs (file
 | 2 | Develop standardized magnitude estimation checklist with required scoping actions | High | Nadia Khan |
 | 3 | Add magnitude validation step requiring independent confirmation of estimated scope | Medium | Nadia Khan |
 | 4 | Build cross-platform IOC correlation capability spanning cloud, endpoint, and SaaS environments | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.AN-08 Test Procedures](../../3_Test_Procedures/RS/RS.AN-08.md)
+- **Controls:** [RS.AN-08_Ex1](../../2_Controls/RS/RS.AN-08_Ex1.md), [RS.AN-08_Ex2](../../2_Controls/RS/RS.AN-08_Ex2.md)

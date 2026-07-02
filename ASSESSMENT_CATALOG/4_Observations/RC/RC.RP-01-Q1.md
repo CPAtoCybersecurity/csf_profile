@@ -45,6 +45,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3.5 sits in the Some Security band (2.0–4.9): pieces of recovery execution are genuinely reliable — quarterly restore tests (Q4 2025 and Q1 2026 evidenced) validate PostgreSQL backup restoration, and AWS multi-AZ plus Kubernetes redundancy were exercised in the 2024 incidents — but there is no dedicated recovery plan document, only the incident response playbook, pending the $100K Cloud Security Optimization project deliverable. That partial-coverage profile matches the space between anchor 3 (defined process, unreliable end-to-end) and anchor 4 (regular execution with material scope weaknesses), since full plan activation — role notification, authorization, decision-making — has never been rehearsed and recovery authorization criteria remain informal. A Minimally Acceptable 5.0 requires the whole recovery-execution scope, not just database restores, to run consistently with documented authority and trained personnel; the missing DR plan, end-to-end exercise, and role training are exactly what separates 3.5 from that floor.
+
 ---
 
 ## Evidence Reviewed
@@ -67,3 +69,8 @@
 | 2 | Conduct a tabletop recovery exercise that tests the full recovery plan activation sequence including role notification and decision-making | High | Nadia Khan |
 | 3 | Document formal recovery authorization criteria and delegation of authority | Medium | Tigan Wang |
 | 4 | Establish recovery role training for all personnel with designated recovery responsibilities | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RC.RP-01 Test Procedures](../../3_Test_Procedures/RC/RC.RP-01.md)
+- **Controls:** [RC.RP-01_Ex1](../../2_Controls/RC/RC.RP-01_Ex1.md), [RC.RP-01_Ex2](../../2_Controls/RC/RC.RP-01_Ex2.md)

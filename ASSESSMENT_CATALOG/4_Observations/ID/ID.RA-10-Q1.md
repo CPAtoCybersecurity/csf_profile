@@ -30,6 +30,8 @@ Smaller suppliers may bypass assessment process. No continuous monitoring of sup
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** A 3 keeps critical supplier assessment in Some Security (2.0–4.9): the process is well defined — a third-party risk management policy, mandatory security questionnaires and SOC 2 reviews for critical vendors, a documented pre-acquisition assessment, and a maintained critical supplier register — but it does not execute reliably across the supplier population. Smaller suppliers can bypass assessment entirely, supplier posture is checked at a point in time with no continuous monitoring, fourth-party sub-processor risk goes systematically unassessed, and the resulting ratings never feed the enterprise risk register. Minimally Acceptable (5.0) is separated from this score by consistent full-population coverage: every supplier assessed or explicitly triaged out as a tracked exception, sustained through the assessment period.
+
 ## Evidence Reviewed
 
 - [Third-Party Risk Policy](../../5_Artifacts/Policies/POL-third-party-risk.md)
@@ -43,3 +45,8 @@ Smaller suppliers may bypass assessment process. No continuous monitoring of sup
 | 2 | Implement continuous supplier security posture monitoring | Medium | Security |
 | 3 | Assess fourth-party (sub-processor) risk systematically | Medium | Vendor Management |
 | 4 | Integrate supplier risk ratings into enterprise risk register | Low | Security |
+
+## Related
+
+- **Test Procedure:** [ID.RA-10 Test Procedures](../../3_Test_Procedures/ID/ID.RA-10.md)
+- **Controls:** [ID.RA-10_Ex1](../../2_Controls/ID/ID.RA-10_Ex1.md)

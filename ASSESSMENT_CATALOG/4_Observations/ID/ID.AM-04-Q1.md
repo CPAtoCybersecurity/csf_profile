@@ -30,6 +30,8 @@ Department-level SaaS purchases sometimes bypass centralized procurement. No aut
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The score of 3 lands in Some Security (2.0–4.9): the supplier inventory process is defined — ServiceNow tracks major vendor relationships with contract details, new vendors complete security questionnaires, and AWS Marketplace purchases roll up through consolidated billing — but its population is incomplete in ways the process cannot detect. Department-level SaaS purchases sometimes bypass centralized procurement entirely, there is no CASB or SaaS discovery to catch unapproved services, and fourth-party sub-processors are absent from the inventory. To reach Minimally Acceptable (5.0), the inventory would have to consistently capture the full supplier population — including departmental SaaS and sub-processors — with any bypasses surfacing as known, tracked exceptions rather than blind spots.
+
 ## Evidence Reviewed
 
 - [Third-Party Risk Policy](../../5_Artifacts/Policies/POL-third-party-risk.md)
@@ -43,3 +45,8 @@ Department-level SaaS purchases sometimes bypass centralized procurement. No aut
 | 2 | Enforce centralized procurement for all SaaS purchases | High | IT Operations |
 | 3 | Document fourth-party (sub-processor) relationships | Medium | Vendor Management |
 | 4 | Integrate supplier inventory with security assessment records | Low | Security |
+
+## Related
+
+- **Test Procedure:** [ID.AM-04 Test Procedures](../../3_Test_Procedures/ID/ID.AM-04.md)
+- **Controls:** [ID.AM-04_Ex1](../../2_Controls/ID/ID.AM-04_Ex1.md), [ID.AM-04_Ex2](../../2_Controls/ID/ID.AM-04_Ex2.md)

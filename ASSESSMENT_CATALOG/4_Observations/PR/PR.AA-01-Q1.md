@@ -53,6 +53,8 @@ The shared developer SSH key on port 45001 remains the most significant identity
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** The actual score of 4 places this subcategory in the Some Security band: the Workday-to-ServiceNow identity lifecycle executes regularly, but with material weaknesses in coverage. Testing found 1 of 8 sampled terminations breached the revocation SLA by 3 days, 3 service accounts created in emergency change windows sit outside the 45-account CMDB inventory (and were excluded from the Q4 2025 recertification), and the shared developer SSH key on port 45001 has never been rotated with no interim compensating controls beyond firewall session logging. Reaching Minimally Acceptable (5.0) requires consistent full-scope execution with exceptions known and tracked — the untreated shared key and the unreconciled service accounts are precisely the known exceptions without treatment that hold the score at 4.
+
 ---
 
 ## Evidence Reviewed
@@ -79,3 +81,8 @@ The shared developer SSH key on port 45001 remains the most significant identity
 | 4 | Implement automated role-change detection to remove prior entitlements on department/title changes | Medium | Chris Magann |
 | 5 | Migrate credential recovery from knowledge-based to video-based identity verification for privileged accounts | Medium | Gerry |
 | 6 | Enable MFA on AWS root account using hardware security key | Critical | Gerry |
+
+## Related
+
+- **Test Procedure:** [PR.AA-01 Test Procedures](../../3_Test_Procedures/PR/PR.AA-01.md)
+- **Controls:** [PR.AA-01_Ex1](../../2_Controls/PR/PR.AA-01_Ex1.md), [PR.AA-01_Ex2](../../2_Controls/PR/PR.AA-01_Ex2.md), [PR.AA-01_Ex3](../../2_Controls/PR/PR.AA-01_Ex3.md), [PR.AA-01_Ex4](../../2_Controls/PR/PR.AA-01_Ex4.md)

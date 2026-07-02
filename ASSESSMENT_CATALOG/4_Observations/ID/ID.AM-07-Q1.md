@@ -30,6 +30,8 @@ Data classification not formalized beyond pilot scope. Metadata tagging inconsis
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3 falls in Some Security (2.0–4.9): a four-tier classification policy with handling requirements exists and a pilot discovery scan covered the primary databases and S3, but execution beyond the pilot is unreliable — scans are ad hoc rather than continuous, metadata tagging is inconsistently applied, and fieldwork surfaced two S3 buckets holding unclassified customer data. That live deviation in the sampled environment, on top of the pilot-only scope, is exactly what the anchor for 3 describes. Minimally Acceptable (5.0) would require classification and discovery to run consistently across all data stores for the period, with the unclassified-bucket condition remediated or at minimum tracked as a treated exception.
+
 ## Evidence Reviewed
 
 - [Data Classification Policy](../../5_Artifacts/Policies/POL-data-classification.md)
@@ -43,3 +45,8 @@ Data classification not formalized beyond pilot scope. Metadata tagging inconsis
 | 2 | Remediate two S3 buckets with unclassified customer data | Critical | Cloud Platform |
 | 3 | Implement continuous data discovery process | Medium | Security |
 | 4 | Standardize metadata tagging across all classified data stores | Medium | Data Governance |
+
+## Related
+
+- **Test Procedure:** [ID.AM-07 Test Procedures](../../3_Test_Procedures/ID/ID.AM-07.md)
+- **Controls:** [ID.AM-07_Ex1](../../2_Controls/ID/ID.AM-07_Ex1.md), [ID.AM-07_Ex2](../../2_Controls/ID/ID.AM-07_Ex2.md), [ID.AM-07_Ex3](../../2_Controls/ID/ID.AM-07_Ex3.md), [ID.AM-07_Ex4](../../2_Controls/ID/ID.AM-07_Ex4.md)

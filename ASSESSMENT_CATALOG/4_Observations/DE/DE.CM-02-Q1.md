@@ -49,6 +49,8 @@ Physical environment monitoring is limited in scope given Alma's cloud-first inf
 | Actual Score | 3 |
 | Target Score | 4 |
 
+**Scoring rationale:** The score of 3 sits in the **Some Security** band (2.0–4.9): a defined process exists — badge readers at all entry points, 90-day log retention, and a monthly facilities review — but execution is unreliable as a *detection* control because after-hours access alerts route only to the facilities manager, never reaching the security team, and physical logs are not correlated with logical authentication events. A monthly manual review cannot catch a compromised badge in anything close to real time. Moving up within the band toward the target of 4 (also Some Security) requires the security-team alert routing and SIEM integration to make the review cycle dependable; a 5 (Minimally Acceptable) would further require anomaly detection that operates consistently rather than as a once-a-month lookback.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ Physical environment monitoring is limited in scope given Alma's cloud-first inf
 | 2 | Integrate physical access logs with SIEM for correlation with logical access events | Medium | Nadia Khan |
 | 3 | Implement real-time anomaly detection for physical access patterns (tailgating, repeated failed badge attempts) | Medium | Nadia Khan |
 | 4 | Add tamper detection on badge readers and physical access control panels | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [DE.CM-02 Test Procedures](../../3_Test_Procedures/DE/DE.CM-02.md)
+- **Controls:** [DE.CM-02_Ex1](../../2_Controls/DE/DE.CM-02_Ex1.md), [DE.CM-02_Ex2](../../2_Controls/DE/DE.CM-02_Ex2.md), [DE.CM-02_Ex3](../../2_Controls/DE/DE.CM-02_Ex3.md), [DE.CM-02_Ex4](../../2_Controls/DE/DE.CM-02_Ex4.md)

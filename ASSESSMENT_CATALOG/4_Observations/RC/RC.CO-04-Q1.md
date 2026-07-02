@@ -45,6 +45,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** A 3.5 falls in the Some Security band (2.0–4.9), midway between the rubric's anchor 3 (defined but unreliable) and anchor 4 (regular execution with material weaknesses). Breach notification procedures exist in the playbook, the 2024 incidents demonstrated actual public communication under fire, and the public trust score KPI shows the outcome is being measured — but the messaging templates remain unapproved drafts, the legal-review and sign-off workflow is understood rather than documented, and regulatory notification compliance has never been independently verified. The Minimally Acceptable band (5.0) requires the process to execute consistently across its full scope with only minor flaws; until pre-approved templates and a formal approval workflow exist and have been exercised, rapid and compliant public communication depends on improvisation rather than a repeatable process.
+
 ---
 
 ## Evidence Reviewed
@@ -65,3 +67,8 @@
 | 2 | Formalize the public communication approval workflow with defined roles, review steps, and target timelines | High | Nadia Khan |
 | 3 | Conduct an independent review of breach notification compliance against applicable state and contractual requirements | Medium | Nadia Khan |
 | 4 | Include public communication as a component of the next tabletop exercise to validate the approval and release process | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RC.CO-04 Test Procedures](../../3_Test_Procedures/RC/RC.CO-04.md)
+- **Controls:** [RC.CO-04_Ex1](../../2_Controls/RC/RC.CO-04_Ex1.md), [RC.CO-04_Ex2](../../2_Controls/RC/RC.CO-04_Ex2.md)

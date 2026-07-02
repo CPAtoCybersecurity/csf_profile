@@ -51,6 +51,8 @@
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3 falls in the Some Security band: meaningful platform-level protections exist — non-root pod security standards, seccomp profiles, disabled core dumps, Windows Credential Guard on the Domain Controller, and SentinelOne memory-attack monitoring — but data-in-use protection as a practice is not reliably executed or verified. There is no secure memory handling standard, the application-level clearing of biometric data after processing has never been validated by code review or memory analysis, and the controls are scattered across tools with no coordinated program or coverage metrics. Minimally Acceptable (5.0) would require the protection to operate consistently across scope with evidence — starting with verified memory clearing for the biometric pipeline and DLP coverage of data-in-use exfiltration vectors, none of which existed this period.
+
 ---
 
 ## Evidence Reviewed
@@ -77,3 +79,8 @@
 | 4 | Evaluate and deploy DLP controls for data-in-use exfiltration paths (screen capture, clipboard, memory dumps) | Medium | Nadia Khan |
 | 5 | Conduct container runtime security assessment with penetration testing | Medium | Chris Magann |
 | 6 | Evaluate confidential computing options (Intel SGX, AMD SEV) for biometric processing workloads as a roadmap item | Low | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.DS-10 Test Procedures](../../3_Test_Procedures/PR/PR.DS-10.md)
+- **Controls:** [PR.DS-10_Ex1](../../2_Controls/PR/PR.DS-10_Ex1.md), [PR.DS-10_Ex2](../../2_Controls/PR/PR.DS-10_Ex2.md)
