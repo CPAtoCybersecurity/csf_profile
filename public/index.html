@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#000000" />
     <meta
       name="description"
-      content="Web site created using create-react-app"
+      content="Free open-source NIST CSF 2.0 maturity assessment tool — score all 106 subcategories, track quarterly progress, visualize gaps on a dashboard radar, and export audit-ready CSV workpapers."
     />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/SC_Logo.png" />
     <!--
@@ -25,6 +25,33 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>CSF Profile Assessment</title>
+    <style>
+      /* Pre-hydration splash — matches the app's terminal theme */
+      html, body {
+        margin: 0;
+        background-color: #000000;
+      }
+      #root:empty {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #000000;
+      }
+      #root:empty::after {
+        content: "CSF_PROFILE ▮ LOADING…";
+        color: #33ff66;
+        font-family: 'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        animation: csf-splash-blink 1.1s step-end infinite;
+      }
+      @keyframes csf-splash-blink {
+        50% { opacity: 0.35; }
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

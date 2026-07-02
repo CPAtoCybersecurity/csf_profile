@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   Users,
@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 
 const Navigation = () => {
+  // "/" renders the Dashboard, so the Dashboard link must highlight there too
+  const { pathname } = useLocation();
+
   // Inline style to force no underline
   const linkStyle = { textDecoration: 'none' };
 
@@ -39,15 +42,14 @@ const Navigation = () => {
         <NavLink
           to="/dashboard"
           style={linkStyle}
-          className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
+          className={({ isActive }) => `${baseStyles} ${isActive || pathname === '/' ? activeStyles : inactiveStyles}`}
         >
           <LayoutDashboard size={16} />
           <span>Dashboard</span>
         </NavLink>
 
         <NavLink
-          to="/"
-          end
+          to="/requirements"
           style={linkStyle}
           className={({ isActive }) => `${baseStyles} ${isActive ? activeStyles : inactiveStyles}`}
         >

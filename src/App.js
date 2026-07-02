@@ -34,7 +34,7 @@ import useRequirementsStore from './stores/requirementsStore';
 import useAssessmentsStore from './stores/assessmentsStore';
 
 // Utils
-import { shouldShowBackupReminder, updateLastReminderDate } from './utils/backupTracking';
+import { shouldShowBackupReminder, updateLastReminderDate, isFirstVisit } from './utils/backupTracking';
 import { checkEnvironmentVariables } from './utils/envValidation';
 import { initializeEntryIdMappings, loadConfluenceConfig } from './utils/confluenceSync';
 
@@ -69,6 +69,10 @@ const AppContent = () => {
   // Check for backup reminder on mount and periodically
   useEffect(() => {
     const checkBackupReminder = () => {
+      // Don't stack the backup reminder on top of the first-visit welcome modal
+      if (isFirstVisit()) {
+        return;
+      }
       if (shouldShowBackupReminder()) {
         setShowBackupReminder(true);
         updateLastReminderDate();
@@ -142,7 +146,8 @@ const AppContent = () => {
         {/* Main content */}
         <main className="flex-1 overflow-hidden">
           <Routes>
-            <Route path="/" element={<Requirements />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/requirements" element={<Requirements />} />
             <Route path="/controls" element={<UserControls />} />
             <Route path="/assessments" element={<Assessments />} />
             <Route path="/dashboard" element={<Dashboard />} />

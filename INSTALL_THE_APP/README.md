@@ -23,8 +23,8 @@ cd csf_profile
 # Install dependencies
 npm install
 
-# Dev (web)
-npm run dev
+# Run the web app
+npm start
 
 # Dev (Tauri desktop)
 npm run tauri dev
@@ -37,6 +37,9 @@ npm run tauri build
 
 - Node.js 18+
 - npm or pnpm
+
+**Desktop builds only** (skip these if you're running the web app with `npm start`):
+
 - Rust toolchain (for Tauri desktop builds — `rustup` recommended)
 - Platform tooling: Xcode CLI tools (macOS), build-essential + webkit2gtk (Linux), MSVC + WebView2 (Windows)
 

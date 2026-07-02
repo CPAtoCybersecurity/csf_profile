@@ -4,7 +4,7 @@
 
 ---
 
-**Report No.:** IA-2025-001
+**Report No.:** IA-2026-001
 **Engagement Type:** Cybersecurity Program Assessment (NIST CSF 2.0)
 **Assessment Period:** Jan 1, 2026 - March 10, 2026
 **Report Date:** March 20, 2026
@@ -43,16 +43,28 @@ All company names, individuals, findings, scores, and data presented herein are 
 
 ## 1. Independent Assessment Opinion
 
-**Overall Assessment Rating: UNSATISFACTORY**
+**Overall Assessment Rating: NEEDS IMPROVEMENT**
 
-Based on our assessment of 40 control implementations across all six NIST CSF 2.0 functions, we conclude that Alma Security's cybersecurity program requires significant improvement to meet target maturity levels. The majority of assessed functions (4 of 6) fall below their target scores, indicating systemic gaps in the cybersecurity program.
+Based on our assessment of 40 control implementations across all six NIST CSF 2.0 functions, we conclude that Alma Security's cybersecurity program requires improvement to meet target maturity levels. While the overall average score meets the overall target, this average masks function-level gaps: the majority of assessed functions (4 of 6) fall below their target scores, and 3 High-priority findings require management attention.
 
 **Key Statistics:**
 - **Controls Assessed:** 40
 - **Controls Below Target:** 13 of 40
-- **Overall Average Score:** 5.0 / 5.0 (target)
+- **Overall Average Score:** 5.0 / 10.0 (target: 5.0)
 - **Overall Maturity Level:** Some Security
 - **Evidence Coverage:** 85.0% of controls have linked artifacts
+
+### Opinion Determination
+
+The overall assessment rating is determined by function-level ratings and finding severity — not by the overall average score alone, which can mask function-level gaps. Function ratings are assigned per the criteria in [Appendix B](#appendix-b-assessment-criteria-and-rating-definitions).
+
+| Overall Rating | Criteria |
+|---|---|
+| **Satisfactory** | All six functions rated Satisfactory and no open Critical or High findings |
+| **Needs Improvement** | One or more functions rated Needs Improvement, or any open High finding, and no function rated Unsatisfactory |
+| **Unsatisfactory** | Any function rated Unsatisfactory (below 70% of target), or any open Critical finding |
+
+**Application:** 4 of 6 functions are rated Needs Improvement (ID, DE, RS, RC), no function scores below 70% of its target, and open findings comprise 0 Critical, 3 High, and 1 Medium — mapping to an overall rating of **NEEDS IMPROVEMENT**.
 
 ---
 
@@ -81,7 +93,7 @@ Based on our assessment of 40 control implementations across all six NIST CSF 2.
 <tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb"><strong>Detect (DE)</strong></td><td style="padding:6px 8px;text-align:center;color:#d97706;font-weight:600;border-bottom:1px solid #e5e7eb">4.5</td><td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb">5.0</td><td style="padding:6px 8px;text-align:center;background:#fef3c7;color:#d97706;font-weight:600;border-bottom:1px solid #e5e7eb">0.5</td><td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb"><span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:4px;font-weight:600;font-size:13px">Needs Improvement</span></td></tr>
 <tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb"><strong>Respond (RS)</strong></td><td style="padding:6px 8px;text-align:center;color:#d97706;font-weight:600;border-bottom:1px solid #e5e7eb">3.8</td><td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb">5.0</td><td style="padding:6px 8px;text-align:center;background:#fef3c7;color:#d97706;font-weight:600;border-bottom:1px solid #e5e7eb">1.3</td><td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb"><span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:4px;font-weight:600;font-size:13px">Needs Improvement</span></td></tr>
 <tr><td style="padding:6px 8px;border-bottom:1px solid #e5e7eb"><strong>Recover (RC)</strong></td><td style="padding:6px 8px;text-align:center;color:#d97706;font-weight:600;border-bottom:1px solid #e5e7eb">4.0</td><td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb">5.0</td><td style="padding:6px 8px;text-align:center;background:#fef3c7;color:#d97706;font-weight:600;border-bottom:1px solid #e5e7eb">1.0</td><td style="padding:6px 8px;text-align:center;border-bottom:1px solid #e5e7eb"><span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:4px;font-weight:600;font-size:13px">Needs Improvement</span></td></tr>
-<tr style="background:#eff6ff;font-weight:700"><td style="padding:8px">Overall</td><td style="padding:8px;text-align:center">5.0</td><td style="padding:8px;text-align:center">5.0</td><td style="padding:8px;text-align:center">0.0</td><td style="padding:8px;text-align:center"><span style="background:#f3f4f6;color:#6b7280;padding:2px 8px;border-radius:4px;font-weight:600;font-size:13px">UNSATISFACTORY</span></td></tr>
+<tr style="background:#eff6ff;font-weight:700"><td style="padding:8px">Overall</td><td style="padding:8px;text-align:center">5.0</td><td style="padding:8px;text-align:center">5.0</td><td style="padding:8px;text-align:center">0.0</td><td style="padding:8px;text-align:center"><span style="background:#fef3c7;color:#d97706;padding:2px 8px;border-radius:4px;font-weight:600;font-size:13px">Needs Improvement</span></td></tr>
 </table>
 
 ### Top 3 Priority Gaps
@@ -250,7 +262,7 @@ A total of **4** findings were identified during the assessment.
 
 This assessment evaluated 40 control implementations across the six NIST CSF 2.0 functions for Alma Security. Of the 40 controls assessed, 27 (68%) meet or exceed target maturity levels, while 13 controls require improvement to reach their target scores.
 
-4 findings were identified, of which 3 are rated Critical or High priority and require immediate management attention.
+4 findings were identified, of which 3 are rated High priority and require immediate management attention; no Critical findings were identified.
 
 Management should prioritize remediation of identified findings in accordance with the action plans outlined in Section 6 and monitor progress through the quarterly assessment cycle.
 
