@@ -127,7 +127,7 @@ const useAssessmentsStore = create(
   persist(
     (set, get) => ({
       assessments: DEFAULT_ASSESSMENTS,
-      currentAssessmentId: null,
+      currentAssessmentId: COMPREHENSIVE_ASSESSMENT_ID,
       loading: false,
       error: null,
 
@@ -1726,7 +1726,20 @@ const useAssessmentsStore = create(
       partialize: (state) => ({
         assessments: state.assessments,
         currentAssessmentId: state.currentAssessmentId
-      })
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Returning users keep their valid selection; fall back to the
+        // comprehensive Alma assessment when none is selected or it no longer exists
+        if (!state) return;
+        const exists = state.assessments?.some(a => a.id === state.currentAssessmentId);
+        if (!state.currentAssessmentId || !exists) {
+          const hasComprehensive = state.assessments?.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID);
+          const fallbackId = hasComprehensive
+            ? COMPREHENSIVE_ASSESSMENT_ID
+            : (state.assessments?.[0]?.id ?? null);
+          useAssessmentsStore.setState({ currentAssessmentId: fallbackId });
+        }
+      }
     }
   )
 );
