@@ -100,6 +100,7 @@ All figures are canonical; do not round them into new values.
 | ITSM / GRC | ServiceNow (tickets, supplier inventory, vendor workflows, risk register) |
 | Alerting | PagerDuty (after-hours paging) |
 | Corporate | Workday (HR, training), Slack, Microsoft 365 / Outlook 365 (with O365 ATP), SharePoint Online / OneDrive |
+| Privileged access | CyberArk (privileged account vaulting and PAM workflows) |
 | Supply-chain integrity | Sigstore / Cosign (artifact signing) |
 
 **Explicitly NOT in the stack:** Splunk, CrowdStrike, Okta, Jira. If any file mentions these, it is noncanon and gets corrected (SIEM = AWS-native; EDR = SentinelOne; SSO/MFA = Windows Authenticator + Palo Alto; tickets = ServiceNow).
@@ -157,24 +158,28 @@ Any reference to "2022 security events" is noncanon — the canonical incident y
 
 ## 10. Known Legacy Values (noncanon → canonical)
 
-The propagation sweep (follow-on issue tier) corrects these. Until then, this table is the authority.
+The propagation sweep completed 2026-07 ([#237]) — every row below is corrected in the repo. The table is retained as the reference list of banned values: the coherence lint ([#238], `scripts/coherence-lint.mjs`) greps for them in CI so they cannot re-enter.
 
-| Noncanon value | Canonical value | Known locations |
+| Noncanon value | Canonical value | Status |
 |---|---|---|
-| Founded 2023 | Founded 2021 | 1_Case_Study/README.md (fixed), alma-business-case.docx (rewritten) |
-| "2022 security events" | 2024 incidents (INC-2024-01/-02) | alma-controls.csv:5, alma-assessments.csv:21 |
-| ~120-person company (as current) | 120 = FY2023 headcount; current = 300 | 2_Controls/GV/GV.RM-03_Ex1.md |
-| R2 = asset inventory, R4 = public trust | R2 = perimeter monitoring, R4 = asset inventory (see §6) | old 1_Case_Study/README.md list |
-| TTD <4 min "by Jan 2025" | by Jan 2027 | alma-controls.csv:7 |
-| "2025 Alma Security CSF" | 2026 Alma Security CSF Assessment | alma-assessments.csv |
-| Assessor "Steve <steve@almasecurity.com>" | Steve Mercer, Internal Audit <steve.mercer@almasecurity.com> | ~100 files in 4_Observations/ |
-| Assessor "OG" | Omar Garza, Internal Audit | ID.AM-01-Q1.md, PROC-sampling-walkthrough.md |
-| "Jane Doe" (quality reviewer) | Dana Whitfield | 6_Audit_Report (fixed) |
-| Steve = "GRC Manager" | Steve Mercer = Director, Internal Audit | src/stores/userStore.js:8 |
-| Nadia Khan = SRE; Chris Magann = Security Engineer | D&R Lead; VM Lead (see §3) | src/stores/userStore.js |
-| "Series C funding" (as raised) | Series B raised Feb 2025; Series C only under discussion | 4_Observations/GV/GV.RM-01-Q1.md |
-| Splunk / CrowdStrike / Okta / Jira | Not in stack (see §5) | legacy docx only |
-| Score 5.0 labeled "Some Security" | 5.0–5.9 = Minimally Acceptable | 6_Audit_Report (fixed) |
+| Founded 2023 | Founded 2021 | fixed (#234) |
+| "2022 security events" | 2024 incidents (INC-2024-01/-02) | fixed (#237) — alma-controls.csv, alma-assessments.csv |
+| ~120-person company (as current) | 120 = FY2023 headcount; current = 300 | fixed (#237) — GV.RM-03_Ex1.md |
+| R2 = asset inventory, R4 = public trust | R2 = perimeter monitoring, R4 = asset inventory (see §6) | fixed (#234) — 1_Case_Study/README.md |
+| TTD <4 min "by Jan 2025" / TTR-CJC "by Aug 2025" | by Jan 2027 / by Aug 2027 | fixed (#237) — CSVs, src stores, spreadsheet templates |
+| "2025 Alma Security CSF" (and name variants) | 2026 Alma Security CSF Assessment | fixed (#237) — CSV, observations, assessmentsStore.js |
+| Assessor "Steve <steve@almasecurity.com>" | Steve Mercer, Internal Audit <steve.mercer@almasecurity.com> (comma-free form in CSVs) | fixed (#237) — observations, test procedures, CSV |
+| Assessor "OG" | Omar Garza, Internal Audit | fixed (#237) — ID.AM-01-Q1.md, PROC-sampling-walkthrough.md |
+| "Jane Doe" (quality reviewer) | Dana Whitfield | fixed (#235) — 6_Audit_Report |
+| Steve = "GRC Manager" | Steve Mercer = Director, Internal Audit | fixed (#237) — src/stores/userStore.js |
+| Nadia Khan = SRE; Chris Magann = Security Engineer | D&R Lead; VM Lead (see §3) | fixed (#237) — src/stores/userStore.js |
+| "Series C funding" (as raised) | Series B raised Feb 2025; Series C only under discussion | fixed (#237) — GV.RM-01-Q1.md |
+| Splunk / CrowdStrike / Okta / Jira | Not in stack (see §5) | fixed (#237) — 20 catalog files reconciled |
+| Score 5.0 labeled "Some Security" | 5.0–5.9 = Minimally Acceptable | fixed (#235) — 6_Audit_Report |
+| `{Subcat}-Ex{N}.md` control filenames | `{Subcat}_Ex{N}.md` per the Canonical Schema | fixed (#237) — 74 files renamed in 2_Controls/ID/ |
+| Dead `feature/api-integration` case-study links | relative links into `1_Case_Study/` | fixed (#237) — GV.RM-01.md, GV.RM-03_Ex1.md, EVD-GV.RM-02 |
+
+One canon *addition* from the sweep: CyberArk (privileged access) was used consistently across eight scenario files and has been added to the §5 stack rather than rewritten out.
 
 ---
 

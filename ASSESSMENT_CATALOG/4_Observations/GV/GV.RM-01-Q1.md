@@ -1,7 +1,7 @@
 # GV.RM-01: Risk Management Objectives — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-08
 **Testing Status:** Complete
 
@@ -23,7 +23,7 @@
 
 ### Gaps
 
-- Objectives not updated after Series C funding discussion that shifted business priorities
+- Objectives not updated after the ongoing Series C funding discussions (Series C is not yet raised) shifted business priorities
 - Department-level awareness of risk management objectives limited below VP level
 
 ## Score

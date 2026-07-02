@@ -1,7 +1,7 @@
 # GV.RM-03: Enterprise Risk Management Integration — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-09
 **Testing Status:** Complete
 

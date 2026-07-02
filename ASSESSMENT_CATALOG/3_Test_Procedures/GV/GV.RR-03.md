@@ -14,7 +14,7 @@
 2. **Validate resource-to-risk alignment**
    - Cross-reference resource allocation with risk treatment plans
    - Verify tools and technology investments support risk mitigation goals
-   - Check that compensating controls (CrowdStrike MDR) are funded when staffing gaps exist
+   - Check that compensating controls (SentinelOne MDR) are funded when staffing gaps exist
 
 3. **Examine management review of resource adequacy**
    - Request evidence of periodic management reviews of resource sufficiency

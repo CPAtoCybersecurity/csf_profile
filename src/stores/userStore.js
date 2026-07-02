@@ -4,13 +4,14 @@ import { v4 as uuidv4 } from 'uuid';
 
 // Default users for new installations
 const DEFAULT_USERS = [
-  { id: 1, name: 'Gerry', title: 'CISO', email: 'gerry@almasecurity.com' },
-  { id: 2, name: 'Steve', title: 'GRC Manager', email: 'steve@almasecurity.com' },
-  { id: 3, name: 'Jane', title: 'Product Engineer', email: 'jane@almasecurity.com' },
-  { id: 4, name: 'John', title: 'Financial Systems Analyst', email: 'john@almasecurity.com' },
-  { id: 5, name: 'Chris.Magann', title: 'Security Engineer', email: 'chris.magann@almasecurity.com' },
-  { id: 6, name: 'Nadia.Khan', title: 'Site Reliability Engineer', email: 'nadia.khan@almasecurity.com' },
-  { id: 7, name: 'Tigan.Wang', title: 'Vulnerability Manager', email: 'tigan.wang@almasecurity.com' },
+  { id: 1, name: 'Gerry.Callahan', title: 'CISO', email: 'gerry.callahan@almasecurity.com' },
+  { id: 2, name: 'Steve.Mercer', title: 'Director, Internal Audit', email: 'steve.mercer@almasecurity.com' },
+  { id: 3, name: 'Jane.Alvarez', title: 'Product Engineer', email: 'jane.alvarez@almasecurity.com' },
+  { id: 4, name: 'John.Tran', title: 'Financial Systems Analyst', email: 'john.tran@almasecurity.com' },
+  { id: 5, name: 'Chris.Magann', title: 'Vulnerability Management Lead', email: 'chris.magann@almasecurity.com' },
+  { id: 6, name: 'Nadia.Khan', title: 'Detection & Response Lead', email: 'nadia.khan@almasecurity.com' },
+  { id: 7, name: 'Tigan.Wang', title: 'Vulnerability Management Engineer', email: 'tigan.wang@almasecurity.com' },
+  { id: 8, name: 'Omar.Garza', title: 'Senior IT Auditor', email: 'omar.garza@almasecurity.com' },
 ];
 
 const useUserStore = create(

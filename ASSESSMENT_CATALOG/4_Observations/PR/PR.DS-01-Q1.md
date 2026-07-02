@@ -1,8 +1,8 @@
 # PR.DS-01: Data-at-Rest Protection -- Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -57,8 +57,8 @@
 - AWS KMS key inventory and encryption policy documentation
 - S3 bucket encryption configuration report (15-bucket sample showing 9 SSE-KMS, 6 SSE-S3)
 - RDS encryption status for all PostgreSQL production instances (all encrypted)
-- Data Encryption Upgrade project plan and status report (Jira ENCRYPT-2026)
-- S3 Bucket Security project remediation tracker (Jira S3SEC-2026)
+- Data Encryption Upgrade project plan and status report (ServiceNow ENCRYPT-2026)
+- S3 Bucket Security project remediation tracker (ServiceNow S3SEC-2026)
 - SentinelOne device control policy configuration and block rate report
 - Removable media exception log (3 approved exceptions in Q1 2026)
 - BitLocker encryption status report for on-premises servers

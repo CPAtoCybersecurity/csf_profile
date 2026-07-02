@@ -1,8 +1,8 @@
 # PR.PS-06: Secure Software Development Practices - Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-16
 
@@ -14,7 +14,7 @@
 
 | Method | Performed | Notes |
 |--------|-----------|-------|
-| Examine | Yes | Reviewed GitLab CI/CD pipeline configuration, Amazon ECR image scanning results, development process documentation, Jira security-related stories, and SQL Injection Mitigation project documentation |
+| Examine | Yes | Reviewed GitLab CI/CD pipeline configuration, Amazon ECR image scanning results, development process documentation, ServiceNow security-related tickets, and SQL Injection Mitigation project documentation |
 | Interview | Yes | Interviewed Chris Magann on development practices, security testing integration, and SSDLC roadmap plans |
 | Test | Yes | Reviewed pipeline configuration for security scan stages; verified ECR scan results do not block deployment; checked for SAST/DAST tooling in pipeline (not present); examined dependency management practices |
 
@@ -60,7 +60,7 @@
 - Amazon ECR image scanning configuration and recent results
 - AWS Security Hub findings from ECR scanning
 - Development process documentation (Confluence engineering wiki)
-- Jira security-related story samples (ad-hoc, not systematic)
+- ServiceNow security-related ticket samples (ad-hoc, not systematic)
 - SQL Injection Mitigation project documentation ($60K, not started)
 - CISO quarterly plan with SSDLC roadmap reference (Q3 2026)
 - Container base image rebuild pipeline configuration

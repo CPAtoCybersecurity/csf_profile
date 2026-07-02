@@ -65,9 +65,9 @@ The Q4 2025 quarterly access recertification campaign reviewed 2,847 entitlement
 | 8-12 | 5 employees | Legacy CRM application | Application decommissioned; accounts orphaned | Oct 25 |
 | 13-15 | 3 contractors | VPN access | Contract ended; VPN access not revoked | Oct 28 |
 | 16-19 | 4 employees | Shared drive (Engineering) | No business need; inherited from old team structure | Oct 29 |
-| 20-23 | 4 employees | Jira project access | Project completed; access lingered | Nov 1 |
+| 20-23 | 4 employees | ServiceNow project access | Project completed; access lingered | Nov 1 |
 
-**Root cause analysis:** The majority of revocations (18 of 23) resulted from incomplete offboarding or transfer processes. Recommendation: strengthen automated deprovisioning triggers for HR status changes in Workday-to-Okta integration.
+**Root cause analysis:** The majority of revocations (18 of 23) resulted from incomplete offboarding or transfer processes. Recommendation: strengthen automated deprovisioning triggers for HR status changes in the Workday-to-Active Directory (corporate SSO) integration.
 
 ---
 
@@ -142,7 +142,7 @@ The Q4 2025 quarterly access recertification campaign reviewed 2,847 entitlement
 
 | # | Recommendation | Priority | Owner |
 |---|---------------|----------|-------|
-| 1 | Automate deprovisioning triggers for HR termination and transfer events in Workday-Okta integration | High | IT Security |
+| 1 | Automate deprovisioning triggers for HR termination and transfer events in the Workday-to-Active Directory (corporate SSO) integration | High | IT Security |
 | 2 | Resolve third-party vendor recertification backlog (3 vendors) | High | Vendor Manager |
 | 3 | Require delegate assignment for all certifiers before campaign launch | Medium | IT Security |
 | 4 | Update separation of duties matrix for recent ERP module implementation | Medium | IT Security |

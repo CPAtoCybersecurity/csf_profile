@@ -1,7 +1,7 @@
 # GV.OC-02: Stakeholder Needs and Expectations — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-04
 **Testing Status:** Complete
 

@@ -61,7 +61,7 @@ Column order is fixed:
 
 ## 4. `alma-assessments.csv` Contract
 
-One row per assessed control implementation. Fixed columns: `ID` (= controls.csv `Control ID`), `Assessment` (canonical name: `2025 Alma Security CSF` for the 2025 cycle), `Scope Type`, `Auditor` (the Internal Audit assessor of record — see [Independence Statement](Scoring-Rubric-and-Methodology.md#6-independence-statement)), `Test Procedure(s)`, then per quarter (Q1–Q4): `Actual Score` (0–10 per the [Scoring Rubric](Scoring-Rubric-and-Methodology.md)), `Target Score`, `Observations`, `Observation Date`, `Testing Status` (`Not Started | In Progress | Complete`), `Examine`, `Interview`, `Test` (Yes/No).
+One row per assessed control implementation. Fixed columns: `ID` (= controls.csv `Control ID`), `Assessment` (canonical name: `2026 Alma Security CSF Assessment` for the 2026 cycle), `Scope Type`, `Auditor` (the Internal Audit assessor of record — see [Independence Statement](Scoring-Rubric-and-Methodology.md#6-independence-statement)), `Test Procedure(s)`, then per quarter (Q1–Q4): `Actual Score` (0–10 per the [Scoring Rubric](Scoring-Rubric-and-Methodology.md)), `Target Score`, `Observations`, `Observation Date`, `Testing Status` (`Not Started | In Progress | Complete`), `Examine`, `Interview`, `Test` (Yes/No).
 
 ## 5. Control Implementation Files (2_Controls)
 

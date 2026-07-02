@@ -69,7 +69,7 @@ export const UPDATED_OBSERVATIONS = {
     linkedArtifacts: ['Risk Register', 'Board Approval Documentation'],
     remediation: { ownerId: null, actionPlan: '', dueDate: '' },
     quarters: {
-      Q1: { actualScore: 6, targetScore: 5, observations: 'Measurable risk management objectives established with Board approval: TTD <4min by Jan 2025, TTR-CJC <16hrs by Aug 2025. Objectives aligned with company goals G1-G8.', observationDate: '2025-01-15', testingStatus: 'Complete', examine: true, interview: true, test: false },
+      Q1: { actualScore: 6, targetScore: 5, observations: 'Measurable risk management objectives established with Board approval: TTD <4min by Jan 2027, TTR-CJC <16hrs by Aug 2027. Objectives aligned with company goals G1-G8.', observationDate: '2025-01-15', testingStatus: 'Complete', examine: true, interview: true, test: false },
       Q2: { actualScore: 6, targetScore: 5, observations: 'Objectives tracked with automated dashboards. Significant progress: TTD reduced 89% from baseline. ASM vendor selected to address R2/R4 risks. Monthly management reviews of objective progress.', observationDate: '2025-04-10', testingStatus: 'Complete', examine: false, interview: true, test: true },
       Q3: { actualScore: 6, targetScore: 5, observations: '', observationDate: '2025-06-06', testingStatus: 'In Progress', examine: false, interview: true, test: false },
       Q4: { actualScore: 6, targetScore: 5, observations: '', observationDate: '', testingStatus: 'Not Started', examine: false, interview: false, test: false }

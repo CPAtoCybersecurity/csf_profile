@@ -1,7 +1,7 @@
 # GV.RM-05: Risk Communication Lines — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-10
 **Testing Status:** Complete
 

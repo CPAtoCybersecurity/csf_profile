@@ -1,6 +1,6 @@
 # DE.AE-02: Potentially Adverse Events Are Analyzed — Q1 2025 Observation
 
-**Assessment:** 2025 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 **Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2025-01-26
 **Testing Status:** Complete

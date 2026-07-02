@@ -80,12 +80,12 @@ methodology, assessment cadence, treatment options, and governance process.
 For each of the five risks in the register, request evidence that the stated treatment is
 being executed:
 
-- R-01 (Understaffing): Job requisitions or offer letters for security roles. CrowdStrike
+- R-01 (Understaffing): Job requisitions or offer letters for security roles. SentinelOne
   MDR SOW as compensating control documentation.
 - R-02 (Asset inventory): AWS Config dashboard screenshot showing resource coverage. Export
   from asset management tool (e.g., Orca Security, or AWS Systems Manager Inventory).
-- R-03 (Slow TTD): Splunk dashboard showing TTD trend data (Oct 2024 baseline vs. Mar 2026
-  current state). GuardDuty findings summary.
+- R-03 (Slow TTD): AWS-native monitoring dashboard (CloudTrail/GuardDuty) showing TTD trend
+  data (Oct 2024 baseline vs. Mar 2026 current state). GuardDuty findings summary.
 - R-04 (Customer trust): Customer-facing SOC 2 roadmap document or trust center page.
   Evidence of customer communication sent post-incident.
 - R-05 (Vendor risk): Vendor questionnaire tracker or spreadsheet showing Tier 1 coverage
@@ -172,4 +172,4 @@ being executed:
 - NIST Cybersecurity Framework 2.0: GV.RM — https://www.nist.gov/cyberframework
 - NIST SP 800-53A: Assessing Security and Privacy Controls
 - NIST SP 800-30 Rev 1: Guide for Conducting Risk Assessments
-- Alma Security Case Study Materials: https://github.com/CPAtoCybersecurity/csf_profile/tree/feature/api-integration/EXAMPLE_BUSINESS_CASE_STUDY_FOR_ASSESSMENT
+- Alma Security Case Study Materials: ../../1_Case_Study/
