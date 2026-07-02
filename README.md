@@ -1,5 +1,7 @@
 # Simply Cyber Academy - CSF Profile Assessment Database v2.2
 
+> **▶ Try it now — no install:** **[csf-profile.pages.dev](https://csf-profile.pages.dev)** — the full app runs in your browser with a sample assessment pre-loaded.
+
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 
 * Track and manage CSF outcomes
@@ -10,6 +12,29 @@ A tool designed to help organizations implement and assess their cybersecurity p
 * Track remediation progress
 
 This is an open source project, and improvement ideas to drive cyber risk reduction with CSF assessments are welcome from the Simply Cyber and other awesome communities.
+
+## Choose Your Onramp
+
+Four ways to use the CSF Profile Assessment Database — pick the one that fits how you work:
+
+| Onramp | When to use it |
+|---|---|
+| **[Live demo](https://csf-profile.pages.dev)** or **[`INSTALL_THE_APP/`](INSTALL_THE_APP/)** | Use the app — in the browser (zero setup) or locally. Recommended for active assessments. |
+| [`GET_THE_SPREADSHEETS/`](GET_THE_SPREADSHEETS/) | You just want CSV/Excel artifacts to work in spreadsheets. |
+| [`GET_THE_NOTION_TEMPLATE/`](GET_THE_NOTION_TEMPLATE/) | You prefer to assess inside Notion. Quick-start bundle and import guide. |
+| [`SET_UP_IN_ATLASSIAN/`](SET_UP_IN_ATLASSIAN/) | You want to mirror the assessment into Jira/Confluence. Screenshots + setup. |
+
+To run the app locally instead, jump to [Installation and Setup](#installation-and-setup).
+
+## Your Capstone in 5 Steps
+
+Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's the whole arc:
+
+1. **Open the app** — [csf-profile.pages.dev](https://csf-profile.pages.dev) (no install), or pick another onramp above.
+2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded; check the Dashboard radar to see where you're headed.
+3. **Score your scope** — pick your subcategories and score current vs. target state using the built-in [0-10 scoring legend](#scoring-system).
+4. **Document observations and findings** — record what you examined, who you interviewed, what you tested, and link evidence artifacts.
+5. **Export and report** — export your CSV workpapers and write up results; use the [example audit report](ASSESSMENT_CATALOG/6_Audit_Report/) as your template. That deliverable is your portfolio piece.
 
 ![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
