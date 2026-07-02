@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed policy revision history, regulatory change tracker, technology change log |
-| Interview | Yes | CISO, General Counsel, GRC Manager |
+| Interview | Yes | CISO, General Counsel, Security GRC Lead |
 | Test | No | N/A |
 
 ## Findings
@@ -46,8 +46,8 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Document formal review timelines for each trigger type | Medium | GRC Manager |
-| 2 | Clear overdue procedure reviews within 30 days | High | GRC Manager |
+| 1 | Document formal review timelines for each trigger type | Medium | Security GRC Lead |
+| 2 | Clear overdue procedure reviews within 30 days | High | Security GRC Lead |
 
 ## Related
 

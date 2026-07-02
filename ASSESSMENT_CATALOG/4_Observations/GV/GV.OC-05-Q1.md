@@ -46,7 +46,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Expand dependency inventory to include vendor sub-processors | Medium | GRC Manager |
+| 1 | Expand dependency inventory to include vendor sub-processors | Medium | Security GRC Lead |
 | 2 | Complete failure mode analysis for recent SaaS additions | High | Security Engineering Lead |
 
 ## Related

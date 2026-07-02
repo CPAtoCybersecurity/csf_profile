@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed regulatory tracker, contractual obligations database, policy alignment matrix |
-| Interview | Yes | General Counsel, CISO, GRC Manager |
+| Interview | Yes | General Counsel, CISO, Security GRC Lead |
 | Test | No | N/A |
 
 ## Findings
@@ -33,7 +33,7 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
-**Scoring rationale:** The score of 6 corresponds to the Optimized band. Legal and regulatory requirements are tracked in ServiceNow with mapped policy controls, contractual cybersecurity obligations are cataloged for major customer agreements, and the strategy is explicitly aligned to SOC 2, GDPR, and state privacy law — consistent execution with an active tracking mechanism that General Counsel and the GRC Manager review, matching the 6 anchor. Fully Optimized (7.0) is out of reach this quarter because coverage is not yet improving across the full obligation population: emerging AI regulations are unmapped and contractual tracking is incomplete for Tier 2 and Tier 3 customer agreements.
+**Scoring rationale:** The score of 6 corresponds to the Optimized band. Legal and regulatory requirements are tracked in ServiceNow with mapped policy controls, contractual cybersecurity obligations are cataloged for major customer agreements, and the strategy is explicitly aligned to SOC 2, GDPR, and state privacy law — consistent execution with an active tracking mechanism that General Counsel and the Security GRC Lead review, matching the 6 anchor. Fully Optimized (7.0) is out of reach this quarter because coverage is not yet improving across the full obligation population: emerging AI regulations are unmapped and contractual tracking is incomplete for Tier 2 and Tier 3 customer agreements.
 
 ## Evidence Reviewed
 
@@ -47,7 +47,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Map AI regulatory requirements to existing policies | High | General Counsel |
-| 2 | Extend contractual tracking to all customer tiers | Medium | GRC Manager |
+| 2 | Extend contractual tracking to all customer tiers | Medium | Security GRC Lead |
 
 ## Related
 

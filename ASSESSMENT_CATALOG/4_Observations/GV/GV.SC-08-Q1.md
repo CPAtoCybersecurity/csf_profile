@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed incident reporting protocols, supplier IR roles, exercise records, crisis comms |
-| Interview | Yes | SOC Manager, GRC Manager |
+| Interview | Yes | SOC Manager, Security GRC Lead |
 | Test | No | N/A |
 
 ## Findings

@@ -69,6 +69,7 @@ Full names are canonical. Legacy single-name placeholders (Gerry / Jane / John /
 | **Steve Mercer** | Director, Internal Audit — Lead Assessor of record | steve.mercer@almasecurity.com | "Steve", "Steve M", steve@almasecurity.com |
 | **Omar Garza** | Senior IT Auditor, Internal Audit — second assessor | omar.garza@almasecurity.com | "OG" |
 | Dana Whitfield | Quality Assurance Reviewer, Internal Audit (contract, part-time) | dana.whitfield@almasecurity.com | "Jane Doe" (audit report QR line) |
+| Leila Haddad | Security GRC Lead (risk register administration, TPRM program lead, security metrics — reports to the CISO) | leila.haddad@almasecurity.com | "GRC Manager" (legacy role title) |
 
 **Role rules:** Steve Mercer and Omar Garza perform assessments and are NEVER control owners, control operators, scoped personnel, or remediation owners. Gerry Callahan is the accountable owner for most security controls; Nadia, Chris Magann, Tigan, Jane, and John own or operate specific controls and are legitimate scoped personnel.
 
@@ -171,13 +172,14 @@ The propagation sweep completed 2026-07 ([#237]) — every row below is correcte
 | Assessor "Steve <steve@almasecurity.com>" | Steve Mercer, Internal Audit <steve.mercer@almasecurity.com> (comma-free form in CSVs) | fixed (#237) — observations, test procedures, CSV |
 | Assessor "OG" | Omar Garza, Internal Audit | fixed (#237) — ID.AM-01-Q1.md, PROC-sampling-walkthrough.md |
 | "Jane Doe" (quality reviewer) | Dana Whitfield | fixed (#235) — 6_Audit_Report |
-| Steve = "GRC Manager" | Steve Mercer = Director, Internal Audit | fixed (#237) — src/stores/userStore.js |
+| Steve = "Security GRC Lead" | Steve Mercer = Director, Internal Audit | fixed (#237) — src/stores/userStore.js |
 | Nadia Khan = SRE; Chris Magann = Security Engineer | D&R Lead; VM Lead (see §3) | fixed (#237) — src/stores/userStore.js |
 | "Series C funding" (as raised) | Series B raised Feb 2025; Series C only under discussion | fixed (#237) — GV.RM-01-Q1.md |
 | Splunk / CrowdStrike / Okta / Jira | Not in stack (see §5) | fixed (#237) — 20 catalog files reconciled |
 | Score 5.0 labeled "Some Security" | 5.0–5.9 = Minimally Acceptable | fixed (#235) — 6_Audit_Report |
 | `{Subcat}-Ex{N}.md` control filenames | `{Subcat}_Ex{N}.md` per the Canonical Schema | fixed (#237) — 74 files renamed in 2_Controls/ID/ |
 | Dead `feature/api-integration` case-study links | relative links into `1_Case_Study/` | fixed (#237) — GV.RM-01.md, GV.RM-03_Ex1.md, EVD-GV.RM-02 |
+| "GRC Manager" (ambiguous title — collides with the assessor function) | Security GRC Lead (Leila Haddad, reports to the CISO — see §3) | fixed (#238) — 44 mentions across 31 catalog files, surfaced by the coherence lint's first run |
 
 One canon *addition* from the sweep: CyberArk (privileged access) was used consistently across eight scenario files and has been added to the §5 stack rather than rewritten out.
 

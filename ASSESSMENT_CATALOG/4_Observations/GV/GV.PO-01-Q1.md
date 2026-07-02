@@ -47,7 +47,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Close onboarding acknowledgment gap within 14 days of hire | Low | HR Director |
-| 2 | Update supporting procedures to align with policy v4.2 | Medium | GRC Manager |
+| 2 | Update supporting procedures to align with policy v4.2 | Medium | Security GRC Lead |
 
 ## Related
 

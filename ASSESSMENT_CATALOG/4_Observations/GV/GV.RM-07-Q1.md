@@ -46,7 +46,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Add positive risk scoring to ServiceNow risk register template | Medium | GRC Manager |
+| 1 | Add positive risk scoring to ServiceNow risk register template | Medium | Security GRC Lead |
 | 2 | Include opportunity identification in quarterly department head surveys | Low | CISO |
 
 ## Related

@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed vendor contracts, security addenda, SLA definitions, SBOM requirements |
-| Interview | Yes | Legal Counsel, GRC Manager, Procurement Director |
+| Interview | Yes | Legal Counsel, Security GRC Lead, Procurement Director |
 | Test | Yes | Sampled 10 vendor contracts for security clause completeness |
 
 ## Findings
@@ -48,7 +48,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Remediate pre-template contracts at renewal with current security addenda | High | Legal Counsel |
-| 2 | Extend SBOM requirements to all Tier 1 vendors regardless of onboarding date | Medium | GRC Manager |
+| 2 | Extend SBOM requirements to all Tier 1 vendors regardless of onboarding date | Medium | Security GRC Lead |
 
 ## Related
 

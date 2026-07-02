@@ -47,7 +47,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Add mission-security alignment to new hire onboarding | Medium | CISO |
-| 2 | Distribute mission-security mapping to all department heads | Low | GRC Manager |
+| 2 | Distribute mission-security mapping to all department heads | Low | Security GRC Lead |
 
 ## Related
 

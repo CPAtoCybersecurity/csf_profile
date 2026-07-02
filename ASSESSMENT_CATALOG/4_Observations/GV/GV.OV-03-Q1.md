@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed KPI dashboards, KRI reports, Board metrics presentations |
-| Interview | Yes | CISO, GRC Manager |
+| Interview | Yes | CISO, Security GRC Lead |
 | Test | Yes | Validated KPI data sources and calculation methodology |
 
 ## Findings
@@ -46,7 +46,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Establish industry benchmarking for KPIs | Low | GRC Manager |
+| 1 | Establish industry benchmarking for KPIs | Low | Security GRC Lead |
 | 2 | Validate KRI thresholds against 12 months of operational data | Medium | CISO |
 
 ## Related

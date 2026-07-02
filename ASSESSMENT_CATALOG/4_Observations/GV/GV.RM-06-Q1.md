@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed risk methodology documentation, risk register templates, prioritization criteria |
-| Interview | Yes | CISO, GRC Manager |
+| Interview | Yes | CISO, Security GRC Lead |
 | Test | Yes | Validated risk scoring calculations in ServiceNow against methodology |
 
 ## Findings
@@ -47,8 +47,8 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Train all risk assessors on quantitative analysis criteria | Medium | GRC Manager |
-| 2 | Enforce required field completion in ServiceNow risk register | Low | GRC Manager |
+| 1 | Train all risk assessors on quantitative analysis criteria | Medium | Security GRC Lead |
+| 2 | Enforce required field completion in ServiceNow risk register | Low | Security GRC Lead |
 
 ## Related
 

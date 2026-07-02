@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-The GRC Manager is the designated C-SCRM lead, responsible for day-to-day vendor risk management operations. The CISO holds accountability for the overall C-SCRM program. A dedicated Third-Party Risk Analyst on the GRC team executes vendor assessments and monitoring. Roles, responsibilities, and escalation paths are documented in the Third Party Risk Management Policy and RACI matrix in ServiceNow.
+The Security GRC Lead is the designated C-SCRM lead, responsible for day-to-day vendor risk management operations. The CISO holds accountability for the overall C-SCRM program. A dedicated Third-Party Risk Analyst on the GRC team executes vendor assessments and monitoring. Roles, responsibilities, and escalation paths are documented in the Third Party Risk Management Policy and RACI matrix in ServiceNow.
 
 ## Artifacts
 

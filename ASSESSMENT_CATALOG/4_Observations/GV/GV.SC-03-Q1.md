@@ -47,7 +47,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Complete integrated control set documentation | High | GRC Manager |
+| 1 | Complete integrated control set documentation | High | Security GRC Lead |
 | 2 | Formalize C-SCRM improvement feedback loop to ERM process | Medium | CISO |
 
 ## Related

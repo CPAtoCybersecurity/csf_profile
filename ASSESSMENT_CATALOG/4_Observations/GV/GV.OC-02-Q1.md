@@ -46,7 +46,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Update stakeholder register quarterly | Medium | GRC Manager |
+| 1 | Update stakeholder register quarterly | Medium | Security GRC Lead |
 | 2 | Document partner ecosystem security expectations | Medium | CISO |
 
 ## Related

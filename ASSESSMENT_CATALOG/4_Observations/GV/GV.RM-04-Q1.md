@@ -46,7 +46,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Enforce all risk acceptances through ServiceNow workflow | High | GRC Manager |
+| 1 | Enforce all risk acceptances through ServiceNow workflow | High | Security GRC Lead |
 | 2 | Complete shared responsibility matrices for new cloud services | Medium | Security Engineering Lead |
 
 ## Related

@@ -47,7 +47,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Complete Board ratification of risk appetite in Q2 2026 | High | CISO |
-| 2 | Document at least two cases where tolerance thresholds drove decisions | Medium | GRC Manager |
+| 2 | Document at least two cases where tolerance thresholds drove decisions | Medium | Security GRC Lead |
 
 ## Related
 

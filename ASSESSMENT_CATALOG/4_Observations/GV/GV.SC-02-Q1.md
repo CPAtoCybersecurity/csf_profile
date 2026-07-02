@@ -10,14 +10,14 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed TPRM policy, RACI matrix, vendor contracts, information sharing protocols |
-| Interview | Yes | GRC Manager, Procurement Director, Legal Counsel |
+| Interview | Yes | Security GRC Lead, Procurement Director, Legal Counsel |
 | Test | No | N/A |
 
 ## Findings
 
 ### Strengths
 
-- C-SCRM roles documented in TPRM policy with designated GRC Manager as program lead
+- C-SCRM roles documented in TPRM policy with designated Security GRC Lead as program lead
 - RACI matrix maps activities across security, procurement, legal, and engineering
 - Supplier cybersecurity responsibilities defined in contractual agreements
 - Information sharing rules established with TLP classifications
@@ -34,7 +34,7 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
-**Scoring rationale:** Supplier cybersecurity roles score 6 — Optimized band — because the role framework operates consistently across all four functions in scope: the TPRM policy names the GRC Manager as program lead, the ServiceNow RACI matrix spans security, procurement, legal, and engineering, and all 5 sampled vendor contract addenda defined supplier responsibilities, with TLP-classified information sharing rules in place. The distance to Fully Optimized (7) is the absence of evidence that the framework is measured and improving: performance goals for C-SCRM roles are not consistently measured in reviews, and the information sharing protocols have never been exercised through a tabletop or simulation, so their real-world effectiveness is asserted rather than demonstrated.
+**Scoring rationale:** Supplier cybersecurity roles score 6 — Optimized band — because the role framework operates consistently across all four functions in scope: the TPRM policy names the Security GRC Lead as program lead, the ServiceNow RACI matrix spans security, procurement, legal, and engineering, and all 5 sampled vendor contract addenda defined supplier responsibilities, with TLP-classified information sharing rules in place. The distance to Fully Optimized (7) is the absence of evidence that the framework is measured and improving: performance goals for C-SCRM roles are not consistently measured in reviews, and the information sharing protocols have never been exercised through a tabletop or simulation, so their real-world effectiveness is asserted rather than demonstrated.
 
 ## Evidence Reviewed
 
@@ -48,7 +48,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Include C-SCRM performance metrics in GRC team reviews | Medium | CISO |
-| 2 | Test information sharing protocols in next tabletop exercise | Medium | GRC Manager |
+| 2 | Test information sharing protocols in next tabletop exercise | Medium | Security GRC Lead |
 
 ## Related
 

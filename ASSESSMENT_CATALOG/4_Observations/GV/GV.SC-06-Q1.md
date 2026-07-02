@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed due diligence records, vendor assessment reports, product integrity checks |
-| Interview | Yes | GRC Manager, Security Engineering Lead |
+| Interview | Yes | Security GRC Lead, Security Engineering Lead |
 | Test | Yes | Verified due diligence completion for 5 vendors onboarded in Q1 2026 |
 
 ## Findings
@@ -34,7 +34,7 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
-**Scoring rationale:** Due diligence rates a 6 — Optimized band — on the strength of clean execution plus active measurement: all 5 vendors onboarded in Q1 2026 completed tier-scaled due diligence before contract execution (zero deviations in the test sample), product authenticity is verified for critical software via hash checks and signature validation, and the GRC Manager tracks cycle time as a defined metric. That metric is what separates the score from Fully Optimized (7): completion averages 22 business days against a 15-day target, and the 7 anchor requires trend data showing effectiveness improving across periods — an off-target metric without a demonstrated improvement trend, plus unformalized hardware integrity checks, holds the control at 6.
+**Scoring rationale:** Due diligence rates a 6 — Optimized band — on the strength of clean execution plus active measurement: all 5 vendors onboarded in Q1 2026 completed tier-scaled due diligence before contract execution (zero deviations in the test sample), product authenticity is verified for critical software via hash checks and signature validation, and the Security GRC Lead tracks cycle time as a defined metric. That metric is what separates the score from Fully Optimized (7): completion averages 22 business days against a 15-day target, and the 7 anchor requires trend data showing effectiveness improving across periods — an off-target metric without a demonstrated improvement trend, plus unformalized hardware integrity checks, holds the control at 6.
 
 ## Evidence Reviewed
 
@@ -47,7 +47,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Streamline due diligence process to meet 15-day SLA | Medium | GRC Manager |
+| 1 | Streamline due diligence process to meet 15-day SLA | Medium | Security GRC Lead |
 | 2 | Formalize hardware integrity verification procedures | Low | Security Engineering Lead |
 
 ## Related

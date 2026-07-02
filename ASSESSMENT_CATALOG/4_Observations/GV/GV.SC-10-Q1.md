@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed offboarding procedures, EOL tracker, access revocation records, data destruction certs |
-| Interview | Yes | GRC Manager, Identity Management Lead |
+| Interview | Yes | Security GRC Lead, Identity Management Lead |
 | Test | Yes | Verified access revocation and data destruction for 2 recently terminated vendor relationships |
 
 ## Findings
@@ -49,8 +49,8 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Add API key and service account sweep to offboarding checklist | High | Identity Management Lead |
-| 2 | Require documented data leakage risk assessment for all terminations | High | GRC Manager |
-| 3 | Create Tier 1 vendor transition plan template | Medium | GRC Manager |
+| 2 | Require documented data leakage risk assessment for all terminations | High | Security GRC Lead |
+| 3 | Create Tier 1 vendor transition plan template | Medium | Security GRC Lead |
 
 ## Related
 

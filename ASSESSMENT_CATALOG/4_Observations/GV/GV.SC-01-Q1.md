@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed C-SCRM strategy, program plan, policies, ServiceNow workflows |
-| Interview | Yes | CISO, GRC Manager, Procurement Director |
+| Interview | Yes | CISO, Security GRC Lead, Procurement Director |
 | Test | Yes | Tested vendor intake workflow in ServiceNow |
 
 ## Findings
@@ -48,7 +48,7 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Conduct annual C-SCRM strategy review in Q2 2026 | High | CISO |
-| 2 | Implement maturity model scoring for program progress | Medium | GRC Manager |
+| 2 | Implement maturity model scoring for program progress | Medium | Security GRC Lead |
 
 ## Related
 

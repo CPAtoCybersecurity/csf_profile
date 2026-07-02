@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed vendor monitoring dashboards, compliance evidence, business continuity plans |
-| Interview | Yes | GRC Manager, Third-Party Risk Analyst |
+| Interview | Yes | Security GRC Lead, Third-Party Risk Analyst |
 | Test | Yes | Verified monitoring alert triggers for 3 Tier 1 vendors |
 
 ## Findings

@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-The GRC Manager and Third-Party Risk Analyst job descriptions explicitly include C-SCRM responsibilities and performance metrics (vendor assessment completion rates, assessment cycle times). Procurement team descriptions include requirements to follow the vendor security assessment process. Performance against C-SCRM objectives is evaluated in annual reviews and tied to individual goals.
+The Security GRC Lead and Third-Party Risk Analyst job descriptions explicitly include C-SCRM responsibilities and performance metrics (vendor assessment completion rates, assessment cycle times). Procurement team descriptions include requirements to follow the vendor security assessment process. Performance against C-SCRM objectives is evaluated in annual reviews and tied to individual goals.
 
 ## Artifacts
 

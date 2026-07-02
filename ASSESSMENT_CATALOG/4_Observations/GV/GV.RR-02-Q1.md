@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed policy role definitions, RACI matrix, job descriptions, performance goals |
-| Interview | Yes | CISO, HR Director, GRC Manager |
+| Interview | Yes | CISO, HR Director, Security GRC Lead |
 | Test | Yes | Verified RACI matrix coverage against actual team activities |
 
 ## Findings
@@ -47,7 +47,7 @@
 
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
-| 1 | Update RACI matrix to reflect current team structure | High | GRC Manager |
+| 1 | Update RACI matrix to reflect current team structure | High | Security GRC Lead |
 | 2 | Add cybersecurity metrics to department head performance reviews | Medium | HR Director |
 
 ## Related
