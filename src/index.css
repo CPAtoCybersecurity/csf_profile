@@ -1512,3 +1512,264 @@ nav a:active { text-decoration: none !important; }
   opacity: 0.4;
   cursor: not-allowed;
 }
+
+/* ==========================================================================
+   Issue #241 — Missing utilities, keyboard-shortcuts overlay, kbd hints,
+   responsive navigation. Uses CSS variables so light/dark theming is automatic.
+   ========================================================================== */
+
+/* --- Missing utility classes (hand-rolled utility layer had no equivalents) --- */
+.overflow-x-auto { overflow-x: auto; }
+.overflow-y-auto { overflow-y: auto; }
+.hidden { display: none; }
+.gap-y-2 { row-gap: 0.5rem; }
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* --- <kbd> chips (status bar hints + overlay) --- */
+.terminal-kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  padding: 0 5px;
+  height: 16px;
+  line-height: 14px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  white-space: nowrap;
+}
+
+/* --- Compact keyboard hints inside the terminal status bar --- */
+.terminal-statusbar-kbdhints {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0 2px;
+  outline: none;
+}
+.terminal-statusbar-kbdhints .terminal-kbd {
+  height: 14px;
+  line-height: 12px;
+}
+.terminal-statusbar-kbdhints .terminal-statusbar-kbdlabel {
+  color: #8a8a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.dark .terminal-statusbar-kbdhints .terminal-statusbar-kbdlabel { color: var(--text-faint); }
+.terminal-statusbar-kbdhints:hover .terminal-statusbar-kbdlabel { color: var(--accent); }
+
+/* --- Keyboard-shortcuts overlay modal --- */
+.kbd-overlay-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.6);
+}
+.dark .kbd-overlay-backdrop { background: rgba(0, 0, 0, 0.78); }
+
+.kbd-overlay-panel {
+  width: 100%;
+  max-width: 720px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  font-family: var(--font-mono);
+  box-shadow: none;
+}
+.kbd-overlay-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-header);
+  color: #f5f1e8;
+  position: sticky;
+  top: 0;
+}
+.dark .kbd-overlay-header { color: var(--accent); }
+.kbd-overlay-title {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+.kbd-overlay-title::before { content: '█ '; }
+.kbd-overlay-close {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 8px;
+  cursor: pointer;
+  border-radius: 0;
+  line-height: 16px;
+}
+.kbd-overlay-close:hover { background: var(--accent); color: var(--bg-primary); }
+
+.kbd-overlay-body { padding: 8px 16px 16px; }
+.kbd-overlay-group { margin-top: 14px; }
+.kbd-overlay-group-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+}
+.kbd-overlay-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 5px 0;
+  font-size: 12px;
+}
+.kbd-overlay-row-desc {
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 11px;
+}
+.kbd-overlay-row-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.kbd-overlay-plus { color: var(--text-faint); font-size: 10px; }
+.kbd-overlay-or {
+  color: var(--text-faint);
+  font-size: 10px;
+  text-transform: uppercase;
+  padding: 0 2px;
+}
+.kbd-overlay-footer {
+  margin-top: 16px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  font-size: 10px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* --- Responsive navigation: hamburger below 1200px --- */
+.terminal-nav-desktop { display: flex; align-items: center; }
+.terminal-nav-mobile { display: none; position: relative; }
+
+.terminal-nav-hamburger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: color 0.1s, border-color 0.1s;
+}
+.terminal-nav-hamburger:hover,
+.terminal-nav-hamburger[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.terminal-nav-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 120;
+  min-width: 240px;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  border: 1px solid var(--accent);
+  border-radius: 0;
+  padding: 6px;
+  font-family: var(--font-mono);
+}
+.terminal-nav-menu-group + .terminal-nav-menu-group {
+  margin-top: 4px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 4px;
+}
+.terminal-nav-menu-group-title {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-faint);
+  padding: 4px 8px 2px;
+}
+.terminal-nav-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: color 0.1s, background-color 0.1s, border-color 0.1s;
+}
+.terminal-nav-menu-item:hover {
+  background: var(--bg-secondary);
+  color: var(--accent);
+}
+.terminal-nav-menu-item.is-active {
+  color: var(--accent);
+  border-left-color: var(--accent);
+  background: var(--bg-secondary);
+}
+
+@media (max-width: 1199px) {
+  .terminal-nav-desktop { display: none; }
+  .terminal-nav-mobile { display: inline-flex; }
+}

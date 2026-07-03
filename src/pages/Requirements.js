@@ -497,8 +497,9 @@ const Requirements = () => {
         </div>
       )}
 
-      {/* Table */}
-      <div className="flex-1 overflow-auto">
+      {/* Table — the scroll container contains both axes; the table's minWidth
+          lets it scroll horizontally on narrow screens instead of squishing. */}
+      <div className="flex-1 overflow-auto overflow-x-auto">
         {filteredData.length === 0 ? (
           requirements.length === 0 ? (
             <EmptyTableState
@@ -512,7 +513,7 @@ const Requirements = () => {
             />
           )
         ) : (
-          <table className="table-professional min-w-full bg-white dark:bg-gray-900" style={{ borderSpacing: 0 }}>
+          <table className="table-professional min-w-full bg-white dark:bg-gray-900" style={{ borderSpacing: 0, minWidth: '1024px' }}>
             <thead className="sticky top-0 z-10">
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-300 dark:border-gray-600">
                 {/* Checkbox column */}
@@ -673,7 +674,7 @@ const Requirements = () => {
 
       {/* Pagination */}
       {filteredData.length > 0 && (
-        <div className="flex items-center justify-between bg-white dark:bg-gray-900 px-4 py-2 border-t border-gray-200 dark:border-gray-700">
+        <div className="flex flex-wrap gap-y-2 items-center justify-between bg-white dark:bg-gray-900 px-4 py-2 border-t border-gray-200 dark:border-gray-700">
           <div className="flex items-center gap-4">
             <p className="text-sm text-gray-600 dark:text-gray-300">
               Showing <span className="font-medium">{(currentPage - 1) * itemsPerPage + 1}</span> to{' '}
