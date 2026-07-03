@@ -1,7 +1,0 @@
-# PR.AA-03
-
-Description: Users, services, and hardware are authenticated
-Function: PR (../functions/PR%20364de7cda7a7817a8e66de4734737f14.md)
-Target Score: 5
-Score: 3.6
-Category: Identity Management, Authentication, and Access Control (../categories/Identity%20Management,%20Authentication,%20and%20Access%20Co%20364de7cda7a781d7901adae8206f8bc3.md)
