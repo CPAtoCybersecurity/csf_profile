@@ -70,12 +70,14 @@ const EmptyState = ({
 
   const sizes = sizeClasses[size];
 
-  const primaryBtnClass =
-    'inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2';
+  // Terminal design system: square, monospace, accent-bordered button that
+  // inverts on hover. `.btn-terminal` self-themes (blue accent in light mode,
+  // green in dark) via CSS custom properties, matching TerminalStatusBar chrome.
+  const primaryBtnClass = 'btn-terminal';
 
   return (
     <div className={`flex flex-col items-center justify-center text-center ${sizes.container} ${className}`}>
-      <div className="mb-4 p-4 rounded-full bg-gray-100 dark:bg-gray-800">
+      <div className="mb-4 p-4 border border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
         <Icon
           size={sizes.icon}
           className="text-gray-400 dark:text-gray-500"
@@ -84,13 +86,13 @@ const EmptyState = ({
       </div>
 
       {title && (
-        <h3 className={`font-semibold text-gray-700 dark:text-gray-200 mb-2 ${sizes.title}`}>
+        <h3 className={`font-mono font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-200 mb-2 ${sizes.title}`}>
           {title}
         </h3>
       )}
 
       {description && (
-        <p className={`text-gray-500 dark:text-gray-400 max-w-md mb-4 ${sizes.description}`}>
+        <p className={`font-mono text-gray-500 dark:text-gray-400 max-w-md mb-4 ${sizes.description}`}>
           {description}
         </p>
       )}
@@ -116,7 +118,7 @@ const EmptyState = ({
           {secondaryAction && (
             <button
               onClick={secondaryAction}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-lg transition-colors"
+              className="btn-terminal"
             >
               {secondaryActionLabel}
             </button>
