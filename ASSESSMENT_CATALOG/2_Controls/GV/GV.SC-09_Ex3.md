@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-The GRC Manager and security operations team hold bi-weekly syncs to discuss vendor-related security requirements, emerging supply chain risks, and operational needs. Supply chain security topics are a standing agenda item in the monthly security committee meeting. The C-SCRM committee bridges risk management and operations through monthly meetings that address vendor onboarding pipeline, assessment status, and operational security requirements.
+The Security GRC Lead and security operations team hold bi-weekly syncs to discuss vendor-related security requirements, emerging supply chain risks, and operational needs. Supply chain security topics are a standing agenda item in the monthly security committee meeting. The C-SCRM committee bridges risk management and operations through monthly meetings that address vendor onboarding pipeline, assessment status, and operational security requirements.
 
 ## Artifacts
 

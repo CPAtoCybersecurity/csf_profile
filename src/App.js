@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
-// Components
+// Components (eager — part of the always-visible shell)
 import Navigation from './components/Navigation';
 import ErrorBoundary from './components/ErrorBoundary';
 import AutoSaveIndicator from './components/AutoSaveIndicator';
@@ -11,19 +11,8 @@ import ThemeToggle from './components/ThemeToggle';
 import FirstVisitWarning from './components/FirstVisitWarning';
 import BackupReminder from './components/BackupReminder';
 import TerminalStatusBar from './components/TerminalStatusBar';
-
-// Pages - New Architecture
-import Requirements from './pages/Requirements';
-import UserControls from './pages/UserControls';
-import Assessments from './pages/Assessments';
-import Dashboard from './pages/Dashboard';
-import UserManagement from './pages/UserManagement';
-import ScoringLegend from './pages/ScoringLegend';
-import Artifacts from './pages/Artifacts';
-import Settings from './pages/Settings';
-import AIAssistant from './pages/AIAssistant';
-import Findings from './pages/Findings';
-import AuditLog from './pages/AuditLog';
+import KeyboardShortcutsOverlay from './components/KeyboardShortcutsOverlay';
+import { SkeletonTable } from './components/SkeletonLoader';
 
 // Hooks
 import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
@@ -37,6 +26,29 @@ import useAssessmentsStore from './stores/assessmentsStore';
 import { shouldShowBackupReminder, updateLastReminderDate, isFirstVisit } from './utils/backupTracking';
 import { checkEnvironmentVariables } from './utils/envValidation';
 import { initializeEntryIdMappings, loadConfluenceConfig } from './utils/confluenceSync';
+
+// Pages - New Architecture (code-split via React.lazy to shrink the initial
+// bundle; each route now loads its own chunk on demand).
+const Requirements = lazy(() => import('./pages/Requirements'));
+const UserControls = lazy(() => import('./pages/UserControls'));
+const Assessments = lazy(() => import('./pages/Assessments'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const UserManagement = lazy(() => import('./pages/UserManagement'));
+const ScoringLegend = lazy(() => import('./pages/ScoringLegend'));
+const Artifacts = lazy(() => import('./pages/Artifacts'));
+const Settings = lazy(() => import('./pages/Settings'));
+const AIAssistant = lazy(() => import('./pages/AIAssistant'));
+const Findings = lazy(() => import('./pages/Findings'));
+const AuditLog = lazy(() => import('./pages/AuditLog'));
+
+// Lightweight fallback shown while a route chunk loads or its store hydrates.
+const RouteFallback = () => (
+  <div className="flex flex-col h-full">
+    <div className="flex-1 overflow-auto">
+      <SkeletonTable rows={10} columns={8} hasCheckbox hasRowNumber />
+    </div>
+  </div>
+);
 
 const AppContent = () => {
   const loadRequirements = useRequirementsStore((state) => state.loadInitialData);
@@ -145,24 +157,29 @@ const AppContent = () => {
 
         {/* Main content */}
         <main className="flex-1 overflow-hidden">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/requirements" element={<Requirements />} />
-            <Route path="/controls" element={<UserControls />} />
-            <Route path="/assessments" element={<Assessments />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/scoring" element={<ScoringLegend />} />
-            <Route path="/artifacts" element={<Artifacts />} />
-            <Route path="/findings" element={<Findings />} />
-            <Route path="/users" element={<UserManagement />} />
-            <Route path="/history" element={<AuditLog />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/ai-assistant" element={<AIAssistant />} />
-          </Routes>
+          <Suspense fallback={<RouteFallback />}>
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/requirements" element={<Requirements />} />
+              <Route path="/controls" element={<UserControls />} />
+              <Route path="/assessments" element={<Assessments />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/scoring" element={<ScoringLegend />} />
+              <Route path="/artifacts" element={<Artifacts />} />
+              <Route path="/findings" element={<Findings />} />
+              <Route path="/users" element={<UserManagement />} />
+              <Route path="/history" element={<AuditLog />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/ai-assistant" element={<AIAssistant />} />
+            </Routes>
+          </Suspense>
         </main>
       </div>
     </div>
     
+    {/* Global keyboard-shortcuts overlay (opens on '?') */}
+    <KeyboardShortcutsOverlay />
+
     {/* First Visit Warning Modal - Rendered outside main container */}
     <FirstVisitWarning />
     

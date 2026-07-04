@@ -12,7 +12,7 @@ This test procedure covers Alma Security's capability to analyze potentially adv
 - **Endpoints:** SentinelOne EDR detections and Deep Visibility queries
 - **Email:** O365 Advanced Threat Protection alerts
 - **Manual review scope:** Slack workspace audit logs, physical badge reader logs, SaaS admin consoles not covered by automated monitoring
-- **Personnel:** SOC team (Detection & Response, led by Nadia Khan), SOC Manager (Gerry), SOC analysts (Jane, John), auditor (Steve)
+- **Personnel:** SOC team (Detection & Response, led by Nadia Khan), SOC Manager (Gerry Callahan), SOC analysts (Jane Alvarez, John Tran). Assessors are not scoped personnel — see the [Independence Statement](../../0_Methodology/Scoring-Rubric-and-Methodology.md#6-independence-statement)
 
 Systems out of scope: on-premises Windows domain controller logs are monitored separately under DE.CM and are not part of the SIEM-like analysis workflow assessed here.
 

@@ -1,60 +1,20 @@
 # Observations
 
-Assessment findings per subcategory per quarter. Each observation documents what the assessor found during testing, the resulting score, and any identified gaps.
+Assessment findings per subcategory per quarter. Each observation documents what the assessor found during testing, the resulting score with a rubric-anchored rationale, and any identified gaps.
 
 ## Template
 
-```markdown
-# {Subcategory ID}: {Subcategory Description} — {Quarter} {Year} Observation
+The canonical structure — including the slot rules and the anti-boilerplate requirements — lives in [`0_Methodology/Observation-Template.md`](../0_Methodology/Observation-Template.md). Author every new observation from that template; [DE.AE-07-Q1.md](DE/DE.AE-07-Q1.md) is the reference exemplar.
 
-**Assessment:** {Assessment name}
-**Assessor:** {Name and email}
-**Observation Date:** {YYYY-MM-DD}
-**Testing Status:** {Not Started | In Progress | Complete}
+Quick reference (see the template for full slot rules):
 
-## Testing Methods
-
-| Method | Performed | Notes |
-|--------|-----------|-------|
-| Examine | {Yes/No} | {What was examined} |
-| Interview | {Yes/No} | {Who was interviewed} |
-| Test | {Yes/No} | {What was tested} |
-
-## Findings
-
-{Narrative summary of what was observed during the assessment period.}
-
-### Strengths
-- {What is working well}
-
-### Gaps
-- {What is missing or insufficient}
-
-## Score
-
-| Metric | Value |
-|--------|-------|
-| Actual Score | {0-10} |
-| Target Score | {0-10} |
-| Previous Quarter | {0-10 or N/A} |
-| Trend | {Improving / Stable / Declining} |
-
-## Evidence Reviewed
-
-- {List of artifacts and evidence examined}
-
-## Recommendations
-
-| # | Recommendation | Priority | Owner |
-|---|---------------|----------|-------|
-| 1 | {Action} | {High/Medium/Low} | {Name} |
-
-## Related
-
-- **Test Procedure:** [../../3_Test_Procedures/{Function}/{Subcategory-ID}.md]
-- **Controls:** [../../2_Controls/{Function}/{Subcategory-ID}_Ex{N}.md]
-- **Artifacts:** {Links to specific artifacts reviewed}
-```
+- Header block: `**Assessment:** 2026 Alma Security CSF Assessment`, `**Assessor:**` (a named Internal Audit member per the [Independence Statement](../0_Methodology/Scoring-Rubric-and-Methodology.md#6-independence-statement)), `**Observation Date:**`, `**Testing Status:**`
+- `## Testing Methods` — Examine / Interview / Test table with file-specific notes
+- `## Findings` with `### Strengths` and `### Gaps`
+- `## Score` — Actual / Target / Previous Quarter / Trend, followed by a `**Scoring rationale:**` tied to the [Scoring Rubric](../0_Methodology/Scoring-Rubric-and-Methodology.md) band anchors
+- `## Evidence Reviewed` — artifacts that exist in `5_Artifacts/`
+- `## Recommendations` — actionable, prioritized, management-owned
+- `## Related` — resolving links to the test procedure, controls, and artifacts
 
 ## File Naming
 

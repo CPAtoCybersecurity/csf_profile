@@ -20,8 +20,8 @@ All company names, individuals, findings, scores, and data presented herein are 
 |---|---|
 | **Prepared For:** | Board of Directors and Audit Committee |
 | **Prepared By:** | Internal Audit Department |
-| **Lead Assessor:** | Steve M |
-| **Quality Reviewer:** | Jane Doe |
+| **Lead Assessor:** | Steve Mercer, Director, Internal Audit |
+| **Quality Reviewer:** | Dana Whitfield |
 | **Report Status:** | Final |
 
 ---
@@ -51,7 +51,7 @@ Based on our assessment of 40 control implementations across all six NIST CSF 2.
 - **Controls Assessed:** 40
 - **Controls Below Target:** 13 of 40
 - **Overall Average Score:** 5.0 / 10.0 (target: 5.0)
-- **Overall Maturity Level:** Some Security
+- **Overall Maturity Level:** Minimally Acceptable
 - **Evidence Coverage:** 85.0% of controls have linked artifacts
 
 ### Opinion Determination
@@ -74,7 +74,7 @@ The overall assessment rating is determined by function-level ratings and findin
 
 | Metric | Value |
 |---|---|
-| **Overall Maturity Score** | 5.0 / 10.0 (Some Security) |
+| **Overall Maturity Score** | 5.0 / 10.0 (Minimally Acceptable) |
 | **Controls Meeting Target** | 27 of 40 (68%) |
 | **Controls Below Target** | 13 of 40 |
 | **Critical Findings** | 0 |
@@ -123,7 +123,7 @@ This assessment evaluated Alma Security's implementation of the NIST Cybersecuri
 
 ### Scoring Framework
 
-Controls were evaluated on a 1-10 scale. See [Appendix B](#appendix-b-assessment-criteria-and-rating-definitions) for full scoring definitions.
+Controls were evaluated on the 0–10 scale defined in the [Scoring Rubric and Methodology](../0_Methodology/Scoring-Rubric-and-Methodology.md). See [Appendix B](#appendix-b-assessment-criteria-and-rating-definitions) for full scoring definitions.
 
 ### Methodology
 
@@ -138,13 +138,13 @@ Assessment procedures included:
 
 ### Current Maturity Profile
 
-The organization's overall cybersecurity maturity is assessed at **Some Security** (5.0 / 10.0).
+The organization's overall cybersecurity maturity is assessed at **Minimally Acceptable** (5.0 / 10.0).
 
 | Dimension | Average Score | Maturity Level |
 |---|---|---|
 | Governance (GV) | 5.9 | Minimally Acceptable |
 | Operations (ID, PR, DE, RS, RC) | 4.5 | Some Security |
-| **Overall** | **5.0** | **Some Security** |
+| **Overall** | **5.0** | **Minimally Acceptable** |
 
 ### Governance vs Operations Gap Analysis
 
@@ -373,16 +373,16 @@ Management should prioritize remediation of identified findings in accordance wi
 | **Needs Improvement** | Function average score is at least 70% of the target but below full target. Controls are partially effective with identified gaps. |
 | **Unsatisfactory** | Function average score is below 70% of the target. Controls have significant deficiencies requiring immediate attention. |
 
-### Scoring Scale (1-10)
+### Scoring Scale (0–10)
 
 | Score | Level | How Secure? |
 |---|---|---|
 | 0 - 1.9 | Insecurity | Organization rarely or never does this. Not enough security. |
 | 2.0 - 4.9 | Some Security | Organization sometimes does this, but unreliably. Rework is common. Not enough security. |
 | 5.0 - 5.9 | Minimally Acceptable | Organization does this consistently, with some minor flaws. Just right. |
-| 6.1 - 6.9 | Optimized | Organization does this consistently, with great effectiveness and high quality. Just right. |
+| 6.0 - 6.9 | Optimized | Organization does this consistently, with great effectiveness and high quality. Just right. |
 | 7.0 - 7.9 | Fully Optimized | Organization does this consistently, with fully optimized effectiveness and quality. Just right. |
-| 8.1 - 10.0 | Too Much Security (Waste) | Organization does this at excessive financial cost. People can't easily get their work done. |
+| 8.0 - 10.0 | Too Much Security (Waste) | Organization does this at excessive financial cost. People can't easily get their work done. |
 
 ---
 
@@ -392,8 +392,8 @@ Management should prioritize remediation of identified findings in accordance wi
 |---|---|
 | **Prepared For** | Board of Directors and Audit Committee |
 | **Prepared By** | Internal Audit Department |
-| **Lead Assessor** | Steve M |
-| **Quality Reviewer** | Jane Doe |
+| **Lead Assessor** | Steve Mercer, Director, Internal Audit |
+| **Quality Reviewer** | Dana Whitfield |
 
 ---
 

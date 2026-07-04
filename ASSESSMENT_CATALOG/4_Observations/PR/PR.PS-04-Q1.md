@@ -1,8 +1,8 @@
 # PR.PS-04: Log Record Generation and Monitoring - Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -50,6 +50,8 @@
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** The 4 places logging and monitoring in the Some Security band: generation and alerting execute regularly in AWS — CloudTrail across all accounts with 12-month online retention, GuardDuty findings routed through Security Hub to PagerDuty, and 25 custom CloudWatch alarms on high-value events like root usage and IAM changes, verified across 10 log source types — but coverage of the full scope is materially incomplete. On-premises systems (Windows DC, legacy fileserver) sit on a local syslog server outside the monitoring workflow, there is no SIEM or cross-source correlation, and monitoring is business-hours only with on-call limited to critical alerts. Minimally Acceptable (5.0) requires the monitoring process to execute consistently across the whole environment, not just the AWS estate — closing the on-premises integration gap is the specific distance to that band.
+
 ---
 
 ## Evidence Reviewed
@@ -76,3 +78,8 @@
 | 4 | Develop platform-specific logging configuration standards (Windows Event IDs, auditd rules, K8s audit policy) | Medium | Nadia Khan |
 | 5 | Define application-layer security logging requirements and integrate into development standards | Medium | Nadia Khan |
 | 6 | Initiate quarterly threat hunting exercises using existing CloudWatch Logs Insights | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [PR.PS-04 Test Procedures](../../3_Test_Procedures/PR/PR.PS-04.md)
+- **Controls:** [PR.PS-04_Ex1](../../2_Controls/PR/PR.PS-04_Ex1.md), [PR.PS-04_Ex2](../../2_Controls/PR/PR.PS-04_Ex2.md), [PR.PS-04_Ex3](../../2_Controls/PR/PR.PS-04_Ex3.md)

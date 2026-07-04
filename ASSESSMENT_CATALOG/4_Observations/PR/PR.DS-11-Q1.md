@@ -1,8 +1,8 @@
 # PR.DS-11: Backup Management -- Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -53,6 +53,8 @@
 | Actual Score | 5 |
 | Target Score | 7 |
 
+**Scoring rationale:** At 5, backup management sits in the Minimally Acceptable band: daily automated backups run for every critical system (RDS with 35-day retention and point-in-time recovery, Velero nightly for Kubernetes volumes, Windows DC), the 30-day RDS log sample showed zero failures, encryption is enforced on every platform, and the Q4 2025 quarterly restore test recovered PostgreSQL in 45 minutes — consistent full-scope execution with known, tracked exceptions like the in-progress S3 Object Lock rollout. It stops short of Optimized (6.0) because monitoring is not measured or acted on systematically: backup-failure detection relies on manual log review with no automated alerting, and RTO/RPO targets remain informal and unapproved by business stakeholders, so there are no agreed indicators against which the owner can manage drift.
+
 ---
 
 ## Evidence Reviewed
@@ -84,3 +86,8 @@
 | 6 | Automate on-premises backup replication to AWS with failure alerting | Medium | Tigan Wang |
 | 7 | Plan and execute full-environment DR recovery test once DR plan is completed | Medium | Tigan Wang |
 | 8 | Include cross-region restore test in quarterly testing program | Low | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.DS-11 Test Procedures](../../3_Test_Procedures/PR/PR.DS-11.md)
+- **Controls:** [PR.DS-11_Ex1](../../2_Controls/PR/PR.DS-11_Ex1.md), [PR.DS-11_Ex2](../../2_Controls/PR/PR.DS-11_Ex2.md), [PR.DS-11_Ex3](../../2_Controls/PR/PR.DS-11_Ex3.md), [PR.DS-11_Ex4](../../2_Controls/PR/PR.DS-11_Ex4.md)

@@ -17,6 +17,17 @@
 
 import { getErrorStatus, sanitizeErrorResponse } from "../utils/errorUtils.js";
 
+// GET /api/ai/status — capability probe for the frontend.
+// Returns a configured flag + model name only; never any key material.
+export const getAIStatus = (req, res) => {
+  res.json({
+    claude: {
+      configured: !!process.env.CLAUDE_API_KEY,
+      model: process.env.CLAUDE_MODEL || "claude-sonnet-4-20250514"
+    }
+  });
+};
+
 export const handleClaudeRequest = async (req, res) => {
   try {
     const { prompt, maxTokens = 2500 } = req.body;

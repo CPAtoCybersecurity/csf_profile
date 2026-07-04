@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-Security KPIs (TTD 7hrs, TTI 11hrs, TTR-CJC 6 days, TTR-C 9 days) are reviewed monthly by the security team and quarterly by the Board. KPI targets are set annually and performance against targets drives policy and procedure adjustments. The Splunk SIEM dashboard provides real-time KPI visibility to the security operations team.
+Security KPIs (TTD 7hrs, TTI 11hrs, TTR-CJC 6 days, TTR-C 9 days) are reviewed monthly by the security team and quarterly by the Board. KPI targets are set annually and performance against targets drives policy and procedure adjustments. AWS-native monitoring dashboards (CloudTrail, GuardDuty) provide real-time KPI visibility to the security operations team.
 
 ## Artifacts
 

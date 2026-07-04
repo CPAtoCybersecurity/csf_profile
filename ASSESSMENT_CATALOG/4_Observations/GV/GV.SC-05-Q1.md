@@ -1,7 +1,7 @@
 # GV.SC-05: Supply Chain Contractual Requirements — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-14
 **Testing Status:** Complete
 
@@ -10,7 +10,7 @@
 | Method | Performed | Notes |
 |--------|-----------|-------|
 | Examine | Yes | Reviewed vendor contracts, security addenda, SLA definitions, SBOM requirements |
-| Interview | Yes | Legal Counsel, GRC Manager, Procurement Director |
+| Interview | Yes | Legal Counsel, Security GRC Lead, Procurement Director |
 | Test | Yes | Sampled 10 vendor contracts for security clause completeness |
 
 ## Findings
@@ -34,6 +34,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** Contractual requirements score 6, in the Optimized band: standardized security addenda with tiered requirements apply to current contracting, SLAs for vulnerability remediation, incident notification, and compliance reporting give the control measurable teeth, and the SBOM collection tracker provides ongoing measurement. The two deviations in the sample — 2 of 10 contracts missing complete addenda — are known, bounded legacy exceptions (pre-template contracts from 2024) with a remediation path at renewal, consistent with tracked-exception treatment rather than unreliable execution. The score stops short of Fully Optimized (7) because coverage is still expanding rather than demonstrably improving on trend: SBOM requirements bind only vendors onboarded after Q3 2025, leaving the earlier vendor base contractually unmeasured.
+
 ## Evidence Reviewed
 
 - Vendor contract security addenda template
@@ -46,4 +48,9 @@
 | # | Recommendation | Priority | Owner |
 |---|----------------|----------|-------|
 | 1 | Remediate pre-template contracts at renewal with current security addenda | High | Legal Counsel |
-| 2 | Extend SBOM requirements to all Tier 1 vendors regardless of onboarding date | Medium | GRC Manager |
+| 2 | Extend SBOM requirements to all Tier 1 vendors regardless of onboarding date | Medium | Security GRC Lead |
+
+## Related
+
+- **Test Procedure:** [GV.SC-05 Test Procedures](../../3_Test_Procedures/GV/GV.SC-05.md)
+- **Controls:** [GV.SC-05_Ex1](../../2_Controls/GV/GV.SC-05_Ex1.md), [GV.SC-05_Ex2](../../2_Controls/GV/GV.SC-05_Ex2.md), [GV.SC-05_Ex3](../../2_Controls/GV/GV.SC-05_Ex3.md), [GV.SC-05_Ex4](../../2_Controls/GV/GV.SC-05_Ex4.md), [GV.SC-05_Ex5](../../2_Controls/GV/GV.SC-05_Ex5.md), [GV.SC-05_Ex6](../../2_Controls/GV/GV.SC-05_Ex6.md), [GV.SC-05_Ex7](../../2_Controls/GV/GV.SC-05_Ex7.md), [GV.SC-05_Ex8](../../2_Controls/GV/GV.SC-05_Ex8.md), [GV.SC-05_Ex9](../../2_Controls/GV/GV.SC-05_Ex9.md)

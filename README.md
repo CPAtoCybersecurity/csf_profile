@@ -51,7 +51,7 @@ Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's t
 
 > **👆 Watch the overview** with G Mark Hardy.
 
-[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/07-app-dashboard-radar.png)](https://app.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG)
+[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/excalidraw-walkthrough.png)](https://app.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG)
 
 > **👆 Click the image above** to check out the walkthrough on Excalidraw.
 
@@ -68,7 +68,7 @@ Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's t
     <td align="center" width="25%"><a href="public/screenshots/05-notion-and-excel-templates.png"><img src="public/screenshots/05-notion-and-excel-templates.png" width="100%"></a><br><sub><b>Notion &amp; Excel Templates</b></sub></td>
     <td align="center" width="25%"><a href="public/screenshots/06-app-scoring-legend.png"><img src="public/screenshots/06-app-scoring-legend.png" width="100%"></a><br><sub><b>Scoring Legend</b></sub></td>
     <td align="center" width="25%"><a href="public/screenshots/07-app-dashboard-radar.png"><img src="public/screenshots/07-app-dashboard-radar.png" width="100%"></a><br><sub><b>Dashboard &amp; Radar</b></sub></td>
-    <td align="center" width="25%"><a href="public/screenshots/08-app-investment-priorities.png"><img src="public/screenshots/08-app-investment-priorities.png" width="100%"></a><br><sub><b>Investment Priorities</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/08-app-investment-priorities.png"><img src="public/screenshots/08-app-investment-priorities.png" width="100%"></a><br><sub><b>Priority Gaps</b></sub></td>
   </tr>
 </table>
 
@@ -223,6 +223,15 @@ The application supports integration with JIRA and Confluence for enhanced track
    - `REACT_APP_CONFLUENCE_API_TOKEN` - Your Confluence API token
 
 3. **Generate API tokens** at: https://id.atlassian.com/manage-profile/security/api-tokens
+
+#### Claude AI Assistant (server-side key)
+
+The AI Assistant's Claude integration is configured **on the backend only** — the browser never sees or stores the API key:
+
+- `CLAUDE_API_KEY` - Your Anthropic API key (used by the backend proxy at `/api/ai/claude`)
+- `CLAUDE_MODEL` - Optional model override (defaults to `claude-sonnet-4-20250514`)
+
+Set these in the backend environment (or `.env`) and restart the server. The frontend shows a "Ready" badge when the key is configured (via `GET /api/ai/status`, which returns a boolean only). Without a key, Claude requests return a mock response so local development still works.
 
 #### Windows-Specific Instructions
 

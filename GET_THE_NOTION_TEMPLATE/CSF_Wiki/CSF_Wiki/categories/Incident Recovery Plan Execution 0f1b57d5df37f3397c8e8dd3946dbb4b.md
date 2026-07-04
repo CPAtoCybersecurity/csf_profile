@@ -1,0 +1,8 @@
+# Incident Recovery Plan Execution
+
+ID: RC.RP
+Description: Restoration activities are performed to ensure operational availability of systems and services affected by cybersecurity incidents
+Function: RC (../functions/RC%205e0bab02a559f214f918f2f3c30ed235.md)
+Actual Score: 0.9166666666666666
+Target Score: 0.8333333333333334
+subcategories: RC.RP-03 (../subcategories/RC%20RP-03%2075b98e6a71b242497e892bc109bf4f11.md), RC.RP-01 (../subcategories/RC%20RP-01%20d32592a5907b893099fe68e9844bcd85.md), RC.RP-02 (../subcategories/RC%20RP-02%20783d220cd373572f61755450e05d7abb.md), RC.RP-04 (../subcategories/RC%20RP-04%20eaea933178276a73f865c1cae7f8cedf.md), RC.RP-05 (../subcategories/RC%20RP-05%20fc45785707368f569954fd83cb4627da.md), RC.RP-06 (../subcategories/RC%20RP-06%209d67b36f66ea5bbaf408e5ed43b01bab.md)

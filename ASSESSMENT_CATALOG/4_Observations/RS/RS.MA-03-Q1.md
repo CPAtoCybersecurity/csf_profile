@@ -1,8 +1,8 @@
 # RS.MA-03: Incident Categorization and Prioritization — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -49,6 +49,8 @@ Review of 4 recent incidents showed consistent categorization. Prioritization wa
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** Categorization and prioritization score 4, in the Some Security band: the playbook taxonomy and the ServiceNow P1–P4 matrix (scope × impact × time-sensitivity) executed cleanly on the sample — all 4 incidents were categorized consistently and every priority assignment carried documented justification. Two material weaknesses hold the score down: response strategy selection was documented for only 3 of the 4 incidents reviewed, and the taxonomy omits the cloud-native categories (misconfigured IAM, exposed S3 bucket, compromised Lambda) that Alma's AWS-heavy estate is most likely to generate. Minimally Acceptable (5.0) requires the process to cover its full scope without sample deviations, so the 1-in-4 strategy-documentation miss and the taxonomy blind spot are exactly what separate 4 from 5.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ Review of 4 recent incidents showed consistent categorization. Prioritization wa
 | 2 | Require response strategy selection documentation for all declared incidents | Medium | Nadia Khan |
 | 3 | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Medium | Nadia Khan |
 | 4 | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MA-03 Test Procedures](../../3_Test_Procedures/RS/RS.MA-03.md)
+- **Controls:** [RS.MA-03_Ex1](../../2_Controls/RS/RS.MA-03_Ex1.md), [RS.MA-03_Ex2](../../2_Controls/RS/RS.MA-03_Ex2.md), [RS.MA-03_Ex3](../../2_Controls/RS/RS.MA-03_Ex3.md)

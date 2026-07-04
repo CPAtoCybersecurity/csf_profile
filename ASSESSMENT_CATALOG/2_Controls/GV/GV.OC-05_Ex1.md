@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-An external dependency inventory is maintained in ServiceNow, cataloging AWS infrastructure, Splunk SIEM, CrowdStrike MDR, and other critical third-party services. Each dependency is mapped to the business functions and assets it supports. The inventory is reviewed quarterly alongside the supplier risk assessment cycle to ensure completeness.
+An external dependency inventory is maintained in ServiceNow, cataloging AWS infrastructure (including CloudTrail/GuardDuty monitoring), SentinelOne MDR, and other critical third-party services. Each dependency is mapped to the business functions and assets it supports. The inventory is reviewed quarterly alongside the supplier risk assessment cycle to ensure completeness.
 
 ## Artifacts
 

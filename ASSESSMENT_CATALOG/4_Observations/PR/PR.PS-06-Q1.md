@@ -1,8 +1,8 @@
 # PR.PS-06: Secure Software Development Practices - Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-16
 
@@ -14,7 +14,7 @@
 
 | Method | Performed | Notes |
 |--------|-----------|-------|
-| Examine | Yes | Reviewed GitLab CI/CD pipeline configuration, Amazon ECR image scanning results, development process documentation, Jira security-related stories, and SQL Injection Mitigation project documentation |
+| Examine | Yes | Reviewed GitLab CI/CD pipeline configuration, Amazon ECR image scanning results, development process documentation, ServiceNow security-related tickets, and SQL Injection Mitigation project documentation |
 | Interview | Yes | Interviewed Chris Magann on development practices, security testing integration, and SSDLC roadmap plans |
 | Test | Yes | Reviewed pipeline configuration for security scan stages; verified ECR scan results do not block deployment; checked for SAST/DAST tooling in pipeline (not present); examined dependency management practices |
 
@@ -52,6 +52,8 @@
 | Actual Score | 2.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** At 2.5, secure development sits low in the Some Security band: security activity is largely ad hoc and dependent on individual developer awareness, with only fragments of process — ECR image scanning on push and weekly base-image rebuilds — operating routinely. There is no SSDLC policy, no SAST or DAST in the GitLab pipeline, no quality gates (images with critical CVEs can deploy to production unblocked), and the $60K SQL Injection Mitigation project has not started despite the vulnerability class being known. The score exceeds a bare 2 because the scanning and rebuild cadence do run on schedule, but Minimally Acceptable (5.0) demands a defined lifecycle executing consistently — policy, pipeline-enforced testing, and gated deployments — none of which exists, which is also why this is the widest actual-to-target gap in the PR function.
+
 ---
 
 ## Evidence Reviewed
@@ -60,7 +62,7 @@
 - Amazon ECR image scanning configuration and recent results
 - AWS Security Hub findings from ECR scanning
 - Development process documentation (Confluence engineering wiki)
-- Jira security-related story samples (ad-hoc, not systematic)
+- ServiceNow security-related ticket samples (ad-hoc, not systematic)
 - SQL Injection Mitigation project documentation ($60K, not started)
 - CISO quarterly plan with SSDLC roadmap reference (Q3 2026)
 - Container base image rebuild pipeline configuration
@@ -80,3 +82,8 @@
 | 6 | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Medium | Chris Magann |
 | 7 | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Medium | Chris Magann |
 | 8 | Establish lightweight threat modeling for security-sensitive features | Medium | Chris Magann |
+
+## Related
+
+- **Test Procedure:** [PR.PS-06 Test Procedures](../../3_Test_Procedures/PR/PR.PS-06.md)
+- **Controls:** [PR.PS-06_Ex1](../../2_Controls/PR/PR.PS-06_Ex1.md), [PR.PS-06_Ex2](../../2_Controls/PR/PR.PS-06_Ex2.md), [PR.PS-06_Ex3](../../2_Controls/PR/PR.PS-06_Ex3.md)

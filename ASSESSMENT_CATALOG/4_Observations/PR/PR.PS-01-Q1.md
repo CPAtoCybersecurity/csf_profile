@@ -1,8 +1,8 @@
 # PR.PS-01: Configuration Management Practices - Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -47,6 +47,8 @@
 | Actual Score | 5 |
 | Target Score | 6 |
 
+**Scoring rationale:** Configuration management earns a 5 — Minimally Acceptable — because the control executes consistently across essentially its full scope with minor, known flaws: CIS-derived baselines are codified as Ansible and Terraform IaC, 95% of production systems run hardened, 47 AWS Config rules monitor continuously, and deviations route through tiered PagerDuty/Slack alerting with remediation tickets (7 examples reviewed). The remaining 5% of legacy dev systems and the separately-managed Windows DC are known exceptions rather than silent gaps. What separates the score from Optimized (6.0) is disciplined measurement and drift response: baseline reviews are ad hoc rather than scheduled against CIS release cycles, Kubernetes nodes have never been validated with kube-bench, and auto-remediation covers only ~30% of rules, so the owner is not yet systematically acting on drift.
+
 ---
 
 ## Evidence Reviewed
@@ -71,3 +73,8 @@
 | 3 | Implement equivalent automated compliance monitoring for on-premises Windows DC (DSC or SCAP) | Medium | Chris Magann |
 | 4 | Establish quarterly baseline review cadence aligned to CIS Benchmark release cycle | Medium | Chris Magann |
 | 5 | Expand AWS Config auto-remediation coverage from 30% to 60%+ of rules | Medium | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.PS-01 Test Procedures](../../3_Test_Procedures/PR/PR.PS-01.md)
+- **Controls:** [PR.PS-01_Ex1](../../2_Controls/PR/PR.PS-01_Ex1.md), [PR.PS-01_Ex2](../../2_Controls/PR/PR.PS-01_Ex2.md), [PR.PS-01_Ex3](../../2_Controls/PR/PR.PS-01_Ex3.md)

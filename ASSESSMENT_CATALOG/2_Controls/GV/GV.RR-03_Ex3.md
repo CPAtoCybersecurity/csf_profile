@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-Alma Security maintains a 15-person security team with dedicated roles across GRC, security engineering, SOC operations, and identity management. Technical resources include ServiceNow GRC, Splunk SIEM, CrowdStrike EDR, and AWS security tooling. Processes are documented in runbooks and playbooks stored in Confluence. The CISO presents resource adequacy assessments to the Board quarterly, with gap analysis driving annual budget requests.
+Alma Security maintains a 15-person security team with dedicated roles across GRC, security engineering, SOC operations, and identity management. Technical resources include ServiceNow GRC, SentinelOne EDR, and AWS-native security tooling (CloudTrail, GuardDuty, VPC Flow Logs). Processes are documented in runbooks and playbooks stored in Confluence. The CISO presents resource adequacy assessments to the Board quarterly, with gap analysis driving annual budget requests.
 
 ## Artifacts
 

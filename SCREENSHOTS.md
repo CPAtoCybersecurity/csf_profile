@@ -23,13 +23,17 @@ The Requirements page is the primary interface for managing CSF assessment data.
 
 ---
 
-## Assessment Observations
+## Assessments (Control Evaluations)
 
-A dedicated view for reviewing all documented observations across the assessment. Filter by quarter to see observation dates, auditors, and detailed notes.
+Manage multiple assessments side by side — each with its own scope, completion tracking, and import/export. The pre-loaded Alma Security assessments demonstrate the full workflow.
 
-![Requirements Detail Panel](public/screenshots/Assessment.png)
+![Assessments — Control Evaluations](public/screenshots/Assessment.png)
 
-![Requirements Detail Panel](public/screenshots/Observations.png)
+## Requirement Detail Panel
+
+Click any requirement row to open the detail panel: framework mapping, category and subcategory descriptions, the NIST implementation example, and the documented implementation with quarterly observations.
+
+![Requirement Detail Panel](public/screenshots/Observations.png)
 
 ---
 
@@ -60,14 +64,14 @@ The Evidence page manages audit artifacts that support assessment findings. Feat
 
 ---
 
-## Remediation Plans
+## Findings & Remediation
 
-Track remediation activities for controls that need improvement:
-- Remediation Owner assignment
-- Due dates for completion
-- Detailed action plans
+Track findings and their remediation for controls that need improvement:
+- Priority, status, and root cause per finding
+- Remediation owner assignment and due dates
+- Detailed remediation action plans
 
-![Remediation Plans](public/screenshots/Remediation_Plans.png)
+![Findings and Remediation](public/screenshots/Remediation_Plans.png)
 
 ---
 

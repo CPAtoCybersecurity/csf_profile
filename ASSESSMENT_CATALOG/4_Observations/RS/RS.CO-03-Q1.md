@@ -1,8 +1,8 @@
 # RS.CO-03: Incident Information Sharing — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -50,6 +50,8 @@ External information sharing is governed by contractual agreements and the CISO'
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** Information sharing rates a 4, in the Some Security band: the channels that exist operate regularly — Slack #security-alerts for the team, ServiceNow for technical detail, cadenced executive status reports, sanitization of external communications, and sharing agreements verified with 2 key partners defining scope and classification. The material weaknesses are coverage holes rather than execution failures: the playbook never defines HR notification for insider-threat incidents, crisis communication with critical suppliers is not formalized beyond the standing agreements, and all external sharing is reactive to contract — no ISAC or community participation. Closing the distance to Minimally Acceptable (5.0) means covering the full set of sharing scenarios the subcategory contemplates (insider-threat, supplier crisis) so that execution is consistent across scope, not just within the channels already built.
+
 ---
 
 ## Evidence Reviewed
@@ -71,3 +73,8 @@ External information sharing is governed by contractual agreements and the CISO'
 | 2 | Formalize crisis communication procedures with critical suppliers including backup channels | Medium | Nadia Khan |
 | 3 | Add explicit HR notification procedures for insider threat incidents to the playbook | Medium | Nadia Khan |
 | 4 | Develop anonymized TTP sharing capability for proactive community contribution | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.CO-03 Test Procedures](../../3_Test_Procedures/RS/RS.CO-03.md)
+- **Controls:** [RS.CO-03_Ex1](../../2_Controls/RS/RS.CO-03_Ex1.md), [RS.CO-03_Ex2](../../2_Controls/RS/RS.CO-03_Ex2.md), [RS.CO-03_Ex3](../../2_Controls/RS/RS.CO-03_Ex3.md), [RS.CO-03_Ex4](../../2_Controls/RS/RS.CO-03_Ex4.md), [RS.CO-03_Ex5](../../2_Controls/RS/RS.CO-03_Ex5.md), [RS.CO-03_Ex6](../../2_Controls/RS/RS.CO-03_Ex6.md)

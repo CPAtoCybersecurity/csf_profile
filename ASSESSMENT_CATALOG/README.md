@@ -6,6 +6,7 @@ Comprehensive NIST CSF 2.0 assessment reference materials for the **Alma Securit
 
 ```
 Assessment_Catalog/
+├── 0_Methodology/         CANON — fact sheet, canonical schema, scoring rubric, independence (read first)
 ├── 1_Case_Study/          Alma Security business context, financials, and master data
 ├── 3_Test_Procedures/     How to assess each subcategory (1 file per subcategory)
 │   └── {GV,ID,PR,DE,RS,RC}/

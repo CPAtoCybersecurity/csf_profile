@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-The Third Party Risk Management Policy formally documents C-SCRM roles: the GRC Manager leads vendor assessments, procurement coordinates vendor onboarding, legal reviews contractual security terms, and engineering validates technical security requirements. The policy is published on the internal wiki and reviewed annually. All personnel with C-SCRM responsibilities acknowledge the policy upon assignment.
+The Third Party Risk Management Policy formally documents C-SCRM roles: the Security GRC Lead leads vendor assessments, procurement coordinates vendor onboarding, legal reviews contractual security terms, and engineering validates technical security requirements. The policy is published on the internal wiki and reviewed annually. All personnel with C-SCRM responsibilities acknowledge the policy upon assignment.
 
 ## Artifacts
 

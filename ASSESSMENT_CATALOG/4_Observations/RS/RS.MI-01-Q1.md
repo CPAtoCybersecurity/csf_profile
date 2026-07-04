@@ -1,8 +1,8 @@
 # RS.MI-01: Incident Containment — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-16
 
@@ -52,6 +52,8 @@ Review of 2 recent incidents showed effective containment execution. The Sentine
 | Actual Score | 5 |
 | Target Score | 6 |
 
+**Scoring rationale:** Containment earns a 5 — Minimally Acceptable, the minimum passing level — because it executes consistently across its full scope with only minor flaws: SentinelOne network-isolated endpoint threats in under 3 minutes (validated on a test endpoint), GuardDuty auto-remediation Lambdas quarantine compromised EC2 instances via restrictive security groups, and both traced incidents documented containment actions in ServiceNow with timestamps and justification. The flaws are real but minor at this level: effectiveness verification after isolation is manual, SaaS-compromise containment is undefined, and on-prem VLAN quarantine is absent. What separates 5 from the Optimized band (6.0) — and from the target — is measurement: the control has no defined effectiveness metrics that Nadia Khan's team reviews and acts on, so drift in the sub-3-minute performance or in false-positive-driven isolations would currently go unnoticed.
+
 ---
 
 ## Evidence Reviewed
@@ -73,3 +75,8 @@ Review of 2 recent incidents showed effective containment execution. The Sentine
 | 2 | Define containment procedures for SaaS application compromise scenarios | Medium | Nadia Khan |
 | 3 | Review and tune automated containment thresholds to balance speed with false positive risk | Medium | Nadia Khan |
 | 4 | Implement VLAN-based quarantine for on-premises systems as supplementary containment mechanism | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MI-01 Test Procedures](../../3_Test_Procedures/RS/RS.MI-01.md)
+- **Controls:** [RS.MI-01_Ex1](../../2_Controls/RS/RS.MI-01_Ex1.md), [RS.MI-01_Ex2](../../2_Controls/RS/RS.MI-01_Ex2.md), [RS.MI-01_Ex3](../../2_Controls/RS/RS.MI-01_Ex3.md), [RS.MI-01_Ex4](../../2_Controls/RS/RS.MI-01_Ex4.md)

@@ -9,9 +9,11 @@ import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
  *   value    {string|number} — Primary displayed value (use "--" for no data)
  *   subtitle {string}  — Optional secondary line of text
  *   trend    {object}  — Optional { value: number|string, direction: 'up'|'down'|'neutral' }
- *   darkMode {boolean} — Passed from parent for theming
+ *   darkMode {boolean} — Accepted for API compatibility. Theming now comes from the
+ *                        terminal design tokens (.terminal-kpi*) which self-theme via
+ *                        CSS custom properties under the .dark root, so it is not read here.
  */
-const KPICard = ({ title, value, subtitle, trend, darkMode }) => {
+const KPICard = ({ title, value, subtitle, trend }) => {
   const renderTrend = () => {
     if (!trend) return null;
 
@@ -35,24 +37,16 @@ const KPICard = ({ title, value, subtitle, trend, darkMode }) => {
     );
   };
 
-  const cardBg = darkMode
-    ? 'bg-gray-800 border-gray-700'
-    : 'bg-white border-gray-200';
-
-  const titleColor = darkMode ? 'text-gray-400' : 'text-gray-500';
-  const valueColor = darkMode ? 'text-white' : 'text-gray-900';
-  const subtitleColor = darkMode ? 'text-gray-500' : 'text-gray-400';
-
   return (
-    <div className={`terminal-kpi border p-4 ${cardBg}`}>
-      <div className={`terminal-kpi-label text-xs uppercase tracking-wider mb-1 ${titleColor}`}>
+    <div className="terminal-kpi p-4">
+      <div className="terminal-kpi-label text-xs uppercase tracking-wider mb-1">
         <span className="terminal-kpi-marker">▌</span> {title}
       </div>
-      <div className={`terminal-kpi-value text-3xl font-bold tracking-tight ${valueColor}`} style={{ fontVariantNumeric: 'tabular-nums' }}>
+      <div className="terminal-kpi-value text-3xl tracking-tight">
         {value}
       </div>
       {subtitle && (
-        <div className={`terminal-kpi-sub text-xs mt-1 ${subtitleColor}`}>{subtitle}</div>
+        <div className="terminal-kpi-sub text-xs mt-1">{subtitle}</div>
       )}
       {renderTrend()}
     </div>

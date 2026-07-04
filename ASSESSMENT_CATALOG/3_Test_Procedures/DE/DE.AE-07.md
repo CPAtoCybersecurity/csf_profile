@@ -12,7 +12,7 @@ This test procedure covers Alma Security's integration of threat intelligence an
 - **Manual threat intelligence:** SaaS-sector ISAC briefings distributed via encrypted email to D&R personnel; CISA KEV catalog monitoring; AWS Security Bulletins
 - **Asset context sources:** AWS resource tags (environment, criticality tier, data sensitivity); SentinelOne endpoint inventory (device role, department, managed status); ServiceNow CMDB (asset owners, business impact ratings, interdependencies)
 - **Vulnerability disclosure monitoring:** CISA KEV catalog, AWS Security Bulletins, ISAC advisories, vendor security notifications
-- **Personnel:** Nadia Khan (D&R Lead — CTI program owner), Chris Magann (Vulnerability Management), SOC analysts (Jane, John), auditor (Steve)
+- **Personnel:** Nadia Khan (D&R Lead — CTI program owner), Chris Magann (Vulnerability Management), SOC analysts (Jane Alvarez, John Tran). Assessors are not scoped personnel — see the [Independence Statement](../../0_Methodology/Scoring-Rubric-and-Methodology.md#6-independence-statement)
 
 Out of scope: threat modeling for product security (application-level threats to Alma's continuous authentication platform), which falls under a separate product security function.
 

@@ -1,8 +1,8 @@
 # PR.AA-04: Identity Assertion Protection — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -57,6 +57,8 @@ AWS federation through SAML is properly configured with audience restrictions, i
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** A 4 lands in the Some Security band: assertion protection executes regularly — SAML assertions signed with SHA-256/RSA-2048 on all 3 tested integrations, OAuth tokens tightened to 1-hour expiration in Q4 2025, and Kerberos hardened to AES-256 only — but with incomplete coverage of scope. SAML assertion encryption reaches only 12 of 35 integrated applications, and 2 of 35 federation configurations carried stale metadata after the January 2026 certificate rotation, a deviation in the tested population that is neither isolated nor yet remediated. Minimally Acceptable (5.0) requires consistent execution across the full federation estate; the spreadsheet-based inventory and the 1-hour token-caching revocation gap keep the control short of that bar.
+
 ---
 
 ## Evidence Reviewed
@@ -83,3 +85,8 @@ AWS federation through SAML is properly configured with audience restrictions, i
 | 4 | Implement back-channel logout (OIDC) for critical applications to enable real-time session revocation | Medium | Chris Magann |
 | 5 | Standardize Kubernetes projected service account token expiration across all namespaces | Medium | Tigan Wang |
 | 6 | Conduct annual assertion verification testing across all 35 integrated relying parties | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [PR.AA-04 Test Procedures](../../3_Test_Procedures/PR/PR.AA-04.md)
+- **Controls:** [PR.AA-04_Ex1](../../2_Controls/PR/PR.AA-04_Ex1.md), [PR.AA-04_Ex2](../../2_Controls/PR/PR.AA-04_Ex2.md), [PR.AA-04_Ex3](../../2_Controls/PR/PR.AA-04_Ex3.md)

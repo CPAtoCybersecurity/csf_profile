@@ -1,8 +1,8 @@
 # PR.PS-05: Unauthorized Software Prevention - Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -50,6 +50,8 @@
 | Actual Score | 4.5 |
 | Target Score | 6 |
 
+**Scoring rationale:** The 4.5 sits at the top of the Some Security band: prevention runs regularly on the endpoint fleet — SentinelOne on 98%+ of workstations with real-time malicious-executable blocking, daily alert review, GPO installation restrictions, and a ServiceNow approved-software catalog — but with material enforcement weaknesses. Application control operates in hybrid detect-only mode so unrecognized executables run pending manual review, 40% of engineering and product users hold macOS local admin rights, Linux servers rely on noexec mounts without SELinux, and the shared SSH key on port 45001 grants root on Kubernetes nodes, bypassing every container-level control. Minimally Acceptable (5.0) requires the preventive intent to be enforced consistently across scope; the detect-only posture and the root-level bypass are what hold the score half a point below that floor.
+
 ---
 
 ## Evidence Reviewed
@@ -76,3 +78,8 @@
 | 4 | Deploy OPA Gatekeeper or Kyverno for comprehensive Kubernetes pod security enforcement | High | Tigan Wang |
 | 5 | Evaluate SELinux or AppArmor enforcement for production Linux servers | Medium | Tigan Wang |
 | 6 | Extend approved software catalog to developer toolchains; implement ServiceNow-to-SentinelOne sync | Medium | Chris Magann |
+
+## Related
+
+- **Test Procedure:** [PR.PS-05 Test Procedures](../../3_Test_Procedures/PR/PR.PS-05.md)
+- **Controls:** [PR.PS-05_Ex1](../../2_Controls/PR/PR.PS-05_Ex1.md), [PR.PS-05_Ex2](../../2_Controls/PR/PR.PS-05_Ex2.md), [PR.PS-05_Ex3](../../2_Controls/PR/PR.PS-05_Ex3.md), [PR.PS-05_Ex4](../../2_Controls/PR/PR.PS-05_Ex4.md)

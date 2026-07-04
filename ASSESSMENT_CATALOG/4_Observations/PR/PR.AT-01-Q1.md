@@ -1,8 +1,8 @@
 # PR.AT-01: Security Awareness Training -- Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -54,6 +54,8 @@
 | Target Score | 7 |
 | Trend | Improving (was 4 in Q3 2025) |
 
+**Scoring rationale:** At 5, the awareness program earns the Minimally Acceptable band: quarterly Workday modules reach all 300 employees with a 94% annual completion rate, onboarding access is gated on training completion, and phishing simulations run every quarter — consistent full-scope execution with minor flaws (12 EMEA contractors lack localized content and formal AUP acknowledgment). Although the 18%-to-7% click-rate decline shows genuine measurement of one dimension, the program stops short of Optimized (6.0) because comprehension itself is never measured — modules use acknowledgment-based completion rather than scored quizzes — and results live in separate systems with no consolidated view an owner could review for drift.
+
 ---
 
 ## Evidence Reviewed
@@ -79,3 +81,8 @@
 | 4 | Build consolidated awareness metrics dashboard combining phishing results, Workday completions, and reporting behavior | Medium | Security Team |
 | 5 | Establish "Phish Spotter" recognition program to positively reinforce reporting behavior | Low | Security Team + HR |
 | 6 | Add pre-training baseline quiz at onboarding to measure incoming awareness level and track improvement | Low | HR + Security Team |
+
+## Related
+
+- **Test Procedure:** [PR.AT-01 Test Procedures](../../3_Test_Procedures/PR/PR.AT-01.md)
+- **Controls:** [PR.AT-01_Ex1](../../2_Controls/PR/PR.AT-01_Ex1.md), [PR.AT-01_Ex2](../../2_Controls/PR/PR.AT-01_Ex2.md), [PR.AT-01_Ex3](../../2_Controls/PR/PR.AT-01_Ex3.md), [PR.AT-01_Ex4](../../2_Controls/PR/PR.AT-01_Ex4.md), [PR.AT-01_Ex5](../../2_Controls/PR/PR.AT-01_Ex5.md)

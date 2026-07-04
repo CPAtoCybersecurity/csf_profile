@@ -30,11 +30,11 @@ const COMPREHENSIVE_ASSESSMENT = {
 const DEFAULT_ASSESSMENTS = [
   {
     id: 'ASM-default-2025-alma',
-    name: '2025 Alma Security CSF',
+    name: '2026 Alma Security CSF Assessment',
     description: 'Annual CSF 2.0 assessment for Alma Security covering all implemented controls',
     scopeType: 'requirements',
     frameworkFilter: null,
-    createdDate: '2025-01-01T00:00:00.000Z',
+    createdDate: '2026-01-01T00:00:00.000Z',
     scopeIds: [
       'GV.SC-04 Ex1', 'GV.OC-01 Ex1', 'GV.RR-02 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2',
       'GV.RM-01 Ex2', 'GV.RR-01 Ex4', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7', 'GV.SC-06 Ex3',
@@ -53,7 +53,7 @@ const DEFAULT_ASSESSMENTS = [
     description: 'Internal Audit Report IA-2026-001.',
     scopeType: 'requirements',
     frameworkFilter: null,
-    createdDate: '2025-04-30T00:00:00.000Z',
+    createdDate: '2026-04-30T00:00:00.000Z',
     scopeIds: [
       'GV.OC-01 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2', 'GV.RM-01 Ex2',
       'GV.RR-01 Ex4', 'GV.RR-02 Ex1', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7',

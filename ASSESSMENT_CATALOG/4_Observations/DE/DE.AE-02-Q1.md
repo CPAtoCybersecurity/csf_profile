@@ -1,8 +1,8 @@
 # DE.AE-02: Potentially Adverse Events Are Analyzed — Q1 2025 Observation
 
-**Assessment:** 2025 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
-**Observation Date:** 2025-01-26
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
+**Observation Date:** 2026-01-26
 **Testing Status:** Complete
 
 ## Testing Methods
@@ -65,7 +65,7 @@ The SOC Manager validates severity classifications and compiles monthly detectio
 | 1 | Complete Incident Response Enhancement project to establish 24/7 SOC monitoring coverage with defined on-call paging criteria for after-hours critical findings | High | Nadia Khan |
 | 2 | Deploy custom cross-source correlation scripts to enable detection of attacks spanning AWS infrastructure and endpoints | High | Nadia Khan |
 | 3 | Expand automated log analysis to on-premises Windows DC and SaaS applications currently dependent on manual review | Medium | Jane |
-| 4 | Conduct full Examine-method configuration review in Q2 to validate CloudTrail, GuardDuty, and SentinelOne configurations against documented standards | Medium | Steve |
+| 4 | Conduct full Examine-method configuration review in Q2 to validate CloudTrail, GuardDuty, and SentinelOne configurations against documented standards | Medium | Nadia Khan |
 | 5 | Define and document TTD sub-targets by detection source (GuardDuty automated vs. manual review) to track improvement granularity | Low | Gerry |
 
 ## Related

@@ -1,8 +1,8 @@
 # PR.AA-02: Identity Proofing and Credential Binding — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-13
 
@@ -54,6 +54,8 @@ The remote identity proofing procedure was formalized in Q4 2025 after the secur
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** A score of 4 falls in the Some Security band — the identity proofing process executes regularly (all 8 sampled onboarding records, including 3 remote video verifications, cleared the ServiceNow gate before credential issuance, and the AD query showed zero duplicate UPNs across 350 user objects) but carries a known exception without treatment. The shared developer SSH key on port 45001 breaks one-to-one identity-to-credential binding for approximately 8 developers and has now slipped from its original Q3 2025 remediation commitment to Q3 2026. The score cannot reach Minimally Acceptable (5.0) while that exception remains open and untreated, and while remote video verifications are neither recorded nor retained, leaving the assessment period without complete evidence.
+
 ---
 
 ## Evidence Reviewed
@@ -79,3 +81,8 @@ The remote identity proofing procedure was formalized in Q4 2025 after the secur
 | 3 | Implement recorded video verification with automated retention in HR document management system | Medium | Gerry |
 | 4 | Automate contractor account expiration tied to contract end date in Workday | High | Tigan Wang |
 | 5 | Extend identity proofing requirements to MFA device replacement and credential recovery processes | Medium | Chris Magann |
+
+## Related
+
+- **Test Procedure:** [PR.AA-02 Test Procedures](../../3_Test_Procedures/PR/PR.AA-02.md)
+- **Controls:** [PR.AA-02_Ex1](../../2_Controls/PR/PR.AA-02_Ex1.md), [PR.AA-02_Ex2](../../2_Controls/PR/PR.AA-02_Ex2.md)

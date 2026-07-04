@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X } from 'lucide-react';
+import { X, ExternalLink, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import useArtifactStore from '../stores/artifactStore';
 
 const ArtifactSelector = ({
@@ -10,8 +11,44 @@ const ArtifactSelector = ({
   disabled = false
 }) => {
   const artifacts = useArtifactStore((state) => state.artifacts);
+  const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+
+  // Read-mode chip: link out to the artifact URL, or open its detail in the Artifacts tab
+  const renderLinkedChip = (name) => {
+    const artifact = artifacts.find(a => a.name === name);
+    const chipClass = 'px-2 py-1 bg-blue-600 text-white rounded-full text-xs inline-flex items-center gap-1 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer';
+
+    if (artifact?.link) {
+      return (
+        <a
+          key={name}
+          href={artifact.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={chipClass}
+          title={`Open ${name} in a new tab`}
+        >
+          {name}
+          <ExternalLink size={12} />
+        </a>
+      );
+    }
+
+    return (
+      <button
+        key={name}
+        type="button"
+        onClick={() => artifact && navigate('/artifacts', { state: { artifactId: artifact.id } })}
+        className={`${chipClass} ${!artifact ? 'opacity-70 cursor-default' : ''}`}
+        title={artifact ? `View ${name} in Artifacts` : name}
+      >
+        {name}
+        {artifact && <ChevronRight size={12} />}
+      </button>
+    );
+  };
 
   // Handle selecting an artifact
   const handleSelectArtifact = (artifact) => {
@@ -52,16 +89,12 @@ const ArtifactSelector = ({
         <div className="mt-1 flex flex-wrap gap-1">
           {multiple ? (
             selectedArtifacts && selectedArtifacts.length > 0 ? (
-              selectedArtifacts.map(name => (
-                <span key={name} className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs">
-                  {name}
-                </span>
-              ))
+              selectedArtifacts.map(name => renderLinkedChip(name))
             ) : (
               <span className="text-gray-400 dark:text-gray-500">No artifacts linked</span>
             )
           ) : (
-            <span className="dark:text-gray-200">{selectedArtifacts || "None"}</span>
+            selectedArtifacts ? renderLinkedChip(selectedArtifacts) : <span className="dark:text-gray-200">None</span>
           )}
         </div>
       ) : (

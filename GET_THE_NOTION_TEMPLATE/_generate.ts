@@ -1,14 +1,55 @@
-import { readdir } from "node:fs/promises";
+import { createHash } from "node:crypto";
 import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 
+/*
+ * NIST CSF Notion template generator — ONE generator, ONE source of truth.
+ *
+ * SOURCE OF TRUTH (issue #242): the app's exported profile CSV,
+ *   GET_THE_SPREADSHEETS/yyyy-mm-dd_CSF_Profile.csv
+ * which is itself the flat, columnar export of the app pipeline
+ *   ASSESSMENT_CATALOG/ -> scripts/generate-comprehensive-assessment.mjs -> app store -> CSV.
+ * The CSV is chosen (over re-parsing ASSESSMENT_CATALOG) because it already
+ * carries the full quarterly GRC schema issue #243 asks us to mirror — Q1-Q4
+ * scores/observations, NIST 800-53 refs, scoping, Examine/Interview/Test,
+ * remediation, auditor, stakeholders — so consuming it keeps us to a single
+ * generator with no second parser to drift. The legacy
+ * source/CSF-implementation-examples.csv was a strict 9-column projection of
+ * this file and has been deleted; it is fully derivable and is no longer a
+ * second source of truth.
+ *
+ * This generator regenerates ALL derived outputs, including the CSF_Wiki/
+ * Notion drag-import bundle (previously a one-time hand export). It NEVER
+ * clobbers hand-curated README prose: it only rewrites content between
+ * explicit <!-- BEGIN GENERATED: name --> / <!-- END GENERATED: name -->
+ * markers, leaving everything else byte-identical.
+ *
+ * Run:  bun GET_THE_NOTION_TEMPLATE/_generate.ts
+ */
+
 const OUTPUT_DIR = import.meta.dir;
+const REPO_ROOT = join(OUTPUT_DIR, "..");
+const SPREADSHEETS_DIR = join(REPO_ROOT, "GET_THE_SPREADSHEETS");
+
 const SOURCE_CSV_PATH =
   Bun.argv[2] ??
   process.env.CSF_SOURCE_CSV ??
-  join(OUTPUT_DIR, "source", "CSF-implementation-examples.csv");
+  join(SPREADSHEETS_DIR, "yyyy-mm-dd_CSF_Profile.csv");
+const FINDINGS_CSV_PATH =
+  process.env.CSF_FINDINGS_CSV ?? join(SPREADSHEETS_DIR, "JIRA-Findings.csv");
+const ARTIFACTS_CSV_PATH =
+  process.env.CSF_ARTIFACTS_CSV ?? join(SPREADSHEETS_DIR, "JIRA-Artifacts.csv");
+
 const SUBCATEGORIES_DIR = join(OUTPUT_DIR, "subcategories");
-const EXPECTED_SOURCE_HEADER = [
+const BUNDLE_DIR = join(OUTPUT_DIR, "CSF_Wiki");
+const BUNDLE_INNER = join(BUNDLE_DIR, "CSF_Wiki");
+const README_PATH = join(OUTPUT_DIR, "README.md");
+
+// Minimum leading columns the app profile CSV must expose. The file carries
+// ~53 columns; we assert the first nine (shared with the legacy source) plus a
+// spot check on the quarterly columns so a malformed export fails loudly.
+const REQUIRED_SOURCE_COLUMNS = [
   "ID",
   "Function",
   "Function Description",
@@ -18,26 +59,57 @@ const EXPECTED_SOURCE_HEADER = [
   "Subcategory ID",
   "Subcategory Description",
   "Implementation Example",
+  "Implementation Description",
+  "In Scope? ",
+  "Owner",
+  "Stakeholder(s)",
+  "Auditor",
+  "NIST 800-53 Control Ref",
+  "Test Procedure(s)",
+  "Q1 Actual Score",
+  "Q4 Test",
+  "Remediation Owner",
+  "Remediation Due Date",
+  "Minimum Target",
+  "Action Plan",
+  "Artifact Name",
 ] as const;
+
+const QUARTERS = ["Q1", "Q2", "Q3", "Q4"] as const;
+type Quarter = (typeof QUARTERS)[number];
 
 type CsvRow = string[];
 
-interface FunctionRow {
-  id: string;
-  name: string;
-  description: string;
+interface QuarterAssessment {
+  actual: string;
+  target: string;
+  observations: string;
+  observationDate: string;
+  testingStatus: string;
+  examine: string;
+  interview: string;
+  test: string;
 }
 
-interface CategoryRow {
-  id: string;
-  name: string;
-  description: string;
-  functionId: string;
+interface Assessment {
+  inScope: string;
+  owner: string;
+  stakeholders: string;
+  auditor: string;
+  nist80053: string;
+  testProcedures: string;
+  quarters: Record<Quarter, QuarterAssessment>;
+  remediationOwner: string;
+  remediationDue: string;
+  minimumTarget: string;
+  actionPlan: string;
+  artifactName: string;
 }
 
 interface ExampleRow {
   id: string;
   text: string;
+  implementation: string;
 }
 
 interface SubcategoryRow {
@@ -47,31 +119,80 @@ interface SubcategoryRow {
   categoryName: string;
   functionId: string;
   functionName: string;
-  owner: string;
-  targetScore: string;
-  score: string;
-  lastReviewed: string;
-  observations: string;
-  evidence: string;
-  notes: string;
+  assessment: Assessment;
   examples: ExampleRow[];
+  score: string; // current actual (latest populated quarter)
+  targetScore: string; // current target (latest populated quarter, else minimum)
+}
+
+interface CategoryRow {
+  id: string;
+  name: string;
+  description: string;
+  functionId: string;
+  subcategoryIds: string[];
+  actualScore: string;
+  targetScore: string;
+}
+
+interface FunctionRow {
+  id: string;
+  name: string;
+  description: string;
+  categoryIds: string[];
+  subcategoryIds: string[];
+  actualScore: string;
+  targetScore: string;
+}
+
+interface FindingRow {
+  summary: string;
+  subcategoryId: string;
+  issueKey: string;
+  issueType: string;
+  status: string;
+  priority: string;
+  assignee: string;
+  reporter: string;
+  created: string;
+  updated: string;
+  dueDate: string;
+  rootCause: string;
+  vulnerability: string;
+  remediationPlan: string;
+  testingStatus: string;
+  description: string;
+}
+
+interface ArtifactRow {
+  summary: string;
+  subcategoryId: string;
+  issueKey: string;
+  issueType: string;
+  status: string;
+  priority: string;
+  assignee: string;
+  reporter: string;
+  created: string;
+  updated: string;
+  link: string;
+  description: string;
 }
 
 interface SourceData {
   functions: FunctionRow[];
   categories: CategoryRow[];
   subcategories: SubcategoryRow[];
+  findings: FindingRow[];
+  artifacts: ArtifactRow[];
   exampleCount: number;
 }
 
-interface FunctionIdParts {
-  shortId: string;
-  longName: string;
-}
+// ---------------------------------------------------------------------------
+// CSV parsing / writing (RFC 4180 character-walk state machine)
+// ---------------------------------------------------------------------------
 
 function parseCsv(source: string): CsvRow[] {
-  // RFC 4180 parser using a character-walk state machine so quoted commas,
-  // doubled quotes, and embedded newlines stay inside their originating field.
   const rows: CsvRow[] = [];
   let row: string[] = [];
   let field = "";
@@ -91,17 +212,10 @@ function parseCsv(source: string): CsvRow[] {
       } else {
         field += character;
       }
-
       continue;
     }
 
     if (character === '"') {
-      if (field.length > 0) {
-        throw new Error(
-          `Malformed CSV: unexpected quote inside unquoted field near character ${index}.`,
-        );
-      }
-
       inQuotes = true;
       continue;
     }
@@ -124,7 +238,6 @@ function parseCsv(source: string): CsvRow[] {
       if (source[index + 1] === "\n") {
         index += 1;
       }
-
       row.push(field);
       rows.push(row);
       row = [];
@@ -156,511 +269,330 @@ function quoteCsvField(value: string): string {
   ) {
     return `"${value.replaceAll('"', '""')}"`;
   }
-
   return value;
 }
 
-function writeCsv(rows: CsvRow[]): string {
+function writeCsvText(rows: CsvRow[]): string {
   return rows
     .map((row: CsvRow) => row.map((value: string) => quoteCsvField(value)).join(","))
     .join("\n");
 }
 
-function extractFunctionId(value: string): FunctionIdParts {
-  const match = /^(.+?)\s*\(([A-Z]{2})\)\s*$/.exec(value);
+function stripBom(value: string): string {
+  return value.replace(/^﻿/, "");
+}
 
+/** Build a header->index lookup, BOM-stripped and trimmed-key tolerant. */
+function headerIndexer(header: CsvRow): (name: string) => number {
+  const map = new Map<string, number>();
+  header.forEach((raw, index) => {
+    map.set(stripBom(raw), index);
+  });
+  return (name: string): number => {
+    if (map.has(name)) {
+      return map.get(name) as number;
+    }
+    // tolerate trailing-space differences between exports
+    for (const [key, index] of map) {
+      if (key.trim() === name.trim()) {
+        return index;
+      }
+    }
+    return -1;
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Field parsing helpers (shared with the legacy generator)
+// ---------------------------------------------------------------------------
+
+function extractFunctionId(value: string): { shortId: string; longName: string } {
+  const match = /^(.+?)\s*\(([A-Z]{2})\)\s*$/.exec(value);
   if (!match) {
     throw new Error(
       `Invalid Function value "${value}". Expected format like "GOVERN (GV)".`,
     );
   }
-
-  return {
-    shortId: match[2],
-    longName: match[1].trim(),
-  };
+  return { shortId: match[2], longName: match[1].trim() };
 }
 
 function stripCategorySuffix(value: string): string {
   const match = /^(.*?)\s*\(([A-Z]{2}\.[A-Z]{2})\)\s*$/.exec(value);
-
   if (!match) {
     throw new Error(
       `Invalid Category value "${value}". Expected a trailing suffix like "(GV.SC)".`,
     );
   }
-
   return match[1].trim();
 }
 
-function escapeYamlString(value: string): string {
-  if (value.length === 0) {
-    return "";
-  }
+// ---------------------------------------------------------------------------
+// Notion export naming: deterministic 32-hex ids + filename conventions
+// ---------------------------------------------------------------------------
 
-  const needsQuotes =
-    /^[\s]/.test(value) || value.includes(":") || /[\[\]"']/.test(value);
-
-  if (!needsQuotes) {
-    return value;
-  }
-
-  return `'${value.replaceAll("'", "''")}'`;
+/** Deterministic 32-hex id (idempotent across runs) mimicking Notion's ids. */
+function notionId(key: string): string {
+  return createHash("md5").update(key).digest("hex");
 }
 
-function renderYamlField(key: string, value: string): string {
-  return value.length === 0 ? `${key}:` : `${key}: ${escapeYamlString(value)}`;
+/**
+ * Notion truncates the title portion of an exported filename to 50 chars and
+ * replaces filesystem-hostile characters (including "." and "/") with spaces.
+ */
+function fileBaseName(title: string, id: string): string {
+  const cleaned = title
+    .replace(/[./\\?%*:|"<>]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 50)
+    .trim();
+  return `${cleaned} ${id}`;
 }
 
-function formatImplementationExample(example: ExampleRow): string {
-  const trimmed = example.text.trim();
-  const match = /^(Ex\d+):\s*(.*)$/.exec(trimmed);
-
-  if (!match) {
-    return `- ${trimmed}`;
-  }
-
-  return `- **${match[1]}:** ${match[2]}`;
+/** URL-encode a bundle-relative path Notion-style: spaces -> %20, commas kept. */
+function encodePath(path: string): string {
+  return path.replaceAll(" ", "%20");
 }
 
-function buildSubcategoryMarkdown(subcategory: SubcategoryRow): string {
-  const lines = [
-    "---",
-    renderYamlField("id", subcategory.id),
-    renderYamlField("function_id", subcategory.functionId),
-    renderYamlField("function_name", subcategory.functionName),
-    renderYamlField("category_id", subcategory.categoryId),
-    renderYamlField("category_name", subcategory.categoryName),
-    "score:",
-    "target_score:",
-    "owner:",
-    "last_reviewed:",
-    "---",
-    "",
-    `# ${subcategory.id} — ${subcategory.description}`,
-    "",
-    "## Description",
-    "",
-    subcategory.description,
-    "",
-    "## Implementation Examples",
-    "",
-    ...subcategory.examples.map((example: ExampleRow) =>
-      formatImplementationExample(example),
-    ),
-    "",
-    "## Notes",
-    "",
-    "_Add scoring rationale, decisions, and context here._",
-    "",
-    "## Observations",
-    "",
-    "_Add observed evidence, anomalies, gaps, or behaviors here._",
-    "",
-    "## Evidence",
-    "",
-    "_List artifacts, links, screenshots, ticket IDs, attestations supporting this score._",
-    "",
-  ];
-
-  return lines.join("\n");
+function relationCell(display: string, relativePathNoExt: string, ext: string): string {
+  return `${display} (${encodePath(relativePathNoExt)}.${ext})`;
 }
 
-function buildReadme(data: SourceData): string {
-  return `# Cybersecurity Framework Quickstart — NIST CSF Maturity Wiki
+// ---------------------------------------------------------------------------
+// Score helpers
+// ---------------------------------------------------------------------------
 
-A drop-in Notion workspace for assessing maturity against the NIST Cybersecurity Framework. Preserves the full 6 → 22 → 106 hierarchy. You score at the subcategory level; Notion rolls scores up to category and function automatically. Designed as preparation work — when you migrate to a dedicated GRC platform, your enriched subcategory CSV is the single artifact you need.
-
-## Who this is for
-
-GRC practitioners, security teams, and consultants who want to start a CSF assessment **today** without waiting on tool procurement. You want notes, observations, owners, and evidence captured against every subcategory; live category- and function-level rollups as you score; and a clean export when the GRC platform is ready.
-
-## What you get
-
-\`\`\`
-README.md            this file
-functions.csv        6 rows  — Functions database
-categories.csv       22 rows — Categories database (relation → Functions)
-subcategories.csv    106 rows — Subcategories database (relation → Categories)
-                                where all scoring happens
-subcategories/       106 markdown pages, one per subcategory:
-                     ├── frontmatter (id, function/category names, score,
-                     │                target_score, owner, last_reviewed)
-                     └── body (Description / Implementation Examples /
-                              Notes / Observations / Evidence)
-_generate.ts         re-runnable Bun TypeScript generator
-\`\`\`
-
-## Scoring rubric (CMMI-style 0.0–5.0)
-
-- \`0.0\` Non-existent — control does not exist
-- \`1.0\` Initial — ad-hoc, undocumented
-- \`2.0\` Repeatable — informal patterns, partial documentation
-- \`3.0\` Defined — documented, communicated, consistently applied
-- \`4.0\` Managed — measured, reviewed, evidence-driven
-- \`5.0\` Optimized — continuously improved, proactive
-
-Intermediate values (e.g. \`3.5\`) express partial progression. This is a defensible default; swap it for a CSF-Tier-aligned scale (1 Partial / 2 Risk-Informed / 3 Repeatable / 4 Adaptive), CMMI-DEV, COBIT capability levels, or any organization-specific scale by editing this section — the database schema is rubric-agnostic.
-
-## How aggregation works
-
-**TL;DR — you only ever enter a number in one place: the \`Score\` field on a Subcategory page.** The 22 Category averages and 6 Function averages are computed by Notion automatically via Rollup properties. You never average by hand.
-
-### The data flow
-
-\`\`\`
-   You score a Subcategory  (0.0–5.0)
-              │
-              ▼
-   Each Category has a Rollup that says:
-      "Average the Score field across all Subcategories that point at me"
-              │
-              ▼
-   Each Function has a Rollup that says:
-      "Average the rollup across all Categories that point at me"
-\`\`\`
-
-Scores flow up; nothing flows down. The 22 Categories don't have their own \`Score\` field — only a Rollup of their child Subcategories. The 6 Functions don't have a \`Score\` field either — only a Rollup of their child Categories.
-
-### Why three linked databases (not one)
-
-| Database | Rows | Has \`Score\` field? | Has Rollup? |
-|----------|------|---------------------|-------------|
-| Functions | 6 | no | yes — averages this Function's Categories' rollups |
-| Categories | 22 | no | yes — averages this Category's Subcategories' Scores |
-| Subcategories | 106 | **yes — you type it here** | no |
-
-Notion's Rollup property only works across **explicit Relations between databases** — it can't aggregate inside a single database. That's why this wiki ships as three databases linked by relations, not one giant 106-row table with Function and Category columns. Three databases gives you working rollups for free; one table doesn't.
-
-### Worked example — GV (GOVERN)
-
-The Function **GOVERN (GV)** has 6 Categories. One of them is **GV.SC — Cybersecurity Supply Chain Risk Management**, which contains 10 Subcategories (GV.SC-01 through GV.SC-10).
-
-Imagine you score 4 of those 10 Subcategories so far:
-
-| Subcategory | Score |
-|-------------|-------|
-| GV.SC-01 | 4.0 |
-| GV.SC-02 | 3.0 |
-| GV.SC-03 | 2.5 |
-| GV.SC-04 | 3.5 |
-| GV.SC-05..10 | (empty — not yet scored) |
-
-**Category-level rollup (GV.SC):** Notion averages the 4 entered Scores (empty rows are skipped):
-
-\`(4.0 + 3.0 + 2.5 + 3.5) ÷ 4 = 3.25\`
-
-The \`GV.SC\` row in your Categories database displays **3.25**.
-
-**Function-level rollup (GV):** assume your other 5 Categories under GV show rollups of \`2.0, 4.0, 3.0, 2.5, 3.5\`. The Function-level rollup averages those 6 Category rollups (including GV.SC's 3.25):
-
-\`(3.25 + 2.0 + 4.0 + 3.0 + 2.5 + 3.5) ÷ 6 = 3.04\`
-
-The \`GV\` row in your Functions database displays **3.04**.
-
-Score one more Subcategory under GV.SC and the GV.SC rollup recomputes; that ripples up to the GV rollup automatically — no formulas, no manual refresh.
-
-### How partial scoring is handled
-
-Notion's \`Rollup → Average\` **ignores empty values**. So if you've only scored 30 of 106 Subcategories, the rollups reflect those 30 — they aren't dragged toward zero by the unscored rows. A half-finished assessment doesn't lie; it just shows you a partial picture you know is partial.
-
-**If you want empty Subcategories to count as 0** (treating "not scored" as "non-existent"), use this approach instead:
-
-- Add a Formula property called \`EffectiveScore\`: \`if(empty(prop("Score")), 0, prop("Score"))\`
-- Configure the Category-level Rollup to roll up \`EffectiveScore\` instead of \`Score\`
-
-That way unscored rows contribute 0 to the average, and your rollups punish coverage gaps.
-
-### Why average Categories first (not all Subcategories directly)
-
-You could skip the Category layer and have each Function rollup average all of its Subcategory scores directly. That is **not** what this wiki does, and here's why:
-
-- **Equal weight per domain.** CSF Categories are organizational domains, and risk officers usually treat them as equal weight. **GV.SC** has 10 Subcategories; **GV.OV** (Oversight) has 3. If a Function rollup averaged all subcategories directly, big categories would drown out small ones — a 10-Subcategory category would carry over 3× the weight of a 3-Subcategory category in the Function score. The two-stage design (Subcategories → Category average → Function average of Category averages) treats every Category as one equal domain.
-- **Faster feedback loop.** People work through one Category at a time. Seeing the Category rollup update as you score keeps the assessment moving. The Function rollup then tells the higher-altitude story.
-
-If you prefer **equal weight per Subcategory** (so big categories dominate the Function score), set up a single rollup on Functions that traverses through Categories down to Subcategories using Notion's nested rollup. That's a different aggregation philosophy — pick one and document it.
-
-### Adding a gap view
-
-The \`Target Score\` column on each Subcategory is your aspirational maturity. To surface the gap visually:
-
-1. Add a Formula property on Subcategories: \`Gap = Target Score - Score\`
-2. Sort or color-code your Subcategory views by \`Gap\` to see the biggest deficits first
-3. (Optional) Add a Category-level rollup of \`Average(Target Score)\` so each Category shows current maturity, target maturity, and the gap between them — that gives you a per-domain investment-priority list
-
-## Notion import — step by step
-
-1. Create a Notion page named **CSF Wiki** (or whatever you prefer).
-2. Drag \`functions.csv\`, \`categories.csv\`, and \`subcategories.csv\` onto the page (or use **Import → CSV**) — each becomes its own inline database. Notion uses the first column as the database title, so each database's title column will be \`ID\` (\`GV\`, \`GV.SC\`, \`GV.SC-04\`, etc.).
-3. Convert the relation columns:
-   - Open the **Categories** database. Find the \`Function\` column (currently text). Click the column header → **Edit property** → change type to **Relation** with target = the Functions database. Notion offers to auto-link rows whose \`Function\` text value matches a Function \`ID\` — accept.
-   - Repeat for the **Subcategories** database: convert the \`Category\` column from text to Relation → Categories.
-4. Add the rollups:
-   - On **Categories**, add a new property of type **Rollup**. Source = the Subcategories relation. Property = \`Score\`. Calculate = \`Average\`. Format → 1 decimal place.
-   - On **Functions**, add a new property of type **Rollup**. Source = the Categories relation. Property = the Category rollup you just created. Calculate = \`Average\`. Format → 1 decimal place.
-5. Bulk-paste each \`subcategories/{ID}.md\` into the matching Subcategory page body. Two routes:
-   - **Manual:** open a Subcategory page and paste the file body — Notion converts markdown on paste.
-   - **Bulk:** Notion's **Import → Markdown & CSV** can ingest the whole \`subcategories/\` directory in one shot, then merge each markdown page into the matching database row by ID.
-6. Pin a top-level page view that shows the Functions database with its rollup column visible. That's your dashboard.
-
-After step 4 your rollups are live. Score a single Subcategory and watch the Category and Function rollups update.
-
-## Schema
-
-\`functions.csv\` — \`ID, Name, Description\`
-
-\`categories.csv\` — \`ID, Name, Description, Function\`
-- \`Function\` references \`functions.csv ID\` for the Notion relation
-
-\`subcategories.csv\` — \`ID, Description, Category, Function, Owner, Target Score, Score, Last Reviewed, Observations, Evidence, Notes\`
-- \`Category\` references \`categories.csv ID\` for the Notion relation
-- \`Function\` is a denormalized convenience column (\`GV\`, \`ID\`, \`PR\`, \`DE\`, \`RS\`, \`RC\`) — keep it as plain Text for fast filtering by Function without traversing the Category relation. You don't need to convert it to a Notion Relation; the Subcategories → Categories → Functions chain already gives you rollup math via that relation.
-- \`Owner\`, \`Target Score\`, \`Score\`, \`Last Reviewed\`, \`Observations\`, \`Evidence\`, \`Notes\` ship empty — fill them in as you assess
-
-## GRC migration path
-
-\`subcategories.csv\` exported back out of Notion — now enriched with Score, Target Score, Owner, Last Reviewed, Observations, Evidence, and Notes — is the single artifact to feed into your GRC platform (Archer, Hyperproof, OneTrust, ServiceNow GRC, MetricStream, etc.). Most GRC tools import CSV directly or via a vendor template into which you can map columns 1:1.
-
-The Functions and Categories databases are browsing scaffolding for the Notion stage. Discard them at migration — your GRC tool's CSF taxonomy module already provides them.
-
-## Source data and regeneration
-
-This bundle was generated from a NIST CSF implementation-examples CSV via \`_generate.ts\`. Counts written: ${data.functions.length} functions, ${data.categories.length} categories, ${data.subcategories.length} subcategories, ${data.exampleCount} implementation examples preserved verbatim on subcategory pages.
-
-To regenerate against an updated source CSV:
-
-\`\`\`sh
-# explicit path
-bun run _generate.ts /path/to/CSF-implementation-examples.csv
-
-# or via env var
-CSF_SOURCE_CSV=/path/to/CSF-implementation-examples.csv bun run _generate.ts
-
-# or fall back to the bundled source/CSF-implementation-examples.csv
-bun run _generate.ts
-\`\`\`
-
-The generator is idempotent — it cleans the \`subcategories/\` directory and overwrites all CSVs and this README on every run.
-
-## What this wiki deliberately does NOT do
-
-- **Score implementation examples.** Examples are read-only NIST reference text, surfaced on each Subcategory page for context — not their own database rows or pages.
-- **Auto-aggregate scores in CSV.** Aggregation is Notion's job, done via Rollup properties on the relations.
-- **Prescribe the "right" rubric.** The default CMMI-style 0–5 scale is a defensible starting point; pick your organization's calibration and edit the rubric section accordingly.
-`;
-}
-
-function ensureHeader(header: CsvRow): void {
-  if (header.length !== EXPECTED_SOURCE_HEADER.length) {
-    throw new Error(
-      `Unexpected source header width: expected ${EXPECTED_SOURCE_HEADER.length} columns but found ${header.length}.`,
-    );
-  }
-
-  for (let index = 0; index < EXPECTED_SOURCE_HEADER.length; index += 1) {
-    if (header[index] !== EXPECTED_SOURCE_HEADER[index]) {
-      throw new Error(
-        `Unexpected source header at column ${index + 1}: expected "${EXPECTED_SOURCE_HEADER[index]}", found "${header[index]}".`,
-      );
+function latestPopulated(values: string[]): string {
+  for (let index = values.length - 1; index >= 0; index -= 1) {
+    if (values[index] && values[index].trim() !== "") {
+      return values[index].trim();
     }
   }
+  return "";
 }
 
-function ensureMatchingFunction(
-  functionsById: Map<string, FunctionRow>,
-  nextValue: FunctionRow,
-): void {
-  const existing = functionsById.get(nextValue.id);
-
-  if (!existing) {
-    functionsById.set(nextValue.id, nextValue);
-    return;
+function average(values: string[]): string {
+  const numbers = values
+    .map((value) => Number.parseFloat(value))
+    .filter((value) => Number.isFinite(value));
+  if (numbers.length === 0) {
+    return "";
   }
-
-  if (
-    existing.name !== nextValue.name ||
-    existing.description !== nextValue.description
-  ) {
-    throw new Error(
-      `Conflicting function data for "${nextValue.id}". Check the source CSV for inconsistent Function rows.`,
-    );
-  }
+  const sum = numbers.reduce((total, value) => total + value, 0);
+  return String(sum / numbers.length);
 }
 
-function ensureMatchingCategory(
-  categoriesById: Map<string, CategoryRow>,
-  nextValue: CategoryRow,
-): void {
-  const existing = categoriesById.get(nextValue.id);
+// ---------------------------------------------------------------------------
+// YAML frontmatter (single-line values only; multi-line content -> body)
+// ---------------------------------------------------------------------------
 
-  if (!existing) {
-    categoriesById.set(nextValue.id, nextValue);
-    return;
+function renderYamlField(key: string, rawValue: string): string {
+  const value = rawValue.replace(/\s*\n\s*/g, " ").trim();
+  if (value.length === 0) {
+    return `${key}:`;
   }
-
-  if (
-    existing.name !== nextValue.name ||
-    existing.description !== nextValue.description ||
-    existing.functionId !== nextValue.functionId
-  ) {
-    throw new Error(
-      `Conflicting category data for "${nextValue.id}". Check the source CSV for inconsistent Category rows.`,
-    );
+  if (/^-?\d+(\.\d+)?$/.test(value)) {
+    return `${key}: ${value}`;
   }
+  return `${key}: '${value.replaceAll("'", "''")}'`;
 }
 
-function ensureMatchingSubcategory(
-  subcategoriesById: Map<string, SubcategoryRow>,
-  nextValue: SubcategoryRow,
-): void {
-  const existing = subcategoriesById.get(nextValue.id);
+// ---------------------------------------------------------------------------
+// Load + shape the source of truth
+// ---------------------------------------------------------------------------
 
-  if (!existing) {
-    subcategoriesById.set(nextValue.id, nextValue);
-    return;
-  }
-
-  if (
-    existing.description !== nextValue.description ||
-    existing.categoryId !== nextValue.categoryId ||
-    existing.categoryName !== nextValue.categoryName ||
-    existing.functionId !== nextValue.functionId ||
-    existing.functionName !== nextValue.functionName
-  ) {
-    throw new Error(
-      `Conflicting subcategory data for "${nextValue.id}". Check the source CSV for inconsistent Subcategory rows.`,
-    );
-  }
-}
-
-function validateCounts(data: SourceData): void {
-  if (data.functions.length !== 6) {
-    throw new Error(
-      `Validation failed: expected 6 functions but found ${data.functions.length}. Verify column 2 values in ${SOURCE_CSV_PATH}.`,
-    );
-  }
-
-  if (data.categories.length !== 22) {
-    throw new Error(
-      `Validation failed: expected 22 categories but found ${data.categories.length}. Verify column 4 values in ${SOURCE_CSV_PATH}.`,
-    );
-  }
-
-  if (data.subcategories.length !== 106) {
-    throw new Error(
-      `Validation failed: expected 106 subcategories but found ${data.subcategories.length}. Verify column 7 values in ${SOURCE_CSV_PATH}.`,
-    );
-  }
+function emptyQuarter(): QuarterAssessment {
+  return {
+    actual: "",
+    target: "",
+    observations: "",
+    observationDate: "",
+    testingStatus: "",
+    examine: "",
+    interview: "",
+    test: "",
+  };
 }
 
 async function loadSource(): Promise<SourceData> {
-  const sourceText = await readFile(SOURCE_CSV_PATH, "utf8");
-  const rows = parseCsv(sourceText);
-
-  if (rows.length === 0) {
-    throw new Error(`Source CSV is empty: ${SOURCE_CSV_PATH}`);
+  const text = await readFile(SOURCE_CSV_PATH, "utf8");
+  const rows = parseCsv(text);
+  if (rows.length < 2) {
+    throw new Error(`Source CSV is empty or headerless: ${SOURCE_CSV_PATH}`);
   }
 
   const header = rows[0];
+  const col = headerIndexer(header);
 
-  if (!header) {
-    throw new Error(`Source CSV is empty: ${SOURCE_CSV_PATH}`);
+  for (const required of REQUIRED_SOURCE_COLUMNS) {
+    if (col(required) < 0) {
+      throw new Error(
+        `Source CSV missing required column "${required}" in ${SOURCE_CSV_PATH}.`,
+      );
+    }
   }
 
-  const dataRows = rows.slice(1);
-  ensureHeader(header);
+  const idIdx = col("ID");
+  const functionIdx = col("Function");
+  const functionDescIdx = col("Function Description");
+  const categoryIdIdx = col("Category ID");
+  const categoryIdx = col("Category");
+  const categoryDescIdx = col("Category Description");
+  const subIdIdx = col("Subcategory ID");
+  const subDescIdx = col("Subcategory Description");
+  const exampleIdx = col("Implementation Example");
+  const implIdx = col("Implementation Description");
 
   const functionsById = new Map<string, FunctionRow>();
   const categoriesById = new Map<string, CategoryRow>();
   const subcategoriesById = new Map<string, SubcategoryRow>();
   let exampleCount = 0;
 
-  for (let rowIndex = 0; rowIndex < dataRows.length; rowIndex += 1) {
-    const row = dataRows[rowIndex];
+  const dataRows = rows
+    .slice(1)
+    .filter((row) => row.length > 1 && (row[idIdx] ?? "").trim() !== "");
 
-    if (row.length !== 9) {
-      throw new Error(
-        `Invalid source row ${rowIndex + 2}: expected 9 columns but found ${row.length}.`,
+  for (const row of dataRows) {
+    const cell = (index: number): string => (index >= 0 ? row[index] ?? "" : "");
+
+    const functionParts = extractFunctionId(cell(functionIdx));
+    const categoryName = stripCategorySuffix(cell(categoryIdx));
+    const functionId = functionParts.shortId;
+    const categoryId = cell(categoryIdIdx);
+    const subId = cell(subIdIdx);
+
+    if (!functionsById.has(functionId)) {
+      functionsById.set(functionId, {
+        id: functionId,
+        name: functionParts.longName,
+        description: cell(functionDescIdx),
+        categoryIds: [],
+        subcategoryIds: [],
+        actualScore: "",
+        targetScore: "",
+      });
+    }
+
+    if (!categoriesById.has(categoryId)) {
+      categoriesById.set(categoryId, {
+        id: categoryId,
+        name: categoryName,
+        description: cell(categoryDescIdx),
+        functionId,
+        subcategoryIds: [],
+        actualScore: "",
+        targetScore: "",
+      });
+      functionsById.get(functionId)?.categoryIds.push(categoryId);
+    }
+
+    if (!subcategoriesById.has(subId)) {
+      const quarters: Record<Quarter, QuarterAssessment> = {
+        Q1: emptyQuarter(),
+        Q2: emptyQuarter(),
+        Q3: emptyQuarter(),
+        Q4: emptyQuarter(),
+      };
+      for (const quarter of QUARTERS) {
+        quarters[quarter] = {
+          actual: cell(col(`${quarter} Actual Score`)),
+          target: cell(col(`${quarter} Target Score`)),
+          observations: cell(col(`${quarter} Observations`)),
+          observationDate: cell(col(`${quarter} Observation Date`)),
+          testingStatus: cell(col(`${quarter} Testing Status`)),
+          examine: cell(col(`${quarter} Examine`)),
+          interview: cell(col(`${quarter} Interview`)),
+          test: cell(col(`${quarter} Test`)),
+        };
+      }
+
+      const assessment: Assessment = {
+        inScope: cell(col("In Scope? ")),
+        owner: cell(col("Owner")),
+        stakeholders: cell(col("Stakeholder(s)")),
+        auditor: cell(col("Auditor")),
+        nist80053: cell(col("NIST 800-53 Control Ref")),
+        testProcedures: cell(col("Test Procedure(s)")),
+        quarters,
+        remediationOwner: cell(col("Remediation Owner")),
+        remediationDue: cell(col("Remediation Due Date")),
+        minimumTarget: cell(col("Minimum Target")),
+        actionPlan: cell(col("Action Plan")),
+        artifactName: cell(col("Artifact Name")),
+      };
+
+      const score = latestPopulated(QUARTERS.map((quarter) => quarters[quarter].actual));
+      const latestTarget = latestPopulated(
+        QUARTERS.map((quarter) => quarters[quarter].target),
       );
+
+      subcategoriesById.set(subId, {
+        id: subId,
+        description: cell(subDescIdx),
+        categoryId,
+        categoryName,
+        functionId,
+        functionName: functionParts.longName,
+        assessment,
+        examples: [],
+        score,
+        targetScore: latestTarget || assessment.minimumTarget,
+      });
+      categoriesById.get(categoryId)?.subcategoryIds.push(subId);
+      functionsById.get(functionId)?.subcategoryIds.push(subId);
     }
 
-    const [
-      exampleId,
-      functionCell,
-      functionDescription,
-      categoryId,
-      categoryCell,
-      categoryDescription,
-      subcategoryId,
-      subcategoryDescription,
-      implementationExample,
-    ] = row;
-
-    const functionParts = extractFunctionId(functionCell);
-    const categoryName = stripCategorySuffix(categoryCell);
-
-    ensureMatchingFunction(functionsById, {
-      id: functionParts.shortId,
-      name: functionParts.longName,
-      description: functionDescription,
-    });
-
-    ensureMatchingCategory(categoriesById, {
-      id: categoryId,
-      name: categoryName,
-      description: categoryDescription,
-      functionId: functionParts.shortId,
-    });
-
-    ensureMatchingSubcategory(subcategoriesById, {
-      id: subcategoryId,
-      description: subcategoryDescription,
-      categoryId,
-      categoryName,
-      functionId: functionParts.shortId,
-      functionName: functionParts.longName,
-      owner: "",
-      targetScore: "",
-      score: "",
-      lastReviewed: "",
-      observations: "",
-      evidence: "",
-      notes: "",
-      examples: [],
-    });
-
-    const subcategory = subcategoriesById.get(subcategoryId);
-
-    if (!subcategory) {
-      throw new Error(`Failed to materialize subcategory "${subcategoryId}".`);
+    const subcategory = subcategoriesById.get(subId);
+    if (subcategory) {
+      subcategory.examples.push({
+        id: cell(idIdx),
+        text: cell(exampleIdx),
+        implementation: cell(implIdx),
+      });
+      exampleCount += 1;
     }
-
-    subcategory.examples.push({
-      id: exampleId,
-      text: implementationExample,
-    });
-    exampleCount += 1;
   }
 
-  const functions = [...functionsById.values()].sort((left, right) =>
-    left.id.localeCompare(right.id),
-  );
-  const categories = [...categoriesById.values()].sort((left, right) =>
-    left.id.localeCompare(right.id),
-  );
-  const subcategories = [...subcategoriesById.values()]
-    .map((subcategory: SubcategoryRow) => ({
-      ...subcategory,
-      examples: [...subcategory.examples].sort((left, right) =>
-        left.id.localeCompare(right.id, undefined, { numeric: true }),
-      ),
-    }))
-    .sort((left, right) => left.id.localeCompare(right.id));
+  // Compute category / function rollup snapshots (Notion recomputes these live
+  // once relations are wired; we ship a static snapshot so the demo is populated).
+  const categories = [...categoriesById.values()];
+  for (const category of categories) {
+    const subs = category.subcategoryIds
+      .map((id) => subcategoriesById.get(id))
+      .filter((sub): sub is SubcategoryRow => Boolean(sub));
+    category.actualScore = average(subs.map((sub) => sub.score));
+    category.targetScore = average(subs.map((sub) => sub.targetScore));
+  }
+
+  const functions = [...functionsById.values()];
+  for (const fn of functions) {
+    const cats = fn.categoryIds
+      .map((id) => categoriesById.get(id))
+      .filter((cat): cat is CategoryRow => Boolean(cat));
+    fn.actualScore = average(cats.map((cat) => cat.actualScore));
+    fn.targetScore = average(cats.map((cat) => cat.targetScore));
+  }
+
+  const sortById = <T extends { id: string }>(list: T[]): T[] =>
+    [...list].sort((left, right) => left.id.localeCompare(right.id));
+
+  const subcategories = sortById([...subcategoriesById.values()]).map((sub) => ({
+    ...sub,
+    examples: [...sub.examples].sort((left, right) =>
+      left.id.localeCompare(right.id, undefined, { numeric: true }),
+    ),
+  }));
+
+  const knownSubIds = new Set(subcategories.map((sub) => sub.id));
+  const findings = await loadFindings(knownSubIds);
+  const artifacts = await loadArtifacts(knownSubIds);
 
   const data: SourceData = {
-    functions,
-    categories,
+    functions: sortById(functions),
+    categories: sortById(categories),
     subcategories,
+    findings,
+    artifacts,
     exampleCount,
   };
 
@@ -668,105 +600,753 @@ async function loadSource(): Promise<SourceData> {
   return data;
 }
 
-async function cleanSubcategoryDir(): Promise<void> {
-  await mkdir(SUBCATEGORIES_DIR, { recursive: true });
-  const entries = await readdir(SUBCATEGORIES_DIR, { withFileTypes: true });
-
-  await Promise.all(
-    entries
-      .filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
-      .map((entry) => rm(join(SUBCATEGORIES_DIR, entry.name))),
-  );
+function validateCounts(data: SourceData): void {
+  if (data.functions.length !== 6) {
+    throw new Error(`Expected 6 functions, found ${data.functions.length}.`);
+  }
+  if (data.categories.length !== 22) {
+    throw new Error(`Expected 22 categories, found ${data.categories.length}.`);
+  }
+  if (data.subcategories.length !== 106) {
+    throw new Error(`Expected 106 subcategories, found ${data.subcategories.length}.`);
+  }
 }
 
-async function emitBundle(data: SourceData): Promise<number> {
-  await cleanSubcategoryDir();
+// ---------------------------------------------------------------------------
+// Findings / Artifacts (mirror the JIRA exports, add a relation-ready column)
+// ---------------------------------------------------------------------------
 
-  const functionsCsvRows: CsvRow[] = [
+const SUBCATEGORY_ID_RE = /[A-Z]{2}\.[A-Z]{2}-\d{2}/;
+
+function firstSubcategoryId(haystacks: string[], known: Set<string>): string {
+  for (const text of haystacks) {
+    const match = SUBCATEGORY_ID_RE.exec(text ?? "");
+    if (match && known.has(match[0])) {
+      return match[0];
+    }
+  }
+  return "";
+}
+
+async function loadFindings(known: Set<string>): Promise<FindingRow[]> {
+  if (!existsSync(FINDINGS_CSV_PATH)) {
+    console.warn(`WARN: findings source not found, emitting empty Findings DB: ${FINDINGS_CSV_PATH}`);
+    return [];
+  }
+  const rows = parseCsv(await readFile(FINDINGS_CSV_PATH, "utf8"));
+  if (rows.length < 2) return [];
+  const col = headerIndexer(rows[0]);
+  const cell = (row: CsvRow, name: string): string => {
+    const index = col(name);
+    return index >= 0 ? row[index] ?? "" : "";
+  };
+
+  return rows
+    .slice(1)
+    .filter((row) => (cell(row, "Issue key") || cell(row, "Summary")).trim() !== "")
+    .map((row) => {
+      const summary = cell(row, "Summary");
+      const description = cell(row, "Description");
+      const controlLink = cell(row, "Custom field (Control Link)");
+      const compliance = cell(row, "Custom field (Compliance Requirement)");
+      return {
+        summary,
+        subcategoryId: firstSubcategoryId(
+          [summary, description, controlLink, compliance],
+          known,
+        ),
+        issueKey: cell(row, "Issue key"),
+        issueType: cell(row, "Issue Type"),
+        status: cell(row, "Status"),
+        priority: cell(row, "Priority"),
+        assignee: cell(row, "Assignee"),
+        reporter: cell(row, "Reporter"),
+        created: cell(row, "Created"),
+        updated: cell(row, "Updated"),
+        dueDate: cell(row, "Due date"),
+        rootCause: cell(row, "Custom field (Root Cause)"),
+        vulnerability: cell(row, "Custom field (Vulnerability)"),
+        remediationPlan: cell(
+          row,
+          "Custom field (Remediation Action Plan (Who will do What by When?) )",
+        ),
+        testingStatus: cell(row, "Custom field (Testing Status)"),
+        description,
+      };
+    });
+}
+
+async function loadArtifacts(known: Set<string>): Promise<ArtifactRow[]> {
+  if (!existsSync(ARTIFACTS_CSV_PATH)) {
+    console.warn(`WARN: artifacts source not found, emitting empty Artifacts DB: ${ARTIFACTS_CSV_PATH}`);
+    return [];
+  }
+  const rows = parseCsv(await readFile(ARTIFACTS_CSV_PATH, "utf8"));
+  if (rows.length < 2) return [];
+  const col = headerIndexer(rows[0]);
+  const cell = (row: CsvRow, name: string): string => {
+    const index = col(name);
+    return index >= 0 ? row[index] ?? "" : "";
+  };
+
+  return rows
+    .slice(1)
+    .filter((row) => (cell(row, "Issue key") || cell(row, "Summary")).trim() !== "")
+    .map((row) => {
+      const summary = cell(row, "Summary");
+      const description = cell(row, "Description");
+      const controlLink = cell(row, "Custom field (Control Link)");
+      const link = cell(row, "Custom field (Link)");
+      return {
+        summary,
+        subcategoryId: firstSubcategoryId([summary, description, controlLink], known),
+        issueKey: cell(row, "Issue key"),
+        issueType: cell(row, "Issue Type"),
+        status: cell(row, "Status"),
+        priority: cell(row, "Priority"),
+        assignee: cell(row, "Assignee"),
+        reporter: cell(row, "Reporter"),
+        created: cell(row, "Created"),
+        updated: cell(row, "Updated"),
+        link: controlLink || link,
+        description,
+      };
+    });
+}
+
+// ---------------------------------------------------------------------------
+// Shared column schemas
+// ---------------------------------------------------------------------------
+
+const SUBCATEGORY_COLUMNS: string[] = [
+  "ID",
+  "Category",
+  "Function",
+  "Description",
+  "In Scope?",
+  "Owner",
+  "Stakeholders",
+  "Auditor",
+  "NIST 800-53 Control Ref",
+  "Test Procedures",
+  "Score",
+  "Target Score",
+  ...QUARTERS.flatMap((quarter) => [
+    `${quarter} Actual Score`,
+    `${quarter} Target Score`,
+    `${quarter} Observations`,
+    `${quarter} Observation Date`,
+    `${quarter} Testing Status`,
+    `${quarter} Examine`,
+    `${quarter} Interview`,
+    `${quarter} Test`,
+  ]),
+  "Remediation Owner",
+  "Remediation Due Date",
+  "Minimum Target",
+  "Action Plan",
+  "Artifact Name",
+];
+
+const FINDINGS_COLUMNS: string[] = [
+  "Summary",
+  "Subcategory ID",
+  "Issue Key",
+  "Issue Type",
+  "Status",
+  "Priority",
+  "Assignee",
+  "Reporter",
+  "Created",
+  "Updated",
+  "Due Date",
+  "Root Cause",
+  "Vulnerability",
+  "Remediation Action Plan",
+  "Testing Status",
+  "Description",
+];
+
+const ARTIFACTS_COLUMNS: string[] = [
+  "Summary",
+  "Subcategory ID",
+  "Issue Key",
+  "Issue Type",
+  "Status",
+  "Priority",
+  "Assignee",
+  "Reporter",
+  "Created",
+  "Updated",
+  "Link",
+  "Description",
+];
+
+function subcategoryValues(
+  sub: SubcategoryRow,
+  categoryCell: string,
+  functionCell: string,
+): string[] {
+  const a = sub.assessment;
+  return [
+    sub.id,
+    categoryCell,
+    functionCell,
+    sub.description,
+    a.inScope,
+    a.owner,
+    a.stakeholders,
+    a.auditor,
+    a.nist80053,
+    a.testProcedures,
+    sub.score,
+    sub.targetScore,
+    ...QUARTERS.flatMap((quarter) => {
+      const q = a.quarters[quarter];
+      return [
+        q.actual,
+        q.target,
+        q.observations,
+        q.observationDate,
+        q.testingStatus,
+        q.examine,
+        q.interview,
+        q.test,
+      ];
+    }),
+    a.remediationOwner,
+    a.remediationDue,
+    a.minimumTarget,
+    a.actionPlan,
+    a.artifactName,
+  ];
+}
+
+function findingValues(finding: FindingRow): string[] {
+  return [
+    finding.summary,
+    finding.subcategoryId,
+    finding.issueKey,
+    finding.issueType,
+    finding.status,
+    finding.priority,
+    finding.assignee,
+    finding.reporter,
+    finding.created,
+    finding.updated,
+    finding.dueDate,
+    finding.rootCause,
+    finding.vulnerability,
+    finding.remediationPlan,
+    finding.testingStatus,
+    finding.description,
+  ];
+}
+
+function artifactValues(artifact: ArtifactRow): string[] {
+  return [
+    artifact.summary,
+    artifact.subcategoryId,
+    artifact.issueKey,
+    artifact.issueType,
+    artifact.status,
+    artifact.priority,
+    artifact.assignee,
+    artifact.reporter,
+    artifact.created,
+    artifact.updated,
+    artifact.link,
+    artifact.description,
+  ];
+}
+
+// ---------------------------------------------------------------------------
+// Loose files (functions.csv, categories.csv, subcategories.csv, findings.csv,
+// artifacts.csv, subcategories/*.md)
+// ---------------------------------------------------------------------------
+
+function formatExampleLines(example: ExampleRow): string[] {
+  const trimmed = example.text.trim();
+  const match = /^(Ex\d+):\s*(.*)$/.exec(trimmed);
+  const head = match ? `- **${match[1]}:** ${match[2]}` : `- ${trimmed}`;
+  const lines = [head];
+  const implementation = example.implementation.trim();
+  if (implementation.length > 0) {
+    lines.push("");
+    for (const paragraph of implementation.split(/\n+/)) {
+      lines.push(`  ${paragraph.trim()}`);
+    }
+  }
+  return lines;
+}
+
+function buildSubcategoryMarkdown(sub: SubcategoryRow): string {
+  const a = sub.assessment;
+  const quarterRows = QUARTERS.map((quarter) => {
+    const q = a.quarters[quarter];
+    return `| ${quarter} | ${q.actual || "—"} | ${q.target || "—"} | ${q.testingStatus || "—"} | ${q.examine || "—"} | ${q.interview || "—"} | ${q.test || "—"} | ${q.observationDate || "—"} |`;
+  });
+
+  const observationBlocks = QUARTERS.flatMap((quarter) => {
+    const q = a.quarters[quarter];
+    if (q.observations.trim() === "") return [];
+    return [`**${quarter} observations**`, "", q.observations.trim(), ""];
+  });
+
+  const lines = [
+    "---",
+    renderYamlField("id", sub.id),
+    renderYamlField("function_id", sub.functionId),
+    renderYamlField("function_name", sub.functionName),
+    renderYamlField("category_id", sub.categoryId),
+    renderYamlField("category_name", sub.categoryName),
+    renderYamlField("in_scope", a.inScope),
+    renderYamlField("owner", a.owner),
+    renderYamlField("stakeholders", a.stakeholders),
+    renderYamlField("auditor", a.auditor),
+    renderYamlField("nist_800_53", a.nist80053),
+    renderYamlField("score", sub.score),
+    renderYamlField("target_score", sub.targetScore),
+    renderYamlField("minimum_target", a.minimumTarget),
+    renderYamlField("remediation_owner", a.remediationOwner),
+    renderYamlField("remediation_due", a.remediationDue),
+    renderYamlField("artifact_name", a.artifactName),
+    "---",
+    "",
+    `# ${sub.id} — ${sub.description}`,
+    "",
+    "## Description",
+    "",
+    sub.description,
+    "",
+    "## Quarterly Assessment",
+    "",
+    "| Quarter | Actual | Target | Testing Status | Examine | Interview | Test | Obs. Date |",
+    "|---------|--------|--------|----------------|---------|-----------|------|-----------|",
+    ...quarterRows,
+    "",
+    ...observationBlocks,
+    "## NIST 800-53 References",
+    "",
+    a.nist80053.trim().length > 0 ? a.nist80053 : "_None mapped._",
+    "",
+    "## Test Procedures",
+    "",
+    a.testProcedures.trim().length > 0
+      ? a.testProcedures.trim()
+      : "_Add examine / interview / test procedures here._",
+    "",
+    "## Implementation Examples",
+    "",
+    ...sub.examples.flatMap((example) => formatExampleLines(example)),
+    "",
+    "## Remediation / Action Plan",
+    "",
+    a.actionPlan.trim().length > 0
+      ? a.actionPlan.trim()
+      : "_Add remediation owner, due date, and action plan here._",
+    "",
+  ];
+
+  return lines.join("\n");
+}
+
+async function emitLooseFiles(data: SourceData): Promise<number> {
+  const functionsCsv: CsvRow[] = [
     ["ID", "Name", "Description"],
-    ...data.functions.map((row: FunctionRow) => [
-      row.id,
-      row.name,
-      row.description,
-    ]),
+    ...data.functions.map((fn) => [fn.id, fn.name, fn.description]),
   ];
 
-  const categoriesCsvRows: CsvRow[] = [
+  const categoriesCsv: CsvRow[] = [
     ["ID", "Name", "Description", "Function"],
-    ...data.categories.map((row: CategoryRow) => [
-      row.id,
-      row.name,
-      row.description,
-      row.functionId,
-    ]),
+    ...data.categories.map((cat) => [cat.id, cat.name, cat.description, cat.functionId]),
   ];
 
-  const subcategoriesCsvRows: CsvRow[] = [
-    [
-      "ID",
-      "Description",
-      "Category",
-      "Function",
-      "Owner",
-      "Target Score",
-      "Score",
-      "Last Reviewed",
-      "Observations",
-      "Evidence",
-      "Notes",
-    ],
-    ...data.subcategories.map((row: SubcategoryRow) => [
-      row.id,
-      row.description,
-      row.categoryId,
-      row.functionId,
-      row.owner,
-      row.targetScore,
-      row.score,
-      row.lastReviewed,
-      row.observations,
-      row.evidence,
-      row.notes,
-    ]),
+  const subcategoriesCsv: CsvRow[] = [
+    SUBCATEGORY_COLUMNS,
+    ...data.subcategories.map((sub) =>
+      subcategoryValues(sub, sub.categoryId, sub.functionId),
+    ),
   ];
 
-  const writes: Promise<void>[] = [
-    writeFile(join(OUTPUT_DIR, "functions.csv"), writeCsv(functionsCsvRows), "utf8"),
-    writeFile(
-      join(OUTPUT_DIR, "categories.csv"),
-      writeCsv(categoriesCsvRows),
-      "utf8",
-    ),
-    writeFile(
-      join(OUTPUT_DIR, "subcategories.csv"),
-      writeCsv(subcategoriesCsvRows),
-      "utf8",
-    ),
-    writeFile(join(OUTPUT_DIR, "README.md"), buildReadme(data), "utf8"),
-    ...data.subcategories.map((subcategory: SubcategoryRow) =>
-      writeFile(
-        join(SUBCATEGORIES_DIR, `${subcategory.id}.md`),
-        buildSubcategoryMarkdown(subcategory),
-        "utf8",
-      ),
+  const findingsCsv: CsvRow[] = [
+    FINDINGS_COLUMNS,
+    ...data.findings.map((finding) => findingValues(finding)),
+  ];
+
+  const artifactsCsv: CsvRow[] = [
+    ARTIFACTS_COLUMNS,
+    ...data.artifacts.map((artifact) => artifactValues(artifact)),
+  ];
+
+  await mkdir(SUBCATEGORIES_DIR, { recursive: true });
+
+  const writes: Promise<unknown>[] = [
+    writeFile(join(OUTPUT_DIR, "functions.csv"), writeCsvText(functionsCsv), "utf8"),
+    writeFile(join(OUTPUT_DIR, "categories.csv"), writeCsvText(categoriesCsv), "utf8"),
+    writeFile(join(OUTPUT_DIR, "subcategories.csv"), writeCsvText(subcategoriesCsv), "utf8"),
+    writeFile(join(OUTPUT_DIR, "findings.csv"), writeCsvText(findingsCsv), "utf8"),
+    writeFile(join(OUTPUT_DIR, "artifacts.csv"), writeCsvText(artifactsCsv), "utf8"),
+    ...data.subcategories.map((sub) =>
+      writeFile(join(SUBCATEGORIES_DIR, `${sub.id}.md`), buildSubcategoryMarkdown(sub), "utf8"),
     ),
   ];
 
   await Promise.all(writes);
+  return 5 + data.subcategories.length;
+}
 
-  return 3 + 1 + data.subcategories.length;
+// ---------------------------------------------------------------------------
+// Notion drag-import bundle (CSF_Wiki/)
+// ---------------------------------------------------------------------------
+
+interface BundleNames {
+  functionBase: Map<string, string>; // functionId -> "DE {id}"
+  categoryBase: Map<string, string>; // categoryId -> "Name {id}"
+  subcategoryBase: Map<string, string>; // subId -> "DE AE-02 {id}"
+  functionsCsv: string;
+  categoriesCsv: string;
+  subcategoriesCsv: string;
+  findingsCsv: string;
+  artifactsCsv: string;
+  rootPage: string;
+}
+
+function buildBundleNames(data: SourceData): BundleNames {
+  const functionBase = new Map<string, string>();
+  const categoryBase = new Map<string, string>();
+  const subcategoryBase = new Map<string, string>();
+
+  for (const fn of data.functions) {
+    functionBase.set(fn.id, fileBaseName(fn.id, notionId(`fn:${fn.id}`)));
+  }
+  for (const cat of data.categories) {
+    categoryBase.set(cat.id, fileBaseName(cat.name, notionId(`cat:${cat.id}`)));
+  }
+  for (const sub of data.subcategories) {
+    subcategoryBase.set(sub.id, fileBaseName(sub.id, notionId(`sub:${sub.id}`)));
+  }
+
+  return {
+    functionBase,
+    categoryBase,
+    subcategoryBase,
+    functionsCsv: `functions ${notionId("db:functions")}`,
+    categoriesCsv: `categories ${notionId("db:categories")}`,
+    subcategoriesCsv: `subcategories ${notionId("db:subcategories")}`,
+    findingsCsv: `findings ${notionId("db:findings")}`,
+    artifactsCsv: `artifacts ${notionId("db:artifacts")}`,
+    rootPage: `CSF_Wiki ${notionId("page:root")}`,
+  };
+}
+
+async function emitBundle(data: SourceData, names: BundleNames): Promise<number> {
+  await mkdir(join(BUNDLE_INNER, "functions"), { recursive: true });
+  await mkdir(join(BUNDLE_INNER, "categories"), { recursive: true });
+  await mkdir(join(BUNDLE_INNER, "subcategories"), { recursive: true });
+
+  const writes: Promise<unknown>[] = [];
+  let fileCount = 0;
+
+  // --- Top index page --------------------------------------------------------
+  const indexEntries: Array<[string, string]> = [
+    ["functions", `CSF_Wiki/${names.functionsCsv}.csv`],
+    ["categories", `CSF_Wiki/${names.categoriesCsv}.csv`],
+    ["subcategories", `CSF_Wiki/${names.subcategoriesCsv}.csv`],
+    ["findings", `CSF_Wiki/${names.findingsCsv}.csv`],
+    ["artifacts", `CSF_Wiki/${names.artifactsCsv}.csv`],
+  ];
+  const indexMarkdown = [
+    "# CSF_Wiki",
+    "",
+    ...indexEntries.map(([label, path]) => `[${label}](${encodePath(path)})`),
+  ].join("\n\n");
+  writes.push(writeFile(join(BUNDLE_DIR, `${names.rootPage}.md`), `${indexMarkdown}\n`, "utf8"));
+  fileCount += 1;
+
+  // --- functions.csv ---------------------------------------------------------
+  const functionsCsvRows: CsvRow[] = [
+    ["ID", "Name", "Description", "Actual Score", "Target Score", "categories", "subcategories"],
+    ...data.functions.map((fn) => {
+      const categoriesCell = fn.categoryIds
+        .map((id) => {
+          const cat = data.categories.find((c) => c.id === id);
+          return relationCell(cat?.name ?? id, `categories/${names.categoryBase.get(id)}`, "csv");
+        })
+        .join(", ");
+      const subcategoriesCell = fn.subcategoryIds
+        .map((id) => relationCell(id, `subcategories/${names.subcategoryBase.get(id)}`, "csv"))
+        .join(", ");
+      return [fn.id, fn.name, fn.description, fn.actualScore, fn.targetScore, categoriesCell, subcategoriesCell];
+    }),
+  ];
+  writes.push(writeFile(join(BUNDLE_INNER, `${names.functionsCsv}.csv`), writeCsvText(functionsCsvRows), "utf8"));
+  fileCount += 1;
+
+  // --- categories.csv --------------------------------------------------------
+  const categoriesCsvRows: CsvRow[] = [
+    ["Function", "ID", "Name", "Description", "subcategories", "Actual Score", "Target Score"],
+    ...data.categories.map((cat) => {
+      const functionCell = relationCell(cat.functionId, `functions/${names.functionBase.get(cat.functionId)}`, "csv");
+      const subcategoriesCell = cat.subcategoryIds
+        .map((id) => relationCell(id, `subcategories/${names.subcategoryBase.get(id)}`, "csv"))
+        .join(", ");
+      return [functionCell, cat.id, cat.name, cat.description, subcategoriesCell, cat.actualScore, cat.targetScore];
+    }),
+  ];
+  writes.push(writeFile(join(BUNDLE_INNER, `${names.categoriesCsv}.csv`), writeCsvText(categoriesCsvRows), "utf8"));
+  fileCount += 1;
+
+  // --- subcategories.csv (extended schema) -----------------------------------
+  const subcategoriesCsvRows: CsvRow[] = [
+    SUBCATEGORY_COLUMNS,
+    ...data.subcategories.map((sub) => {
+      const categoryCell = relationCell(sub.categoryName, `categories/${names.categoryBase.get(sub.categoryId)}`, "csv");
+      const functionCell = relationCell(sub.functionId, `functions/${names.functionBase.get(sub.functionId)}`, "csv");
+      return subcategoryValues(sub, categoryCell, functionCell);
+    }),
+  ];
+  writes.push(writeFile(join(BUNDLE_INNER, `${names.subcategoriesCsv}.csv`), writeCsvText(subcategoriesCsvRows), "utf8"));
+  fileCount += 1;
+
+  // --- findings.csv / artifacts.csv ------------------------------------------
+  const findingsCsvRows: CsvRow[] = [FINDINGS_COLUMNS, ...data.findings.map((f) => findingValues(f))];
+  const artifactsCsvRows: CsvRow[] = [ARTIFACTS_COLUMNS, ...data.artifacts.map((a) => artifactValues(a))];
+  writes.push(writeFile(join(BUNDLE_INNER, `${names.findingsCsv}.csv`), writeCsvText(findingsCsvRows), "utf8"));
+  writes.push(writeFile(join(BUNDLE_INNER, `${names.artifactsCsv}.csv`), writeCsvText(artifactsCsvRows), "utf8"));
+  fileCount += 2;
+
+  // --- function pages --------------------------------------------------------
+  for (const fn of data.functions) {
+    const categoriesProp = fn.categoryIds
+      .map((id) => {
+        const cat = data.categories.find((c) => c.id === id);
+        return relationCell(cat?.name ?? id, `../categories/${names.categoryBase.get(id)}`, "md");
+      })
+      .join(", ");
+    const subcategoriesProp = fn.subcategoryIds
+      .map((id) => relationCell(id, `../subcategories/${names.subcategoryBase.get(id)}`, "md"))
+      .join(", ");
+    const page = [
+      `# ${fn.id}`,
+      "",
+      `Name: ${fn.name}`,
+      `Description: ${fn.description}`,
+      `Actual Score: ${fn.actualScore}`,
+      `Target Score: ${fn.targetScore}`,
+      `categories: ${categoriesProp}`,
+      `subcategories: ${subcategoriesProp}`,
+      "",
+    ].join("\n");
+    writes.push(writeFile(join(BUNDLE_INNER, "functions", `${names.functionBase.get(fn.id)}.md`), page, "utf8"));
+    fileCount += 1;
+  }
+
+  // --- category pages --------------------------------------------------------
+  for (const cat of data.categories) {
+    const functionProp = relationCell(cat.functionId, `../functions/${names.functionBase.get(cat.functionId)}`, "md");
+    const subcategoriesProp = cat.subcategoryIds
+      .map((id) => relationCell(id, `../subcategories/${names.subcategoryBase.get(id)}`, "md"))
+      .join(", ");
+    const page = [
+      `# ${cat.name}`,
+      "",
+      `ID: ${cat.id}`,
+      `Description: ${cat.description}`,
+      `Function: ${functionProp}`,
+      `Actual Score: ${cat.actualScore}`,
+      `Target Score: ${cat.targetScore}`,
+      `subcategories: ${subcategoriesProp}`,
+      "",
+    ].join("\n");
+    writes.push(writeFile(join(BUNDLE_INNER, "categories", `${names.categoryBase.get(cat.id)}.md`), page, "utf8"));
+    fileCount += 1;
+  }
+
+  // --- subcategory pages (properties + preserved implementation examples) ----
+  for (const sub of data.subcategories) {
+    const categoryProp = relationCell(sub.categoryName, `../categories/${names.categoryBase.get(sub.categoryId)}`, "md");
+    const functionProp = relationCell(sub.functionId, `../functions/${names.functionBase.get(sub.functionId)}`, "md");
+    const a = sub.assessment;
+    const page = [
+      `# ${sub.id}`,
+      "",
+      `Description: ${sub.description}`,
+      `Category: ${categoryProp}`,
+      `Function: ${functionProp}`,
+      `Score: ${sub.score}`,
+      `Target Score: ${sub.targetScore}`,
+      `In Scope?: ${a.inScope}`,
+      `Owner: ${a.owner}`,
+      `Auditor: ${a.auditor}`,
+      `NIST 800-53 Control Ref: ${a.nist80053}`,
+      "",
+      "## Implementation Examples",
+      "",
+      ...sub.examples.flatMap((example) => formatExampleLines(example)),
+      "",
+    ].join("\n");
+    writes.push(
+      writeFile(join(BUNDLE_INNER, "subcategories", `${names.subcategoryBase.get(sub.id)}.md`), page, "utf8"),
+    );
+    fileCount += 1;
+  }
+
+  await Promise.all(writes);
+  return fileCount;
+}
+
+// ---------------------------------------------------------------------------
+// README (marker-scoped generated blocks only — never clobbers curated prose)
+// ---------------------------------------------------------------------------
+
+function buildGeneratedBlocks(data: SourceData): Record<string, string> {
+  const perFunction = data.functions
+    .map(
+      (fn) =>
+        `| ${fn.id} | ${fn.name} | ${fn.categoryIds.length} | ${fn.subcategoryIds.length} | ${fn.actualScore || "—"} | ${fn.targetScore || "—"} |`,
+    )
+    .join("\n");
+
+  const counts = [
+    "This bundle is generated from the app source-of-truth CSV",
+    "(`GET_THE_SPREADSHEETS/yyyy-mm-dd_CSF_Profile.csv`) by `_generate.ts`.",
+    "",
+    `- **Functions:** ${data.functions.length}`,
+    `- **Categories:** ${data.categories.length}`,
+    `- **Subcategories:** ${data.subcategories.length}`,
+    `- **Implementation examples preserved:** ${data.exampleCount}`,
+    `- **Findings:** ${data.findings.length}`,
+    `- **Artifacts:** ${data.artifacts.length}`,
+    "",
+    "| Function | Name | Categories | Subcategories | Actual (avg) | Target (avg) |",
+    "|----------|------|-----------|---------------|--------------|--------------|",
+    perFunction,
+  ].join("\n");
+
+  const schema = [
+    "**`subcategories.csv`** — one row per subcategory (where all scoring happens).",
+    "Mirrors the app profile CSV, at the subcategory grain. Columns:",
+    "",
+    "`ID, Category, Function, Description, In Scope?, Owner, Stakeholders, Auditor,",
+    "NIST 800-53 Control Ref, Test Procedures, Score, Target Score,",
+    "Q1–Q4 {Actual Score, Target Score, Observations, Observation Date, Testing Status,",
+    "Examine, Interview, Test}, Remediation Owner, Remediation Due Date, Minimum Target,",
+    "Action Plan, Artifact Name`",
+    "",
+    "- `Category` → relation to `categories.csv`; `Function` → denormalized filter column.",
+    "- `Score` / `Target Score` are the latest populated quarter (the value Notion rolls up).",
+    "- The four quarterly blocks give the time dimension for quarterly GRC snapshots.",
+    "- Subcategory-level assessment values are taken from each subcategory's **primary",
+    "  implementation example (Ex1)**; every implementation example is preserved verbatim",
+    "  on the subcategory page body.",
+    "",
+    "**`findings.csv`** — mirrors `JIRA-Findings.csv`. Columns:",
+    "",
+    "`Summary, Subcategory ID, Issue Key, Issue Type, Status, Priority, Assignee, Reporter,",
+    "Created, Updated, Due Date, Root Cause, Vulnerability, Remediation Action Plan,",
+    "Testing Status, Description`",
+    "",
+    "**`artifacts.csv`** — mirrors `JIRA-Artifacts.csv`. Columns:",
+    "",
+    "`Summary, Subcategory ID, Issue Key, Issue Type, Status, Priority, Assignee, Reporter,",
+    "Created, Updated, Link, Description`",
+    "",
+    "`Subcategory ID` on Findings and Artifacts is a **relation-ready** column: convert it",
+    "to a Notion Relation targeting the Subcategories database to link every finding and",
+    "artifact back to the subcategory it evidences. It is pre-populated wherever a",
+    "subcategory ID (e.g. `PR.IR-01`) appears in the source finding/artifact text.",
+  ].join("\n");
+
+  const bundleTree = [
+    "```",
+    "README.md            this file (curated prose; generated blocks between markers)",
+    "functions.csv        6 rows  — Functions database (loose CSV path)",
+    "categories.csv       22 rows — Categories database (relation → Functions)",
+    "subcategories.csv    106 rows — Subcategories database (extended GRC schema)",
+    "findings.csv         Findings database (relation-ready → Subcategories)",
+    "artifacts.csv        Artifacts database (relation-ready → Subcategories)",
+    "subcategories/       106 markdown pages (frontmatter + quarterly assessment + examples)",
+    "CSF_Wiki/            Notion drag-import bundle (Markdown & CSV export layout):",
+    "                     ├── CSF_Wiki [id].md          top index page",
+    "                     └── CSF_Wiki/",
+    "                         ├── functions [id].csv     6 rows + rollup snapshot",
+    "                         ├── categories [id].csv    22 rows + rollup snapshot",
+    "                         ├── subcategories [id].csv 106 rows, extended schema",
+    "                         ├── findings [id].csv      Findings database",
+    "                         ├── artifacts [id].csv     Artifacts database",
+    "                         ├── functions/     6 pages",
+    "                         ├── categories/    22 pages",
+    "                         └── subcategories/ 106 pages (with implementation examples)",
+    "_generate.ts         re-runnable Bun generator (idempotent)",
+    "```",
+  ].join("\n");
+
+  return { counts, schema, "bundle-tree": bundleTree };
+}
+
+async function updateReadme(data: SourceData): Promise<string[]> {
+  if (!existsSync(README_PATH)) {
+    throw new Error(
+      `README.md not found at ${README_PATH}. Author it with BEGIN/END GENERATED markers first.`,
+    );
+  }
+  const original = await readFile(README_PATH, "utf8");
+  const blocks = buildGeneratedBlocks(data);
+  let updated = original;
+  const missing: string[] = [];
+
+  for (const [name, content] of Object.entries(blocks)) {
+    const begin = `<!-- BEGIN GENERATED: ${name} -->`;
+    const end = `<!-- END GENERATED: ${name} -->`;
+    const escape = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const pattern = new RegExp(`${escape(begin)}[\\s\\S]*?${escape(end)}`);
+    if (!pattern.test(updated)) {
+      missing.push(name);
+      continue;
+    }
+    updated = updated.replace(pattern, `${begin}\n${content}\n${end}`);
+  }
+
+  if (updated !== original) {
+    await writeFile(README_PATH, updated, "utf8");
+  }
+  return missing;
+}
+
+// ---------------------------------------------------------------------------
+// Orchestration
+// ---------------------------------------------------------------------------
+
+async function cleanDerivedOutputs(): Promise<void> {
+  await rm(BUNDLE_DIR, { recursive: true, force: true });
+  await rm(SUBCATEGORIES_DIR, { recursive: true, force: true });
 }
 
 const data = await loadSource();
-const totalFilesWritten = await emitBundle(data);
+await cleanDerivedOutputs();
+const looseCount = await emitLooseFiles(data);
+const bundleNames = buildBundleNames(data);
+const bundleCount = await emitBundle(data, bundleNames);
+const missingMarkers = await updateReadme(data);
+
+if (missingMarkers.length > 0) {
+  console.warn(
+    `WARN: README missing GENERATED markers (left untouched): ${missingMarkers.join(", ")}`,
+  );
+}
 
 console.log(
   [
-    `Functions written: ${data.functions.length}`,
-    `Categories written: ${data.categories.length}`,
-    `Subcategories written: ${data.subcategories.length}`,
-    `Implementation examples written: ${data.exampleCount}`,
-    `Total files written: ${totalFilesWritten}`,
-    `Output path: ${OUTPUT_DIR}`,
+    `Source: ${SOURCE_CSV_PATH}`,
+    `Functions: ${data.functions.length}`,
+    `Categories: ${data.categories.length}`,
+    `Subcategories: ${data.subcategories.length}`,
+    `Implementation examples: ${data.exampleCount}`,
+    `Findings: ${data.findings.length}`,
+    `Artifacts: ${data.artifacts.length}`,
+    `Loose files written: ${looseCount}`,
+    `Bundle files written: ${bundleCount}`,
+    `Subcategory pages in CSF_Wiki bundle: ${data.subcategories.length}`,
   ].join("\n"),
 );

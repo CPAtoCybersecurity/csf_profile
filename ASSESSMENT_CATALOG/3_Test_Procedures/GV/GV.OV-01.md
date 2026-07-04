@@ -13,7 +13,7 @@
    - Check for documented decisions driven by KPI trends
 
 2. **Examine KPI dashboard and trend analysis**
-   - Review Splunk/security operations KPI dashboard
+   - Review security operations KPI dashboard (AWS-native monitoring: CloudTrail/GuardDuty)
    - Verify baseline-to-current trend data is maintained (TTD: 81hrs baseline to 7hrs current)
    - Confirm KPIs are reviewed at defined intervals (monthly at minimum)
 

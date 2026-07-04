@@ -1,8 +1,8 @@
 # RS.AN-03: Incident Root Cause Analysis — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -49,6 +49,8 @@ Review of 3 closed incident tickets showed that all included root cause document
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** A score of 4 places root cause analysis in the Some Security band: the process runs regularly — all 3 sampled closed tickets contained root cause documentation, and TKT-SOC-1001 traced the attack from email delivery through credential compromise to lateral movement using SentinelOne, CloudTrail, and GuardDuty telemetry — but with material weaknesses in depth and rigor. Two of the three sampled tickets recorded root cause as a single paragraph with no event sequencing, and the playbook defines no minimum documentation standard or formal technique such as 5-Whys or fault tree analysis. What separates this from Minimally Acceptable (5.0) is consistency: until a documentation floor exists and every incident meets it, execution across the full scope depends on which analyst writes the ticket.
+
 ---
 
 ## Evidence Reviewed
@@ -69,3 +71,8 @@ Review of 3 closed incident tickets showed that all included root cause document
 | 2 | Require formal root cause analysis technique (5-Whys or equivalent) for incidents above medium severity | Medium | Nadia Khan |
 | 3 | Establish feedback loop from root cause findings to detection rule tuning and control improvement backlog | Medium | Nadia Khan |
 | 4 | Conduct quarterly root cause trend analysis to identify systemic security weaknesses | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.AN-03 Test Procedures](../../3_Test_Procedures/RS/RS.AN-03.md)
+- **Controls:** [RS.AN-03_Ex1](../../2_Controls/RS/RS.AN-03_Ex1.md), [RS.AN-03_Ex2](../../2_Controls/RS/RS.AN-03_Ex2.md), [RS.AN-03_Ex3](../../2_Controls/RS/RS.AN-03_Ex3.md), [RS.AN-03_Ex4](../../2_Controls/RS/RS.AN-03_Ex4.md)

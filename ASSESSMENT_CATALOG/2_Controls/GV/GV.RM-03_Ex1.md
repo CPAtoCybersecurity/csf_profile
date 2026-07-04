@@ -9,7 +9,7 @@
 
 ## How Alma Security Implements GV.RM
 
-Alma Security operates as a ~120-person Series B cybersecurity SaaS company. Its risk management
+Alma Security operates as a ~300-person Series B cybersecurity SaaS company. Its risk management
 strategy is driven by a dual obligation: protecting its own platform (which customers trust to
 protect *their* environments) and maintaining the operational security posture required to close
 enterprise accounts and progress toward SOC 2 Type II certification.
@@ -35,9 +35,9 @@ reviewed in monthly CISO staff meetings and updated formally each quarter.
 
 | Risk ID | Risk Description | Likelihood | Impact | Current Treatment |
 |---|---|---|---|---|
-| R-01 | Infrastructure security team understaffed (~50% of target headcount) | High | High | Active hiring; interim compensating controls via CrowdStrike MDR |
+| R-01 | Infrastructure security team understaffed (~50% of target headcount) | High | High | Active hiring; interim compensating controls via SentinelOne MDR |
 | R-02 | Incomplete asset inventory — cloud assets not fully catalogued | High | Medium | AWS Config enabled; manual reconciliation underway |
-| R-03 | Slow incident detection (TTD averaging 3+ days before Oct 2024) | Medium | High | GuardDuty + Splunk SIEM implemented; TTD now ~7 hours as of Mar 2026 |
+| R-03 | Slow incident detection (TTD averaging 3+ days before Oct 2024) | Medium | High | GuardDuty + CloudTrail monitoring implemented; TTD now ~7 hours as of Mar 2026 |
 | R-04 | Low public/customer trust due to prior security incident publicity | Medium | High | Customer communication program, SOC 2 roadmap published externally |
 | R-05 | Third-party vendor risk — key SaaS dependencies without security assessments | Medium | Medium | Vendor questionnaire program initiated Q4 2025; 60% of Tier 1 vendors assessed |
 
@@ -78,4 +78,4 @@ Using the 0–10 scoring scale from *Mastering Cyber Resilience* (AKYLADE):
 - NIST Cybersecurity Framework 2.0: GV.RM — https://www.nist.gov/cyberframework
 - NIST SP 800-39: Managing Information Security Risk
 - NIST SP 800-30 Rev 1: Guide for Conducting Risk Assessments
-- Alma Security Case Study Materials: https://github.com/CPAtoCybersecurity/csf_profile/tree/feature/api-integration/EXAMPLE_BUSINESS_CASE_STUDY_FOR_ASSESSMENT
+- Alma Security Case Study Materials: ../../1_Case_Study/

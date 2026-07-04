@@ -1,7 +1,7 @@
 # ID.RA-06: Risk Response Management -- Q1 2026 Observation
 
 **Assessment:** 2026 Alma Security CSF Assessment
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-15
 **Testing Status:** Complete
 
@@ -30,6 +30,8 @@ Risk responses documented with rationale in risk register. POA&M process tracks 
 | Actual Score | 3 |
 | Target Score | 6 |
 
+**Scoring rationale:** A 3 falls in Some Security (2.0–4.9) and matches the anchor for defined process, unreliable execution. The machinery is documented — risk responses recorded with rationale in the register, a POA&M process tracking remediation, acceptance criteria defined in the vulnerability management plan — but the evidence shows it slipping: 12 POA&M items are overdue beyond their original timelines, compensating control documentation is inconsistent, and accepted risks have no re-evaluation schedule, so acceptance decisions age without review. Minimally Acceptable (5.0) is separated from this score by on-schedule execution: remediation closing within committed timelines across the POA&M population, with any overdue items handled as tracked, treated exceptions rather than an open backlog.
+
 ## Evidence Reviewed
 
 - [Patch Management Procedure](../../5_Artifacts/Procedures/PROC-patch-management.md)
@@ -43,3 +45,8 @@ Risk responses documented with rationale in risk register. POA&M process tracks 
 | 2 | Implement automated risk response status reporting | High | Security |
 | 3 | Standardize compensating control documentation | Medium | Security |
 | 4 | Establish periodic re-evaluation schedule for accepted risks | Medium | Security |
+
+## Related
+
+- **Test Procedure:** [ID.RA-06 Test Procedures](../../3_Test_Procedures/ID/ID.RA-06.md)
+- **Controls:** [ID.RA-06_Ex1](../../2_Controls/ID/ID.RA-06_Ex1.md), [ID.RA-06_Ex2](../../2_Controls/ID/ID.RA-06_Ex2.md), [ID.RA-06_Ex3](../../2_Controls/ID/ID.RA-06_Ex3.md), [ID.RA-06_Ex4](../../2_Controls/ID/ID.RA-06_Ex4.md), [ID.RA-06_Ex5](../../2_Controls/ID/ID.RA-06_Ex5.md)

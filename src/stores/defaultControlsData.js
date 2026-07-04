@@ -4,13 +4,13 @@
 // and Requirements are read-only framework data.
 
 // User ID mapping (from userStore.js):
-// 1 = Gerry (CISO)
-// 2 = Steve (GRC Manager)
-// 3 = Jane (Product Engineer)
-// 4 = John (Financial Systems Analyst)
-// 5 = Chris.Magann (Security Engineer)
-// 6 = Nadia.Khan (Site Reliability Engineer)
-// 7 = Tigan.Wang (Vulnerability Manager)
+// 1 = Gerry.Callahan (CISO)
+// 2 = Steve.Mercer (Director, Internal Audit)
+// 3 = Jane.Alvarez (Product Engineer)
+// 4 = John.Tran (Financial Systems Analyst)
+// 5 = Chris.Magann (Vulnerability Management Lead)
+// 6 = Nadia.Khan (Detection & Response Lead)
+// 7 = Tigan.Wang (Vulnerability Management Engineer)
 
 export const DEFAULT_CONTROLS = [
   // === DETECT (DE) FUNCTION ===
@@ -161,7 +161,7 @@ export const DEFAULT_CONTROLS = [
   },
   {
     controlId: 'GV.RM-01 Ex2',
-    implementationDescription: 'Risk management objectives are established with Board approval and tracked via automated dashboards: TTD target <4 minutes by Jan 2025, TTR-CJC target <16 hours by Aug 2025. Objectives align with company goals G1-G8. Monthly management reviews assess progress, with ASM vendor selection addressing risk register items R2 (perimeter monitoring) and R4 (asset inventory).',
+    implementationDescription: 'Risk management objectives are established with Board approval and tracked via automated dashboards: TTD target <4 minutes by Jan 2027, TTR-CJC target <16 hours by Aug 2027. Objectives align with company goals G1-G8. Monthly management reviews assess progress, with ASM vendor selection addressing risk register items R2 (perimeter monitoring) and R4 (asset inventory).',
     ownerId: 2, // CPA to Cybersecurity (Steve)
     stakeholderIds: [2], // Steve McMichael
     linkedRequirementIds: ['GV.RM-01 Ex2'],

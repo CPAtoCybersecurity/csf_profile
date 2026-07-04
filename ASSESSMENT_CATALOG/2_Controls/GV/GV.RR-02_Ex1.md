@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-Alma Security's Information Security Policy formally defines cybersecurity risk management roles: the CISO owns overall risk strategy, the GRC Manager maintains the risk register, Security Engineers own technical control implementation, and department heads are responsible for risk acceptance within their domains. Role definitions include escalation paths and decision authority levels, all maintained in ServiceNow.
+Alma Security's Information Security Policy formally defines cybersecurity risk management roles: the CISO owns overall risk strategy, the Security GRC Lead maintains the risk register, Security Engineers own technical control implementation, and department heads are responsible for risk acceptance within their domains. Role definitions include escalation paths and decision authority levels, all maintained in ServiceNow.
 
 ## Artifacts
 

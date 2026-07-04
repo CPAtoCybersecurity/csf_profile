@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-The GRC Manager has documented goals: 100% of Tier 1 vendors assessed annually, new vendor assessments completed within 15 business days, and quarterly supplier risk reporting delivered on schedule. The Third-Party Risk Analyst has targets for assessment throughput and quality. Performance is measured through ServiceNow dashboards and reviewed quarterly by the CISO.
+The Security GRC Lead has documented goals: 100% of Tier 1 vendors assessed annually, new vendor assessments completed within 15 business days, and quarterly supplier risk reporting delivered on schedule. The Third-Party Risk Analyst has targets for assessment throughput and quality. Performance is measured through ServiceNow dashboards and reviewed quarterly by the CISO.
 
 ## Artifacts
 

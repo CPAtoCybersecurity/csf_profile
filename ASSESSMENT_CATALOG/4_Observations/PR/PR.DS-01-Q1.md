@@ -1,8 +1,8 @@
 # PR.DS-01: Data-at-Rest Protection -- Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -50,6 +50,8 @@
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** The 4 sits in the Some Security band: encryption at rest executes regularly — all production RDS PostgreSQL instances use KMS customer-managed keys, SentinelOne removable-media controls cover the 300-endpoint fleet, and KMS rotation runs on a 365-day cycle with CloudTrail logging — but coverage of scope is incomplete. The S3 migration to SSE-KMS is only ~60% done (the 15-bucket sample showed 6 still on SSE-S3), FIM has gaps on Kubernetes worker nodes, and the unfinished data classification schema means encryption requirements cannot yet be mapped to sensitivity. Minimally Acceptable (5.0) requires consistent execution across the full scope; until the two funded projects ($95K Data Encryption Upgrade, $70K S3 Bucket Security) close the bucket and classification gaps, the control stays a step below the floor.
+
 ---
 
 ## Evidence Reviewed
@@ -57,8 +59,8 @@
 - AWS KMS key inventory and encryption policy documentation
 - S3 bucket encryption configuration report (15-bucket sample showing 9 SSE-KMS, 6 SSE-S3)
 - RDS encryption status for all PostgreSQL production instances (all encrypted)
-- Data Encryption Upgrade project plan and status report (Jira ENCRYPT-2026)
-- S3 Bucket Security project remediation tracker (Jira S3SEC-2026)
+- Data Encryption Upgrade project plan and status report (ServiceNow ENCRYPT-2026)
+- S3 Bucket Security project remediation tracker (ServiceNow S3SEC-2026)
 - SentinelOne device control policy configuration and block rate report
 - Removable media exception log (3 approved exceptions in Q1 2026)
 - BitLocker encryption status report for on-premises servers
@@ -78,3 +80,8 @@
 | 5 | Extend SentinelOne FIM coverage to all Kubernetes worker nodes | Medium | Tigan Wang |
 | 6 | Establish quarterly proactive data integrity validation program for critical data stores | Medium | Nadia Khan |
 | 7 | Implement centralized BitLocker compliance reporting for on-premises infrastructure | Low | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.DS-01 Test Procedures](../../3_Test_Procedures/PR/PR.DS-01.md)
+- **Controls:** [PR.DS-01_Ex1](../../2_Controls/PR/PR.DS-01_Ex1.md), [PR.DS-01_Ex2](../../2_Controls/PR/PR.DS-01_Ex2.md), [PR.DS-01_Ex3](../../2_Controls/PR/PR.DS-01_Ex3.md), [PR.DS-01_Ex4](../../2_Controls/PR/PR.DS-01_Ex4.md), [PR.DS-01_Ex5](../../2_Controls/PR/PR.DS-01_Ex5.md)
