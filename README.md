@@ -224,6 +224,15 @@ The application supports integration with JIRA and Confluence for enhanced track
 
 3. **Generate API tokens** at: https://id.atlassian.com/manage-profile/security/api-tokens
 
+#### Claude AI Assistant (server-side key)
+
+The AI Assistant's Claude integration is configured **on the backend only** — the browser never sees or stores the API key:
+
+- `CLAUDE_API_KEY` - Your Anthropic API key (used by the backend proxy at `/api/ai/claude`)
+- `CLAUDE_MODEL` - Optional model override (defaults to `claude-sonnet-4-20250514`)
+
+Set these in the backend environment (or `.env`) and restart the server. The frontend shows a "Ready" badge when the key is configured (via `GET /api/ai/status`, which returns a boolean only). Without a key, Claude requests return a mock response so local development still works.
+
 #### Windows-Specific Instructions
 
 For local development on Windows, you can set environment variables using PowerShell or Command Prompt:

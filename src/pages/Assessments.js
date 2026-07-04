@@ -123,7 +123,7 @@ const Assessments = () => {
   const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
 
   // AI Store for test procedure generation
-  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeApiKey, checkOllama } = useAIStore();
+  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
 
   // Local state
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
@@ -162,12 +162,14 @@ const Assessments = () => {
   const [isAnalyzingEvidence, setIsAnalyzingEvidence] = useState(false);
   const [evidenceAnalysis, setEvidenceAnalysis] = useState(null);
 
-  // Check Ollama status on mount
+  // Check provider status on mount
   React.useEffect(() => {
     if (llmProvider === 'ollama') {
       checkOllama();
+    } else {
+      checkClaude();
     }
-  }, [llmProvider, checkOllama]);
+  }, [llmProvider, checkOllama, checkClaude]);
 
   // Keyboard shortcut: 'n' to create new assessment
   React.useEffect(() => {
@@ -343,7 +345,7 @@ const Assessments = () => {
   // Wizard helper: check if AI is ready
   const isAIReady = llmProvider === 'ollama'
     ? ollamaStatus.available && ollamaStatus.hasModel
-    : !!claudeApiKey;
+    : claudeStatus.configured;
 
   // Generate test procedures for selected scope items
   const handleGenerateTestProcedures = useCallback(async () => {

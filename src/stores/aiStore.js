@@ -30,6 +30,14 @@ const useAIStore = create(
         models: []
       },
 
+      // Claude backend status — the API key lives server-side only (see GET /api/ai/status).
+      // Deliberately NOT persisted (excluded from partialize): status is re-probed each session.
+      claudeStatus: {
+        checking: true,
+        configured: false,
+        model: null
+      },
+
       // Analysis state
       isAnalyzing: false,
       analysisResult: null,
@@ -51,6 +59,29 @@ const useAIStore = create(
       // Actions
       setLlmProvider: (provider) => set({ llmProvider: provider }),
       setDataMode: (mode) => set({ dataMode: mode }),
+
+      // Check Claude backend availability — returns configured flag + model name, never key material
+      checkClaude: async () => {
+        set({ claudeStatus: { ...get().claudeStatus, checking: true } });
+
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/ai/status`, {
+            method: 'GET',
+            signal: AbortSignal.timeout(3000)
+          });
+          if (!response.ok) throw new Error('AI status unavailable');
+          const data = await response.json();
+          set({
+            claudeStatus: {
+              checking: false,
+              configured: !!data?.claude?.configured,
+              model: data?.claude?.model || null
+            }
+          });
+        } catch (error) {
+          set({ claudeStatus: { checking: false, configured: false, model: null } });
+        }
+      },
 
       // Check Ollama availability
       checkOllama: async () => {
