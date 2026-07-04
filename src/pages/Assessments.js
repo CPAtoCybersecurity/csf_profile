@@ -63,6 +63,37 @@ const formatTestProcedures = (text) => {
   return formatted;
 };
 
+// Helper to format single-line observation text into renderable markdown.
+// Catalog observations arrive as one long line, so "### Heading" and " - **item**"
+// markers need real line breaks before ReactMarkdown can render them.
+const formatObservations = (text) => {
+  if (!text) return '';
+  if (text.includes('\n')) return text; // already multi-line markdown — render as-is
+
+  return text
+    .replace(/\s*(#{1,6})\s+/g, '\n\n$1 ') // headings onto their own line
+    .replace(/\s+-\s+(?=\*\*)/g, '\n- ')   // "- **item**" markers into list lines
+    .replace(/^\n+/, '');
+};
+
+// Strip markdown syntax for plain-text previews (e.g. truncated table cells)
+const stripMarkdown = (text) => {
+  if (!text) return '';
+  return text
+    .replace(/```[\s\S]*?```/g, ' ')          // fenced code blocks
+    .replace(/`([^`]*)`/g, '$1')              // inline code
+    .replace(/!\[([^\]]*)\]\([^)]*\)/g, '$1') // images
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')  // links
+    .replace(/^#{1,6}\s+/gm, '')              // headings
+    .replace(/(\*\*|__)(.*?)\1/g, '$2')       // bold
+    .replace(/(\*|_)(.*?)\1/g, '$2')          // italic
+    .replace(/^\s*[-*+]\s+/gm, '')            // list markers
+    .replace(/^\s*\d+\.\s+/gm, '')            // numbered list markers
+    .replace(/^\s*>\s?/gm, '')                // blockquotes
+    .replace(/\s+/g, ' ')                     // collapse whitespace
+    .trim();
+};
+
 const Assessments = () => {
   // Store state
   const assessments = useAssessmentsStore((state) => state.assessments);
@@ -1459,8 +1490,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         placeholder={`Document ${selectedQuarter} observations...`}
                       />
                     ) : (
-                      <div className="text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
-                        {currentObservation.quarters?.[selectedQuarter]?.observations || 'None'}
+                      <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
+                        <ReactMarkdown>{formatObservations(currentObservation.quarters?.[selectedQuarter]?.observations) || 'None'}</ReactMarkdown>
                       </div>
                     )}
                   </div>
@@ -1541,7 +1572,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             {scopedItems.map((item, index) => {
               const obs = currentAssessment?.observations?.[item.itemId];
               const quarterData = obs?.quarters?.[selectedQuarter] || {};
-              const auditor = obs?.auditorId ? useUserStore.getState().getUser(obs.auditorId) : null;
+              const auditor = obs?.auditorId ? useUserStore.getState().getUserById(obs.auditorId) : null;
 
               return (
                 <div
@@ -1636,7 +1667,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   {/* Q Observations */}
                   <div className="w-48 flex-shrink-0">
                     <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {quarterData.observations ? quarterData.observations.substring(0, 50) + '...' : '-'}
+                      {quarterData.observations ? stripMarkdown(quarterData.observations).substring(0, 50) + '...' : '-'}
                     </p>
                   </div>
 
