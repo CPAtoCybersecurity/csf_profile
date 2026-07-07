@@ -1,0 +1,367 @@
+<title>Alma Security — Board Briefing, June 2026</title>
+<style>
+  :root{
+    --paper:#FAFBFC; --panel:#FFFFFF; --ink:#182430; --ink-2:#4A5A68; --ink-3:#7A8894;
+    --line:#DCE3E8; --accent:#0B807C; --accent-soft:#0B807C22;
+    --good:#2E7D4F; --warn:#A8730E; --crit:#A63A3A;
+    --shadow:0 1px 2px rgba(24,36,48,.06),0 8px 28px rgba(24,36,48,.07);
+  }
+  @media (prefers-color-scheme: dark){:root{
+    --paper:#131A21; --panel:#1B242D; --ink:#E8EDF1; --ink-2:#A9B6C0; --ink-3:#748291;
+    --line:#2C3843; --accent:#3BC2BC; --accent-soft:#3BC2BC26;
+    --good:#5CBE8A; --warn:#D9A441; --crit:#D4726B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.35);
+  }}
+  :root[data-theme="dark"]{
+    --paper:#131A21; --panel:#1B242D; --ink:#E8EDF1; --ink-2:#A9B6C0; --ink-3:#748291;
+    --line:#2C3843; --accent:#3BC2BC; --accent-soft:#3BC2BC26;
+    --good:#5CBE8A; --warn:#D9A441; --crit:#D4726B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 28px rgba(0,0,0,.35);
+  }
+  :root[data-theme="light"]{
+    --paper:#FAFBFC; --panel:#FFFFFF; --ink:#182430; --ink-2:#4A5A68; --ink-3:#7A8894;
+    --line:#DCE3E8; --accent:#0B807C; --accent-soft:#0B807C22;
+    --good:#2E7D4F; --warn:#A8730E; --crit:#A63A3A;
+    --shadow:0 1px 2px rgba(24,36,48,.06),0 8px 28px rgba(24,36,48,.07);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--paper); color:var(--ink);
+    font:16px/1.55 "Helvetica Neue",-apple-system,"Segoe UI",Arial,sans-serif;
+    display:flex; flex-direction:column;
+  }
+  .deck{flex:1; position:relative; overflow:hidden}
+  .slide{
+    position:absolute; inset:0; padding:clamp(20px,4.5vh,44px) clamp(20px,6vw,84px);
+    display:none; flex-direction:column; overflow-y:auto;
+  }
+  .slide.on{display:flex}
+  @media (prefers-reduced-motion: no-preference){
+    .slide.on{animation:rise .28s ease-out}
+    @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  }
+  .eyebrow{
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+    font-weight:600; margin:0 0 10px;
+  }
+  h1,h2{
+    font-family:Palatino,"Palatino Linotype","Book Antiqua",Georgia,serif;
+    text-wrap:balance; margin:0 0 6px; line-height:1.18; font-weight:600;
+  }
+  h1{font-size:clamp(30px,4.6vw,52px)}
+  h2{font-size:clamp(22px,3vw,34px); max-width:22ch}
+  .sub{color:var(--ink-2); max-width:62ch; margin:6px 0 0; font-size:clamp(15px,1.4vw,18px)}
+  .body{flex:1; display:flex; flex-direction:column; justify-content:center; gap:18px; min-height:0; padding-top:14px}
+  .cols{display:grid; gap:18px}
+  .cols.c2{grid-template-columns:1fr 1fr}
+  .cols.c3{grid-template-columns:1fr 1fr 1fr}
+  @media (max-width:820px){.cols.c2,.cols.c3{grid-template-columns:1fr}}
+  .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:16px 18px; box-shadow:var(--shadow)}
+  .card h3{margin:0 0 6px; font-size:15px}
+  .card p{margin:0; color:var(--ink-2); font-size:14px}
+  .big{font-family:Palatino,Georgia,serif; font-size:clamp(26px,3vw,38px); font-weight:600; font-variant-numeric:tabular-nums}
+  .kpi-l{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3); margin-bottom:4px}
+  table{border-collapse:collapse; width:100%; font-size:14px}
+  th{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); text-align:left; font-weight:600}
+  th,td{padding:8px 12px 8px 0; border-bottom:1px solid var(--line); vertical-align:top}
+  td{color:var(--ink-2)} td:first-child{color:var(--ink); font-weight:600; white-space:nowrap}
+  .num{font-variant-numeric:tabular-nums}
+  .pill{display:inline-block; padding:2px 9px; border-radius:99px; font-size:12px; font-weight:600; white-space:nowrap}
+  .pill.good{background:color-mix(in srgb,var(--good) 14%,transparent); color:var(--good)}
+  .pill.warn{background:color-mix(in srgb,var(--warn) 14%,transparent); color:var(--warn)}
+  .pill.crit{background:color-mix(in srgb,var(--crit) 14%,transparent); color:var(--crit)}
+  .chart-wrap{overflow-x:auto}
+  svg text{font:12px "Helvetica Neue",Arial,sans-serif; fill:var(--ink-2)}
+  svg .lbl{font-weight:600; fill:var(--ink)}
+  svg .mut{fill:var(--ink-3)}
+  .foot{color:var(--ink-3); font-size:12px; margin-top:auto; padding-top:16px}
+  .nav{
+    display:flex; align-items:center; gap:14px; padding:10px clamp(20px,6vw,84px);
+    border-top:1px solid var(--line); background:var(--panel); font-size:13px; color:var(--ink-3);
+  }
+  .nav button{
+    background:none; border:1px solid var(--line); color:var(--ink-2); border-radius:8px;
+    padding:5px 12px; cursor:pointer; font-size:13px;
+  }
+  .nav button:hover{border-color:var(--accent); color:var(--accent)}
+  .nav button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+  .dots{display:flex; gap:6px; margin-left:auto}
+  .dots span{width:7px; height:7px; border-radius:99px; background:var(--line); cursor:pointer}
+  .dots span.on{background:var(--accent)}
+  .decision{display:flex; gap:14px; align-items:flex-start}
+  .decision .n{
+    font-family:Palatino,Georgia,serif; font-size:26px; color:var(--accent); font-weight:600;
+    line-height:1; padding-top:2px; min-width:30px;
+  }
+  ul.tight{margin:0; padding-left:18px; color:var(--ink-2); font-size:14.5px}
+  ul.tight li{margin:6px 0}
+  .quote{font-family:Palatino,Georgia,serif; font-style:italic; font-size:clamp(17px,1.8vw,21px); color:var(--ink-2); border-left:3px solid var(--accent); padding-left:16px; margin:0}
+</style>
+
+<div class="deck" id="deck">
+
+<!-- 1 · Thesis -->
+<section class="slide">
+  <p class="eyebrow">Alma Security · Board of Directors · June 2026 · CISO Briefing</p>
+  <div class="body">
+    <h1>Alma sells trust. In 2024 we learned that a security failure here is a revenue event — this briefing shows where we stand, the plan, and the three decisions we ask of you.</h1>
+    <p class="sub">Gerry Callahan, Chief Information Security Officer · First full-framework management self-assessment (NIST CSF 2.0, all 106 outcomes) · Companion to Internal Audit's independent Q1 report (IA-2026-001)</p>
+  </div>
+  <p class="foot">For learning purposes only — Alma Security is a fictional company. This deck is a training artifact from the Simply Cyber Academy CSF Profile scenario, not real board materials.</p>
+</section>
+
+<!-- 2 · Why we're here -->
+<section class="slide">
+  <p class="eyebrow">Context</p>
+  <h2>Two incidents in 2024 cost us people, customers, and terms on our Series B.</h2>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><h3>March 2024 — public S3 exposure</h3><p>~18,400 customer configuration records exposed (no biometric templates). Public coverage was severe because our product is trust itself.</p></div>
+      <div class="card"><h3>August 2024 — stolen developer key</h3><p>A shared SSH key was used to reach a staging node. Detection took <strong>81 hours</strong> — that number is now the baseline every quarter is measured against.</p></div>
+      <div class="card"><h3>The aftermath</h3><p>Five senior security staff departed. Public trust collapsed. The Series B closed with governance conditions: independent directors, an Audit Committee, Internal Audit.</p></div>
+    </div>
+    <p class="quote">Eighteen months into the rebuild, the honest question is not "are we fixed?" — it is "do we know, in dollars, where we are still exposed, and is that exposure falling every quarter?"</p>
+  </div>
+  <p class="foot">Incidents INC-2024-01 / INC-2024-02 · Detail in the risk register (ServiceNow) and IA-2026-001</p>
+</section>
+
+<!-- 3 · What we did -->
+<section class="slide">
+  <p class="eyebrow">Method</p>
+  <h2>We scored ourselves against all 106 outcomes of NIST CSF 2.0 — honestly.</h2>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><div class="kpi-l">Coverage</div><div class="big">106 / 106</div><p>Every framework outcome scored — beyond Internal Audit's 38-control Q1 scope. 68 outcomes got their first documented look.</p></div>
+      <div class="card"><div class="kpi-l">Scale</div><div class="big">0 – 10</div><p>5.0 is the minimum passing bar. 8+ is flagged as <em>waste</em> — spending more than the risk justifies. We scored nothing above 7.</p></div>
+      <div class="card"><div class="kpi-l">Evidence</div><div class="big">E · I · T</div><p>Each score cites what was examined, who was interviewed, and what was tested. Scores stay consistent with Internal Audit where scopes overlap.</p></div>
+    </div>
+    <p class="sub">A self-assessment that flatters us would be worthless to you. This one does not.</p>
+  </div>
+  <p class="foot">Full workpapers: 2026 Alma Security CSF Assessment (Q2), CSF Profile Assessment Database</p>
+</section>
+
+<!-- 4 · Results -->
+<section class="slide">
+  <p class="eyebrow">Results</p>
+  <h2>Governance is rebuilt. Operations lag it — the exact profile of a program mid-rebuild.</h2>
+  <div class="body">
+    <div class="card chart-wrap"><svg id="fnChart" width="860" height="300" role="img" aria-label="Bar chart of CSF function scores versus targets"></svg></div>
+    <p class="sub">Overall <strong class="num">4.19</strong> against a target of <strong class="num">5.4</strong>. 74 of 106 outcomes sit below the minimum bar — <strong>every one has a funded owner and a date</strong>. Detection, response, and recovery are where the 2024 incidents live on.</p>
+  </div>
+  <p class="foot">Bars: Q2 actual · ticks: 2026 target · 5.0 line: minimum passing</p>
+</section>
+
+<!-- 5 · Risk view -->
+<section class="slide">
+  <p class="eyebrow">What it means</p>
+  <h2>Six named risks carry the exposure — and the cheapest fix comes first.</h2>
+  <div class="body">
+    <div class="card" style="overflow-x:auto">
+      <table>
+        <tr><th>Risk</th><th>What it costs us</th><th>Status</th><th>Target</th></tr>
+        <tr><td>R4 · No full asset inventory</td><td>We cannot verify any other fix without it — the highest-leverage move on the board</td><td><span class="pill crit">Open — leads the plan</span></td><td class="num">Aug 2026</td></tr>
+        <tr><td>R2 · Perimeter unmonitored</td><td>Internet-facing weaknesses persist between bimonthly scans (the March-2024 pattern)</td><td><span class="pill warn">ASM in flight — behind plan</span></td><td class="num">Jun 2026 → reforecast Sep</td></tr>
+        <tr><td>R3 · Slow detection</td><td>Attacker dwell time; 81h baseline now 9h — target is minutes</td><td><span class="pill warn">Improving</span></td><td class="num">Jan 2027</td></tr>
+        <tr><td>R1 · Team understaffed 50%</td><td>Response depth is single-threaded; hiring is the <em>most expensive</em> fix per unit of risk — we close part of it structurally</td><td><span class="pill warn">Rescoped</span></td><td class="num">Sep 2026</td></tr>
+        <tr><td>R6 · Supplier risk</td><td>A biometric-data processor compromise cascades into our platform</td><td><span class="pill warn">Structured, unmeasured</span></td><td class="num">Dec 2026</td></tr>
+        <tr><td>R5 · Public trust</td><td>Renewal and pipeline risk on a trust product</td><td><span class="pill warn">Rebuilding</span></td><td class="num">Jan 2027</td></tr>
+      </table>
+    </div>
+  </div>
+  <p class="foot">Strategic register, ServiceNow · reviewed monthly by CISO staff, quarterly with the Audit Committee</p>
+</section>
+
+<!-- 6 · KPI trajectory -->
+<section class="slide">
+  <p class="eyebrow">Progress</p>
+  <h2>Detection speed has improved 9× — and the target is another 100× by January.</h2>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card chart-wrap"><svg id="ttdChart" width="430" height="240" role="img" aria-label="Time to detect trajectory from 81 hours to under 4 minutes"></svg></div>
+      <div class="card">
+        <div class="kpi-l">The committed ladder</div>
+        <table>
+          <tr><th>Measure</th><th>Now</th><th>Committed</th></tr>
+          <tr><td>Time to detect</td><td class="num">9 h</td><td class="num">&lt; 4 min · Jan 2027</td></tr>
+          <tr><td>Time to respond (crown jewels)</td><td class="num">—</td><td class="num">&lt; 16 h · Aug 2027</td></tr>
+          <tr><td>Time to recover (critical)</td><td class="num">—</td><td class="num">&lt; 3 days · Aug 2027</td></tr>
+          <tr><td>Public trust score</td><td class="num">rebuilding</td><td class="num">90%+ · Jan 2027</td></tr>
+        </table>
+        <p style="margin-top:10px">One caution we owe you: part of the detection improvement is better <em>visibility</em>, not only better speed. When the full asset inventory lands, <strong>reported risk will briefly rise</strong>. That is measurement honesty, not deterioration.</p>
+      </div>
+    </div>
+  </div>
+  <p class="foot">TTD baseline measured Oct 2024, post-incident · current 9h is D&amp;R's Q2 operational self-measurement (unaudited) · targets as committed in the 2026 plan</p>
+</section>
+
+<!-- 7 · Money -->
+<section class="slide">
+  <p class="eyebrow">Investment</p>
+  <h2>The $5.9M security spend maps directly onto the gaps this assessment found.</h2>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card">
+        <div class="kpi-l">Program</div>
+        <div class="big">$5.3M</div>
+        <p>15-person team, tooling, and program operations — detection &amp; response, vulnerability management, GRC.</p>
+      </div>
+      <div class="card">
+        <div class="kpi-l">Named projects · $637K</div>
+        <table>
+          <tr><td>Incident Response Enhancement</td><td class="num">$150K</td><td>findings F-03, F-05</td></tr>
+          <tr><td>Web Application Firewall</td><td class="num">$112K</td><td>product exposure</td></tr>
+          <tr><td>Cloud Security Optimization</td><td class="num">$100K</td><td>F-04</td></tr>
+          <tr><td>Attack Surface Management</td><td class="num">$100K</td><td>F-01, F-04 — <strong>first</strong></td></tr>
+          <tr><td>Data Encryption Upgrade</td><td class="num">$95K</td><td>F-07</td></tr>
+          <tr><td>MFA Rollout</td><td class="num">$80K</td><td>F-06</td></tr>
+        </table>
+      </div>
+    </div>
+    <p class="sub">The ask later in this deck is not new money — it is a re-sequencing of what you already funded, plus a reporting contract that shows you the return.</p>
+  </div>
+  <p class="foot">FY2026 security budget · findings cross-referenced in the CISO assessment report</p>
+</section>
+
+<!-- 8 · The plan: ROC -->
+<section class="slide">
+  <p class="eyebrow">The plan</p>
+  <h2>We will run risk as a daily operation — a Risk Operations Center, not a bigger alarm room.</h2>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><h3>What a SOC answers</h3><p>"Is someone attacking us right now?" Reactive, alert-driven, measured in response minutes. We keep this capability — Nadia Khan's team — and we do not build a second one.</p></div>
+      <div class="card" style="border-color:var(--accent)"><h3 style="color:var(--accent)">What the ROC answers</h3><p>"Where are we most exposed, and how do we systematically reduce that exposure — in dollars?" Proactive, risk-driven, measured in exposure reduced per dollar spent. This is the operating system for everything on slide 5.</p></div>
+    </div>
+    <ul class="tight">
+      <li><strong>One queue:</strong> every risk signal — vulnerabilities, misconfigurations, threat intelligence, supplier findings — lands in one prioritized register, weighted by business impact, not raw severity. If everything is critical, nothing is.</li>
+      <li><strong>One language:</strong> exposure expressed as probable loss in dollars, calibrated against the risk appetite already written into our insurance limits.</li>
+      <li><strong>One cadence:</strong> weekly prioritize-validate-remediate cycles replace the annual assessment ritual; the quarterly CSF score becomes a read-out, not an event.</li>
+    </ul>
+  </div>
+  <p class="foot">Full process: "Establishing ROC Principles at Alma Security" (companion document)</p>
+</section>
+
+<!-- 9 · Roadmap -->
+<section class="slide">
+  <p class="eyebrow">Roadmap</p>
+  <h2>Four steps over 15 months — each with an exit test you can hold us to.</h2>
+  <div class="body">
+    <div class="cols c2">
+      <div class="card"><h3><span style="color:var(--accent)">Step 1 · Months 1–3</span> — See everything once</h3><p>Unified asset inventory with owners and criticality (retires R4, funded by the ASM project). <strong>Exit:</strong> ≥70% coverage, orphan assets &lt;10%, first risk baseline published.</p></div>
+      <div class="card"><h3><span style="color:var(--accent)">Step 2 · Months 3–8</span> — Operate weekly</h3><p>Standing prioritize-validate-remediate cycle; engineering squads own their queues; first dollar estimates on top scenarios. <strong>Exit:</strong> fixes outpace new findings two months running.</p></div>
+      <div class="card"><h3><span style="color:var(--accent)">Step 3 · Months 9–14</span> — Price it</h3><p>Loss-versus-appetite curves for the top five scenarios; every investment proposed with projected risk reduction; automation drafts, humans approve. <strong>Exit:</strong> FY2027 budget argued in dollars-at-risk.</p></div>
+      <div class="card"><h3><span style="color:var(--accent)">Step 4 · Month 15+</span> — Mature</h3><p>Quarterly board pack fully in dollars; evaluate managed 24/7 augmentation instead of overnight hiring. <strong>Exit:</strong> reporting you can read without a glossary, every quarter.</p></div>
+    </div>
+    <p class="sub">People: no new department. The vulnerability-management and GRC functions become the ROC seed team; one planned backfill is redirected to a data-pipeline engineer.</p>
+  </div>
+  <p class="foot">Exit criteria tracked in the risk operations review · maturity target: "Defined" by end-2027</p>
+</section>
+
+<!-- 10 · Reporting contract -->
+<section class="slide">
+  <p class="eyebrow">Governance</p>
+  <h2>Your quarterly view becomes three questions with numeric answers.</h2>
+  <div class="body">
+    <div class="cols c3">
+      <div class="card"><div class="kpi-l">Question 1</div><h3>How much risk do we have?</h3><p>Value at risk, in dollars, against the appetite line derived from our insurance limits — per business area.</p></div>
+      <div class="card"><div class="kpi-l">Question 2</div><h3>What is the plan?</h3><p>How much we mitigate, accept, and transfer — and what each treatment costs.</p></div>
+      <div class="card"><div class="kpi-l">Question 3</div><h3>Is it working?</h3><p>Exposure trend, fix-rate versus new-finding rate, and return per dollar of remediation.</p></div>
+    </div>
+    <p class="quote">The standard we are adopting: every page of the quarterly pack readable by a director with no cybersecurity background. If a page needs a glossary, the page has failed — not the director.</p>
+  </div>
+  <p class="foot">Six-section quarterly format · monthly detail flows to the Audit Committee, not the full board</p>
+</section>
+
+<!-- 11 · Decisions -->
+<section class="slide">
+  <p class="eyebrow">Decisions requested</p>
+  <h2>Three approvals today put the plan in motion at zero net-new spend.</h2>
+  <div class="body">
+    <div class="card decision"><div class="n">1</div><div><h3>Approve the ROC charter under the Audit Committee</h3><p>Extends the Series B governance conditions you already set: the ROC prioritizes, named owners remediate, one register is the single source. (Sponsor: Priya Raman.)</p></div></div>
+    <div class="card decision"><div class="n">2</div><div><h3>Approve the resequencing: inventory first, one backfill redirected</h3><p>Asset inventory becomes the gating deliverable (target Aug 2026); one of the five planned security hires converts to a data-pipeline engineer for the ROC. No budget change.</p></div></div>
+    <div class="card decision"><div class="n">3</div><div><h3>Endorse the risk-appetite statement — and expect the spike</h3><p>Appetite derived from existing insurance limits and reserves (CFO-confirmed). When full visibility lands in Q3, reported risk will rise before it falls. We ask you to treat that as the plan working.</p></div></div>
+  </div>
+  <p class="foot">Next checkpoint: Q3 2026 self-assessment — success is DETECT and IDENTIFY crossing 70% of target with zero unfunded critical findings</p>
+</section>
+
+</div>
+
+<div class="nav">
+  <button id="prev" aria-label="Previous slide">← Prev</button>
+  <button id="next" aria-label="Next slide">Next →</button>
+  <span id="counter" class="num"></span>
+  <div class="dots" id="dots"></div>
+</div>
+
+<script>
+(function(){
+  const slides=[...document.querySelectorAll('.slide')];
+  const dots=document.getElementById('dots');
+  slides.forEach((_,i)=>{const d=document.createElement('span');d.addEventListener('click',()=>go(i));dots.appendChild(d);});
+  let cur=0;
+  function go(i){
+    cur=Math.max(0,Math.min(slides.length-1,i));
+    slides.forEach((s,j)=>s.classList.toggle('on',j===cur));
+    [...dots.children].forEach((d,j)=>d.classList.toggle('on',j===cur));
+    document.getElementById('counter').textContent=(cur+1)+' / '+slides.length;
+  }
+  document.getElementById('prev').addEventListener('click',()=>go(cur-1));
+  document.getElementById('next').addEventListener('click',()=>go(cur+1));
+  addEventListener('keydown',e=>{
+    if(e.key==='ArrowRight'||e.key===' ')go(cur+1);
+    if(e.key==='ArrowLeft')go(cur-1);
+  });
+  go(0);
+
+  const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+  // Function scores: bullet bars (actual) + target ticks + minimum line
+  function drawFn(){
+    const d=[["GOVERN",5.06,5.52],["PROTECT",4.48,5.59],["IDENTIFY",3.71,5.19],["DETECT",3.64,5.64],["RESPOND",3.62,5.31],["RECOVER",3.00,5.13]];
+    const svg=document.getElementById('fnChart'); if(!svg)return;
+    const W=860,H=300,L=110,R=30,T=16,B=26,pw=W-L-R,ph=H-T-B;
+    const x=v=>L+pw*v/7, bh=22, gap=(ph-d.length*bh)/(d.length+1);
+    let s='';
+    for(let g=0;g<=7;g++){const gx=x(g);
+      s+='<line x1="'+gx+'" y1="'+T+'" x2="'+gx+'" y2="'+(H-B)+'" stroke="'+css('--line')+'" stroke-width="1"/>';
+      s+='<text x="'+gx+'" y="'+(H-8)+'" text-anchor="middle" class="mut">'+g+'</text>';}
+    const mx=x(5);
+    s+='<line x1="'+mx+'" y1="'+T+'" x2="'+mx+'" y2="'+(H-B)+'" stroke="'+css('--ink-3')+'" stroke-width="1.5" stroke-dasharray="4 4"/>';
+    s+='<text x="'+(mx+5)+'" y="'+(T+10)+'" class="mut">minimum 5.0</text>';
+    d.forEach((r,i)=>{
+      const y=T+gap+i*(bh+gap);
+      s+='<text x="'+(L-10)+'" y="'+(y+bh/2+4)+'" text-anchor="end" class="lbl">'+r[0]+'</text>';
+      s+='<rect x="'+L+'" y="'+y+'" width="'+(x(r[1])-L)+'" height="'+bh+'" rx="4" fill="'+css('--accent')+'"/>';
+      s+='<line x1="'+x(r[2])+'" y1="'+(y-4)+'" x2="'+x(r[2])+'" y2="'+(y+bh+4)+'" stroke="'+css('--ink')+'" stroke-width="2.5"/>';
+      s+='<text x="'+(x(r[1])+7)+'" y="'+(y+bh/2+4)+'" class="lbl">'+r[1].toFixed(2)+'</text>';
+    });
+    svg.innerHTML=s;
+  }
+
+  // TTD trajectory (log-ish step down), minutes scale
+  function drawTtd(){
+    const svg=document.getElementById('ttdChart'); if(!svg)return;
+    const pts=[["Oct 2024",4860],["Q1 2026",540],["Q2 2026",540],["Jan 2027 target",4]];
+    const W=430,H=240,L=52,R=18,T=18,B=40,pw=W-L-R,ph=H-T-B;
+    const lo=Math.log10(3),hi=Math.log10(6000);
+    const x=i=>L+pw*i/(pts.length-1), y=v=>T+ph*(1-(Math.log10(v)-lo)/(hi-lo));
+    let s='';
+    [[4860,"81 h"],[540,"9 h"],[60,"1 h"],[4,"4 min"]].forEach(g=>{
+      s+='<line x1="'+L+'" y1="'+y(g[0])+'" x2="'+(W-R)+'" y2="'+y(g[0])+'" stroke="'+css('--line')+'"/>';
+      s+='<text x="'+(L-6)+'" y="'+(y(g[0])+4)+'" text-anchor="end" class="mut">'+g[1]+'</text>';});
+    let path='';
+    pts.forEach((p,i)=>{path+=(i?'L':'M')+x(i)+' '+y(p[1])+' ';});
+    s+='<path d="'+path+'" fill="none" stroke="'+css('--accent')+'" stroke-width="2.5"/>';
+    pts.forEach((p,i)=>{
+      const last=i===pts.length-1;
+      s+='<circle cx="'+x(i)+'" cy="'+y(p[1])+'" r="'+(last?6:4.5)+'" fill="'+(last?css('--good'):css('--accent'))+'" stroke="'+css('--panel')+'" stroke-width="2"/>';
+      s+='<text x="'+x(i)+'" y="'+(H-10)+'" text-anchor="'+(i===0?'start':last?'end':'middle')+'" class="mut">'+p[0]+'</text>';});
+    s+='<text x="'+(x(3)-10)+'" y="'+(y(4)-12)+'" text-anchor="end" class="lbl">&lt; 4 minutes</text>';
+    svg.innerHTML=s;
+  }
+
+  drawFn(); drawTtd();
+  new MutationObserver(()=>{drawFn();drawTtd();}).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{drawFn();drawTtd();});
+})();
+</script>
