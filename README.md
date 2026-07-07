@@ -1,6 +1,6 @@
 # Simply Cyber Academy - CSF Profile Assessment Database v2.2
 
-> **▶ Try it now — no install:** **[csf-profile.pages.dev](https://csf-profile.pages.dev)** — the full app runs in your browser with a sample assessment pre-loaded.
+> **▶ Try it now — no install:** **[csf-profile-app.pages.dev](https://csf-profile-app.pages.dev)** — the full app runs in your browser with a sample assessment pre-loaded.
 
 A tool designed to help organizations implement and assess their cybersecurity posture using the NIST Cybersecurity Framework (CSF). This application provides a structured approach to:
 
