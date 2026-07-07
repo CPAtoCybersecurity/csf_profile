@@ -52,8 +52,9 @@
 
 ## Related Artifacts
 
-- [Security Awareness Program](../Sample_Artifacts/)
-- [2025-05-26_Phish-1001-LI-Campaign-Data.xlsx](../Sample_Artifacts/2025-05-26_Phish-1001-LI-Campaign-Data.xlsx)
+- [Security Awareness Program Description](../../5_Artifacts/Evidence/EVD-security-awareness-program.md)
+- [Training Completion Report — Q1 2026](../../5_Artifacts/Evidence/EVD-training-completion-q1.md)
+- [Phishing Campaign Data — May 2025](../../5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx)
 
 ---
 
