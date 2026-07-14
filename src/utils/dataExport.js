@@ -88,6 +88,48 @@ export const exportAllDataJSON = (stores) => {
 };
 
 /**
+ * Build a shareable export: the complete-database envelope minus private
+ * pack data. The filter is LINEAGE-aware, not tag-only — it drops every
+ * assessment that originated from a pack import (including all observations
+ * nested inside it, which carry no tags of their own) and every finding that
+ * either carries pack provenance or points at a pack-owned assessment.
+ *
+ * @param {Object} stores - Same store map exportAllDataJSON receives
+ * @param {Object} [options]
+ * @param {boolean} [options.includePrivate=false] - Keep pack data (explicit opt-in)
+ */
+export const buildShareableExport = (stores, { includePrivate = false } = {}) => {
+  const jsonData = exportAllDataJSON(stores);
+  if (includePrivate) {
+    jsonData.dataType = 'Complete Assessment Database (private pack data INCLUDED)';
+    return jsonData;
+  }
+
+  const packAssessmentIds = new Set(
+    jsonData.data.assessments.filter((a) => a.source === 'pack').map((a) => a.id)
+  );
+  jsonData.data.assessments = jsonData.data.assessments.filter((a) => a.source !== 'pack');
+  jsonData.data.findings = jsonData.data.findings.filter(
+    (f) => f.source !== 'pack' && !packAssessmentIds.has(f.assessmentId)
+  );
+  jsonData.dataType = 'Shareable Assessment Database (private pack data excluded)';
+  jsonData.metadata.assessmentCount = jsonData.data.assessments.length;
+  jsonData.metadata.findingCount = jsonData.data.findings.length;
+  return jsonData;
+};
+
+/**
+ * Download a shareable export (csf_share_YYYY-MM-DD.json).
+ * @param {Object} stores - All store references
+ * @param {Object} [options] - See buildShareableExport
+ */
+export const exportShareableDatabase = (stores, options = {}) => {
+  const jsonData = buildShareableExport(stores, options);
+  const date = new Date().toISOString().split('T')[0];
+  downloadJSON(jsonData, `csf_share_${date}.json`);
+};
+
+/**
  * Download JSON data as a file
  * @param {Object} jsonData - The data object to export
  * @param {string} filename - The filename for the download

@@ -1,0 +1,70 @@
+{
+  "packFormat": 1,
+  "engineMin": "2.2.0",
+  "packVersion": "2026.07-fixture",
+  "org": {
+    "slug": "alma-security",
+    "name": "Alma Security",
+    "sector": "technology",
+    "sizeBand": "50-200"
+  },
+  "created": "2026-07-14",
+  "sections": {
+    "metricValues": [
+      {
+        "subcategoryId": "GV.SC-04",
+        "quarters": {
+          "Q2": {
+            "actualScore": 2,
+            "targetScore": 3,
+            "testingStatus": "Tested",
+            "observations": "Supplier criticality tiers defined for top 20 vendors. FIXTURE DATA — fictional Alma Security."
+          },
+          "Q3": {
+            "actualScore": 3,
+            "targetScore": 3,
+            "testingStatus": "Tested",
+            "observations": "Tiering extended to all active vendors; quarterly review cadence started."
+          }
+        }
+      },
+      {
+        "subcategoryId": "PR.AA-01",
+        "quarters": {
+          "Q2": {
+            "actualScore": 1,
+            "targetScore": 3,
+            "testingStatus": "Not Tested",
+            "observations": "Identity inventory incomplete; contractor accounts unmanaged."
+          }
+        }
+      }
+    ],
+    "risks": [
+      {
+        "id": "R-001",
+        "title": "Wire-transfer BEC against finance team",
+        "subcategoryIds": ["PR.AA-01"],
+        "likelihood": 4,
+        "impact": 5,
+        "notes": "Fictional fixture risk: finance team spear-phished twice in 2025; no out-of-band verification step."
+      },
+      {
+        "id": "R-002",
+        "title": "Unmanaged SaaS holding client data",
+        "subcategoryIds": ["GV.SC-04"],
+        "likelihood": 3,
+        "impact": 3,
+        "notes": "Fictional fixture risk: shadow SaaS discovered during vendor tiering."
+      }
+    ],
+    "resources": [
+      {
+        "subcategoryId": "GV.SC-04",
+        "links": [
+          { "title": "Alma vendor-tiering runbook", "url": "https://example.com/runbook", "kind": "internal-runbook" }
+        ]
+      }
+    ]
+  }
+}
