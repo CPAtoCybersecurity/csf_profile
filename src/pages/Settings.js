@@ -33,6 +33,7 @@ import useFindingsStore from '../stores/findingsStore';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
+import { importCompleteDatabase, validateDatabaseExport } from '../utils/dataImport';
 
 // Utils
 import {
@@ -229,6 +230,9 @@ const Settings = () => {
   const assessmentsImportRef = useRef(null);
   const entryIdImportRef = useRef(null);
 
+  // Database restore ref
+  const restoreImportRef = useRef(null);
+
   // Export handlers
   const handleExportCompleteDatabase = useCallback(() => {
     try {
@@ -254,6 +258,51 @@ const Settings = () => {
     } catch (err) {
       console.error('Export assessments error:', err);
       toast.error('Export failed. Please try again.');
+    }
+  }, []);
+
+  // Restore handler — full replace of store data from a complete-database export.
+  const handleRestoreDatabase = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      const stores = {
+        controlsStore: useControlsStore,
+        assessmentsStore: useAssessmentsStore,
+        requirementsStore: useRequirementsStore,
+        frameworksStore: useFrameworksStore,
+        artifactStore: useArtifactStore,
+        userStore: useUserStore,
+        findingsStore: useFindingsStore
+      };
+
+      const validation = validateDatabaseExport(parsed);
+      if (!validation.ok) {
+        toast.error(`Restore rejected: ${validation.errors.join(' ')}`);
+        return;
+      }
+
+      const summary = Object.entries(validation.counts)
+        .map(([section, count]) => `${section}: ${count}`)
+        .join(', ');
+      const warningText = validation.warnings.length ? `\n\nNote: ${validation.warnings.join(' ')}` : '';
+      const confirmed = window.confirm(
+        `RESTORE DATABASE — this REPLACES your current data.\n\n` +
+        `File contains — ${summary}.${warningText}\n\n` +
+        `A backup download of your current data will be ATTEMPTED first ` +
+        `(csf_pre_restore_*.backup.json) — browsers cannot guarantee it lands, ` +
+        `so only continue if you also have a recent export of your own. Continue?`
+      );
+      if (!confirmed) return;
+
+      const result = importCompleteDatabase(parsed, stores);
+      toast.success(`Database restored (${result.applied.length} sections). Backup of prior data downloaded.`);
+    } catch (err) {
+      console.error('Database restore error:', err);
+      toast.error(err.message || 'Restore failed. Please verify the file and try again.');
     }
   }, []);
 
@@ -535,7 +584,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Important: Local Data Storage</h3>
                     <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                      All assessment data is stored in your browser's IndexedDB. This data can be lost if you:
+                      All assessment data is stored in your browser's local storage. This data can be lost if you:
                     </p>
                     <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1 mb-3">
                       <li>Clear your browser cache or site data</li>
@@ -834,10 +883,32 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
               </button>
             </div>
             <p className="text-xs text-green-600 mt-3">
-              <strong>Complete Database:</strong> Exports all controls, assessments, requirements, frameworks, artifacts, and user data in a single JSON file (csf_assessment_YYYY-MM-DD.json)
+              <strong>Complete Database:</strong> Exports all controls, assessments, requirements, frameworks, artifacts, findings, and user data in a single JSON file (csf_assessment_YYYY-MM-DD.json)
             </p>
             <p className="text-xs text-green-600 mt-2">
               <strong>Assessments Only:</strong> Exports assessment observations and scores with enhanced readability (assessments_YYYY-MM-DD.json)
+            </p>
+          </div>
+
+          {/* Database Restore — destructive, visually distinct from export */}
+          <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-red-800">Restore From Backup</h3>
+                <p className="text-sm text-red-700 mt-1">
+                  Replaces ALL current data with the contents of a Complete Database export. A backup of your current data downloads automatically before anything is replaced.
+                </p>
+              </div>
+            </div>
+            <button
+              className="flex items-center gap-2 text-sm bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              onClick={() => restoreImportRef.current?.click()}
+            >
+              <Upload size={16} />
+              Restore Complete Database
+            </button>
+            <p className="text-xs text-red-600 mt-3">
+              Accepts csf_assessment_*.json files created by Export Complete Database. This is a full replace, not a merge.
             </p>
           </div>
 
@@ -1279,6 +1350,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         style={{ display: 'none' }}
         accept=".csv"
         onChange={handleEntryIdImport}
+      />
+      <input
+        type="file"
+        ref={restoreImportRef}
+        style={{ display: 'none' }}
+        accept=".json,application/json"
+        onChange={handleRestoreDatabase}
       />
 
       {/* Edit Framework Modal */}

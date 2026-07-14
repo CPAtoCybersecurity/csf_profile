@@ -1,5 +1,35 @@
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 import confluenceClient from "../services/confluenceClient.js";
 import { sanitizeErrorResponse, getErrorStatus } from "../utils/errorUtils.js";
+
+// Entry-ID mappings persist to disk so they survive server restarts
+// (previously a process-global, lost on every restart). server/data/ is
+// gitignored — mappings are deployment-local state, never repository content.
+const DATA_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "data");
+const MAPPINGS_FILE = path.join(DATA_DIR, "entry-id-mappings.json");
+
+const loadMappings = () => {
+  try {
+    return JSON.parse(fs.readFileSync(MAPPINGS_FILE, "utf8"));
+  } catch {
+    return {};
+  }
+};
+
+const persistMappings = (mappings) => {
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+    // Write to a temp file then rename: a crash mid-write must never corrupt
+    // or truncate the only copy of the mappings.
+    const tempFile = `${MAPPINGS_FILE}.tmp`;
+    fs.writeFileSync(tempFile, JSON.stringify(mappings, null, 2));
+    fs.renameSync(tempFile, MAPPINGS_FILE);
+  } catch (error) {
+    console.error("Failed to persist entry-id mappings:", error.message);
+  }
+};
 
 // GET /api/confluence/page/:pageId
 export const getPage = async (req, res) => {
@@ -37,7 +67,7 @@ export const validateConfluence = async (req, res) => {
   }
 };
 
-let entryIdMappings = {};
+let entryIdMappings = loadMappings();
 
 // GET mappings
 export const getMappings = (req, res) => {
@@ -50,6 +80,7 @@ export const saveMappings = (req, res) => {
     ...entryIdMappings,
     ...req.body
   };
+  persistMappings(entryIdMappings);
 
   res.status(200).json({ success: true });
 };
@@ -57,5 +88,6 @@ export const saveMappings = (req, res) => {
 // DELETE mappings
 export const clearMappings = (req, res) => {
   entryIdMappings = {};
+  persistMappings(entryIdMappings);
   res.status(200).json({ success: true });
 };

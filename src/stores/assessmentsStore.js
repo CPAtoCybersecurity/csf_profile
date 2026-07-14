@@ -123,6 +123,107 @@ const migrateObservationToQuarterly = (oldObs) => {
   };
 };
 
+/**
+ * Current schema version of csf-assessments-storage. Exported so the restore
+ * path (dataImport.js) can migrate older exported payloads before applying them.
+ */
+export const ASSESSMENTS_SCHEMA_VERSION = 9;
+
+/**
+ * Full persisted-state migration chain for csf-assessments-storage.
+ * Exported for tests and for the restore path. Every step falls through to the
+ * next so a client on ANY old version receives every later migration (the
+ * previous implementation returned early from each step, so a v0 client
+ * silently skipped v2–v9).
+ */
+export const migrateAssessmentsState = (persistedState, version) => {
+  let state = persistedState || {};
+
+  // Version 1: Migrate observations to quarterly structure
+  if (version === 0 && state.assessments) {
+    const migratedAssessments = state.assessments.map(assessment => {
+      if (!assessment.observations) return assessment;
+      const migratedObservations = {};
+      Object.entries(assessment.observations).forEach(([itemId, obs]) => {
+        // Only migrate if not already in quarterly format
+        migratedObservations[itemId] = obs.quarters ? obs : migrateObservationToQuarterly(obs);
+      });
+      return { ...assessment, observations: migratedObservations };
+    });
+    state = { ...state, assessments: migratedAssessments };
+  }
+
+  // Version 2: Added default assessments for new installations.
+  // Existing users with data keep their assessments; new/empty states get defaults.
+  if (version < 2 && !(state.assessments?.length > 0)) {
+    state = { ...state, assessments: DEFAULT_ASSESSMENTS, currentAssessmentId: null };
+  }
+
+  // Version 3: Update default assessment with corrected CSV data (Q1-Q4 scores)
+  if (version < 3) {
+    const assessments = (state.assessments || []).map(assessment =>
+      assessment.id === 'ASM-default-2025-alma'
+        ? { ...assessment, observations: UPDATED_OBSERVATIONS }
+        : assessment
+    );
+    state = { ...state, assessments };
+  }
+
+  // Versions 4 & 5: Fix scopeType from 'controls' to 'requirements' where scopeIds
+  // are subcategory/requirement-style IDs (e.g., GV.SC-04, DE.CM-03, GV.SC-04 Ex1)
+  if (version < 5) {
+    const assessments = (state.assessments || []).map(assessment => {
+      if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
+        const firstId = assessment.scopeIds[0];
+        if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
+          return { ...assessment, scopeType: 'requirements' };
+        }
+      }
+      return assessment;
+    });
+    state = { ...state, assessments };
+  }
+
+  // Version 6: Add Alma Security Internal Audit as second default assessment
+  if (version < 6) {
+    const assessments = state.assessments || [];
+    if (!assessments.some(a => a.id === 'ASM-audit-2025-alma')) {
+      state = { ...state, assessments: [...assessments, DEFAULT_ASSESSMENTS[1]] };
+    }
+  }
+
+  // Version 7: Rename second assessment
+  if (version < 7) {
+    const assessments = (state.assessments || []).map(a =>
+      a.id === 'ASM-audit-2025-alma'
+        ? { ...a, name: '2026 Alma Security CSF', description: 'Internal Audit Report IA-2026-001.' }
+        : a
+    );
+    state = { ...state, assessments };
+  }
+
+  // Version 8: Add comprehensive catalog-driven assessment
+  if (version < 8) {
+    const assessments = state.assessments || [];
+    if (!assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID)) {
+      state = { ...state, assessments: [...assessments, COMPREHENSIVE_ASSESSMENT] };
+    }
+  }
+
+  // Version 9: Refresh comprehensive assessment observations to include linkedFindings
+  if (version < 9) {
+    const assessments = (state.assessments || []).map(a =>
+      a.id === COMPREHENSIVE_ASSESSMENT_ID ? COMPREHENSIVE_ASSESSMENT : a
+    );
+    if (!assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID)) {
+      assessments.push(COMPREHENSIVE_ASSESSMENT);
+    }
+    state = { ...state, assessments };
+  }
+
+  return state;
+};
+
 const useAssessmentsStore = create(
   persist(
     (set, get) => ({
@@ -1580,149 +1681,8 @@ const useAssessmentsStore = create(
     }),
     {
       name: 'csf-assessments-storage',
-      version: 9,
-      migrate: (persistedState, version) => {
-        // Version 1: Migrate observations to quarterly structure
-        if (version === 0 && persistedState?.assessments) {
-          const migratedAssessments = persistedState.assessments.map(assessment => {
-            if (!assessment.observations) return assessment;
-
-            const migratedObservations = {};
-            Object.entries(assessment.observations).forEach(([itemId, obs]) => {
-              // Only migrate if not already in quarterly format
-              if (!obs.quarters) {
-                migratedObservations[itemId] = migrateObservationToQuarterly(obs);
-              } else {
-                migratedObservations[itemId] = obs;
-              }
-            });
-
-            return {
-              ...assessment,
-              observations: migratedObservations
-            };
-          });
-
-          return {
-            ...persistedState,
-            assessments: migratedAssessments
-          };
-        }
-        // Version 2: Added default assessment for new installations
-        // Existing users with data keep their assessments, new users get defaults
-        if (version < 2) {
-          if (persistedState?.assessments?.length > 0) {
-            // Existing user with data - keep their assessments
-            return persistedState;
-          }
-          // New user or empty state - use defaults
-          return { assessments: DEFAULT_ASSESSMENTS, currentAssessmentId: null };
-        }
-        // Version 3: Update default assessment with corrected CSV data (Q1-Q4 scores)
-        if (version < 3) {
-          const assessments = persistedState?.assessments || [];
-          const updatedAssessments = assessments.map(assessment => {
-            // Only update the default Alma Security assessment
-            if (assessment.id === 'ASM-default-2025-alma') {
-              return {
-                ...assessment,
-                observations: UPDATED_OBSERVATIONS
-              };
-            }
-            return assessment;
-          });
-          return {
-            ...persistedState,
-            assessments: updatedAssessments
-          };
-        }
-        // Version 4: Fix scopeType from 'controls' to 'requirements'
-        // The scopeIds are subcategory/requirement IDs, not control IDs
-        if (version < 4) {
-          const assessments = persistedState?.assessments || [];
-          const updatedAssessments = assessments.map(assessment => {
-            // Fix scopeType for assessments that have requirement/subcategory-style IDs
-            if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
-              const firstId = assessment.scopeIds[0];
-              // If IDs look like subcategory IDs (e.g., GV.SC-04, DE.AE-02) or requirement IDs (e.g., GV.SC-04 Ex1)
-              if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
-                return {
-                  ...assessment,
-                  scopeType: 'requirements'
-                };
-              }
-            }
-            return assessment;
-          });
-          return {
-            ...persistedState,
-            assessments: updatedAssessments
-          };
-        }
-        // Version 5: Re-run scopeType fix with improved regex for subcategory IDs
-        // Handles cases like GV.SC-02, DE.CM-03 that were missed in v4
-        if (version < 5) {
-          const assessments = persistedState?.assessments || [];
-          const updatedAssessments = assessments.map(assessment => {
-            if (assessment.scopeType === 'controls' && assessment.scopeIds?.length > 0) {
-              const firstId = assessment.scopeIds[0];
-              // Match subcategory IDs: XX.YY-NN or XX.YYY-NN (e.g., GV.SC-02, DE.CM-03)
-              if (firstId && /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}/.test(firstId)) {
-                return {
-                  ...assessment,
-                  scopeType: 'requirements'
-                };
-              }
-            }
-            return assessment;
-          });
-          return {
-            ...persistedState,
-            assessments: updatedAssessments
-          };
-        }
-        // Version 6: Add Alma Security Internal Audit as second default assessment
-        if (version < 6) {
-          const assessments = persistedState?.assessments || [];
-          const hasAlmaAudit = assessments.some(a => a.id === 'ASM-audit-2025-alma');
-          if (!hasAlmaAudit) {
-            return {
-              ...persistedState,
-              assessments: [...assessments, DEFAULT_ASSESSMENTS[1]]
-            };
-          }
-        }
-        // Version 7: Rename second assessment
-        if (version < 7) {
-          const assessments = (persistedState?.assessments || []).map(a => {
-            if (a.id === 'ASM-audit-2025-alma') {
-              return { ...a, name: '2026 Alma Security CSF', description: 'Internal Audit Report IA-2026-001.' };
-            }
-            return a;
-          });
-          return { ...persistedState, assessments };
-        }
-        // Version 8: Add comprehensive catalog-driven assessment
-        if (version < 8) {
-          const assessments = persistedState?.assessments || [];
-          const exists = assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID);
-          if (!exists) {
-            return { ...persistedState, assessments: [...assessments, COMPREHENSIVE_ASSESSMENT] };
-          }
-        }
-        // Version 9: Refresh comprehensive assessment observations to include linkedFindings
-        if (version < 9) {
-          const assessments = (persistedState?.assessments || []).map(a => {
-            if (a.id === COMPREHENSIVE_ASSESSMENT_ID) return COMPREHENSIVE_ASSESSMENT;
-            return a;
-          });
-          if (!assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID)) {
-            assessments.push(COMPREHENSIVE_ASSESSMENT);
-          }
-          return { ...persistedState, assessments };
-        }
-        return persistedState;
-      },
+      version: ASSESSMENTS_SCHEMA_VERSION,
+      migrate: (persistedState, version) => migrateAssessmentsState(persistedState, version),
       partialize: (state) => ({
         assessments: state.assessments,
         currentAssessmentId: state.currentAssessmentId
