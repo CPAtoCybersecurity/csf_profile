@@ -45,4 +45,12 @@ SCRATCH-*.md
 
 # Backup files
 *.backup
+
+# Pre-restore auto-backups contain a full copy of assessment data — never repo content
+*.backup.json
+backups/
+
+# Server-local persisted state (entry-id mappings) — deployment data, not code
+server/data/
+
 CLAUDE.md
