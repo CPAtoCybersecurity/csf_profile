@@ -21,3 +21,14 @@ if (typeof global.TextDecoder === 'undefined') {
 if (!global.crypto || !global.crypto.getRandomValues) {
   Object.defineProperty(global, 'crypto', { value: webcrypto, configurable: true });
 }
+
+// jsdom has no ResizeObserver; recharts' ResponsiveContainer (Dashboard)
+// requires one at mount, and the crash otherwise lands in the app error
+// boundary — failing every assertion about the normal UI.
+if (typeof global.ResizeObserver === 'undefined') {
+  global.ResizeObserver = class ResizeObserver {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+}
