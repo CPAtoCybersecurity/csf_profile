@@ -23,15 +23,17 @@ const sanitizeFilename = (filename) => {
 
 const DocumentUpload = ({ embedded = false }) => {
   const navigate = useNavigate();
-  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeApiKey, checkOllama } = useAIStore();
+  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
   const fileInputRef = useRef(null);
 
-  // Check Ollama status on mount
+  // Check provider status on mount
   React.useEffect(() => {
     if (llmProvider === 'ollama') {
       checkOllama();
+    } else {
+      checkClaude();
     }
-  }, [llmProvider, checkOllama]);
+  }, [llmProvider, checkOllama, checkClaude]);
 
   const [uploadedDocuments, setUploadedDocuments] = useState([]);
   const [userNotes, setUserNotes] = useState('');
@@ -210,7 +212,7 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
 
   const isReady = llmProvider === 'ollama'
     ? ollamaStatus.available && ollamaStatus.hasModel
-    : !!claudeApiKey;
+    : claudeStatus.configured;
 
   const getScoreIcon = (score) => {
     switch (score) {

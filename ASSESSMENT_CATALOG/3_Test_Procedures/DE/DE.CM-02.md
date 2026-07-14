@@ -4,7 +4,7 @@
 
 **Scope:** Alma Security 2026 CSF Assessment
 
-**Auditor:** Steve <steve@almasecurity.com>
+**Auditor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 ---
 

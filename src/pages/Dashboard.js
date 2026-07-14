@@ -604,22 +604,22 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="p-4 bg-white min-h-full">
+    <div className="p-4 bg-white dark:bg-gray-900 min-h-full">
       <div className="flex items-center justify-between mb-4">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Dashboard</h1>
       </div>
 
-      {/* Assessment Info */}
+      {/* Assessment Info — terminal panel: square, monospace, accent label */}
       {selectedAssessment && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div className="mb-4 p-3 font-mono bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-medium text-blue-900">{selectedAssessment.name}</span>
+              <span className="font-semibold uppercase tracking-wider text-blue-700 dark:text-green-300">{selectedAssessment.name}</span>
               {selectedAssessment.description && (
-                <span className="text-blue-700 ml-2">— {selectedAssessment.description}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">— {selectedAssessment.description}</span>
               )}
             </div>
-            <div className="text-sm text-blue-600">
+            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
               {selectedAssessment.scopeIds?.length || 0} items in scope
             </div>
           </div>
@@ -1263,7 +1263,7 @@ const Dashboard = () => {
       )}
 
       {/* Gap Prioritization Matrix */}
-      <div className={`card mt-6 p-4 rounded-lg shadow-sm border ${darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+      <div className="card mt-6 p-4">
         <div className="flex items-center justify-between mb-4">
           <h2 className={`text-lg font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-900'}`}>
             Priority Gaps (Q{selectedQuarter})

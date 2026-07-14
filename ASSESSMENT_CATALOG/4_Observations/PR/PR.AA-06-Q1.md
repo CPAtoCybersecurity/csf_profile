@@ -1,8 +1,8 @@
 # PR.AA-06: Physical Access Management — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -62,6 +62,8 @@ Physical access logs are retained in the ACS but are not forwarded to the SIEM f
 | Actual Score | 5 |
 | Target Score | 6 |
 
+**Scoring rationale:** The score of 5 places physical access management in the Minimally Acceptable band — the control executes consistently across its full scope with minor, known flaws. The 8-zone classification, badge-plus-PIN server room restricted to 11 monthly-reviewed individuals, and a 30-day visitor log of 47 entries with 100% badge return all evidence consistent operation, while the 2 of 6 sampled badge deactivations delayed 3–5 business days are a known exception with a tracked remediation (ServiceNow automation due May 2026). The control does not reach Optimized (6.0) because there is no measurement layer: physical access logs are not forwarded to the SIEM for correlation with logical events, so no owner is reviewing indicators and acting on drift.
+
 ---
 
 ## Evidence Reviewed
@@ -90,3 +92,8 @@ Physical access logs are retained in the ACS but are not forwarded to the SIEM f
 | 4 | Migrate from paper visitor log to digital visitor management system (Envoy, SwipedOn) | Medium | Gerry |
 | 5 | Integrate server room camera footage with ACS badge events for automated video retrieval | Low | Chris Magann |
 | 6 | Evaluate biometric authentication (fingerprint or palm) for server room entry | Low | Gerry |
+
+## Related
+
+- **Test Procedure:** [PR.AA-06 Test Procedures](../../3_Test_Procedures/PR/PR.AA-06.md)
+- **Controls:** [PR.AA-06_Ex1](../../2_Controls/PR/PR.AA-06_Ex1.md), [PR.AA-06_Ex2](../../2_Controls/PR/PR.AA-06_Ex2.md), [PR.AA-06_Ex3](../../2_Controls/PR/PR.AA-06_Ex3.md)

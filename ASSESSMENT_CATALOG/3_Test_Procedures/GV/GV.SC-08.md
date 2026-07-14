@@ -23,7 +23,7 @@
 
 4. **Interview Nadia Khan (D&R Lead) on supplier incident coordination**
    - Ask about supplier involvement in incident response procedures
-   - Verify CrowdStrike MDR coordination is documented and tested
+   - Verify SentinelOne MDR coordination is documented and tested
    - Confirm post-incident lessons learned include supplier perspectives
 
 ## Evidence Requests
@@ -31,8 +31,8 @@
 - [ ] Incident response plan with supplier provisions
 - [ ] Exercise records showing supplier participation
 - [ ] Supplier incident communication protocols
-- [ ] CrowdStrike MDR coordination documentation
+- [ ] SentinelOne MDR coordination documentation
 
 ## Notes
 
-CrowdStrike MDR as a compensating control for R-01 (understaffing) makes supplier incident coordination particularly important. Assessment should verify this relationship is integrated into incident planning.
+SentinelOne MDR as a compensating control for R-01 (understaffing) makes supplier incident coordination particularly important. Assessment should verify this relationship is integrated into incident planning.

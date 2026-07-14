@@ -1,0 +1,26 @@
+Summary,Subcategory ID,Issue Key,Issue Type,Status,Priority,Assignee,Reporter,Created,Updated,Link,Description
+K8s-Pod-Distribution-Report,,AR-25,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:21 PM,11/Jan/26 3:21 PM,,
+RDS-Failover-Test-Results,,AR-24,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:21 PM,11/Jan/26 3:21 PM,,
+Auto-Scaling-Event-History,,AR-23,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:21 PM,11/Jan/26 3:21 PM,,
+CloudFront-Distribution-Config,,AR-22,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:20 PM,11/Jan/26 3:20 PM,,
+Kubernetes-HA-Architecture-Diagram,,AR-21,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:20 PM,11/Jan/26 3:20 PM,,
+RDS-Multi-AZ-Configuration,,AR-20,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:20 PM,11/Jan/26 3:20 PM,,
+Auto-Scaling-Group-Config-Screenshot,,AR-19,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:20 PM,11/Jan/26 3:20 PM,,
+AWS-ALB-Configuration-Export,,AR-18,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:20 PM,11/Jan/26 3:20 PM,,
+MDM-Vendor-Evaluation,,AR-17,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:06 PM,11/Jan/26 3:06 PM,,
+SentinelOne-Policy-Violation-Alerts,,AR-16,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:06 PM,11/Jan/26 3:06 PM,,
+SentinelOne-AppControl-Pilot-Report,,AR-15,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:06 PM,11/Jan/26 3:06 PM,,
+Mac-Endpoint-Inventory,,AR-14,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:06 PM,11/Jan/26 3:06 PM,,
+SentinelOne-AppControl-Policy-Config,,AR-13,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 3:05 PM,11/Jan/26 3:05 PM,,
+ASM-Implementation-Status-Report,,AR-12,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:46 PM,11/Jan/26 2:46 PM,,
+VPC-FlowLog-Retention-Remediation-Evidence,,AR-11,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:46 PM,11/Jan/26 2:46 PM,,
+GuardDuty-Findings-Reports,,AR-10,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:46 PM,11/Jan/26 2:46 PM,,
+ASM-Vendor-Evaluation-Matrix.xlsx,,AR-9,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:36 PM,11/Jan/26 2:45 PM,,
+Route53-DNS-Logging-Config-Screenshots.png,,AR-8,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:36 PM,11/Jan/26 2:45 PM,,
+VPC-FlowLog-Dashboard-Screenshots.png,,AR-7,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:35 PM,11/Jan/26 2:45 PM,,
+CloudTrail-Config-Exports.json,,AR-6,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,11/Jan/26 2:35 PM,11/Jan/26 2:45 PM,,
+Third Party Risk Management Policy,,AR-5,Assessment Artifact,ACTIVE,Medium,CPA to Cybersecurity,CPA to Cybersecurity,10/Jan/26 7:31 AM,10/Jan/26 7:33 AM,https://github.com/CPAtoCybersecurity/csf_profile/commit/3393340912d4d2e6a9607fa3d1ba251e8b9b23ce,
+SOC-Ticket-1005,,AR-4,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,10/Jan/26 7:31 AM,10/Jan/26 7:33 AM,https://github.com/CPAtoCybersecurity/csf_profile/commit/104f9b021cc951d53947a99bbd0e44669adf4ebb,Sample case
+SOC-Ticket-1004,,AR-3,Assessment Artifact,ACTIVE,Medium,,CPA to Cybersecurity,10/Jan/26 7:31 AM,10/Jan/26 5:14 PM,https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md,Sample case
+SOC-Ticket-1001,,AR-2,Assessment Artifact,ACTIVE,Medium,CPA to Cybersecurity,CPA to Cybersecurity,10/Jan/26 7:31 AM,10/Jan/26 7:32 AM,https://github.com/CPAtoCybersecurity/csf_profile/commit/0977939cf00b964fdca5aa9339c24c6d12c23c56,Sample case
+Phishing Campaign Results from Jan 2026,,AR-1,Assessment Artifact,ACTIVE,Medium,CPA to Cybersecurity,CPA to Cybersecurity,10/Jan/26 7:28 AM,10/Jan/26 10:14 AM,https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/2025-05-26_Phish-1001-LI-Campaign-Data.xlsx,Phishing tool (Go Phish) campaign export of results

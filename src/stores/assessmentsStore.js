@@ -30,11 +30,11 @@ const COMPREHENSIVE_ASSESSMENT = {
 const DEFAULT_ASSESSMENTS = [
   {
     id: 'ASM-default-2025-alma',
-    name: '2025 Alma Security CSF',
+    name: '2026 Alma Security CSF Assessment',
     description: 'Annual CSF 2.0 assessment for Alma Security covering all implemented controls',
     scopeType: 'requirements',
     frameworkFilter: null,
-    createdDate: '2025-01-01T00:00:00.000Z',
+    createdDate: '2026-01-01T00:00:00.000Z',
     scopeIds: [
       'GV.SC-04 Ex1', 'GV.OC-01 Ex1', 'GV.RR-02 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2',
       'GV.RM-01 Ex2', 'GV.RR-01 Ex4', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7', 'GV.SC-06 Ex3',
@@ -53,7 +53,7 @@ const DEFAULT_ASSESSMENTS = [
     description: 'Internal Audit Report IA-2026-001.',
     scopeType: 'requirements',
     frameworkFilter: null,
-    createdDate: '2025-04-30T00:00:00.000Z',
+    createdDate: '2026-04-30T00:00:00.000Z',
     scopeIds: [
       'GV.OC-01 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2', 'GV.RM-01 Ex2',
       'GV.RR-01 Ex4', 'GV.RR-02 Ex1', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7',
@@ -127,7 +127,7 @@ const useAssessmentsStore = create(
   persist(
     (set, get) => ({
       assessments: DEFAULT_ASSESSMENTS,
-      currentAssessmentId: null,
+      currentAssessmentId: COMPREHENSIVE_ASSESSMENT_ID,
       loading: false,
       error: null,
 
@@ -1726,7 +1726,20 @@ const useAssessmentsStore = create(
       partialize: (state) => ({
         assessments: state.assessments,
         currentAssessmentId: state.currentAssessmentId
-      })
+      }),
+      onRehydrateStorage: () => (state) => {
+        // Returning users keep their valid selection; fall back to the
+        // comprehensive Alma assessment when none is selected or it no longer exists
+        if (!state) return;
+        const exists = state.assessments?.some(a => a.id === state.currentAssessmentId);
+        if (!state.currentAssessmentId || !exists) {
+          const hasComprehensive = state.assessments?.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID);
+          const fallbackId = hasComprehensive
+            ? COMPREHENSIVE_ASSESSMENT_ID
+            : (state.assessments?.[0]?.id ?? null);
+          useAssessmentsStore.setState({ currentAssessmentId: fallbackId });
+        }
+      }
     }
   )
 );

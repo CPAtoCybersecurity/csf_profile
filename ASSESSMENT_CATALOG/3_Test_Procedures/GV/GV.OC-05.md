@@ -9,7 +9,7 @@
 1. **Review external dependency inventory**
    - Request documented inventory of external dependencies (cloud providers, SaaS tools, ISPs)
    - Verify AWS as primary cloud provider is documented with dependency mapping
-   - Confirm critical third-party services identified (e.g., Splunk, CrowdStrike, ServiceNow)
+   - Confirm critical third-party services identified (e.g., SentinelOne, ServiceNow, PagerDuty)
 
 2. **Validate single points of failure analysis**
    - Review whether external dependencies have been assessed for single points of failure
@@ -35,4 +35,4 @@
 
 ## Notes
 
-Alma's reliance on AWS infrastructure, Splunk for SIEM, and CrowdStrike for MDR creates concentrated dependency risk. Assessment should verify these dependencies are formally tracked beyond the vendor risk program.
+Alma's reliance on AWS infrastructure for both hosting and security monitoring (CloudTrail, GuardDuty) and on SentinelOne for EDR/MDR creates concentrated dependency risk. Assessment should verify these dependencies are formally tracked beyond the vendor risk program.

@@ -1,7 +1,7 @@
 # GV.RR-03: Resource Allocation — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessment:** 2026 Alma Security CSF Assessment
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-12
 **Testing Status:** Complete
 
@@ -34,6 +34,8 @@
 | Actual Score | 6 |
 | Target Score | 7 |
 
+**Scoring rationale:** Resource allocation earns a 6 — Optimized band — because the process runs consistently and is measured: the FY2026 budget is built jointly by the CISO and CFO against risk tolerance, technology investments map to specific risk treatments, and the quarterly CEO/CISO resource adequacy reviews are exactly the owner-reviews-indicators mechanism the rubric's 6 anchor demands. It falls short of Fully Optimized (7) because measured drift is not closing on schedule: two security engineering positions have sat open for 3+ months and the training budget is only 60% utilized, both flagged in adequacy reviews without timely resolution. Fully Optimized requires improvement actions that close on schedule across periods — these have not.
+
 ## Evidence Reviewed
 
 - FY2026 cybersecurity budget
@@ -47,3 +49,8 @@
 |---|----------------|----------|-------|
 | 1 | Accelerate hiring for open security engineering positions | High | CISO |
 | 2 | Allocate protected time for security team training | Medium | CISO |
+
+## Related
+
+- **Test Procedure:** [GV.RR-03 Test Procedures](../../3_Test_Procedures/GV/GV.RR-03.md)
+- **Controls:** [GV.RR-03_Ex1](../../2_Controls/GV/GV.RR-03_Ex1.md), [GV.RR-03_Ex2](../../2_Controls/GV/GV.RR-03_Ex2.md), [GV.RR-03_Ex3](../../2_Controls/GV/GV.RR-03_Ex3.md)

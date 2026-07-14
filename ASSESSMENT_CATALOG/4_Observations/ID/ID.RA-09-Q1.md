@@ -1,7 +1,7 @@
 # ID.RA-09: Acquisition Integrity Assessment -- Q1 2026 Observation
 
 **Assessment:** 2026 Alma Security CSF Assessment
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-16
 **Testing Status:** Complete
 
@@ -30,6 +30,8 @@ Software integrity verification not standardized for all acquisitions. No SBOM r
 | Actual Score | 3 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3 sits in Some Security (2.0–4.9): acquisition integrity checks are defined but applied unevenly. Vendor security questionnaires are required for new acquisitions, an approved vendor list is maintained, AWS Marketplace supplies vetted sources, and critical deployment packages are checksum-verified — yet integrity verification is not standardized across all acquisitions, procured software carries no SBOM requirement, internally developed software has no code-signing verification policy, and hardware authenticity rests on supply-chain trust alone. What separates this from Minimally Acceptable (5.0) is uniform application: integrity verification performed consistently for the entire acquisition population — not just critical packages — with any unverified items recorded as tracked exceptions.
+
 ## Evidence Reviewed
 
 - [Third-Party Risk Policy](../../5_Artifacts/Policies/POL-third-party-risk.md)
@@ -43,3 +45,8 @@ Software integrity verification not standardized for all acquisitions. No SBOM r
 | 2 | Implement SBOM requirements for procured software | Medium | Procurement |
 | 3 | Establish code signing verification policy | Medium | Engineering |
 | 4 | Enhance hardware authenticity assessment beyond supply chain trust | Low | Procurement |
+
+## Related
+
+- **Test Procedure:** [ID.RA-09 Test Procedures](../../3_Test_Procedures/ID/ID.RA-09.md)
+- **Controls:** [ID.RA-09_Ex1](../../2_Controls/ID/ID.RA-09_Ex1.md)

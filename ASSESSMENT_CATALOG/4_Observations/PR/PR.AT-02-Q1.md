@@ -1,8 +1,8 @@
 # PR.AT-02: Specialized Role-Based Training -- Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -56,6 +56,8 @@
 | Target Score | 5 |
 | Trend | Stable (new assessment baseline) |
 
+**Scoring rationale:** The 3 belongs to the Some Security band: specialized training happens — SentinelOne vendor training for the D&R team, partially-funded GIAC certifications for Chris Magann, a Q4 2025 tabletop that surfaced and closed AWS incident-response gaps — but it runs on institutional knowledge and individual initiative rather than a reliable, policy-backed process. There is no role classification matrix, completion is tracked in team spreadsheets and vendor portals outside Workday, and developers with production access receive only optional lunch-and-learns. Reaching Minimally Acceptable (5.0) would require the practice to execute consistently across all specialized roles with centrally evidenced completion; today whole role families (developer, DevSecOps) fall outside the program entirely.
+
 ---
 
 ## Evidence Reviewed
@@ -84,3 +86,8 @@
 | 6 | Establish quarterly tabletop exercise calendar with rotating scenarios for the D&R team | Medium | Nadia Khan + CISO |
 | 7 | Draft policy amendment establishing formal annual specialized role refresher requirements distinct from general awareness | Medium | CISO |
 | 8 | Administer baseline competency assessment to all specialized role personnel before next training cycle | Medium | Security Team |
+
+## Related
+
+- **Test Procedure:** [PR.AT-02 Test Procedures](../../3_Test_Procedures/PR/PR.AT-02.md)
+- **Controls:** [PR.AT-02_Ex1](../../2_Controls/PR/PR.AT-02_Ex1.md), [PR.AT-02_Ex2](../../2_Controls/PR/PR.AT-02_Ex2.md), [PR.AT-02_Ex3](../../2_Controls/PR/PR.AT-02_Ex3.md), [PR.AT-02_Ex4](../../2_Controls/PR/PR.AT-02_Ex4.md)

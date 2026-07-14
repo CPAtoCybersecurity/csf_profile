@@ -1,8 +1,8 @@
 # RC.RP-03: Verify Backup and Restoration Asset Integrity — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-16
 
@@ -45,6 +45,8 @@
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 4 is the strongest RC score this quarter but still Some Security (2.0–4.9), matching the rubric's anchor 4: a regularly executing process with material coverage weaknesses. What executes is genuinely solid — automated verification against PostgreSQL backups (90-day log sample examined), quarterly restore tests in isolated environments, and AWS-managed encryption (S3 server-side, RDS at rest) — and this was the one RC subcategory where the Test method fully validated the evidence. Coverage is the problem: verification stops at the database tier, leaving Kubernetes manifests, infrastructure-as-code, and application configuration unverified, with no IOC scanning of backup assets and no immutable (write-once) copies to resist ransomware or insider tampering. Minimally Acceptable (5.0) requires consistent execution across the *full* restoration-asset scope with exceptions tracked; the database-only verification boundary is precisely the material weakness holding the score at 4.
+
 ---
 
 ## Evidence Reviewed
@@ -65,3 +67,8 @@
 | 2 | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | High | Tigan Wang |
 | 3 | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Medium | Tigan Wang |
 | 4 | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery | Medium | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [RC.RP-03 Test Procedures](../../3_Test_Procedures/RC/RC.RP-03.md)
+- **Controls:** [RC.RP-03_Ex1](../../2_Controls/RC/RC.RP-03_Ex1.md)

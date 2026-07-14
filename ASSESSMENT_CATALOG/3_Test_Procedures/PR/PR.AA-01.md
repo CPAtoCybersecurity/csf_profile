@@ -17,7 +17,7 @@
    - Confirm credential management requirements (complexity, rotation, expiration)
 
 3. **Verify user onboarding process**
-   - Review onboarding workflow in ticketing system (ServiceNow, Jira)
+   - Review onboarding workflow in ticketing system (ServiceNow)
    - Confirm access requests require manager and asset owner approval
    - Verify accounts are provisioned based on role-based access control (RBAC)
    - Check that new hire access is granted within defined SLA
@@ -37,7 +37,7 @@
 6. **Compute identity hygiene KPIs**
    - Calculate orphaned account rate: (orphaned accounts / total accounts) x 100 — target: < 1%
    - Calculate average time to deprovisioning after termination date (target: same day for involuntary, 24 hours for voluntary)
-   - Export active accounts from identity provider (Okta, Azure AD, Active Directory) and cross-reference against current HR roster
+   - Export active accounts from the identity provider (Active Directory / corporate SSO) and cross-reference against current HR roster
    - Identify accounts inactive 90+ days with no documented exception
    - Calculate access review completion rate and last review date per system (Recurrence assertion)
 

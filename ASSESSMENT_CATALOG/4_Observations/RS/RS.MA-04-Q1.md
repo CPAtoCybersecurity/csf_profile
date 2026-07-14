@@ -1,8 +1,8 @@
 # RS.MA-04: Incident Escalation and Elevation — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -50,6 +50,8 @@ External escalation procedures include the third-party DFIR retainer activation 
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** Escalation scores 4, in the Some Security band: criteria are documented across four trigger types (severity, scope expansion, containment failure, time), ServiceNow escalation timers automatically notify on missed milestones, and both traced incidents showed sound judgment — including one correctly elevated from the SOC analyst to Nadia Khan on scope expansion. The material weaknesses are evidential and procedural: real-time incident status lives in Slack rather than the system of record, so the formal trail is incomplete; escalation effectiveness is unmeasured (no time-to-escalate or accuracy tracking); and cross-functional escalation to legal, communications, and HR remains underdeveloped. To reach Minimally Acceptable (5.0), the escalation record must be consistently complete in ServiceNow across all incidents — a control whose evidence partially resides in an informal channel cannot yet demonstrate consistent full-scope execution.
+
 ---
 
 ## Evidence Reviewed
@@ -71,3 +73,8 @@ External escalation procedures include the third-party DFIR retainer activation 
 | 2 | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Medium | Nadia Khan |
 | 3 | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Medium | Nadia Khan |
 | 4 | Add automated escalation triggers based on IOC sweep results indicating scope expansion | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MA-04 Test Procedures](../../3_Test_Procedures/RS/RS.MA-04.md)
+- **Controls:** [RS.MA-04_Ex1](../../2_Controls/RS/RS.MA-04_Ex1.md), [RS.MA-04_Ex2](../../2_Controls/RS/RS.MA-04_Ex2.md)

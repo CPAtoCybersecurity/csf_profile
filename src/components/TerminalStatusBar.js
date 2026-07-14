@@ -155,6 +155,23 @@ const TerminalStatusBar = ({ onBackupClick }) => {
       <span className="terminal-statusbar-segment">
         <button
           type="button"
+          className="terminal-statusbar-kbdhints"
+          onClick={() => window.dispatchEvent(new CustomEvent('keyboard-show-help'))}
+          title="Show keyboard shortcuts (press ?)"
+          aria-label="Show keyboard shortcuts"
+        >
+          <kbd className="terminal-kbd">?</kbd>
+          <span className="terminal-statusbar-kbdlabel">Shortcuts</span>
+          <kbd className="terminal-kbd">/</kbd>
+          <span className="terminal-statusbar-kbdlabel">Search</span>
+          <kbd className="terminal-kbd">↑↓</kbd>
+          <span className="terminal-statusbar-kbdlabel">Nav</span>
+        </button>
+      </span>
+
+      <span className="terminal-statusbar-segment">
+        <button
+          type="button"
           className="terminal-statusbar-action"
           onClick={handleExportSummary}
           disabled={!hasAssessment}

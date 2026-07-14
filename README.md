@@ -2,7 +2,19 @@
 
 A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framework (CSF) 2.0 profile assessments — a lightweight alternative to commercial GRC platforms. Track outcomes, assign ownership, document observations and findings, score current and target states, and export for visualization. All locally, with your data staying on your machine.
 
-**[🚀 Try the Live Demo](https://csf-profile.pages.dev)** — no install required. Explore a populated assessment of the fictional company "Alma Security" in seconds.
+**[🚀 Try the Live Demo](https://csf-profile-app.pages.dev)** — no install required. Explore a populated assessment of the fictional company "Alma Security" in seconds.
+
+## Your Capstone in 5 Steps
+
+Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's the whole arc:
+
+1. **Open the app** — [csf-profile-app.pages.dev](https://csf-profile-app.pages.dev) (no install), or pick another door below.
+2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded; check the Dashboard radar to see where you're headed.
+3. **Score your scope** — pick your subcategories and score current vs. target state using the built-in [0-10 scoring legend](#scoring-system).
+4. **Document observations and findings** — record what you examined, who you interviewed, what you tested, and link evidence artifacts.
+5. **Export and report** — export your CSV workpapers and write up results; use the [example audit report](ASSESSMENT_CATALOG/6_Audit_Report/) as your template. That deliverable is your portfolio piece.
+
+![Simply Cyber Academy Logo](public/SC_SimplyCyberAcademy_color.png)
 
 ## 🏛️ As Seen On NIST.gov
 
@@ -12,9 +24,14 @@ A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framewor
 
 ## 🎬 As Seen On CISO Tradecraft!
 
-[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/07-app-dashboard-radar.png)](https://app.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG)
 
-> **👆 Click the image above** to open the full interactive walkthrough on Excalidraw.
+[![CISO Tradecraft Feature](https://img.youtube.com/vi/4uI-tsaLWaI/0.jpg)](https://www.youtube.com/watch?v=4uI-tsaLWaI&t=1808s)
+
+> **👆 Watch the overview** with G Mark Hardy.
+
+[![CSF Profile Assessment Tool — full walkthrough on Excalidraw](public/screenshots/excalidraw-walkthrough.png)](https://app.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG)
+
+> **👆 Click the image above** to check out the walkthrough on Excalidraw.
 
 ### Tap through the tour
 
@@ -29,7 +46,7 @@ A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framewor
     <td align="center" width="25%"><a href="public/screenshots/05-notion-and-excel-templates.png"><img src="public/screenshots/05-notion-and-excel-templates.png" width="100%"></a><br><sub><b>Notion &amp; Excel Templates</b></sub></td>
     <td align="center" width="25%"><a href="public/screenshots/06-app-scoring-legend.png"><img src="public/screenshots/06-app-scoring-legend.png" width="100%"></a><br><sub><b>Scoring Legend</b></sub></td>
     <td align="center" width="25%"><a href="public/screenshots/07-app-dashboard-radar.png"><img src="public/screenshots/07-app-dashboard-radar.png" width="100%"></a><br><sub><b>Dashboard &amp; Radar</b></sub></td>
-    <td align="center" width="25%"><a href="public/screenshots/08-app-investment-priorities.png"><img src="public/screenshots/08-app-investment-priorities.png" width="100%"></a><br><sub><b>Investment Priorities</b></sub></td>
+    <td align="center" width="25%"><a href="public/screenshots/08-app-investment-priorities.png"><img src="public/screenshots/08-app-investment-priorities.png" width="100%"></a><br><sub><b>Priority Gaps</b></sub></td>
   </tr>
 </table>
 
@@ -37,9 +54,7 @@ A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framewor
   <a href="https://link.excalidraw.com/l/1U6BgkXrdYQ/tLdWtKGDaG"><b>🔗 Open the full walkthrough →</b></a>
 </p>
 
-**[View Screenshots](SCREENSHOTS.md)** - See the application in action
-
-**[View Explainer Slides](public/screenshots/CSF-Profile-Assessment-Explainer-Slides.pdf)** - Learn how CSF Profile assessments work
+**[More Screenshots](SCREENSHOTS.md)** - See the application in action
 
 ## 🚪 Choose Your Door
 
@@ -50,7 +65,7 @@ The same NIST CSF 2.0 guidance, flattened into proper tables, ships in five form
 | 📊 **Spreadsheets** | Excel / Power Query users; feeding your AI assistant; zero-tooling quick start | [GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/) |
 | 📝 **Notion template** | Individuals and small teams who want a free, dynamic CSF database — no GRC tool budget needed | [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/) |
 | 🧩 **Jira + Confluence** | Atlassian shops who want assessments, artifacts, and findings as real tickets and pages | [SET_UP_IN_ATLASSIAN/](SET_UP_IN_ATLASSIAN/) |
-| 💻 **React app** | Consultants and analysts who want a guided assessment workflow ([or just try the demo](https://csf-profile.pages.dev)) | [INSTALL_THE_APP/](INSTALL_THE_APP/) or [Installation](#installation-and-setup) below |
+| 💻 **React app** | Consultants and analysts who want a guided assessment workflow ([or just try the demo](https://csf-profile-app.pages.dev)) | [INSTALL_THE_APP/](INSTALL_THE_APP/) or [Installation](#installation-and-setup) below |
 | 🎓 **Practice case study** | Career-changers building a GRC portfolio — run a full assessment of fictional "Alma Security" | [ASSESSMENT_CATALOG/](ASSESSMENT_CATALOG/) |
 
 ## 🤝 Contributing
@@ -176,6 +191,15 @@ The application supports integration with JIRA and Confluence for enhanced track
    - `REACT_APP_CONFLUENCE_API_TOKEN` - Your Confluence API token
 
 3. **Generate API tokens** at: https://id.atlassian.com/manage-profile/security/api-tokens
+
+#### Claude AI Assistant (server-side key)
+
+The AI Assistant's Claude integration is configured **on the backend only** — the browser never sees or stores the API key:
+
+- `CLAUDE_API_KEY` - Your Anthropic API key (used by the backend proxy at `/api/ai/claude`)
+- `CLAUDE_MODEL` - Optional model override (defaults to `claude-sonnet-4-20250514`)
+
+Set these in the backend environment (or `.env`) and restart the server. The frontend shows a "Ready" badge when the key is configured (via `GET /api/ai/status`, which returns a boolean only). Without a key, Claude requests return a mock response so local development still works.
 
 #### Windows-Specific Instructions
 

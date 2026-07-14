@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield, FileArchive } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
 import useArtifactStore from '../stores/artifactStore';
@@ -12,6 +12,7 @@ import EmptyState from '../components/EmptyState';
 
 const Artifacts = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const data = useCSFStore((state) => state.data);
   const artifacts = useArtifactStore((state) => state.artifacts);
   const setArtifacts = useArtifactStore((state) => state.setArtifacts);
@@ -251,6 +252,24 @@ const Artifacts = () => {
       linkedSubcategoryIds: artifact.linkedSubcategoryIds || []
     });
   };
+
+  // Deep-link: open an artifact's detail when navigated here with router state
+  // (e.g. clicking a linked-artifact chip in Assessments/Controls)
+  useEffect(() => {
+    const targetId = location.state?.artifactId;
+    if (!targetId) return;
+    const target = artifacts.find(a => a.id === targetId);
+    if (target) {
+      setSelectedArtifact(target);
+      setEditMode(false);
+      setFormData({
+        ...target,
+        linkedSubcategoryIds: target.linkedSubcategoryIds || []
+      });
+    }
+    // Clear the state so refresh/back doesn't re-trigger the selection
+    navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, artifacts, navigate]);
 
   // Get status badge style
   const getStatusStyle = (status) => {

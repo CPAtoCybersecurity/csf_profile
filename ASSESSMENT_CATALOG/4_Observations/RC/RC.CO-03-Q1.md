@@ -1,8 +1,8 @@
 # RC.CO-03: Communicate Recovery Activities and Progress — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-16
 
@@ -46,6 +46,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3.5 places recovery communication in the Some Security band (2.0–4.9): communication procedures are documented in the incident response playbook and the 2024 incidents produced real execution evidence, but reliability between the rubric's 3 (defined, unreliably executed) and 4 (regular, with material weaknesses) anchors is the honest read. Execution has never been rehearsed through a tabletop or communication drill, status-update cadence is ad hoc rather than defined per stakeholder group, and supplier coordination procedures for AWS and key SaaS vendors are undocumented. Reaching the Minimally Acceptable band at the target of 5 would require consistent execution across the full communication scope — including a rehearsed cadence, formalized supplier procedures, and a contractual information-sharing obligation register — with exceptions known and tracked, none of which exists today.
+
 ---
 
 ## Evidence Reviewed
@@ -68,3 +70,8 @@
 | 3 | Document crisis communication procedures for critical supplier coordination, including AWS and key SaaS vendors | Medium | Tigan Wang |
 | 4 | Review and formalize Slack channel access controls for recovery communication channels | Low | Tigan Wang |
 | 5 | Compile a contractual information-sharing obligation register for use during recovery communications | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RC.CO-03 Test Procedures](../../3_Test_Procedures/RC/RC.CO-03.md)
+- **Controls:** [RC.CO-03_Ex1](../../2_Controls/RC/RC.CO-03_Ex1.md), [RC.CO-03_Ex2](../../2_Controls/RC/RC.CO-03_Ex2.md), [RC.CO-03_Ex3](../../2_Controls/RC/RC.CO-03_Ex3.md), [RC.CO-03_Ex4](../../2_Controls/RC/RC.CO-03_Ex4.md)

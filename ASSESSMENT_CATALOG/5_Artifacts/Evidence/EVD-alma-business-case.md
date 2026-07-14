@@ -13,7 +13,7 @@ Alma Security is a security startup based in Redwood City, California. Founded i
 
 Alma's mission is to enable businesses to continuously authenticate users based on their "whole selves." Its ambitious goals include:
 
-1. Achieving 20% market share and 10,000 active customers by January 2025
+1. Achieving 20% market share and 10,000 active customers by January 2027
 2. Attaining a 90%+ customer trust score by 2025
 3. Reducing churn below 5% by August 2024
 4. Launching in Europe and India in 2024

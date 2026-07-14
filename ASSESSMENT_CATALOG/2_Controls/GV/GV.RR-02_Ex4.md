@@ -9,7 +9,7 @@
 
 ## Alma Security Implementation
 
-The CISO sets annual cybersecurity performance goals for the 15-person security team, aligned with organizational KPIs (TTD, TTI, TTR targets). Individual goals are documented in the HRIS system and reviewed quarterly. The GRC Manager tracks program-level metrics, Security Engineers have vulnerability remediation targets, and SOC analysts have detection and response time objectives. Performance is evaluated in annual reviews with mid-year check-ins.
+The CISO sets annual cybersecurity performance goals for the 15-person security team, aligned with organizational KPIs (TTD, TTI, TTR targets). Individual goals are documented in the HRIS system and reviewed quarterly. The Security GRC Lead tracks program-level metrics, Security Engineers have vulnerability remediation targets, and SOC analysts have detection and response time objectives. Performance is evaluated in annual reviews with mid-year check-ins.
 
 ## Artifacts
 

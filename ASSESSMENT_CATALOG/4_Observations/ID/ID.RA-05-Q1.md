@@ -1,7 +1,7 @@
 # ID.RA-05: Risk-Informed Response Prioritization -- Q1 2026 Observation
 
 **Assessment:** 2026 Alma Security CSF Assessment
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 **Observation Date:** 2026-03-15
 **Testing Status:** Complete
 
@@ -30,6 +30,8 @@ Threat models not updated after significant application changes. Risk response c
 | Actual Score | 4 |
 | Target Score | 6 |
 
+**Scoring rationale:** The 4 places risk-informed prioritization in Some Security (2.0–4.9), at the anchor for a regularly executing process with material weaknesses. Risk assessment outputs demonstrably drive security budget prioritization, threat models exist for the top critical applications, and the risk register documents prioritized responses with timelines — but the threat models go stale because they are not refreshed after significant application changes, response completion is tracked by hand, and there is no methodology for expressing cyber risk in financial terms. What separates this from Minimally Acceptable (5.0) is keeping the prioritization inputs current across their full scope — threat models that track the applications as they change, and completion status reliable enough to prioritize against.
+
 ## Evidence Reviewed
 
 - [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md)
@@ -43,3 +45,8 @@ Threat models not updated after significant application changes. Risk response c
 | 2 | Automate risk response completion tracking | Medium | Security |
 | 3 | Implement financial risk quantification methodology | Medium | Security |
 | 4 | Establish quarterly risk-informed investment review | Low | Security |
+
+## Related
+
+- **Test Procedure:** [ID.RA-05 Test Procedures](../../3_Test_Procedures/ID/ID.RA-05.md)
+- **Controls:** [ID.RA-05_Ex1](../../2_Controls/ID/ID.RA-05_Ex1.md), [ID.RA-05_Ex2](../../2_Controls/ID/ID.RA-05_Ex2.md)

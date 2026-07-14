@@ -68,7 +68,7 @@ This playbook defines the detection, containment, eradication, and recovery proc
    - SentinelOne: Deep Visibility query for process tree, network connections, file modifications
    - GuardDuty: Finding details including source IP, API calls, resource affected
    - CloudTrail: API activity for affected IAM identities
-   - Okta: Authentication logs for affected user accounts
+   - Corporate SSO (Active Directory): Authentication logs for affected user accounts
 2. Determine scope of compromise:
    - How many systems/accounts are affected?
    - What data may have been accessed?
@@ -89,7 +89,7 @@ For confirmed endpoint compromise:
    - This isolates the endpoint from the network while maintaining agent communication
    - Verify quarantine is active in SentinelOne console
 2. **Process kill:** Use SentinelOne to terminate malicious processes identified in the investigation
-3. **Account disable:** Disable affected user account(s) in Okta
+3. **Account disable:** Disable affected user account(s) in Active Directory (corporate SSO)
 4. **Credential rotation:** Reset passwords and revoke active sessions for affected accounts
 
 ### 5.2 AWS GuardDuty / Cloud Containment
@@ -164,7 +164,7 @@ For lateral movement or network-level threats:
 | Initial post-incident report | Within 24 hours of incident closure |
 | Post-incident review meeting | Within 5 business days of incident closure |
 | Final incident report | Within 10 business days |
-| Remediation tracking | Ongoing; tracked in Jira |
+| Remediation tracking | Ongoing; tracked in ServiceNow |
 
 ### 8.2 Review Requirements
 

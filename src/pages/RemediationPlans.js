@@ -54,7 +54,7 @@ const RemediationPlans = () => {
   const handleRowClick = (item) => {
     // Navigate to Requirements page and select this item
     useUIStore.getState().setCurrentItemId(item.ID);
-    navigate('/');
+    navigate('/requirements');
   };
 
   return (

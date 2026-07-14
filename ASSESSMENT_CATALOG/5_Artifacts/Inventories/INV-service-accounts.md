@@ -47,7 +47,7 @@ This inventory documents all service accounts used by Alma Security automated sy
 | Account Name | System / Service | Owner | Purpose | Privilege Level | Last Password Rotation | CyberArk Managed |
 |-------------|-----------------|-------|---------|-----------------|----------------------|-------------------|
 | svc-dc-backup | Windows DC backup | T. Wang | Windows Server Backup agent | Medium | February 1, 2026 | Yes |
-| svc-ad-sync | Okta AD agent | IT Security | Active Directory to Okta synchronization | Medium | January 15, 2026 | Yes |
+| svc-ad-sync | Corporate SSO directory sync | IT Security | Active Directory to corporate SSO synchronization | Medium | January 15, 2026 | Yes |
 | svc-wsus-update | WSUS | C. Magann | Windows update distribution | Low | February 1, 2026 | Yes |
 | svc-fileserver-scan | Legacy file server | C. Magann | Antivirus scanning on 2012 R2 server | Low | February 1, 2026 | Yes |
 | svc-print-mgmt | Print services | IT | Print server management | Low | December 1, 2025 | Yes |
@@ -58,7 +58,7 @@ This inventory documents all service accounts used by Alma Security automated sy
 
 | Account Name | System / Service | Owner | Purpose | Privilege Level | Last Credential Rotation | CyberArk Managed |
 |-------------|-----------------|-------|---------|-----------------|-------------------------|-------------------|
-| svc-jira-automation | Jira | Engineering Mgr | Automated ticket creation from vuln scans | Low | January 10, 2026 | Yes |
+| svc-itsm-automation | ServiceNow | Engineering Mgr | Automated ticket creation from vuln scans | Low | January 10, 2026 | Yes |
 | svc-servicenow-api | ServiceNow | IT Security | Access request workflow automation | Medium | February 1, 2026 | Yes |
 | svc-slack-bot | Slack | N. Khan | Security alert posting to #soc-alerts | Low | January 15, 2026 | Yes |
 | svc-workday-api | Workday | HR | Training completion data extraction | Low (read-only) | March 1, 2026 | Yes |

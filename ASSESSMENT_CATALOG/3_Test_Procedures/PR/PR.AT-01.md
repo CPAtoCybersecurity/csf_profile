@@ -4,7 +4,7 @@
 
 **Scope:** Alma Security 2025 CSF Assessment
 
-**Auditor:** Steve <steve@almasecurity.com>
+**Auditor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 ---
 
@@ -52,8 +52,9 @@
 
 ## Related Artifacts
 
-- [Security Awareness Training Evidence](../../5_Artifacts/Evidence/EVD-training-completion-q1.md)
-- [Phishing Campaign Data (2025-05-26)](../../5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx)
+- [Security Awareness Program Description](../../5_Artifacts/Evidence/EVD-security-awareness-program.md)
+- [Training Completion Report — Q1 2026](../../5_Artifacts/Evidence/EVD-training-completion-q1.md)
+- [Phishing Campaign Data — May 2025](../../5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx)
 
 ---
 

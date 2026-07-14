@@ -1,8 +1,8 @@
 # PR.PS-02: Software Maintenance and Lifecycle - Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -49,6 +49,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3.5 belongs to the Some Security band: a defined patch program operates — SLAs of 14 days for critical and 72 hours for emergency patches enforced through AWS Systems Manager, weekly vulnerability scans (daily for crown jewels), and weekly container base-image rebuilds — but execution is unreliable at the edges of scope. The Windows Server 2012 R2 fileserver is 2+ years past end-of-life with an aging risk acceptance, Kubernetes node patching periodically exceeds SLA, application-layer npm/pip updates depend on developer initiative, and an estimated 15–20% of SaaS tools bypassed security review entirely. Minimally Acceptable (5.0) requires consistent execution across the whole software estate with exceptions tracked and current; the unmanaged dependency layer and the stale EOL exception keep this control well below that floor.
+
 ---
 
 ## Evidence Reviewed
@@ -75,3 +77,8 @@
 | 4 | Implement automated dependency update tooling (Dependabot or Renovate) | Medium | Chris Magann |
 | 5 | Automate Kubernetes node draining and rolling updates for patching | Medium | Tigan Wang |
 | 6 | Conduct SaaS audit to identify unreviewed tools and route through procurement | Medium | Chris Magann |
+
+## Related
+
+- **Test Procedure:** [PR.PS-02 Test Procedures](../../3_Test_Procedures/PR/PR.PS-02.md)
+- **Controls:** [PR.PS-02_Ex1](../../2_Controls/PR/PR.PS-02_Ex1.md), [PR.PS-02_Ex2](../../2_Controls/PR/PR.PS-02_Ex2.md), [PR.PS-02_Ex3](../../2_Controls/PR/PR.PS-02_Ex3.md), [PR.PS-02_Ex4](../../2_Controls/PR/PR.PS-02_Ex4.md), [PR.PS-02_Ex5](../../2_Controls/PR/PR.PS-02_Ex5.md), [PR.PS-02_Ex6](../../2_Controls/PR/PR.PS-02_Ex6.md)

@@ -8,6 +8,8 @@ import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useSort from '../hooks/useSort';
 import EmptyState from '../components/EmptyState';
+import ReactMarkdown from 'react-markdown';
+import { formatInlineMarkdown } from '../utils/markdownText';
 
 const Findings = () => {
   const navigate = useNavigate();
@@ -609,9 +611,9 @@ const Findings = () => {
                     placeholder="Describe the finding..."
                   />
                 ) : (
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {selectedFinding?.description || 'No description provided.'}
-                  </p>
+                  <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300">
+                    <ReactMarkdown>{formatInlineMarkdown(selectedFinding?.description) || 'No description provided.'}</ReactMarkdown>
+                  </div>
                 )}
               </div>
 
@@ -631,9 +633,9 @@ const Findings = () => {
                     placeholder="What is the root cause of this finding?"
                   />
                 ) : (
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {selectedFinding?.rootCause || 'No root cause documented.'}
-                  </p>
+                  <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300">
+                    <ReactMarkdown>{formatInlineMarkdown(selectedFinding?.rootCause) || 'No root cause documented.'}</ReactMarkdown>
+                  </div>
                 )}
               </div>
 
@@ -653,9 +655,9 @@ const Findings = () => {
                     placeholder="Who will do what by when?"
                   />
                 ) : (
-                  <p className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap">
-                    {selectedFinding?.remediationActionPlan || 'No remediation plan documented.'}
-                  </p>
+                  <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300">
+                    <ReactMarkdown>{formatInlineMarkdown(selectedFinding?.remediationActionPlan) || 'No remediation plan documented.'}</ReactMarkdown>
+                  </div>
                 )}
               </div>
 

@@ -44,7 +44,7 @@ This procedure covers recertification of:
 
 ### Step 1: Campaign Preparation (IT Security, Days -5 to 0)
 
-1. Extract current access entitlements from Okta, CyberArk, AWS IAM, and application-level role assignments
+1. Extract current access entitlements from Active Directory (corporate SSO), CyberArk, AWS IAM, and application-level role assignments
 2. Cross-reference against HR active employee roster from Workday to identify terminated or transferred users
 3. Flag accounts with no activity in the past 90 days for certifier attention
 4. Configure certification campaign in ServiceNow with the following parameters:
@@ -104,7 +104,7 @@ In parallel with the general campaign:
 ### Step 6: Remediation (IT Security, Days 14-19)
 
 1. Process all revocation decisions within 5 business days:
-   - Disable account in Okta (immediate)
+   - Disable account in Active Directory / corporate SSO (immediate)
    - Remove application-level roles
    - Revoke CyberArk privileged access
    - Update ServiceNow ticket with completion confirmation

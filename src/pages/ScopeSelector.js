@@ -63,15 +63,17 @@ const CSF_FUNCTIONS = {
 
 const ScopeSelector = ({ embedded = false }) => {
   const navigate = useNavigate();
-  const { llmProvider, generateWithOllama, generateWithClaude, searchHF, dataMode, ollamaStatus, claudeApiKey, checkOllama } = useAIStore();
+  const { llmProvider, generateWithOllama, generateWithClaude, searchHF, dataMode, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
   const requirements = useRequirementsStore((state) => state.requirements);
 
-  // Check Ollama status on mount
+  // Check provider status on mount
   useEffect(() => {
     if (llmProvider === 'ollama') {
       checkOllama();
+    } else {
+      checkClaude();
     }
-  }, [llmProvider, checkOllama]);
+  }, [llmProvider, checkOllama, checkClaude]);
 
   const [selectedScope, setSelectedScope] = useState(new Set());
   const [testProcedures, setTestProcedures] = useState({});
@@ -229,7 +231,7 @@ Be specific, actionable, and auditor-focused.`;
 
   const isReady = llmProvider === 'ollama'
     ? ollamaStatus.available && ollamaStatus.hasModel
-    : !!claudeApiKey;
+    : claudeStatus.configured;
 
   return (
     <div className={embedded ? "h-full bg-gray-50" : "min-h-screen bg-gray-50"}>

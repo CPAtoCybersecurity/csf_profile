@@ -35,8 +35,7 @@ This inventory documents all authorized software approved for installation on Al
 | Software | Approved Version(s) | Purpose | Approved By | Last Reviewed |
 |----------|---------------------|---------|-------------|---------------|
 | SentinelOne Agent | 24.1+ | EDR, application control, device control | IT Security | Feb 2026 |
-| CrowdStrike Falcon | N/A | Not deployed (SentinelOne is primary) | N/A | N/A |
-| Okta Verify | Latest | MFA authentication | IT Security | Feb 2026 |
+| Windows Authenticator | Latest | MFA authentication (2FA for corporate SSO) | IT Security | Feb 2026 |
 | CyberArk Endpoint Privilege Manager | 24.x | Privilege management | IT Security | Feb 2026 |
 | GlobalProtect VPN | 6.x | Remote access VPN | IT Infrastructure | Feb 2026 |
 
@@ -70,11 +69,10 @@ This inventory documents all authorized software approved for installation on Al
 
 | Software | Approved Version(s) | Purpose | Approved By | Last Reviewed |
 |----------|---------------------|---------|-------------|---------------|
-| Jira | Cloud (latest) | Project tracking | Engineering | Feb 2026 |
 | Confluence | Cloud (latest) | Documentation | Engineering | Feb 2026 |
 | Figma | Cloud (latest) | UI/UX design | Product | Feb 2026 |
 | Miro | Cloud (latest) | Whiteboarding | Product | Feb 2026 |
-| ServiceNow | Cloud (latest) | ITSM, access requests | IT | Feb 2026 |
+| ServiceNow | Cloud (latest) | ITSM, access requests, project tracking | IT | Feb 2026 |
 | Workday | Cloud (latest) | HR, training | HR | Feb 2026 |
 
 ---

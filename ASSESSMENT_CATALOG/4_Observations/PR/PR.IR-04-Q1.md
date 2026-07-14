@@ -1,8 +1,8 @@
 # PR.IR-04: Adequate Resource Capacity — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-15
 
@@ -49,6 +49,8 @@
 | Actual Score | 3.5 |
 | Target Score | 5 |
 
+**Scoring rationale:** The 3.5 falls in the Some Security band: reactive capacity mechanisms run reliably — HPA pod scaling, EKS node auto-scaling, AWS Shield Standard, and CloudWatch utilization alerting — but capacity management as a deliberate practice barely exists. There is no capacity planning process or growth model tying the 10,000-customer target to infrastructure requirements, no rate limiting at any layer, no DDoS response runbook, and Layer 7 attacks are unmitigated until the $112K WAF project delivers. The half-step above a 3 credits the operational auto-scaling evidence (6 months of scaling events reviewed); Minimally Acceptable (5.0) would require proactive, full-scope capacity assurance — planning reviews, application-layer DDoS mitigation, and documented on-premises and log-storage capacity — that was absent this period.
+
 ---
 
 ## Evidence Reviewed
@@ -75,3 +77,8 @@
 | 5 | Develop a capacity model linking customer growth targets to compute, storage, and network projections | Medium | Tigan Wang |
 | 6 | Document Redwood City DC physical capacity and incorporate into capacity planning | Medium | Tigan Wang |
 | 7 | Assess log storage capacity against retention and audit requirements (AU-04) | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [PR.IR-04 Test Procedures](../../3_Test_Procedures/PR/PR.IR-04.md)
+- **Controls:** [PR.IR-04_Ex1](../../2_Controls/PR/PR.IR-04_Ex1.md), [PR.IR-04_Ex2](../../2_Controls/PR/PR.IR-04_Ex2.md)

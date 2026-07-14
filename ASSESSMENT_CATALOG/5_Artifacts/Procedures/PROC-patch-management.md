@@ -48,7 +48,7 @@ This procedure defines the operational process for identifying, prioritizing, te
 1. Scan results are automatically ingested into a consolidated vulnerability tracking system
 2. Vulnerabilities are deduplicated and correlated across scanners
 3. Findings are enriched with asset criticality from the crown jewel designations
-4. Remediation tickets are auto-generated in Jira for new findings
+4. Remediation tickets are auto-generated in ServiceNow for new findings
 
 ---
 
@@ -82,7 +82,7 @@ Vulnerabilities are prioritized using a combination of CVSS score and asset crit
 
 ### Step 1: Assessment (Vulnerability Management, Day 0)
 
-1. Review new scan findings and auto-generated Jira tickets
+1. Review new scan findings and auto-generated ServiceNow tickets
 2. Validate severity classification and adjust if false positive or mitigated by compensating controls
 3. Assign remediation owner based on asset ownership
 4. For Emergency priority: immediately notify CISO and asset owner; convene war room if exploitation is active
@@ -92,7 +92,7 @@ Vulnerabilities are prioritized using a combination of CVSS score and asset crit
 1. Identify affected systems and potential impact
 2. Test patch in staging environment matching production configuration
 3. Validate application functionality after patch application
-4. Document test results in Jira ticket
+4. Document test results in ServiceNow ticket
 5. For crown jewel systems: require secondary tester sign-off
 
 ### Step 3: Change Approval (Change Advisory Board or Emergency)
@@ -128,7 +128,7 @@ Vulnerabilities are prioritized using a combination of CVSS score and asset crit
 
 1. Run targeted vulnerability scan against patched systems
 2. Confirm vulnerability is no longer detected
-3. Update Jira ticket with verification evidence
+3. Update ServiceNow ticket with verification evidence
 4. Close ticket
 
 ---
@@ -149,7 +149,7 @@ For actively exploited zero-day vulnerabilities or Emergency priority findings:
 
 Systems that cannot be patched within SLA require:
 
-- Documented business justification in Jira
+- Documented business justification in ServiceNow
 - Compensating controls (network segmentation, enhanced monitoring, WAF rules)
 - Risk acceptance signed by CISO
 - Time-bound remediation plan with target date

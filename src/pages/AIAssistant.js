@@ -17,7 +17,7 @@ const AIAssistant = () => {
   // AI Store
   const {
     llmProvider, setLlmProvider,
-    claudeApiKey, setClaudeApiKey,
+    claudeStatus, checkClaude,
     dataMode, setDataMode,
     ollamaStatus, checkOllama,
     isAnalyzing, analysisResult, analysisError,
@@ -39,6 +39,7 @@ const AIAssistant = () => {
   // Check Ollama and get dataset info on mount
   useEffect(() => {
     checkOllama();
+    checkClaude();
     getDatasetInfo();
   }, []);
 
@@ -157,6 +158,9 @@ const AIAssistant = () => {
                 }`}
               >
                 🤖 Claude
+                {claudeStatus.configured && (
+                  <span className="ml-1 text-xs bg-green-100 text-green-700 px-1 rounded">Ready</span>
+                )}
               </button>
             </div>
           </div>
@@ -178,20 +182,23 @@ const AIAssistant = () => {
           </div>
         </div>
 
-        {/* Claude API Key (if selected) */}
-        {llmProvider === 'claude' && (
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              Claude API Key
-            </label>
-            <input
-              type="password"
-              value={claudeApiKey}
-              onChange={(e) => setClaudeApiKey(e.target.value)}
-              placeholder="sk-ant-..."
-              className="w-full px-3 py-2 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
-            />
-          </div>
+        {/* Claude backend status (if selected) — API key lives server-side only */}
+        {llmProvider === 'claude' && !claudeStatus.checking && (
+          claudeStatus.configured ? (
+            <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+              <p className="text-sm text-green-800 dark:text-green-200">
+                ✓ Claude is configured on the server{claudeStatus.model ? ` (${claudeStatus.model})` : ''}. API keys never touch the browser.
+              </p>
+            </div>
+          ) : (
+            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+              <p className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Claude not configured</p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
+                Set <code className="bg-white dark:bg-gray-800 px-1 rounded">CLAUDE_API_KEY</code> in the backend environment and restart the server.
+                The key stays server-side; until it is set, Claude requests return a mock response.
+              </p>
+            </div>
+          )
         )}
 
         {/* Ollama Setup Instructions */}

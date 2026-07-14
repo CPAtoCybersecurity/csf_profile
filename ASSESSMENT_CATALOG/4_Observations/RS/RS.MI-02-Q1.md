@@ -1,8 +1,8 @@
 # RS.MI-02: Incident Eradication — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-16
 
@@ -52,6 +52,8 @@ Review of 2 recent incidents showed effective eradication with documented action
 | Actual Score | 4 |
 | Target Score | 5 |
 
+**Scoring rationale:** Eradication rates a 4, in the Some Security band: the removal machinery executes regularly and well — SentinelOne remediation (process kill, file quarantine, rollback) succeeded in both incidents reviewed, GuardDuty Lambdas revoke compromised IAM credentials and terminate rogue EC2 instances, and manual runbooks plus the DFIR retainer cover the harder cases. The material weakness is on the back end: post-eradication verification is inconsistent, with the phishing incident receiving thorough verification scanning while the second incident's check stopped at confirming SentinelOne remediation completed, never validating that no persistence mechanisms remained. That 1-of-2 verification deviation, with no standardized checklist or automated re-scan to prevent recurrence, is what keeps the score below Minimally Acceptable (5.0), where execution must be consistent across the full eradicate-and-verify scope.
+
 ---
 
 ## Evidence Reviewed
@@ -74,3 +76,8 @@ Review of 2 recent incidents showed effective eradication with documented action
 | 2 | Implement automated post-eradication validation scan triggered after manual eradication actions | High | Nadia Khan |
 | 3 | Validate gold image inventory and reimaging procedures quarterly | Medium | Nadia Khan |
 | 4 | Assess advanced persistent threat eradication capability gaps and identify tooling enhancements | Low | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [RS.MI-02 Test Procedures](../../3_Test_Procedures/RS/RS.MI-02.md)
+- **Controls:** [RS.MI-02_Ex1](../../2_Controls/RS/RS.MI-02_Ex1.md), [RS.MI-02_Ex2](../../2_Controls/RS/RS.MI-02_Ex2.md), [RS.MI-02_Ex3](../../2_Controls/RS/RS.MI-02_Ex3.md)

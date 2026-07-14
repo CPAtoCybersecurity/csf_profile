@@ -1,5 +1,5 @@
 /**
- * Tests for FirstVisitWarning component
+ * Tests for FirstVisitWarning component (terminal Welcome modal)
  */
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
@@ -21,80 +21,77 @@ describe('FirstVisitWarning Component', () => {
     jest.restoreAllMocks();
   });
 
-  test('renders modal when it is first visit', () => {
+  test('renders welcome modal when it is first visit', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
-    
+
     render(<FirstVisitWarning />);
-    
-    expect(screen.getByText('Data Storage Warning')).toBeInTheDocument();
-    expect(screen.getByText(/local browser storage only/i)).toBeInTheDocument();
-    expect(screen.getByText(/I Understand/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/welcome to csf_profile/i)).toBeInTheDocument();
+    expect(screen.getByText(/nist csf 2\.0 assessment tool/i)).toBeInTheDocument();
+    expect(screen.getByText(/start exploring/i)).toBeInTheDocument();
   });
 
   test('does not render when first visit already acknowledged', () => {
     backupTracking.isFirstVisit.mockReturnValue(false);
-    
+
     const { container } = render(<FirstVisitWarning />);
-    
+
     expect(container.firstChild).toBeNull();
   });
 
-  test('displays warning about data loss risks', () => {
+  test('introduces the pre-loaded Alma Security sample assessment', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
-    
+
     render(<FirstVisitWarning />);
-    
-    expect(screen.getByText(/clear browser cache or site data/i)).toBeInTheDocument();
-    expect(screen.getByText(/uninstall or reset your browser/i)).toBeInTheDocument();
-    expect(screen.getByText(/reach storage limits/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/alma security/i)).toBeInTheDocument();
+    expect(screen.getByText(/pre-loaded and selected/i)).toBeInTheDocument();
   });
 
-  test('displays protection tips', () => {
+  test('lists what the user can explore', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
-    
+
     render(<FirstVisitWarning />);
-    
-    expect(screen.getByText(/export data regularly as csv backups/i)).toBeInTheDocument();
-    expect(screen.getByText(/store backups in multiple locations/i)).toBeInTheDocument();
-    expect(screen.getByText(/enable backup reminders in settings/i)).toBeInTheDocument();
+
+    expect(screen.getByText(/score current vs\. target state per subcategory/i)).toBeInTheDocument();
+    expect(screen.getByText(/watch the dashboard radar update as you go/i)).toBeInTheDocument();
+    expect(screen.getByText(/document observations, findings, and evidence/i)).toBeInTheDocument();
+    expect(screen.getByText(/export audit-ready csv workpapers/i)).toBeInTheDocument();
   });
 
-  test('calls acknowledgeFirstVisit when "I Understand" is clicked', () => {
+  test('warns that data lives in local storage', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
-    
+
     render(<FirstVisitWarning />);
-    
-    const button = screen.getByText(/I Understand/i);
+
+    expect(screen.getByText(/data lives in your browser's local storage/i)).toBeInTheDocument();
+  });
+
+  test('calls acknowledgeFirstVisit when "Start exploring" is clicked', () => {
+    backupTracking.isFirstVisit.mockReturnValue(true);
+
+    render(<FirstVisitWarning />);
+
+    const button = screen.getByText(/start exploring/i);
     fireEvent.click(button);
-    
-    expect(backupTracking.acknowledgeFirstVisit).toHaveBeenCalledTimes(1);
-  });
 
-  test('calls acknowledgeFirstVisit when close button is clicked', () => {
-    backupTracking.isFirstVisit.mockReturnValue(true);
-    
-    render(<FirstVisitWarning />);
-    
-    const closeButton = screen.getByLabelText(/close/i);
-    fireEvent.click(closeButton);
-    
     expect(backupTracking.acknowledgeFirstVisit).toHaveBeenCalledTimes(1);
   });
 
   test('modal disappears after acknowledgment', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
-    
+
     const { rerender } = render(<FirstVisitWarning />);
-    
-    expect(screen.getByText('Data Storage Warning')).toBeInTheDocument();
-    
-    const button = screen.getByText(/I Understand/i);
+
+    expect(screen.getByText(/welcome to csf_profile/i)).toBeInTheDocument();
+
+    const button = screen.getByText(/start exploring/i);
     fireEvent.click(button);
-    
+
     // After clicking, component should unmount
     backupTracking.isFirstVisit.mockReturnValue(false);
     rerender(<FirstVisitWarning />);
-    
-    expect(screen.queryByText('Data Storage Warning')).not.toBeInTheDocument();
+
+    expect(screen.queryByText(/welcome to csf_profile/i)).not.toBeInTheDocument();
   });
 });

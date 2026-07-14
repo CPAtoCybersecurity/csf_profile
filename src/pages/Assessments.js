@@ -25,6 +25,7 @@ import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
 import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
+import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 
 // File upload security configuration
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -63,6 +64,10 @@ const formatTestProcedures = (text) => {
   return formatted;
 };
 
+// Markdown helpers shared with Findings: formatInlineMarkdown breaks
+// single-line catalog text into renderable markdown; stripMarkdown cleans
+// truncated plain-text previews. See src/utils/markdownText.js.
+
 const Assessments = () => {
   // Store state
   const assessments = useAssessmentsStore((state) => state.assessments);
@@ -92,7 +97,7 @@ const Assessments = () => {
   const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
 
   // AI Store for test procedure generation
-  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeApiKey, checkOllama } = useAIStore();
+  const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
 
   // Local state
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
@@ -131,12 +136,14 @@ const Assessments = () => {
   const [isAnalyzingEvidence, setIsAnalyzingEvidence] = useState(false);
   const [evidenceAnalysis, setEvidenceAnalysis] = useState(null);
 
-  // Check Ollama status on mount
+  // Check provider status on mount
   React.useEffect(() => {
     if (llmProvider === 'ollama') {
       checkOllama();
+    } else {
+      checkClaude();
     }
-  }, [llmProvider, checkOllama]);
+  }, [llmProvider, checkOllama, checkClaude]);
 
   // Keyboard shortcut: 'n' to create new assessment
   React.useEffect(() => {
@@ -312,7 +319,7 @@ const Assessments = () => {
   // Wizard helper: check if AI is ready
   const isAIReady = llmProvider === 'ollama'
     ? ollamaStatus.available && ollamaStatus.hasModel
-    : !!claudeApiKey;
+    : claudeStatus.configured;
 
   // Generate test procedures for selected scope items
   const handleGenerateTestProcedures = useCallback(async () => {
@@ -1459,8 +1466,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         placeholder={`Document ${selectedQuarter} observations...`}
                       />
                     ) : (
-                      <div className="text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
-                        {currentObservation.quarters?.[selectedQuarter]?.observations || 'None'}
+                      <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
+                        <ReactMarkdown>{formatInlineMarkdown(currentObservation.quarters?.[selectedQuarter]?.observations) || 'None'}</ReactMarkdown>
                       </div>
                     )}
                   </div>
@@ -1541,7 +1548,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             {scopedItems.map((item, index) => {
               const obs = currentAssessment?.observations?.[item.itemId];
               const quarterData = obs?.quarters?.[selectedQuarter] || {};
-              const auditor = obs?.auditorId ? useUserStore.getState().getUser(obs.auditorId) : null;
+              const auditor = obs?.auditorId ? useUserStore.getState().getUserById(obs.auditorId) : null;
 
               return (
                 <div
@@ -1636,7 +1643,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   {/* Q Observations */}
                   <div className="w-48 flex-shrink-0">
                     <p className="text-sm text-gray-600 dark:text-gray-400 truncate">
-                      {quarterData.observations ? quarterData.observations.substring(0, 50) + '...' : '-'}
+                      {quarterData.observations ? stripMarkdown(quarterData.observations).substring(0, 50) + '...' : '-'}
                     </p>
                   </div>
 

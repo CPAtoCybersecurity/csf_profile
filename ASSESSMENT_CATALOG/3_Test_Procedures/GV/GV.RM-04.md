@@ -13,7 +13,7 @@
 
 2. **Validate response option implementation**
    - For each of the five documented risks, verify the chosen response option is documented
-   - Check that R-01 (understaffing) uses both mitigation (hiring) and transfer (CrowdStrike MDR)
+   - Check that R-01 (understaffing) uses both mitigation (hiring) and transfer (SentinelOne MDR)
    - Verify cybersecurity insurance status and coverage decisions
 
 3. **Examine shared responsibility documentation**

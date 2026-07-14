@@ -1,8 +1,8 @@
 # PR.IR-02: Environmental Threat Protection — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF 2.0 Profile Assessment
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -47,6 +47,8 @@
 | Actual Score | 4.5 |
 | Target Score | 6 |
 
+**Scoring rationale:** The 4.5 sits at the top of the Some Security band: environmental protections operate regularly — fire suppression is deployed in the Redwood City data center, HVAC monitoring alerts on temperature and humidity deviations, and the AWS multi-AZ architecture inherits geographic resilience — but the assessment could not obtain evidence for material elements. Fire suppression inspection records were not reviewed, flood/water sensor deployment is unconfirmed despite Northern California flood risk, and UPS capacity and load-testing cadence are undocumented, which is exactly the missing-evidence weakness the rubric's level-4 anchor describes. Minimally Acceptable (5.0) requires evidence covering the full scope for the period; producing the inspection records, confirming flood detection, and documenting UPS testing would close that half-point gap.
+
 ---
 
 ## Evidence Reviewed
@@ -70,3 +72,8 @@
 | 4 | Document UPS capacity, battery replacement schedule, and establish load testing cadence | Medium | Tigan Wang |
 | 5 | Implement monthly environmental trend reporting from HVAC monitoring data | Low | Tigan Wang |
 | 6 | Create escalation procedures linking environmental monitoring alerts to IT incident management | Medium | Tigan Wang |
+
+## Related
+
+- **Test Procedure:** [PR.IR-02 Test Procedures](../../3_Test_Procedures/PR/PR.IR-02.md)
+- **Controls:** [PR.IR-02_Ex1](../../2_Controls/PR/PR.IR-02_Ex1.md), [PR.IR-02_Ex2](../../2_Controls/PR/PR.IR-02_Ex2.md)

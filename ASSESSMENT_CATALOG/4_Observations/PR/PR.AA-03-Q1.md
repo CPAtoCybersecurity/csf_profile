@@ -1,8 +1,8 @@
 # PR.AA-03: Authentication Controls — Q1 2026 Observation
 
-**Assessment:** 2026 Alma Security CSF
+**Assessment:** 2026 Alma Security CSF Assessment
 
-**Assessor:** Steve <steve@almasecurity.com>
+**Assessor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
 
 **Observation Date:** 2026-03-14
 
@@ -59,6 +59,8 @@ Five AWS IAM accounts still use long-lived access keys rather than SSO-federated
 | Actual Score | 3 |
 | Target Score | 6 |
 
+**Scoring rationale:** The score of 3 sits in the Some Security band: authentication controls are defined (MFA via Windows Authenticator SSO, a CIS-aligned 14-character AD password policy, 802.1X on the office network) but execution is unreliable across the environment. The AWS root account has console access with password-only authentication, the shared SSH key on port 45001 bypasses MFA entirely at an average of 12 sessions per day, enrollment stalls at 85%, and 5 long-lived IAM access keys — the oldest 14 months without rotation — sidestep MFA in the CLI. Closing the distance to Minimally Acceptable (5.0) would require consistent full-scope enforcement: root-account MFA, 100% enrollment, and elimination or treatment of the MFA-bypassing credentials, none of which existed during the period.
+
 ---
 
 ## Evidence Reviewed
@@ -86,3 +88,8 @@ Five AWS IAM accounts still use long-lived access keys rather than SSO-federated
 | 4 | Rotate and migrate 5 long-lived AWS IAM access keys to SSO-federated temporary credentials | High | Tigan Wang |
 | 5 | Extend FIDO2 hardware key requirement to all IT administrators and engineering leads (Phase 3) | Medium | Chris Magann |
 | 6 | Integrate SentinelOne compliance API with Palo Alto for automated network quarantine of unhealthy devices | Medium | Nadia Khan |
+
+## Related
+
+- **Test Procedure:** [PR.AA-03 Test Procedures](../../3_Test_Procedures/PR/PR.AA-03.md)
+- **Controls:** [PR.AA-03_Ex1](../../2_Controls/PR/PR.AA-03_Ex1.md), [PR.AA-03_Ex2](../../2_Controls/PR/PR.AA-03_Ex2.md), [PR.AA-03_Ex3](../../2_Controls/PR/PR.AA-03_Ex3.md), [PR.AA-03_Ex4](../../2_Controls/PR/PR.AA-03_Ex4.md)
