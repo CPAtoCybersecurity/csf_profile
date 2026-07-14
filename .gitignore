@@ -50,6 +50,12 @@ SCRATCH-*.md
 *.backup.json
 backups/
 
+# Private data packs hold an org's real assessment data — never repo content.
+# (The committed test fixture is named *.packfixture.json on purpose: it is
+# fictional and must not match this pattern.)
+*.csfpack.json
+private-data/
+
 # Server-local persisted state (entry-id mappings) — deployment data, not code
 server/data/
 

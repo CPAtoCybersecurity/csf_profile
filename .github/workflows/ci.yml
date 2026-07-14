@@ -24,6 +24,22 @@ jobs:
           fi
           echo "No private data files tracked."
 
+      - name: Fail if pack CONTENT is tracked under any filename
+        run: |
+          # Filename globs guard the convention; this guards the content. Any
+          # tracked JSON carrying a pack signature ("packFormat") fails, no
+          # matter what it is named. Exactly one fictional fixture is allowed.
+          hits=$(git grep -l '"packFormat"' -- '*.json' \
+            ':(exclude)src/utils/alma-security.packfixture.json' \
+            ':(exclude)package-lock.json' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::Files with data-pack content (packFormat signature) must never be committed:"
+            echo "$hits"
+            echo "Only the fictional fixture src/utils/alma-security.packfixture.json is allowed. See PRIVATE_DATA.md."
+            exit 1
+          fi
+          echo "No pack-content files tracked beyond the allowlisted fixture."
+
   lint-changed:
     name: Lint changed files (new code must be clean)
     runs-on: ubuntu-latest
