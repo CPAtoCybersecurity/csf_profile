@@ -1,0 +1,121 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  private-data-leak-guard:
+    name: Private data leak guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fail if private data files are tracked
+        run: |
+          hits=$(git ls-files -- '*.csfpack.json' 'private-data/' '*.backup.json' 'backups/')
+          if [ -n "$hits" ]; then
+            echo "::error::Private data files must never be committed to this repository:"
+            echo "$hits"
+            echo "See PRIVATE_DATA.md (data-pack architecture): private packs and backups stay outside the repo tree."
+            exit 1
+          fi
+          echo "No private data files tracked."
+
+      - name: Fail if pack CONTENT is tracked under any filename
+        run: |
+          # Filename globs guard the convention; this guards the content. Any
+          # tracked JSON carrying a pack signature ("packFormat") fails, no
+          # matter what it is named. Exactly one fictional fixture is allowed.
+          hits=$(git grep -l '"packFormat"' -- '*.json' \
+            ':(exclude)src/utils/alma-security.packfixture.json' \
+            ':(exclude)package-lock.json' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::Files with data-pack content (packFormat signature) must never be committed:"
+            echo "$hits"
+            echo "Only the fictional fixture src/utils/alma-security.packfixture.json is allowed. See PRIVATE_DATA.md."
+            exit 1
+          fi
+          echo "No pack-content files tracked beyond the allowlisted fixture."
+
+  lint-changed:
+    name: Lint changed files (new code must be clean)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Lint changed JS files
+        run: |
+          # Legacy lint-debt allowlist (21 files, 2026-07-13). These files lint dirty today;
+          # each is tracked for cleanup as a good-first-issue. Remove a file from this list
+          # when its cleanup lands. When the list is empty, delete the allowlist entirely
+          # (and drop CI=false from the build step) so lint gates the whole tree again.
+          cat > /tmp/lint-legacy-allowlist.txt <<'EOF'
+          src/App.js
+          src/App.test.js
+          src/components/AIImplementationGuidance.js
+          src/components/AIScoreExplainer.js
+          src/components/AIScoreSuggestion.js
+          src/components/BackupReminder.test.js
+          src/components/EvidenceTracker.js
+          src/components/FirstVisitWarning.test.js
+          src/components/LastBackupIndicator.test.js
+          src/pages/AIAssistant.js
+          src/pages/Artifacts.js
+          src/pages/AssessmentObservations.js
+          src/pages/Assessments.js
+          src/pages/Controls.js
+          src/pages/Dashboard.js
+          src/pages/Requirements.js
+          src/pages/ScopeSelector.js
+          src/pages/UserControls.js
+          src/utils/auditReportMarkdown.js
+          src/utils/confluenceSync.js
+          src/utils/exportEncryption.js
+          EOF
+          base="${{ github.event.pull_request.base.sha }}"
+          changed=$(git diff --name-only --diff-filter=ACMR "$base"...HEAD -- 'src/**/*.js' 'src/**/*.jsx' || true)
+          if [ -z "$changed" ]; then echo "No JS changes."; exit 0; fi
+          to_lint=$(echo "$changed" | grep -Fxv -f /tmp/lint-legacy-allowlist.txt || true)
+          if [ -z "$to_lint" ]; then echo "Only legacy-allowlisted files changed; their cleanup issues own the lint gate."; exit 0; fi
+          echo "Linting:"; echo "$to_lint"
+          echo "$to_lint" | xargs npx eslint --env es2022 --env browser --env node --env jest --max-warnings=0
+
+  test-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      - name: Run tests
+        run: npm test -- --watchAll=false
+
+      # Compile check only for now: 22 pre-existing eslint warnings (10 files) would fail
+      # the build under CI=true. They are tracked as good-first-issues; when the count
+      # hits zero, remove CI=false so warnings block again.
+      - name: Build
+        run: CI=false npm run build
+
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+        continue-on-error: true

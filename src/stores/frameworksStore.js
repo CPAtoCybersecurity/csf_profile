@@ -102,6 +102,19 @@ const useFrameworksStore = create(
         return get().frameworks.find(f => f.isDefault) || get().frameworks[0];
       },
 
+      // Replace all frameworks (bulk setter for database restore / import).
+      // Guarantees at least one framework remains default so the app always
+      // has an active framework to render.
+      setFrameworks: (frameworks) => {
+        if (!Array.isArray(frameworks) || frameworks.length === 0) return;
+        const hasDefault = frameworks.some(f => f.isDefault);
+        set({
+          frameworks: hasDefault
+            ? frameworks
+            : frameworks.map((f, i) => (i === 0 ? { ...f, isDefault: true } : f))
+        });
+      },
+
       // Add new framework
       addFramework: (framework) => {
         const newFramework = {

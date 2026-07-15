@@ -25,7 +25,9 @@ describe('LastBackupIndicator Component', () => {
     render(<LastBackupIndicator onExportClick={mockOnExportClick} />);
     
     expect(screen.getByText('Never')).toBeInTheDocument();
-    expect(screen.getByText(/last backup:/i)).toBeInTheDocument();
+    // "Last" and "backup" render as separate stacked spans
+    expect(screen.getByText('Last')).toBeInTheDocument();
+    expect(screen.getByText('backup')).toBeInTheDocument();
   });
 
   test('renders success state for recent backup', () => {

@@ -1,14 +1,52 @@
 /**
- * Data export utilities for complete database backup/restore
- * Exports all IndexedDB contents to JSON format
+ * Data export utilities for complete database backup/restore.
+ * All persisted state lives in the browser's localStorage (zustand persist);
+ * these helpers serialize it to a versioned JSON envelope.
  */
+
+/**
+ * Export format version. Bump when the envelope shape changes and teach
+ * validateDatabaseExport (dataImport.js) how to handle the older shape.
+ * Format 1: legacy `version: '1.0'` exports (no storeVersions, no findings).
+ * Format 2: adds formatVersion, storeVersions, and the findings section.
+ */
+export const EXPORT_FORMAT_VERSION = 2;
+
+// zustand persist keys whose schema versions travel with the export so a
+// restore can detect version drift between the exporting and importing app.
+export const PERSIST_KEYS = {
+  assessments: 'csf-assessments-storage',
+  frameworks: 'csf-frameworks-storage',
+  findings: 'csf-findings-storage',
+  requirements: 'csf-requirements-storage'
+};
+
+/**
+ * Read the schema version a zustand persist key currently has on disk.
+ * Returns null when the key is absent or unreadable (fresh browser, no data).
+ */
+export const readPersistedVersion = (persistKey) => {
+  try {
+    const raw = window.localStorage.getItem(persistKey);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return typeof parsed?.version === 'number' ? parsed.version : null;
+  } catch {
+    return null;
+  }
+};
+
+const collectStoreVersions = () =>
+  Object.fromEntries(
+    Object.entries(PERSIST_KEYS).map(([name, key]) => [name, readPersistedVersion(key)])
+  );
 
 /**
  * Export all application data to JSON
  * @param {Object} stores - Object containing all store references
  *   {
- *     controlsStore, assessmentsStore, requirementsStore, 
- *     frameworksStore, artifactStore, userStore
+ *     controlsStore, assessmentsStore, requirementsStore,
+ *     frameworksStore, artifactStore, userStore, findingsStore
  *   }
  */
 export const exportAllDataJSON = (stores) => {
@@ -18,19 +56,22 @@ export const exportAllDataJSON = (stores) => {
     requirementsStore,
     frameworksStore,
     artifactStore,
-    userStore
+    userStore,
+    findingsStore
   } = stores;
 
   const jsonData = {
     exportDate: new Date().toISOString(),
     dataType: 'Complete Assessment Database',
-    version: '1.0',
+    formatVersion: EXPORT_FORMAT_VERSION,
+    storeVersions: collectStoreVersions(),
     metadata: {
       applicationName: 'CSF Profile Assessment Tool',
       exportTimestamp: new Date().toISOString(),
       userCount: userStore?.getState?.()?.users?.length || 0,
       controlCount: controlsStore?.getState?.()?.controls?.length || 0,
-      assessmentCount: assessmentsStore?.getState?.()?.assessments?.length || 0
+      assessmentCount: assessmentsStore?.getState?.()?.assessments?.length || 0,
+      findingCount: findingsStore?.getState?.()?.findings?.length || 0
     },
     data: {
       users: userStore?.getState?.()?.users || [],
@@ -38,11 +79,54 @@ export const exportAllDataJSON = (stores) => {
       assessments: assessmentsStore?.getState?.()?.assessments || [],
       requirements: requirementsStore?.getState?.()?.requirements || [],
       frameworks: frameworksStore?.getState?.()?.frameworks || [],
-      artifacts: artifactStore?.getState?.()?.artifacts || []
+      artifacts: artifactStore?.getState?.()?.artifacts || [],
+      findings: findingsStore?.getState?.()?.findings || []
     }
   };
 
   return jsonData;
+};
+
+/**
+ * Build a shareable export: the complete-database envelope minus private
+ * pack data. The filter is LINEAGE-aware, not tag-only — it drops every
+ * assessment that originated from a pack import (including all observations
+ * nested inside it, which carry no tags of their own) and every finding that
+ * either carries pack provenance or points at a pack-owned assessment.
+ *
+ * @param {Object} stores - Same store map exportAllDataJSON receives
+ * @param {Object} [options]
+ * @param {boolean} [options.includePrivate=false] - Keep pack data (explicit opt-in)
+ */
+export const buildShareableExport = (stores, { includePrivate = false } = {}) => {
+  const jsonData = exportAllDataJSON(stores);
+  if (includePrivate) {
+    jsonData.dataType = 'Complete Assessment Database (private pack data INCLUDED)';
+    return jsonData;
+  }
+
+  const packAssessmentIds = new Set(
+    jsonData.data.assessments.filter((a) => a.source === 'pack').map((a) => a.id)
+  );
+  jsonData.data.assessments = jsonData.data.assessments.filter((a) => a.source !== 'pack');
+  jsonData.data.findings = jsonData.data.findings.filter(
+    (f) => f.source !== 'pack' && !packAssessmentIds.has(f.assessmentId)
+  );
+  jsonData.dataType = 'Shareable Assessment Database (private pack data excluded)';
+  jsonData.metadata.assessmentCount = jsonData.data.assessments.length;
+  jsonData.metadata.findingCount = jsonData.data.findings.length;
+  return jsonData;
+};
+
+/**
+ * Download a shareable export (csf_share_YYYY-MM-DD.json).
+ * @param {Object} stores - All store references
+ * @param {Object} [options] - See buildShareableExport
+ */
+export const exportShareableDatabase = (stores, options = {}) => {
+  const jsonData = buildShareableExport(stores, options);
+  const date = new Date().toISOString().split('T')[0];
+  downloadJSON(jsonData, `csf_share_${date}.json`);
 };
 
 /**

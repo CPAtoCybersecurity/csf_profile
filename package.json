@@ -41,6 +41,11 @@
       "react-app/jest"
     ]
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "node_modules/(?!(uuid)/)"
+    ]
+  },
   "browserslist": {
     "production": [
       ">0.2%",

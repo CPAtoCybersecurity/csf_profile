@@ -32,7 +32,9 @@ import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
 
 // Utils
-import { exportCompleteDatabase, exportAssessmentsJSON } from '../utils/dataExport';
+import { exportCompleteDatabase, exportAssessmentsJSON, exportShareableDatabase } from '../utils/dataExport';
+import { importCompleteDatabase, validateDatabaseExport } from '../utils/dataImport';
+import { previewPackImport, importPack } from '../utils/packImport';
 
 // Utils
 import {
@@ -229,6 +231,14 @@ const Settings = () => {
   const assessmentsImportRef = useRef(null);
   const entryIdImportRef = useRef(null);
 
+  // Database restore ref
+  const restoreImportRef = useRef(null);
+
+  // Private data-pack import
+  const packImportRef = useRef(null);
+  const [packPreview, setPackPreview] = useState(null); // { parsed, preview }
+  const [includePackData, setIncludePackData] = useState(false);
+
   // Export handlers
   const handleExportCompleteDatabase = useCallback(() => {
     try {
@@ -238,7 +248,8 @@ const Settings = () => {
         requirementsStore: useRequirementsStore,
         frameworksStore: useFrameworksStore,
         artifactStore: useArtifactStore,
-        userStore: useUserStore
+        userStore: useUserStore,
+        findingsStore: useFindingsStore
       });
       toast.success('Complete database exported as JSON');
     } catch (err) {
@@ -247,6 +258,80 @@ const Settings = () => {
     }
   }, []);
 
+  const handleExportShareable = useCallback(() => {
+    try {
+      if (includePackData) {
+        const confirmed = window.confirm(
+          'Include private pack data in this export?\n\n' +
+          'The file will contain your organization\'s private assessment values and risk entries. ' +
+          'Only do this for a copy you keep to yourself — never for a file you plan to share.'
+        );
+        if (!confirmed) return;
+      }
+      exportShareableDatabase({
+        controlsStore: useControlsStore,
+        assessmentsStore: useAssessmentsStore,
+        requirementsStore: useRequirementsStore,
+        frameworksStore: useFrameworksStore,
+        artifactStore: useArtifactStore,
+        userStore: useUserStore,
+        findingsStore: useFindingsStore
+      }, { includePrivate: includePackData });
+      toast.success(includePackData
+        ? 'Export created WITH private pack data — handle with care'
+        : 'Shareable export created (private pack data excluded)');
+    } catch (err) {
+      console.error('Shareable export error:', err);
+      toast.error('Export failed. Please try again.');
+    }
+  }, [includePackData]);
+
+  // Pack import — preview first, no writes until the user confirms.
+  const handlePackFileSelected = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      const preview = previewPackImport(parsed, {
+        assessmentsStore: useAssessmentsStore,
+        findingsStore: useFindingsStore,
+        frameworksStore: useFrameworksStore,
+        requirementsStore: useRequirementsStore
+      });
+      if (!preview.validation.ok) {
+        toast.error(`Pack rejected: ${preview.validation.errors.join(' ')}`);
+        return;
+      }
+      setPackPreview({ parsed, preview });
+    } catch (err) {
+      console.error('Pack preview error:', err);
+      toast.error(err.message || 'Could not read the pack file.');
+    }
+  }, []);
+
+  const handleConfirmPackImport = useCallback(() => {
+    if (!packPreview) return;
+    try {
+      const result = importPack(packPreview.parsed, {
+        assessmentsStore: useAssessmentsStore,
+        findingsStore: useFindingsStore,
+        frameworksStore: useFrameworksStore,
+        requirementsStore: useRequirementsStore
+      });
+      toast.success(
+        `${result.replaced ? 'Replaced' : 'Created'} "${packPreview.preview.orgName}" pack data — ` +
+        `${result.applied.metricValues} subcategory value sets, ${result.applied.risks} risks`
+      );
+    } catch (err) {
+      console.error('Pack import error:', err);
+      toast.error(err.message || 'Pack import failed.');
+    } finally {
+      setPackPreview(null);
+    }
+  }, [packPreview]);
+
   const handleExportAssessments = useCallback(() => {
     try {
       exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore);
@@ -254,6 +339,51 @@ const Settings = () => {
     } catch (err) {
       console.error('Export assessments error:', err);
       toast.error('Export failed. Please try again.');
+    }
+  }, []);
+
+  // Restore handler — full replace of store data from a complete-database export.
+  const handleRestoreDatabase = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const parsed = JSON.parse(await file.text());
+      const stores = {
+        controlsStore: useControlsStore,
+        assessmentsStore: useAssessmentsStore,
+        requirementsStore: useRequirementsStore,
+        frameworksStore: useFrameworksStore,
+        artifactStore: useArtifactStore,
+        userStore: useUserStore,
+        findingsStore: useFindingsStore
+      };
+
+      const validation = validateDatabaseExport(parsed);
+      if (!validation.ok) {
+        toast.error(`Restore rejected: ${validation.errors.join(' ')}`);
+        return;
+      }
+
+      const summary = Object.entries(validation.counts)
+        .map(([section, count]) => `${section}: ${count}`)
+        .join(', ');
+      const warningText = validation.warnings.length ? `\n\nNote: ${validation.warnings.join(' ')}` : '';
+      const confirmed = window.confirm(
+        `RESTORE DATABASE — this REPLACES your current data.\n\n` +
+        `File contains — ${summary}.${warningText}\n\n` +
+        `A backup download of your current data will be ATTEMPTED first ` +
+        `(csf_pre_restore_*.backup.json) — browsers cannot guarantee it lands, ` +
+        `so only continue if you also have a recent export of your own. Continue?`
+      );
+      if (!confirmed) return;
+
+      const result = importCompleteDatabase(parsed, stores);
+      toast.success(`Database restored (${result.applied.length} sections). Backup of prior data downloaded.`);
+    } catch (err) {
+      console.error('Database restore error:', err);
+      toast.error(err.message || 'Restore failed. Please verify the file and try again.');
     }
   }, []);
 
@@ -535,7 +665,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   <div>
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Important: Local Data Storage</h3>
                     <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                      All assessment data is stored in your browser's IndexedDB. This data can be lost if you:
+                      All assessment data is stored in your browser's local storage. This data can be lost if you:
                     </p>
                     <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1 mb-3">
                       <li>Clear your browser cache or site data</li>
@@ -832,12 +962,78 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 <Download size={16} />
                 Export Assessments Only
               </button>
+              <button
+                className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                onClick={handleExportShareable}
+              >
+                <Download size={16} />
+                Export Shareable Copy
+              </button>
             </div>
             <p className="text-xs text-green-600 mt-3">
-              <strong>Complete Database:</strong> Exports all controls, assessments, requirements, frameworks, artifacts, and user data in a single JSON file (csf_assessment_YYYY-MM-DD.json)
+              <strong>Complete Database:</strong> Exports all controls, assessments, requirements, frameworks, artifacts, findings, and user data in a single JSON file (csf_assessment_YYYY-MM-DD.json)
             </p>
             <p className="text-xs text-green-600 mt-2">
               <strong>Assessments Only:</strong> Exports assessment observations and scores with enhanced readability (assessments_YYYY-MM-DD.json)
+            </p>
+            <p className="text-xs text-green-600 mt-2">
+              <strong>Shareable Copy:</strong> Same as Complete Database but excludes private data-pack records by default (csf_share_YYYY-MM-DD.json) — safe for demos and sharing
+            </p>
+            <label className="flex items-center gap-2 text-xs text-green-700 mt-2">
+              <input
+                type="checkbox"
+                checked={includePackData}
+                onChange={(e) => setIncludePackData(e.target.checked)}
+              />
+              Include private pack data in the shareable copy (asks for confirmation)
+            </label>
+          </div>
+
+          {/* Database Restore — destructive, visually distinct from export */}
+          <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-red-800">Restore From Backup</h3>
+                <p className="text-sm text-red-700 mt-1">
+                  Replaces ALL current data with the contents of a Complete Database export. A backup of your current data downloads automatically before anything is replaced.
+                </p>
+              </div>
+            </div>
+            <button
+              className="flex items-center gap-2 text-sm bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              onClick={() => restoreImportRef.current?.click()}
+            >
+              <Upload size={16} />
+              Restore Complete Database
+            </button>
+            <p className="text-xs text-red-600 mt-3">
+              Accepts csf_assessment_*.json files created by Export Complete Database. This is a full replace, not a merge.
+            </p>
+          </div>
+
+          {/* Private data pack — additive import, deliberately distinct from the destructive Restore card above */}
+          <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-purple-800">Private Data Pack</h3>
+                <p className="text-sm text-purple-700 mt-1">
+                  Load your organization's private assessment values and risk entries from a local pack file.
+                  Additive: it creates a pack-owned assessment and never touches data you entered by hand.
+                </p>
+              </div>
+            </div>
+            <button
+              className="flex items-center gap-2 text-sm bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+              onClick={() => packImportRef.current?.click()}
+            >
+              <Upload size={16} />
+              Import Data Pack
+            </button>
+            <p className="text-xs text-purple-600 mt-3">
+              Accepts *.csfpack.json files — see PRIVATE_DATA.md in the repository for the format.
+              You will see a preview before anything is written. Re-importing a pack replaces what that
+              pack owns and never duplicates it. Pack data stays on this machine and is excluded from
+              shareable exports by default.
             </p>
           </div>
 
@@ -1280,6 +1476,84 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         accept=".csv"
         onChange={handleEntryIdImport}
       />
+      <input
+        type="file"
+        ref={restoreImportRef}
+        style={{ display: 'none' }}
+        accept=".json,application/json"
+        onChange={handleRestoreDatabase}
+      />
+      <input
+        type="file"
+        ref={packImportRef}
+        style={{ display: 'none' }}
+        accept=".json,application/json"
+        onChange={handlePackFileSelected}
+      />
+
+      {/* Pack Import Preview Modal — shows exactly what will happen before any write */}
+      {packPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900">Import data pack</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {packPreview.preview.orgName} — pack "{packPreview.preview.slug}" version {String(packPreview.preview.packVersion)}
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-gray-700 list-disc list-inside">
+                <li>
+                  {packPreview.preview.willReplace
+                    ? `Replaces the existing pack-owned assessment "${packPreview.preview.existingName}".`
+                    : `Creates a new pack-owned assessment${packPreview.preview.frameworkName ? ` against ${packPreview.preview.frameworkName}` : ''}.`}
+                </li>
+                <li>
+                  {packPreview.preview.metricValues.resolved} of {packPreview.preview.metricValues.count} subcategory
+                  value sets matched the active framework.
+                </li>
+                <li>{packPreview.preview.risks.count} risk entries import as findings.</li>
+                {packPreview.preview.metricValues.unresolved.length > 0 && (
+                  <li className="text-amber-700">
+                    Not matched (skipped): {packPreview.preview.metricValues.unresolved.join(', ')}
+                  </li>
+                )}
+                {(packPreview.preview.metricValues.ambiguous || []).map((a) => (
+                  <li key={a.subcategoryId} className="text-amber-700">
+                    {a.subcategoryId} matched {a.matches} requirement rows — values attach to {a.attachedTo}
+                  </li>
+                ))}
+                {packPreview.preview.notApplied.length > 0 && (
+                  <li className="text-amber-700">
+                    Accepted but not applied by this build: {packPreview.preview.notApplied.join(', ')}
+                  </li>
+                )}
+                {packPreview.preview.validation.warnings.map((w) => (
+                  <li key={w} className="text-amber-700">{w}</li>
+                ))}
+              </ul>
+              {packPreview.preview.localEditsSinceImport && (
+                <p className="mt-4 text-sm text-red-700 font-medium">
+                  Warning: the pack-owned assessment was edited in this app after the last import.
+                  Importing now discards those local edits.
+                </p>
+              )}
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  className="text-sm px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  onClick={() => setPackPreview(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="text-sm px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white"
+                  onClick={handleConfirmPackImport}
+                >
+                  Import Pack
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Edit Framework Modal */}
       {editingFramework && (
