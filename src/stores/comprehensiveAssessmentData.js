@@ -487,9 +487,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1030,
     "artifactId": "AR-131",
-    "name": "SentinelOne Application Control Configuration Evidence",
-    "description": "Catalog evidence: EVD-sentinelone-app-control.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-sentinelone-app-control.md",
+    "name": "Security Awareness Program — Alma Security",
+    "description": "Catalog evidence: EVD-security-awareness-program.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-security-awareness-program.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -503,6 +503,22 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1031,
     "artifactId": "AR-132",
+    "name": "SentinelOne Application Control Configuration Evidence",
+    "description": "Catalog evidence: EVD-sentinelone-app-control.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-sentinelone-app-control.md",
+    "complianceRequirement": null,
+    "controlId": null,
+    "linkedSubcategoryIds": [],
+    "linkedEvaluationIds": [],
+    "type": "Evidence",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "AR-132",
+    "status": "ACTIVE"
+  },
+  {
+    "id": 1032,
+    "artifactId": "AR-133",
     "name": "Q1 2026 Security Awareness Training Completion Evidence",
     "description": "Catalog evidence: EVD-training-completion-q1.md",
     "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-training-completion-q1.md",
@@ -513,7 +529,7 @@ export const COMPREHENSIVE_ARTIFACTS = [
     "type": "Evidence",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "AR-132",
+    "jiraKey": "AR-133",
     "status": "ACTIVE"
   }
 ];
@@ -560,6 +576,27 @@ export const COMPREHENSIVE_SCOPE_IDS = [
   "GV.SC-08 Ex1",
   "GV.SC-09 Ex1",
   "GV.SC-10 Ex1",
+  "ID.AM-01 Ex1",
+  "ID.AM-02 Ex1",
+  "ID.AM-03 Ex1",
+  "ID.AM-04 Ex1",
+  "ID.AM-05 Ex1",
+  "ID.AM-07 Ex1",
+  "ID.AM-08 Ex1",
+  "ID.IM-01 Ex1",
+  "ID.IM-02 Ex1",
+  "ID.IM-03 Ex1",
+  "ID.IM-04 Ex1",
+  "ID.RA-01 Ex1",
+  "ID.RA-02 Ex1",
+  "ID.RA-03 Ex1",
+  "ID.RA-04 Ex1",
+  "ID.RA-05 Ex1",
+  "ID.RA-06 Ex1",
+  "ID.RA-07 Ex1",
+  "ID.RA-08 Ex1",
+  "ID.RA-09 Ex1",
+  "ID.RA-10 Ex1",
   "PR.AA-01 Ex1",
   "PR.AA-02 Ex1",
   "PR.AA-03 Ex1",
@@ -608,13 +645,24 @@ export const COMPREHENSIVE_SCOPE_IDS = [
 export const COMPREHENSIVE_OBSERVATIONS = {
   "DE.AE-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review CloudTrail and GuardDuty configuration\n2. Examine detection rule tuning\n3. Verify TTD (Time to Detect) metrics\n4. Assess 24/7 monitoring gaps",
+    "testProcedures": "# DE.AE-02: Potentially Adverse Events Are Analyzed to Better Understand Associated Activities\n\n**Function:** DETECT (DE) | **Category:** DE.AE — Adverse Event Analysis\n**NIST SP 800-53 Ref:** AU-06, CA-07, IR-04, SI-04\n**Implementation Examples:** 4 (Ex1–Ex4)\n\n## Scope & Applicability\n\nThis test procedure covers Alma Security's capability to analyze potentially adverse events across:\n\n- **Cloud infrastructure:** AWS CloudTrail (API activity logging), GuardDuty (automated threat detection), VPC Flow Logs, DNS query logs across all AWS accounts\n- **Endpoints:** SentinelOne EDR detections and Deep Visibility queries\n- **Email:** O365 Advanced Threat Protection alerts\n- **Manual review scope:** Slack workspace audit logs, physical badge reader logs, SaaS admin consoles not covered by automated monitoring\n- **Personnel:** SOC team (Detection & Response, led by Nadia Khan), SOC Manager (Gerry Callahan), SOC analysts (Jane Alvarez, John Tran). Assessors are not scoped personnel — see the [Independence Statement](../../0_Methodology/Scoring-Rubric-and-Methodology.md#6-independence-statement)\n\nSystems out of scope: on-premises Windows domain controller logs are monitored separately under DE.CM and are not part of the SIEM-like analysis workflow assessed here.\n\n## Continuous Monitoring Indicators\n\n| Indicator | Source | Frequency | Threshold |\n|-----------|--------|-----------|-----------|\n| Time to Detect (TTD) | SOC metrics dashboard | Monthly | Baseline 81h → Current 9h → Target <4min by Jan 2027 |\n| GuardDuty finding volume | AWS Security Hub | Daily | Trend analysis; spike >2x weekly average triggers review |\n| Manual review completion rate | Ticketing system | Weekly | 100% of scheduled reviews completed on time |\n| Threat intel feed currency | GuardDuty + ISAC feeds | Weekly | Feeds updated within 24h of publication |\n| Detection rule tuning actions | Change log | Quarterly | ≥1 rule update per quarter based on false positive analysis |\n\n## Test Procedures\n\n### Examine\n\n| # | Procedure | Expected Evidence |\n|---|-----------|-------------------|\n| E1 | Verify CloudTrail is enabled for all regions across all AWS accounts | CloudTrail configuration export showing multi-region, multi-account coverage with log file validation enabled |\n| E2 | Confirm GuardDuty is enabled and centralized across all accounts | GuardDuty console screenshot showing enabled status in production account (123456789012) and delegated admin configuration |\n| E3 | Review GuardDuty custom findings configurations and suppression rules | Exported suppression filter list with documented rationale for each suppression; confirm no high-severity finding types are suppressed |\n| E4 | Examine threat intelligence feed integration | GuardDuty threat list configuration showing Amazon-curated feeds active; O365 ATP rule configuration; evidence of ISAC membership and briefing attendance |\n| E5 | Review manual log review schedule and completion records | Documented review cadence by system criticality tier; ticketing system query showing completed review tickets for Slack, badge reader, and SaaS admin logs over the past 90 days |\n| E6 | Inspect log analysis reporting outputs | GuardDuty findings report from AWS Security Hub (severity-ranked); SentinelOne weekly endpoint threat report; SOC Manager's monthly detection summary with TTD metrics |\n| E7 | Verify automation gap tracking | List of systems requiring manual review with justification; roadmap for custom cross-source correlation script deployment |\n\n### Interview\n\n| # | Role | Key Questions |\n|---|------|---------------|\n| I1 | Nadia Khan (D&R Lead) | \"Walk me through how a GuardDuty finding gets from detection to analyst review. What is the average time from finding generation to analyst acknowledgment?\" — Expected: Can describe the full alert-to-triage pipeline with specific tool names and routing paths |\n| I2 | SOC Analyst (Jane or John) | \"Describe your manual log review process. Which systems do you review, how often, and what are you looking for?\" — Expected: Can name the specific systems (Slack, badge readers, SaaS consoles), the review cadence, and the finding documentation process |\n| I3 | SOC Analyst (Jane or John) | \"How do you use threat intelligence during log analysis? Give me a recent example where a threat intel indicator influenced your analysis.\" — Expected: Can reference a specific ISAC briefing or GuardDuty threat list update that changed their analysis approach |\n| I4 | Gerry (SOC Manager) | \"How do you validate severity classifications in detection reports? What happens when you disagree with an automated classification?\" — Expected: Can describe the review process for GuardDuty and SentinelOne reports and the override/escalation path |\n\n### Test\n\n| # | Procedure | Pass Criteria |\n|---|-----------|---------------|\n| T1 | Generate a benign test event (e.g., API call from an unusual region) and verify it appears in CloudTrail within expected timeframe | Event appears in CloudTrail logs within 15 minutes; log file integrity validation passes |\n| T2 | Review a sample of 5 GuardDuty findings from the past 30 days; verify each was triaged with documented analyst action | All 5 findings have corresponding tickets or documented triage decisions; no high-severity finding was left unacknowledged for >4 hours during business hours |\n| T3 | Request the most recent monthly detection summary report; verify TTD metric calculation methodology | Report dated within 30 days; TTD calculated consistently across incidents; current TTD documented against the 81-hour baseline and the <4-minute target |\n| T4 | Select one system from the manual review list; verify the last 3 review cycles were completed and documented | All 3 review cycles have tickets with findings documented using the standard finding template; reviews were completed within the defined cadence window |\n\n## Evidence Requirements\n\n- [ ] CloudTrail configuration export (all regions, all accounts)\n- [ ] GuardDuty enabled status and delegated admin screenshot\n- [ ] GuardDuty suppression filter list with rationale\n- [ ] Threat intelligence feed configuration (GuardDuty threat lists, O365 ATP rules)\n- [ ] ISAC membership documentation or briefing attendance records\n- [ ] Manual log review schedule and last 90 days of completed review tickets\n- [ ] GuardDuty findings report from AWS Security Hub (last 30 days)\n- [ ] SentinelOne weekly endpoint threat report (most recent)\n- [ ] SOC Manager monthly detection summary with TTD metrics\n- [ ] Automation gap tracking document with remediation roadmap\n- [ ] SOC on-call rotation schedule\n\n## Pass/Fail Criteria\n\n**Pass:** All four implementation examples are demonstrably operational:\n- Automated SIEM-like monitoring (Ex1) covers all AWS accounts with GuardDuty and CloudTrail\n- Threat intelligence (Ex2) is integrated into at least two detection tools with evidence of regular updates\n- Manual review (Ex3) is scheduled, executed on cadence, and documented for all identified non-automated systems\n- Reporting (Ex4) produces regular outputs that track TTD against baseline with SOC Manager validation\n\n**Partial Pass:** Three of four examples are fully operational; the fourth has a documented remediation plan with a target date within 6 months.\n\n**Fail:** Fewer than three examples are operational, OR automated monitoring has coverage gaps affecting production systems, OR TTD metrics are not tracked, OR manual review has no documented cadence.\n\n## Alma Security Context\n\nAlma Security uses AWS-native tools (CloudTrail, GuardDuty, VPC Flow Logs, DNS logs) as its primary SIEM-like detection platform rather than a traditional SIEM. This is appropriate for their cloud-first architecture but creates a dependency on AWS-native capabilities and limits cross-source correlation to custom scripts. The TTD improvement from 81 hours to 9 hours demonstrates meaningful progress, but the January 2027 target of <4 minutes requires significant investment in automation beyond the current toolset.\n\nKey gap: no 24/7 monitoring coverage. Business hours SOC with on-call rotation means after-hours detection relies entirely on automated alerting with no real-time human analysis. The Incident Response Enhancement project ($150K budget) is the primary remediation vehicle.\n\nManual review of Slack, badge reader, and SaaS admin logs is a compensating control for systems that lack API-based log forwarding. The planned custom correlation scripts will reduce but not eliminate the need for manual review.\n\n## Related\n\n- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1005](../../5_Artifacts/Tickets/TKT-SOC-1005.md), [Information Security Policy](../../5_Artifacts/Policies/POL-information-security.md), [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md)\n- **Controls:** [DE.AE-02_Ex1](../../2_Controls/DE/DE.AE-02_Ex1.md), [DE.AE-02_Ex2](../../2_Controls/DE/DE.AE-02_Ex2.md), [DE.AE-02_Ex3](../../2_Controls/DE/DE.AE-02_Ex3.md), [DE.AE-02_Ex4](../../2_Controls/DE/DE.AE-02_Ex4.md)\n- **Observations:** [DE.AE-02-Q1](../../4_Observations/DE/DE.AE-02-Q1.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.AE-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "AWS Config Compliance Snapshot",
       "SOC Incident Ticket"
     ],
-    "linkedFindings": [],
+    "linkedFindings": [
+      "FND-1001",
+      "FND-1002",
+      "FND-1003"
+    ],
     "remediation": {
       "ownerId": null,
       "actionPlan": "",
@@ -624,8 +672,8 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       "Q1": {
         "actualScore": 2,
         "targetScore": 5,
-        "observations": "CloudTrail and GuardDuty provide SIEM-like functionality. TTD at 9 hours. Malicious activity detection rules tuned based on threat intelligence.",
-        "observationDate": "2025-01-26",
+        "observations": "Alma Security relies on AWS CloudTrail and GuardDuty as its primary SIEM-like monitoring platform, supplemented by SentinelOne for endpoint detection and O365 ATP for email threats. GuardDuty analyzes CloudTrail management and data events, VPC Flow Logs, and DNS query logs to generate findings for known malicious activity patterns. Detection rules are tuned based on threat intelligence from Amazon-curated feeds, Microsoft global threat intelligence, and industry ISAC briefings. TTD has improved from the October 2024 baseline of 81 hours to 9 hours at the time of assessment, representing a significant improvement driven by GuardDuty automation and SOC process maturation. However, this remains well above the January 2027 target of under 4 minutes. Manual log review is performed weekly for systems outside automated monitoring coverage (Slack workspace audit logs, physical badge reader logs, SaaS admin consoles). Reviews are assigned on a rotating basis by Nadia Khan and documented in the ticketing system. The manual review process is operational but relies on analyst discipline; no automated alerting exists for missed review windows. The SOC Manager validates severity classifications and compiles monthly detection summary reports tracking TTD metrics. GuardDuty findings are surfaced through AWS Security Hub, and SentinelOne produces weekly endpoint threat reports. ### Strengths - GuardDuty provides automated, continuous analysis of cloud API activity across all AWS accounts without requiring SIEM infrastructure management - TTD improvement from 81 hours to 9 hours demonstrates that the detection program is maturing and that investments in tooling and process are yielding results - Threat intelligence is integrated from multiple sources (Amazon feeds, Microsoft ATP, ISAC briefings), providing layered detection coverage - Manual review process is defined with clear ownership and cadence for non-automated systems - Monthly detection reporting with TTD metric tracking provides management visibility into detection program effectiveness ### Gaps - **No 24/7 monitoring coverage:** SOC operates business hours with on-call rotation. After-hours detection depends entirely on automated alerting with no real-time human triage. A critical GuardDuty finding generated at 2 AM would not receive human analysis until the next business day unless it triggers an on-call page, and on-call paging criteria are not well-defined. - **Limited cross-source correlation:** CloudTrail, GuardDuty, SentinelOne, and O365 ATP operate as independent detection silos. Custom correlation scripts are planned but not yet deployed, limiting the ability to identify attacks that span cloud infrastructure and endpoints. - **SIEM coverage limited to AWS-native systems:** On-premises Windows domain controller at Redwood City and several SaaS applications lack automated log analysis integration. Manual review is the compensating control, but review cadence (weekly) means detection latency for these systems is measured in days. - **No document examination performed:** Configuration review was deferred to Q2. Scoring is based on interview and test only, which may overstate or understate the actual configuration posture.",
+        "observationDate": "2026-01-26",
         "testingStatus": "Complete",
         "examine": false,
         "interview": true,
@@ -665,16 +713,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.AE-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Assess log aggregation architecture\n2. Evaluate event correlation capabilities\n3. Test threat intelligence integration in correlation\n4. Review correlation effectiveness",
+    "testProcedures": "# DE.AE-03: Information Is Correlated from Multiple Sources\n\n**Function:** DETECT (DE) | **Category:** DE.AE — Adverse Event Analysis\n**NIST SP 800-53 Ref:** AU-06, CA-07, IR-04, IR-05, IR-08, PM-16, SI-04\n**Implementation Examples:** 3 (Ex1–Ex3)\n\n## Scope & Applicability\n\nThis test procedure covers Alma Security's ability to correlate security event information across:\n\n- **Cloud-native log sources:** CloudTrail (API activity), VPC Flow Logs (network traffic), DNS query logs — all aggregated to a centralized S3 bucket with CloudWatch Logs integration\n- **Correlation engines:** AWS GuardDuty (multi-signal correlation across AWS sources), O365 ATP (email threat correlation within Microsoft ecosystem)\n- **Endpoint telemetry:** SentinelOne management console (process, file, network event correlation)\n- **Manual correlation:** SOC team cross-platform pivot techniques between AWS, SentinelOne, and O365 consoles\n- **Threat intelligence enrichment:** GuardDuty threat lists, ISAC briefings used to contextualize correlated events\n- **Personnel:** Nadia Khan (D&R Lead), SOC analysts (Jane, John), auditor (Steve)\n\nOut of scope: physical access badge logs and Slack workspace audit logs, which are reviewed manually under DE.AE-02 but not currently included in correlation workflows.\n\n## Continuous Monitoring Indicators\n\n| Indicator | Source | Frequency | Threshold |\n|-----------|--------|-----------|-----------|\n| Mean time from first signal to correlated incident view | SOC metrics | Monthly | Establish baseline; target <30 min for multi-source incidents |\n| Cross-platform correlation attempts per incident | Incident tickets | Per incident | ≥1 cross-platform pivot documented for all Medium+ incidents |\n| GuardDuty multi-signal finding rate | AWS Security Hub | Weekly | Trend analysis; declining rate may indicate coverage gap |\n| Correlation script deployment status | Project tracker | Monthly | Track progress toward automated cross-source correlation |\n| Duplicate/uncorrelated alert volume | Ticketing system | Weekly | Decreasing trend indicates improving correlation maturity |\n\n## Test Procedures\n\n### Examine\n\n| # | Procedure | Expected Evidence |\n|---|-----------|-------------------|\n| E1 | Verify CloudTrail logs, VPC Flow Logs, and DNS query logs forward to the centralized S3 bucket | S3 bucket configuration showing log delivery from all AWS accounts; CloudWatch Logs integration settings |\n| E2 | Confirm SentinelOne telemetry is aggregated in the management console with queryable event data | SentinelOne console screenshot showing Deep Visibility query capability across enrolled endpoints |\n| E3 | Review O365 ATP log retention in the Microsoft 365 unified audit log | M365 audit log retention settings; confirmation that ATP events are searchable alongside other O365 events |\n| E4 | Assess GuardDuty multi-source correlation configuration | GuardDuty data sources panel showing CloudTrail, VPC Flow Logs, and DNS logs enabled; sample multi-signal finding |\n| E5 | Review status of custom cross-source correlation scripts funded by IR Enhancement project ($150K) | Project status report; script architecture documentation; deployment timeline |\n| E6 | Examine whether a normalized event taxonomy exists across detection platforms | Any documentation mapping event types across GuardDuty, SentinelOne, and O365 ATP to common categories |\n\n### Interview\n\n| # | Role | Key Questions |\n|---|------|---------------|\n| I1 | Nadia Khan (D&R Lead) | \"When a GuardDuty finding suggests lateral movement, how does your team correlate that with endpoint telemetry from SentinelOne? Walk me through the manual process.\" — Expected: Describes specific pivot techniques (IP-to-host lookup, timestamp correlation, user identity linkage) |\n| I2 | SOC Analyst (Jane or John) | \"Describe the last time you correlated events across two or more platforms during an investigation. What was the incident, and how long did the cross-platform correlation take?\" — Expected: Can describe a specific incident with named tools and approximate time investment |\n| I3 | Nadia Khan (D&R Lead) | \"How do you use threat intelligence to improve event correlation? Give me an example where a threat indicator helped you link events across platforms.\" — Expected: References a specific ISAC briefing or GuardDuty threat list indicator that connected otherwise separate findings |\n\n### Test\n\n| # | Procedure | Pass Criteria |\n|---|-----------|---------------|\n| T1 | Simulate a lateral movement scenario: generate a suspicious API call in CloudTrail and a corresponding network connection in VPC Flow Logs; verify both events can be linked to the same source | Assessor can identify both events and correlate them using available tools within 30 minutes; correlation path is documented |\n| T2 | Select 3 recent multi-vector incidents from the ticketing system; verify that investigation notes document cross-source evidence from at least 2 platforms | All 3 incidents reference evidence from multiple detection sources; correlation reasoning is documented in the ticket |\n| T3 | Attempt to correlate a GuardDuty finding with SentinelOne endpoint telemetry for the same timeframe and host | Correlation is achievable manually; document the number of console switches and approximate time required to complete the pivot |\n| T4 | Review GuardDuty multi-signal findings from the past 30 days; verify at least one finding demonstrates automated correlation across CloudTrail, VPC Flow Logs, and DNS | At least one multi-signal finding exists; the finding correctly correlated events from multiple data sources |\n\n## Evidence Requirements\n\n- [ ] Centralized S3 log bucket configuration (log sources, retention, access controls)\n- [ ] CloudWatch Logs integration settings for CloudTrail/VPC Flow Logs/DNS\n- [ ] GuardDuty data sources configuration and sample multi-signal finding\n- [ ] SentinelOne Deep Visibility query capability demonstration\n- [ ] O365 unified audit log retention and search configuration\n- [ ] Cross-source correlation script project status report and architecture\n- [ ] 3 recent incident tickets showing multi-platform investigation evidence\n- [ ] ISAC threat briefing distribution records for SOC personnel\n\n## Pass/Fail Criteria\n\n**Pass:** All three implementation examples are demonstrably operational:\n- Log aggregation (Ex1) centralizes cloud-native logs to a single queryable repository with SentinelOne and O365 telemetry accessible from their respective consoles\n- Event correlation (Ex2) is automated within platforms (GuardDuty multi-signal, SentinelOne Deep Visibility) and cross-platform correlation is achievable (manually or via scripts) with documented analyst workflows\n- Threat intelligence (Ex3) enriches correlation through at least two sources with evidence of operational use during investigations\n\n**Partial Pass:** Log aggregation and within-platform correlation are operational, but cross-platform correlation is entirely manual with no documented workflow and no progress toward automation.\n\n**Fail:** Log sources remain siloed with no centralized aggregation, OR GuardDuty multi-source correlation is not enabled, OR SOC analysts cannot demonstrate cross-platform event correlation for a recent incident.\n\n## Alma Security Context\n\nAlma operates a multi-platform detection environment without a traditional unified SIEM. GuardDuty provides strong automated correlation within the AWS ecosystem, and SentinelOne correlates endpoint events within its own telemetry. The critical gap is cross-platform correlation between these silos — currently manual, requiring analysts to pivot between 3+ consoles to link cloud API activity to endpoint behavior to email threats.\n\nThe $150K Incident Response Enhancement project includes custom correlation script development to bridge this gap. Until deployed, Alma's correlation maturity is capped by analyst speed and availability. For a 300-person SaaS company, the current approach is defensible in the short term but will not scale as the environment grows or as attack complexity increases.\n\nThe absence of physical access and identity management event sources from correlation workflows is a secondary gap — relevant for insider threat scenarios but lower priority than the cloud-endpoint correlation gap.\n\n## Related\n\n- **Artifacts:** [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [Information Security Policy](../../5_Artifacts/Policies/POL-information-security.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1005](../../5_Artifacts/Tickets/TKT-SOC-1005.md)\n- **Controls:** [DE.AE-03_Ex1](../../2_Controls/DE/DE.AE-03_Ex1.md), [DE.AE-03_Ex2](../../2_Controls/DE/DE.AE-03_Ex2.md), [DE.AE-03_Ex3](../../2_Controls/DE/DE.AE-03_Ex3.md)\n- **Observations:** [DE.AE-03-Q1](../../4_Observations/DE/DE.AE-03-Q1.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.AE-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1001",
-      "FND-1002",
-      "FND-1003"
+      "FND-1004",
+      "FND-1005",
+      "FND-1006"
     ],
     "remediation": {
       "ownerId": null,
@@ -726,16 +781,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.AE-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review automated impact estimation capabilities\n2. Evaluate manual impact assessment process\n3. Test impact estimation accuracy\n4. Assess communication of impact estimates",
+    "testProcedures": "# DE.AE-04: The Estimated Impact and Scope of Adverse Events Are Understood\n\n**Function:** DETECT (DE) | **Category:** DE.AE — Adverse Event Analysis\n**NIST SP 800-53 Ref:** PM-09, PM-11, PM-18, PM-28, PM-30\n**Implementation Examples:** 2 (Ex1–Ex2)\n\n## Scope & Applicability\n\nThis test procedure covers Alma Security's capability to estimate the business impact and technical scope of adverse events through:\n\n- **Automated impact estimation:** GuardDuty severity ratings (Low/Medium/High) with affected resource identifiers; SentinelOne threat assessments with scope indicators (affected endpoints, process trees, lateral movement signals)\n- **Manual impact estimation:** SOC Manager assessment factoring asset criticality, customer tenant exposure, service availability impact, regulatory notification thresholds, and reputational risk\n- **Asset context sources:** AWS resource tags (environment, criticality tier), ServiceNow CMDB (asset owners, business impact ratings), SentinelOne endpoint inventory (device role, department)\n- **Personnel:** Gerry (SOC Manager — impact validation authority), Nadia Khan (D&R Lead), SOC analysts (Jane, John), auditor (Steve)\n\nScope includes all systems in Alma's detection coverage: AWS infrastructure (production account 123456789012), SentinelOne-enrolled endpoints, and O365-protected email. Impact estimation for physical security events at the Redwood City office is out of scope for this procedure.\n\n## Continuous Monitoring Indicators\n\n| Indicator | Source | Frequency | Threshold |\n|-----------|--------|-----------|-----------|\n| Impact estimate accuracy | Post-incident review | Per incident | Initial estimate within 1 severity level of final assessment for ≥80% of incidents |\n| Time from alert to impact estimate | Incident tickets | Per incident | Initial estimate documented within 15 min (automated) or 2 hours (manual) of triage start |\n| Scope revision frequency | Incident tickets | Per incident | Track how often initial scope expands; increasing trend may indicate estimation methodology gaps |\n| Asset criticality coverage | CMDB | Quarterly | ≥90% of production assets have criticality ratings assigned |\n| Executive impact notification timeliness | Escalation records | Per SEV-1/SEV-2 | CISO notified within 1 hour per incident response playbook |\n\n## Test Procedures\n\n### Examine\n\n| # | Procedure | Expected Evidence |\n|---|-----------|-------------------|\n| E1 | Review incident response playbook for impact estimation guidance | Playbook section defining impact categories (Negligible through Critical) with specific criteria for each level including customer data exposure, service availability, and regulatory thresholds |\n| E2 | Verify GuardDuty findings include severity ratings and affected resource identification | Sample GuardDuty findings showing severity classification, affected resource ARN, and contextual enrichment data |\n| E3 | Confirm SentinelOne threat assessments include scope indicators | SentinelOne console showing threat assessment with affected endpoint count, process tree visualization, and lateral movement indicators |\n| E4 | Review ServiceNow CMDB for asset criticality ratings coverage | CMDB report showing percentage of production assets with assigned criticality ratings; identify assets with no criticality classification |\n| E5 | Examine 3-5 recent incident tickets for impact estimation documentation | Tickets showing initial impact estimate, any revisions, final impact assessment, and rationale at each stage |\n\n### Interview\n\n| # | Role | Key Questions |\n|---|------|---------------|\n| I1 | Gerry (SOC Manager) | \"Walk me through how you refine an automated GuardDuty severity rating during triage. What additional factors do you consider that the automated rating doesn't capture?\" — Expected: References customer tenant exposure, crown jewel system status, and business context that automated tools miss |\n| I2 | Nadia Khan (D&R Lead) | \"How do you estimate blast radius for an incident that spans multiple systems? What tools and data sources do you use to determine scope?\" — Expected: Describes CMDB lookup, asset dependency mapping, and a systematic approach rather than ad-hoc estimation |\n| I3 | SOC Analyst (Jane or John) | \"Describe a recent incident where the initial scope estimate changed significantly during investigation. What caused the revision?\" — Expected: Can describe a specific incident with the trigger for scope change and how the team communicated the revised estimate |\n| I4 | Gerry (SOC Manager) | \"At what point in an investigation do you notify executive leadership about impact? How do you quantify business impact for non-technical stakeholders?\" — Expected: References specific severity thresholds from the playbook and describes translating technical scope into business terms (customers affected, revenue exposure, regulatory implications) |\n\n### Test\n\n| # | Procedure | Pass Criteria |\n|---|-----------|---------------|\n| T1 | Review 5 recent incident tickets; compare initial impact estimates against final post-incident assessments | ≥4 of 5 initial estimates are within 1 severity level of the final assessment; all tickets document the impact estimation rationale |\n| T2 | For 3 incidents, verify scope was assessed by cross-referencing affected assets against the CMDB | All 3 tickets reference CMDB lookups or asset interdependency checks during scope assessment; affected assets are identified by name/ID, not just \"multiple systems\" |\n| T3 | Verify that at least one recent SEV-1 or SEV-2 incident included executive notification with business impact summary within the playbook SLA | Notification occurred within 1 hour of severity assignment; notification included non-technical impact summary (customers, services, data types affected) |\n| T4 | Present a hypothetical scenario (e.g., compromised service account with access to customer biometric data) and ask the on-duty SOC analyst to walk through impact estimation | Analyst applies playbook criteria correctly, references asset criticality, identifies regulatory notification thresholds (GDPR 72h), and escalates per severity definitions |\n\n## Evidence Requirements\n\n- [ ] Incident response playbook impact classification section\n- [ ] 5 recent incident tickets showing impact estimation progression (initial → revised → final)\n- [ ] GuardDuty finding examples with severity and affected resource details\n- [ ] SentinelOne threat assessment examples with scope indicators and process trees\n- [ ] ServiceNow CMDB asset criticality coverage report\n- [ ] Escalation records for most recent SEV-1/SEV-2 showing executive notification timeline\n- [ ] Post-incident review documents comparing initial vs. final impact estimates\n\n## Pass/Fail Criteria\n\n**Pass:** Both implementation examples are demonstrably operational:\n- Automated estimation (Ex1) provides initial severity and scope via GuardDuty and SentinelOne with SOC Manager review and refinement documented in tickets\n- Manual estimation (Ex2) supplements automated ratings with business context (customer exposure, service availability, regulatory thresholds) with documented rationale\n\n**Partial Pass:** Automated severity ratings are operational but manual estimation lacks consistent methodology — impact rationale is documented in some tickets but not all, or business impact quantification is absent.\n\n**Fail:** No documented impact estimation process exists, OR automated severity ratings are accepted without review or refinement, OR incident tickets contain no impact or scope documentation.\n\n## Alma Security Context\n\nAs a SaaS company handling continuous authentication with biometric data, Alma's impact estimation must account for customer data sensitivity beyond typical infrastructure incidents. A compromised service with access to biometric data triggers regulatory notification obligations (GDPR 72-hour requirement) and existential reputational risk for a company whose product *is* security.\n\nThe current approach combining GuardDuty automated severity with SOC Manager manual refinement is appropriate for Alma's scale. The primary gap is the absence of a quantitative scope scoring rubric — scope estimation relies heavily on individual analyst judgment, which creates inconsistency. The ServiceNow CMDB provides asset context but lacks automated interdependency mapping that would help analysts estimate blast radius for cascading failures.\n\nThe five documented risks (R-01 through R-05) should inform impact estimation: incidents affecting detection capabilities (R-03) or customer trust (R-04) warrant elevated impact classification regardless of technical severity.\n\n## Related\n\n- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1001 Phishing](../../5_Artifacts/Tickets/TKT-SOC-1001-phishing.md)\n- **Controls:** [DE.AE-04_Ex1](../../2_Controls/DE/DE.AE-04_Ex1.md), [DE.AE-04_Ex2](../../2_Controls/DE/DE.AE-04_Ex2.md)\n- **Observations:** [DE.AE-04-Q1](../../4_Observations/DE/DE.AE-04-Q1.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.AE-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Weekly Vulnerability Scan Summary",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1004",
-      "FND-1005",
-      "FND-1006"
+      "FND-1007",
+      "FND-1008",
+      "FND-1009"
     ],
     "remediation": {
       "ownerId": null,
@@ -787,16 +849,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.AE-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Verify automated alert routing\n2. Assess on-demand access to security findings\n3. Review automated ticket creation workflow\n4. Evaluate manual reporting and escalation",
+    "testProcedures": "# DE.AE-06: Information on Adverse Events Is Provided to Authorized Staff and Tools\n\n**Function:** DETECT (DE) | **Category:** DE.AE — Adverse Event Analysis\n**NIST SP 800-53 Ref:** IR-04, PM-15, PM-16, RA-04, RA-10\n**Implementation Examples:** 4 (Ex1–Ex4)\n\n## Scope & Applicability\n\nThis test procedure covers Alma Security's mechanisms for distributing adverse event information to authorized personnel and tools:\n\n- **Automated alert routing:** GuardDuty findings via SNS-to-Slack (#security-alerts channel); SentinelOne alerts to SOC console; O365 ATP alerts in Microsoft 365 Defender portal; PagerDuty escalations for after-hours High/Critical findings\n- **On-demand access:** GuardDuty console, SentinelOne management portal, CloudWatch Logs Insights, Athena queries against centralized S3 log bucket — all RBAC-controlled\n- **Automated ticketing:** SentinelOne auto-creates tickets for High/Critical endpoint detections; GuardDuty High-severity findings trigger Lambda-to-ticketing integration; tickets auto-assigned per SOC rotation\n- **Manual reporting:** Staff-initiated security tickets for suspicious activity not caught by automated detection; SOC Manager validates severity within 2 hours\n- **Personnel:** Nadia Khan (D&R Lead — access provisioning), Gerry (SOC Manager — severity validation), SOC analysts (Jane, John — triage and response), engineering staff (manual reporting)\n\nOut of scope: distribution of vulnerability scan results (covered under DE.CM) and executive reporting cadence (covered under GV.OV).\n\n## Continuous Monitoring Indicators\n\n| Indicator | Source | Frequency | Threshold |\n|-----------|--------|-----------|-----------|\n| Mean time from detection to SOC notification | Alert routing logs | Weekly | <5 min for High/Critical (automated); <15 min for Medium |\n| Mean time to acknowledge (MTTA) | Ticketing system | Weekly | Establish baseline; target <30 min during business hours |\n| After-hours alert delivery success rate | PagerDuty logs | Monthly | 100% of High/Critical findings reach on-call within 5 min |\n| Auto-ticket creation success rate | Ticketing system | Weekly | ≥99% of qualifying alerts generate tickets |\n| Manual security ticket volume | Ticketing system | Monthly | Trend analysis; low volume may indicate underreporting |\n\n## Test Procedures\n\n### Examine\n\n| # | Procedure | Expected Evidence |\n|---|-----------|-------------------|\n| E1 | Trace GuardDuty finding delivery path: GuardDuty → SNS → Lambda → Slack #security-alerts | SNS topic subscription configuration; Lambda function code or configuration; Slack channel integration settings; sample message in #security-alerts with finding details |\n| E2 | Verify SentinelOne alert routing to SOC console with threat classification and recommended actions | SentinelOne notification policy configuration; sample alert showing classification, affected host, and response recommendations |\n| E3 | Review PagerDuty escalation policy for after-hours security alerts | PagerDuty service configuration showing escalation rules; on-call rotation schedule; severity-to-urgency mapping (High/Critical → page, Medium/Low → queue) |\n| E4 | Confirm SOC analyst access provisioning for detection platforms | AWS IAM role assignments for GuardDuty/CloudWatch/Athena scoped to security operations; SentinelOne RBAC configuration showing authorized users; access review records |\n| E5 | Review auto-ticketing configuration for SentinelOne and GuardDuty | SentinelOne ticketing integration settings showing trigger criteria (High/Critical); Lambda function for GuardDuty-to-ticketing; sample auto-generated tickets with pre-populated fields |\n| E6 | Examine manual security ticket creation process | Incident response playbook section defining required fields and severity classification for manual tickets; sample manually-created ticket from non-SOC staff |\n\n### Interview\n\n| # | Role | Key Questions |\n|---|------|---------------|\n| I1 | SOC Analyst (Jane or John) | \"Walk me through what happens when a GuardDuty High-severity finding fires at 2 PM on a Tuesday vs. 2 AM on a Saturday. How does the alert reach you in each case?\" — Expected: Describes business hours Slack monitoring plus after-hours PagerDuty escalation with specific routing differences |\n| I2 | Nadia Khan (D&R Lead) | \"How do you control who has access to security findings? When was the last time you reviewed access permissions for detection consoles?\" — Expected: Describes RBAC model, names specific IAM roles and SentinelOne permission groups, references a recent access review |\n| I3 | Non-SOC Engineering Staff | \"If you noticed something suspicious on your workstation or in a production system, how would you report it? Have you ever done so?\" — Expected: Can describe the manual ticket creation process or at minimum knows to contact the security team; ideally references a specific channel or procedure |\n| I4 | Gerry (SOC Manager) | \"How do you validate severity for manually-created tickets? What happens if someone reports something they think is critical but it's actually a false alarm?\" — Expected: Describes the 2-hour SLA for severity validation, the review process, and how false alarms are handled without discouraging future reporting |\n\n### Test\n\n| # | Procedure | Pass Criteria |\n|---|-----------|---------------|\n| T1 | Review 5 recent auto-generated tickets (mix of GuardDuty and SentinelOne); verify each was created within the expected timeframe and assigned to the correct SOC analyst | All 5 tickets were auto-created; assignment matches the on-duty analyst from the rotation schedule; ticket contains pre-populated threat details |\n| T2 | Verify PagerDuty delivery for after-hours alerts: review PagerDuty incident log for the past 30 days and confirm all High/Critical after-hours findings triggered pages | All qualifying after-hours findings have corresponding PagerDuty incidents; page delivery confirmed within 5 minutes of finding generation |\n| T3 | Test on-demand access: have an authorized SOC analyst query GuardDuty findings, run a CloudWatch Logs Insights query, and execute an Athena query against VPC Flow Logs in the centralized S3 bucket | Analyst successfully accesses all three platforms and retrieves results without access errors; an unauthorized user (selected from non-SOC staff) is denied access |\n| T4 | Review 3 manually-created security tickets; verify each has required fields populated and received SOC Manager severity validation within the 2-hour SLA | All 3 tickets have severity, affected system, description, and reporter fields; SOC Manager validation timestamp is within 2 hours of ticket creation |\n\n## Evidence Requirements\n\n- [ ] SNS-to-Slack integration configuration for GuardDuty findings\n- [ ] SentinelOne notification policy and ticketing integration settings\n- [ ] PagerDuty escalation policy and on-call rotation schedule\n- [ ] Lambda function configuration for GuardDuty-to-ticketing integration\n- [ ] AWS IAM role policies for SOC analyst access to detection platforms\n- [ ] SentinelOne RBAC user permissions export\n- [ ] 5 sample auto-generated tickets (GuardDuty + SentinelOne mix)\n- [ ] 3 sample manually-created security tickets with SOC Manager validation\n- [ ] PagerDuty incident log for after-hours alerts (past 30 days)\n- [ ] Incident response playbook manual reporting section\n\n## Pass/Fail Criteria\n\n**Pass:** All four implementation examples are demonstrably operational:\n- Automated alert distribution (Ex1) delivers findings to SOC via Slack and PagerDuty with confirmed after-hours delivery within 5 minutes for High/Critical\n- On-demand access (Ex2) is provisioned for authorized SOC personnel across all detection platforms with RBAC controls preventing unauthorized access\n- Automated ticketing (Ex3) creates and assigns tickets for qualifying alerts with pre-populated fields and correct rotation-based assignment\n- Manual reporting (Ex4) is supported by documented procedures, used by non-SOC staff, and validated by SOC Manager within the 2-hour SLA\n\n**Partial Pass:** Three of four examples are fully operational; the fourth (typically manual reporting) has a documented process but limited evidence of use by non-SOC staff.\n\n**Fail:** Automated alert distribution does not reach SOC within expected timeframes, OR after-hours High/Critical alerts have no paging mechanism, OR detection platform access is not RBAC-controlled, OR no mechanism exists for manual security reporting.\n\n## Alma Security Context\n\nAlma's alert distribution architecture is effective during business hours when the SOC team actively monitors Slack #security-alerts. The critical design decision is the PagerDuty integration for after-hours escalation — this is the lifeline for a team without 24/7 SOC coverage. The 5-minute delivery SLA for High/Critical findings is reasonable, but the gap for Medium-severity findings (queued until next business day) creates a risk window where medium-severity events could escalate without timely human awareness.\n\nThe Lambda-based auto-ticketing for GuardDuty and SentinelOne's native ticketing integration provide a solid automated workflow. The manual reporting path is important for Alma's size — with 300 employees, security-aware staff are a meaningful detection layer. The SOC Manager's 2-hour severity validation SLA for manual tickets balances responsiveness with analyst capacity.\n\nThe absence of alert acknowledgment tracking (no MTTA metric) is a gap that prevents measuring distribution effectiveness. Without knowing how long it takes from alert delivery to analyst acknowledgment, Alma cannot distinguish between \"alert delivered\" and \"alert seen and acted upon.\"\n\n## Related\n\n- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [SOC Ticket 1005](../../5_Artifacts/Tickets/TKT-SOC-1005.md), [SOC Ticket 1001 Phishing](../../5_Artifacts/Tickets/TKT-SOC-1001-phishing.md), [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [Information Security Policy](../../5_Artifacts/Policies/POL-information-security.md)\n- **Controls:** [DE.AE-06_Ex1](../../2_Controls/DE/DE.AE-06_Ex1.md), [DE.AE-06_Ex2](../../2_Controls/DE/DE.AE-06_Ex2.md), [DE.AE-06_Ex3](../../2_Controls/DE/DE.AE-06_Ex3.md), [DE.AE-06_Ex4](../../2_Controls/DE/DE.AE-06_Ex4.md)\n- **Observations:** [DE.AE-06-Q1](../../4_Observations/DE/DE.AE-06-Q1.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.AE-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1007",
-      "FND-1008",
-      "FND-1009"
+      "FND-1010",
+      "FND-1011",
+      "FND-1012"
     ],
     "remediation": {
       "ownerId": null,
@@ -848,17 +917,24 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.AE-07 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Assess threat intelligence feed integration\n2. Evaluate asset context integration\n3. Review vulnerability disclosure monitoring\n4. Test threat intelligence effectiveness",
+    "testProcedures": "# DE.AE-07: Cyber Threat Intelligence and Other Contextual Information Are Integrated into the Analysis\n\n**Function:** DETECT (DE) | **Category:** DE.AE — Adverse Event Analysis\n**NIST SP 800-53 Ref:** PM-16, RA-03, RA-10\n**Implementation Examples:** 3 (Ex1–Ex3)\n\n## Scope & Applicability\n\nThis test procedure covers Alma Security's integration of threat intelligence and contextual information into detection and analysis:\n\n- **Automated threat intelligence feeds:** GuardDuty (Amazon-managed feeds — malicious IPs, domains, cryptomining indicators); O365 ATP (Microsoft Threat Intelligence with Alma-specific custom rules); SentinelOne cloud intelligence (IOCs, malware signatures, behavioral models)\n- **Manual threat intelligence:** SaaS-sector ISAC briefings distributed via encrypted email to D&R personnel; CISA KEV catalog monitoring; AWS Security Bulletins\n- **Asset context sources:** AWS resource tags (environment, criticality tier, data sensitivity); SentinelOne endpoint inventory (device role, department, managed status); ServiceNow CMDB (asset owners, business impact ratings, interdependencies)\n- **Vulnerability disclosure monitoring:** CISA KEV catalog, AWS Security Bulletins, ISAC advisories, vendor security notifications\n- **Personnel:** Nadia Khan (D&R Lead — CTI program owner), Chris Magann (Vulnerability Management), SOC analysts (Jane Alvarez, John Tran). Assessors are not scoped personnel — see the [Independence Statement](../../0_Methodology/Scoring-Rubric-and-Methodology.md#6-independence-statement)\n\nOut of scope: threat modeling for product security (application-level threats to Alma's continuous authentication platform), which falls under a separate product security function.\n\n## Continuous Monitoring Indicators\n\n| Indicator | Source | Frequency | Threshold |\n|-----------|--------|-----------|-----------|\n| Threat intelligence feed freshness | GuardDuty, SentinelOne, O365 ATP | Weekly | All automated feeds updated within 24h of last publication |\n| CISA KEV exposure assessment turnaround | Vulnerability management tickets | Per disclosure | Critical KEV entries assessed against asset inventory within 24h of publication |\n| ISAC briefing consumption rate | D&R team records | Monthly | ≥90% of relevant ISAC briefings reviewed by at least one D&R team member |\n| Asset criticality coverage in CMDB | ServiceNow | Quarterly | ≥90% of production assets have criticality and data sensitivity ratings |\n| Detection rule updates informed by CTI | Change log | Quarterly | ≥1 detection rule created or tuned per quarter based on threat intelligence input |\n\n## Test Procedures\n\n### Examine\n\n| # | Procedure | Expected Evidence |\n|---|-----------|-------------------|\n| E1 | Verify GuardDuty threat intelligence feeds are active and receiving updates | GuardDuty settings showing threat list status; timestamp of most recent threat list update; confirmation that custom threat lists (if any) are maintained |\n| E2 | Confirm O365 ATP consumes Microsoft Threat Intelligence and has Alma-specific custom rules | O365 ATP policy configuration; list of Alma-specific custom threat rules with creation dates and rationale |\n| E3 | Review SentinelOne cloud intelligence integration status | SentinelOne settings showing cloud intelligence enabled; sample detection demonstrating behavioral model or IOC match from cloud intelligence |\n| E4 | Assess ISAC membership and threat briefing distribution to SOC personnel | ISAC membership documentation (SaaS-sector or authentication-sector); distribution list configuration; sample briefing with distribution confirmation |\n| E5 | Review AWS resource tagging for asset criticality context | AWS resource tag policy; sample tag inventory showing environment, criticality, and data sensitivity tags; coverage report from AWS Config required-tags rule |\n| E6 | Examine SentinelOne endpoint inventory attributes | Endpoint inventory export showing device role, department, and managed status fields populated for enrolled endpoints |\n| E7 | Verify CISA KEV catalog and vendor advisory monitoring process | Documentation of monitoring cadence; sample vulnerability disclosure with evidence of exposure assessment against asset inventory; cross-reference with vulnerability scan summary |\n\n### Interview\n\n| # | Role | Key Questions |\n|---|------|---------------|\n| I1 | Nadia Khan (D&R Lead) | \"Describe your threat intelligence program. What sources do you consume, how are they distributed to your team, and how do they influence detection rule tuning?\" — Expected: Names specific sources (GuardDuty feeds, ISAC, CISA KEV), describes distribution mechanism, and gives at least one example of CTI-driven rule change |\n| I2 | SOC Analyst (Jane or John) | \"When you're triaging a GuardDuty finding, how do you determine the criticality of the affected asset? What data sources do you reference?\" — Expected: Describes checking AWS resource tags for environment/criticality, looking up the asset in CMDB for owner and business impact, and using that context to prioritize response |\n| I3 | Chris Magann (Vulnerability Management) | \"When a new critical CVE appears on the CISA KEV catalog, what is your process for determining if Alma is exposed? How quickly does that assessment happen?\" — Expected: Describes checking the CVE against deployed software inventory, AWS Config rules, and SentinelOne application inventory with a target turnaround time |\n| I4 | Nadia Khan (D&R Lead) | \"Has threat intelligence from an ISAC briefing or external source ever caused you to create a new detection rule or modify an existing one? Walk me through that example.\" — Expected: Can describe a specific instance with the intelligence source, the resulting action, and the detection improvement achieved |\n\n### Test\n\n| # | Procedure | Pass Criteria |\n|---|-----------|---------------|\n| T1 | Verify GuardDuty threat list update timestamps are within 7 days; review 3 recent GuardDuty findings and confirm threat intelligence enrichment is present in finding details | All 3 findings include threat intelligence context (threat type, known-bad indicator match, or behavioral pattern); threat lists are current |\n| T2 | Select a recent CISA KEV entry relevant to Alma's technology stack; verify an exposure assessment was conducted and documented | Assessment exists with documentation of affected/not-affected determination; if affected, remediation timeline is documented; assessment was completed within 48 hours of KEV publication |\n| T3 | Request the SOC analyst to triage a sample GuardDuty finding and demonstrate asset context lookup; verify they reference AWS tags and/or CMDB during triage | Analyst looks up the affected resource's criticality tier, environment (prod/dev), data sensitivity, and owner before completing severity assessment; context influences triage decision |\n| T4 | Review SentinelOne endpoint inventory for 10 random endpoints; verify asset context fields (device role, department, managed status) are populated | ≥8 of 10 endpoints have all three fields populated; any gaps are documented with explanation |\n\n## Evidence Requirements\n\n- [ ] GuardDuty threat intelligence feed configuration and update timestamps\n- [ ] O365 ATP policy configuration with Alma-specific custom rules\n- [ ] SentinelOne cloud intelligence integration settings and sample detection\n- [ ] ISAC membership documentation and sample threat briefing\n- [ ] AWS resource tag policy and coverage report from AWS Config\n- [ ] SentinelOne endpoint inventory export with attribute fields\n- [ ] ServiceNow CMDB asset criticality coverage report\n- [ ] CISA KEV exposure assessment example with timeline\n- [ ] Vulnerability scan summary report showing CVE cross-referencing\n- [ ] Evidence of at least one detection rule change driven by threat intelligence\n\n## Pass/Fail Criteria\n\n**Pass:** All three implementation examples are demonstrably operational:\n- Threat intelligence feeds (Ex1) are active on at least two automated platforms (GuardDuty + SentinelOne or O365 ATP) with evidence of regular updates, plus at least one manual intelligence source (ISAC or CISA KEV) actively consumed\n- Asset inventory context (Ex2) is available during triage with criticality, environment, and ownership attributes populated for ≥80% of production assets across AWS and SentinelOne\n- Vulnerability disclosure monitoring (Ex3) has a documented process with evidence of at least one recent exposure assessment completed within 48 hours of disclosure\n\n**Partial Pass:** Automated feeds are active but manual CTI sources (ISAC, CISA KEV) are consumed informally without documented process, OR asset context is available but coverage is below 80%, OR vulnerability disclosure monitoring exists but assessment turnaround exceeds 48 hours.\n\n**Fail:** No threat intelligence feeds beyond vendor defaults are actively consumed, OR asset criticality context is not referenced during triage, OR no vulnerability disclosure monitoring process exists.\n\n## Alma Security Context\n\nAlma's CTI posture relies heavily on vendor-provided intelligence (GuardDuty, SentinelOne cloud, Microsoft ATP) with limited investment in external CTI sources. For a 300-person SaaS company, this is common but creates a blind spot for sector-specific threats targeting authentication infrastructure — exactly the kind of threat most relevant to Alma's business.\n\nThe ISAC membership and CISA KEV monitoring represent the manual CTI layer. The observation from Q1 2026 noted that ISAC engagement is informal and there is no dedicated threat intelligence function. For Alma's current scale, a formal CTI program is aspirational, but structured consumption of 2-3 external sources (ISAC, CISA KEV, vendor advisories) with documented integration into detection tuning is achievable and would meaningfully improve the score.\n\nAsset context integration is a strength area — AWS resource tags at 93.5% compliance (per AWS Config) and SentinelOne endpoint attributes provide good triage context. The ServiceNow CMDB adds ownership and business impact data. The gap is that this context is not systematically fed into detection rule tuning decisions — asset criticality informs triage prioritization but not which detection rules are most important to maintain or enhance.\n\n## Related\n\n- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [Information Security Policy](../../5_Artifacts/Policies/POL-information-security.md), [Vulnerability Scan Summary](../../5_Artifacts/Reports/RPT-vulnerability-scan-summary.md), [AWS Config Compliance](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [SOC Ticket 1005](../../5_Artifacts/Tickets/TKT-SOC-1005.md)\n- **Controls:** [DE.AE-07_Ex1](../../2_Controls/DE/DE.AE-07_Ex1.md), [DE.AE-07_Ex2](../../2_Controls/DE/DE.AE-07_Ex2.md), [DE.AE-07_Ex3](../../2_Controls/DE/DE.AE-07_Ex3.md)\n- **Observations:** [DE.AE-07-Q1](../../4_Observations/DE/DE.AE-07-Q1.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.AE-07",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1010",
-      "FND-1011",
-      "FND-1012",
-      "FND-1013"
+      "FND-1013",
+      "FND-1014",
+      "FND-1015",
+      "FND-1016"
     ],
     "remediation": {
       "ownerId": null,
@@ -910,16 +986,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.AE-08 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review incident declaration criteria\n2. Evaluate false positive management\n3. Test incident declaration accuracy\n4. Assess declaration timeliness",
+    "testProcedures": "# DE.AE-08: Incidents Are Declared When Adverse Events Meet the Defined Incident Criteria\n\n**Function:** DETECT (DE) | **Category:** DE.AE — Adverse Event Analysis\n**NIST SP 800-53 Ref:** IR-04, IR-08\n**Implementation Examples:** 2 (Ex1–Ex2)\n\n## Scope & Applicability\n\nThis test procedure covers Alma Security's process for declaring security incidents based on defined criteria:\n\n- **Incident declaration criteria:** Severity-based thresholds defined in the incident response playbook — SEV-1 Critical (customer data exposure, production compromise, active ransomware), SEV-2 High (lateral movement, credential theft), SEV-3 Medium (policy violations, suspicious patterns), SEV-4 Low (reconnaissance, failed attacks)\n- **Declaration authority:** SOC Manager (Gerry) has primary declaration authority; on-call SOC analyst has after-hours declaration authority for SEV-1/SEV-2\n- **Automated declaration:** GuardDuty High-severity findings auto-generate ServiceNow incident tickets, effectively auto-declaring as incidents\n- **False positive management:** Documented false positive registry with suppression rules, business justifications, monthly SOC Manager review, quarterly re-validation\n- **Personnel:** Gerry (SOC Manager — declaration authority and FP registry owner), Nadia Khan (D&R Lead), SOC analysts (Jane, John — triage and criteria application), auditor (Steve)\n\nOut of scope: post-declaration incident response activities (containment, eradication, recovery), which are assessed under RS.AN and RS.MA.\n\n## Continuous Monitoring Indicators\n\n| Indicator | Source | Frequency | Threshold |\n|-----------|--------|-----------|-----------|\n| Time from alert to incident declaration | Incident tickets | Per incident | <15 min for auto-declared (High/Critical); <2 hours for manual declaration |\n| False positive rate | Ticketing system | Monthly | Track trend; increasing rate indicates criteria or suppression rule drift |\n| Missed incident rate | Post-incident reviews | Quarterly | 0 confirmed incidents that were not declared when criteria were met |\n| Suppression rule count | False positive registry | Monthly | Trend analysis; growing count without corresponding review may indicate drift |\n| Declaration criteria review cadence | Policy records | Annual minimum | Criteria reviewed and updated at least annually |\n\n## Test Procedures\n\n### Examine\n\n| # | Procedure | Expected Evidence |\n|---|-----------|-------------------|\n| E1 | Review incident response playbook incident criteria section | Playbook defining severity levels (SEV-1 through SEV-4) with specific thresholds for each; criteria address customer data exposure, service availability, credential compromise, and regulatory notification triggers |\n| E2 | Verify criteria are specific enough for consistent application | Criteria include objective indicators (e.g., \"confirmed lateral movement\" not \"suspicious activity\") that reduce reliance on individual analyst interpretation for common scenarios |\n| E3 | Review the false positive registry | Documented suppression rules for GuardDuty finding types, SentinelOne exclusions, and O365 ATP overrides; each rule has business justification, approval record, creation date, and last review date |\n| E4 | Confirm monthly SOC Manager review of false positive registry | Review records showing Gerry's monthly assessment of suppression rules; evidence that at least one rule was modified or removed based on review |\n| E5 | Verify quarterly re-validation of suppression rules | Quarterly review records confirming all active suppressions were assessed for continued validity; documentation of any rules that were removed because the underlying condition changed |\n| E6 | Review ServiceNow auto-declaration configuration for GuardDuty High-severity findings | ServiceNow workflow or Lambda configuration showing automatic incident ticket creation for qualifying GuardDuty findings with severity mapping |\n\n### Interview\n\n| # | Role | Key Questions |\n|---|------|---------------|\n| I1 | Gerry (SOC Manager) | \"Walk me through how you decide to declare an incident for a medium-severity event that's ambiguous — it could be a legitimate policy violation or it could be the early stage of an attack. What criteria do you apply?\" — Expected: References specific playbook criteria, describes how asset criticality and context influence the decision, acknowledges that borderline cases require judgment and explains the conservative approach taken |\n| I2 | SOC Analyst (Jane or John) | \"You receive a GuardDuty Medium finding for unusual API activity from an IAM role. It doesn't trigger auto-declaration. Walk me through your triage and declaration decision.\" — Expected: Describes applying playbook criteria to the finding characteristics, checking the false positive registry for known patterns, referencing asset context, and documenting the decision rationale in the ticket |\n| I3 | Gerry (SOC Manager) | \"How do you manage the false positive registry? When was the last time you removed or modified a suppression rule, and what prompted it?\" — Expected: Describes the monthly review process, names a specific rule change, and explains how the registry prevents both alert fatigue and missed detections |\n| I4 | Nadia Khan (D&R Lead) | \"Has there been a case where an event was initially classified as a false positive but later turned out to be a real incident? How did that inform your criteria or suppression rules?\" — Expected: Either describes a specific case with lessons learned, or explains the controls in place to prevent this scenario (quarterly re-validation, conservative suppression approach) |\n\n### Test\n\n| # | Procedure | Pass Criteria |\n|---|-----------|---------------|\n| T1 | Pull 8 recent security events (mix of auto-declared incidents, manually-declared incidents, and events not declared as incidents); trace the declaration decision for each | All auto-declared events met the severity threshold for automatic declaration; all manually-declared events have documented rationale referencing playbook criteria; all non-declared events have documented triage disposition explaining why criteria were not met |\n| T2 | From the 8 events, identify any that should have been declared as incidents but were not (missed declarations) | Zero missed declarations; if any are found, document the failure point (criteria gap, analyst error, false positive suppression) |\n| T3 | Review the false positive registry; select 3 active suppression rules and verify each has current business justification and was reviewed within the last quarter | All 3 rules have documented justification, approval, and a review date within the last 90 days; no rule suppresses High-severity finding types without explicit risk acceptance |\n| T4 | Measure time from initial alert to incident declaration for the 3 most recent declared incidents | Auto-declared incidents: tickets created within 15 minutes of finding generation; manually-declared incidents: declaration documented within 2 hours of initial triage; after-hours incidents: on-call analyst exercised declaration authority per playbook delegation |\n\n## Evidence Requirements\n\n- [ ] Incident response playbook with incident declaration criteria (SEV-1 through SEV-4 definitions)\n- [ ] False positive registry with suppression rules, justifications, and review dates\n- [ ] Monthly SOC Manager review records for the false positive registry (last 3 months)\n- [ ] Quarterly re-validation records for suppression rules (most recent)\n- [ ] ServiceNow auto-declaration workflow configuration for GuardDuty\n- [ ] 8 recent security event tickets showing declaration or non-declaration decisions with rationale\n- [ ] SOC on-call rotation and after-hours declaration authority documentation\n- [ ] Post-incident review records referencing criteria effectiveness (if available)\n\n## Pass/Fail Criteria\n\n**Pass:** Both implementation examples are demonstrably operational:\n- Incident criteria application (Ex1) is documented in the playbook with specific severity thresholds, consistently applied across auto-declared and manually-triaged events, and exercised by SOC analysts who can demonstrate criteria application during interview\n- False positive management (Ex2) includes a documented registry with business justifications, monthly SOC Manager review, quarterly re-validation, and no evidence of legitimate threats suppressed by active rules\n\n**Partial Pass:** Criteria exist and are applied for auto-declared events, but manual triage decisions show inconsistent criteria application (e.g., 2 of 8 events lack documented declaration rationale), OR false positive registry exists but review cadence is not consistently maintained.\n\n**Fail:** No documented incident criteria exist, OR declaration decisions are made ad-hoc without reference to criteria, OR the false positive registry has not been reviewed in >6 months, OR a missed declaration is identified with no corrective action.\n\n## Alma Security Context\n\nAlma's incident declaration process benefits from the automatic declaration path for GuardDuty High-severity findings — this removes human latency from the most critical events. The SOC Manager as declaration authority with on-call analyst delegation for after-hours events is appropriate for Alma's team size, though the business-hours SOC model means after-hours declaration for medium-severity events may be delayed until the next business day.\n\nThe primary gap identified in the Q1 2026 observation is the absence of compound event analysis criteria. Alma's current criteria evaluate individual events against severity thresholds but do not address scenarios where multiple low-severity findings collectively indicate a coordinated attack (e.g., reconnaissance from multiple IPs followed by credential stuffing attempts). For a company in the authentication sector, multi-stage attack detection is particularly relevant.\n\nThe false positive registry with monthly review and quarterly re-validation is a mature practice that demonstrates awareness of the tension between alert fatigue and missed detections. Maintaining this discipline as the detection environment grows (more GuardDuty finding types, more SentinelOne exclusions) will be important.\n\n## Related\n\n- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [SOC Ticket 1001 Phishing](../../5_Artifacts/Tickets/TKT-SOC-1001-phishing.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md)\n- **Controls:** [DE.AE-08_Ex1](../../2_Controls/DE/DE.AE-08_Ex1.md), [DE.AE-08_Ex2](../../2_Controls/DE/DE.AE-08_Ex2.md)\n- **Observations:** [DE.AE-08-Q1](../../4_Observations/DE/DE.AE-08-Q1.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.AE-08",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1014",
-      "FND-1015",
-      "FND-1016"
+      "FND-1017",
+      "FND-1018",
+      "FND-1019"
     ],
     "remediation": {
       "ownerId": null,
@@ -971,16 +1054,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.CM-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Verify network traffic monitoring coverage\n2. Evaluate network anomaly detection\n3. Test unauthorized endpoint detection\n4. Assess rogue wireless monitoring",
+    "testProcedures": "# DE.CM-01: Network Monitoring Test Procedures\n\n**CSF Subcategory:** DE.CM-01 — Networks and network services are monitored to find potentially adverse events\n\n**Scope:** Alma Security 2026 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Verify network traffic monitoring coverage**\n   - Confirm VPC Flow Logs are enabled for all VPCs and subnets across AWS accounts\n   - Verify DNS query logging is active for all Route 53 resolvers\n   - Assess network monitoring coverage for the Redwood City office network (wired and wireless)\n   - Identify any network segments without active monitoring\n\n2. **Evaluate network anomaly detection**\n   - Review GuardDuty network-based finding types and detection coverage\n   - Test VPC Flow Log analysis for volumetric anomalies and unexpected communication paths\n   - Verify network flow baseline existence and deviation alerting\n   - Assess detection capability for DNS tunneling, DGA domains, and C2 communication\n\n3. **Test unauthorized endpoint detection**\n   - Review 802.1X and WPA3-Enterprise authentication logs for unregistered device attempts\n   - Cross-reference SentinelOne endpoint inventory against IT asset register\n   - Verify VPC security group rules restrict access to authorized resources only\n   - Test detection of connections from unauthorized IP ranges\n\n4. **Assess rogue wireless monitoring**\n   - Verify wireless controller rogue AP detection is active\n   - Review quarterly wireless security assessment reports\n   - Confirm policy enforcement for personal hotspot prohibition\n\n---\n\n## Evidence Requests\n\n- [ ] VPC Flow Log configuration for all accounts\n- [ ] DNS query logging configuration\n- [ ] GuardDuty network finding type list and enabled detectors\n- [ ] 802.1X and RADIUS authentication logs (sample)\n- [ ] SentinelOne endpoint inventory vs. IT asset register reconciliation\n- [ ] Wireless controller rogue AP detection configuration\n- [ ] Quarterly wireless security assessment report\n\n---\n\n## Notes\n\nThis test procedure evaluates Alma's network monitoring capabilities across both AWS cloud infrastructure and the Redwood City office environment. VPC Flow Logs and GuardDuty provide strong cloud network monitoring, while office network monitoring relies on enterprise wireless controller capabilities and physical network access controls. No external attack surface monitoring (ASM) tool is currently deployed.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.CM-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1017",
-      "FND-1018",
-      "FND-1019"
+      "FND-1020",
+      "FND-1021",
+      "FND-1022"
     ],
     "remediation": {
       "ownerId": null,
@@ -1032,15 +1122,22 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.CM-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Verify physical access control monitoring\n2. Assess visitor management controls\n3. Evaluate tamper detection\n4. Review surveillance and alarm systems",
+    "testProcedures": "# DE.CM-02: Physical Environment Monitoring Test Procedures\n\n**CSF Subcategory:** DE.CM-02 — The physical environment is monitored to find potentially adverse events\n\n**Scope:** Alma Security 2026 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Verify physical access control monitoring**\n   - Review badge reader system configuration and log retention settings\n   - Verify alerting for failed badge attempts and after-hours access\n   - Confirm SOC inclusion of physical access anomalies in weekly log reviews\n   - Test cross-referencing of badge events with employee schedules\n\n2. **Assess visitor management controls**\n   - Review visitor management system for ID verification and escort requirements\n   - Verify visitor badge time-limitation and automatic deactivation\n   - Confirm weekly and monthly visitor log review cadence\n   - Test restricted zone access enforcement for visitor badges\n\n3. **Evaluate tamper detection**\n   - Verify tamper-detection sensors on server room and network closet access points\n   - Review monthly physical security walkthrough documentation\n   - Confirm reporting path from facilities team to security team for tamper anomalies\n   - Inspect physical security of network infrastructure (cable runs, patch panels)\n\n4. **Review surveillance and alarm systems**\n   - Verify security camera coverage of building entrances, parking, and server room access\n   - Confirm 90-day video retention on recording system\n   - Test 24/7 central station alarm monitoring functionality\n   - Review after-hours alarm response procedures with contracted security provider\n\n---\n\n## Evidence Requests\n\n- [ ] Badge reader system configuration and log sample\n- [ ] After-hours access alert configuration\n- [ ] Visitor management system policies and recent visitor logs\n- [ ] Monthly physical security walkthrough reports\n- [ ] Security camera coverage map and retention configuration\n- [ ] Alarm system central station monitoring contract\n- [ ] After-hours security response provider contract\n\n---\n\n## Notes\n\nThis test procedure evaluates physical security monitoring at Alma's Redwood City office. As a 300-person SaaS company with on-premises server infrastructure (Windows Domain Controller), physical security monitoring complements the digital detection capabilities assessed in DE.CM-01 and DE.CM-09.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.CM-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Incident Response Playbook (Excerpt)"
     ],
     "linkedFindings": [
-      "FND-1020",
-      "FND-1021",
-      "FND-1022"
+      "FND-1023",
+      "FND-1024",
+      "FND-1025"
     ],
     "remediation": {
       "ownerId": null,
@@ -1092,17 +1189,24 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.CM-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Assess user behavior analytics capabilities\n2. Verify logical access monitoring\n3. Evaluate technology usage monitoring\n4. Assess deception technology posture",
+    "testProcedures": "# DE.CM-03: Personnel Activity Monitoring Test Procedures\n\n**CSF Subcategory:** DE.CM-03 — Personnel activity and technology usage are monitored to find potentially adverse events\n\n**Scope:** Alma Security 2026 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Assess user behavior analytics capabilities**\n   - Review GuardDuty behavioral baseline capabilities for AWS API call patterns\n   - Evaluate O365 ATP user behavior analytics for email and collaboration activity\n   - Determine whether dedicated UBA tooling is deployed or planned\n   - Assess detection coverage for insider threat indicators\n\n2. **Verify logical access monitoring**\n   - Confirm CloudTrail captures all IAM authentication events including failures\n   - Verify Active Directory authentication log collection on the Windows Domain Controller\n   - Test detection of credential stuffing, brute force, and impossible travel scenarios\n   - Review monitoring for account lockout events and their investigation workflow\n\n3. **Evaluate technology usage monitoring**\n   - Review Slack workspace monitoring for malicious content and policy violations\n   - Assess SentinelOne endpoint monitoring for unauthorized software usage\n   - Verify monitoring of privileged account usage beyond normal job functions\n   - Confirm that monitoring respects employee privacy requirements and is documented in policy\n\n4. **Assess deception technology posture**\n   - Determine whether honeypots, honeytokens, or canary accounts are deployed\n   - If not deployed, document rationale and future plans\n   - Evaluate whether deception technology is in the roadmap following IR Enhancement project\n\n---\n\n## Evidence Requests\n\n- [ ] GuardDuty behavioral detection finding examples\n- [ ] O365 ATP user behavior analytics configuration\n- [ ] CloudTrail IAM authentication event samples\n- [ ] Active Directory authentication log samples\n- [ ] Slack monitoring configuration and policy\n- [ ] SentinelOne application control policy\n- [ ] Employee monitoring policy or acceptable use policy\n\n---\n\n## Notes\n\nThis test procedure evaluates Alma's monitoring of personnel activity and technology usage. The absence of dedicated UBA tooling means Alma relies on platform-native behavioral analytics from GuardDuty and O365 ATP. The SaaS continuous authentication context makes insider threat detection particularly relevant given the sensitivity of the authentication data Alma processes.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.CM-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1023",
-      "FND-1024",
-      "FND-1025",
-      "FND-1026"
+      "FND-1026",
+      "FND-1027",
+      "FND-1028",
+      "FND-1029"
     ],
     "remediation": {
       "ownerId": null,
@@ -1154,16 +1258,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.CM-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Verify vendor access monitoring\n2. Assess cloud service provider monitoring\n3. Evaluate vendor activity validation\n4. Review service provider SLA monitoring",
+    "testProcedures": "# DE.CM-06: External Service Provider Monitoring Test Procedures\n\n**CSF Subcategory:** DE.CM-06 — External service provider activities and services are monitored to find potentially adverse events\n\n**Scope:** Alma Security 2026 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Verify vendor access monitoring**\n   - Confirm CloudTrail logs all API activity from third-party vendor IAM roles\n   - Review GuardDuty monitoring for anomalous patterns from external principal ARNs\n   - Verify vendor access sessions use time-limited IAM role assumptions with session logging\n   - Review SOC weekly log review process for third-party access activity\n\n2. **Assess cloud service provider monitoring**\n   - Verify CloudTrail and GuardDuty monitoring for AWS service-level activity\n   - Confirm O365 ATP monitoring for Microsoft cloud service threats\n   - Review SaaS application admin console monitoring in weekly manual log reviews\n   - Identify third-party SaaS services without active security monitoring\n\n3. **Evaluate vendor activity validation**\n   - Pull sample of recent vendor access sessions from CloudTrail\n   - Cross-reference vendor activity against approved change tickets and maintenance windows\n   - Verify that unauthorized vendor actions would be detected and flagged\n   - Review vendor access termination process when engagements conclude\n\n4. **Review service provider SLA monitoring**\n   - Confirm monitoring of AWS service health dashboards for availability events\n   - Verify alerting for service provider security advisories and incidents\n   - Review contractual security monitoring obligations for key service providers\n\n---\n\n## Evidence Requests\n\n- [ ] CloudTrail logs showing vendor IAM role assumption events (sample)\n- [ ] GuardDuty findings related to external principal activity (if any)\n- [ ] Vendor access approval and change ticket cross-reference\n- [ ] List of third-party SaaS applications with monitoring status\n- [ ] Service provider security SLA documentation\n\n---\n\n## Notes\n\nThis test procedure evaluates monitoring of external service provider activities across Alma's environment. As an AWS-centric SaaS company, vendor access primarily occurs through IAM role assumption, providing CloudTrail-based audit trails. The gap in monitoring third-party SaaS admin consoles relies on manual weekly reviews until automation is implemented.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.CM-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1027",
-      "FND-1028",
-      "FND-1029"
+      "FND-1030",
+      "FND-1031",
+      "FND-1032"
     ],
     "remediation": {
       "ownerId": null,
@@ -1215,17 +1326,24 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "DE.CM-09 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Verify common attack vector monitoring\n2. Assess authentication attack detection\n3. Evaluate configuration drift monitoring\n4. Test endpoint health and integrity monitoring",
+    "testProcedures": "# DE.CM-09: Computing Environment Monitoring Test Procedures\n\n**CSF Subcategory:** DE.CM-09 — Computing hardware and software, runtime environments, and their data are monitored to find potentially adverse events\n\n**Scope:** Alma Security 2026 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Verify common attack vector monitoring**\n   - Confirm O365 ATP with Alma-specific rules monitors inbound/outbound email threats\n   - Verify SentinelOne monitors web downloads and file activity on endpoints\n   - Review Slack monitoring for malicious links and suspicious file uploads\n   - Test PagerDuty escalation path for critical detections outside business hours\n\n2. **Assess authentication attack detection**\n   - Verify CloudTrail monitoring of IAM authentication failures and MFA challenge failures\n   - Confirm Active Directory Kerberos and NTLM authentication anomaly detection\n   - Review GuardDuty findings for brute force and credential access from malicious IPs\n   - Test impossible travel detection capabilities\n\n3. **Evaluate configuration drift monitoring**\n   - Verify AWS Config monitors resource configurations against security baselines\n   - Confirm SentinelOne Application Control monitors unauthorized software installations\n   - Review SNS notification configuration for AWS Config compliance findings\n   - Pull sample of recent configuration drift detections and remediation actions\n\n4. **Test endpoint health and integrity monitoring**\n   - Verify SentinelOne real-time malware detection and behavioral analysis on managed endpoints\n   - Confirm SentinelOne anti-tamper protection prevents unauthorized agent modification\n   - Review vulnerability scan summary for missing critical patches\n   - Assess CloudTrail detection of unauthorized AMI, Lambda, and container image modifications\n\n---\n\n## Evidence Requests\n\n- [ ] O365 ATP configuration including Alma-specific custom threat rules\n- [ ] SentinelOne detection policy configuration\n- [ ] Slack monitoring configuration\n- [ ] AWS Config rules and compliance dashboard\n- [ ] SentinelOne Application Control policy and recent findings\n- [ ] Vulnerability scan summary report\n- [ ] SentinelOne endpoint health dashboard\n- [ ] CloudTrail events for infrastructure modification detection (sample)\n\n---\n\n## Notes\n\nThis test procedure evaluates monitoring of Alma's computing environment including endpoints, cloud infrastructure, email, and collaboration platforms. SentinelOne and O365 ATP provide the primary detection capabilities for endpoints and email respectively, while AWS Config and CloudTrail monitor cloud infrastructure integrity. The breadth of DE.CM-09 (5 implementation examples) reflects the comprehensive scope of computing environment monitoring required for a SaaS company handling continuous authentication data.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "DE.CM-09",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "SOC Incident Ticket",
       "Incident Response Playbook (Excerpt)"
     ],
     "linkedFindings": [
-      "FND-1030",
-      "FND-1031",
-      "FND-1032",
-      "FND-1033"
+      "FND-1033",
+      "FND-1034",
+      "FND-1035",
+      "FND-1036"
     ],
     "remediation": {
       "ownerId": null,
@@ -1277,13 +1395,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OC-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review mission alignment documentation\n2. Interview CISO on mission-risk linkage\n3. Examine strategic planning artifacts\n4. Cross-reference with non-security leadership",
+    "testProcedures": "# GV.OC-01: Organizational Mission Test Procedures\n\n**CSF Subcategory:** GV.OC-01 - The organizational mission is understood and informs cybersecurity risk management\n\n---\n\n## Test Procedures\n\n1. **Review mission alignment documentation**\n   - Request Alma Security's mission and vision statements\n   - Verify cybersecurity strategy references organizational mission\n   - Confirm security goals (G1-G8) trace back to business objectives\n\n2. **Interview CISO on mission-risk linkage**\n   - Ask how cybersecurity risk decisions connect to Alma's continuous authentication mission\n   - Verify awareness of business growth targets (10K customers, $36M ARR trajectory)\n   - Confirm security strategy explicitly supports product trust requirements\n\n3. **Examine strategic planning artifacts**\n   - Review most recent annual security strategy document\n   - Verify mission context is referenced in risk register preamble\n   - Check Board reporting materials for mission-risk connection\n\n4. **Cross-reference with non-security leadership**\n   - Interview VP Engineering or Product lead on mission-security alignment\n   - Confirm shared understanding of how security enables business objectives\n\n## Evidence Requests\n\n- [ ] Mission and vision statements\n- [ ] Cybersecurity strategy document referencing organizational mission\n- [ ] Board reporting materials showing mission-risk alignment\n- [ ] Security goals (G1-G8) documentation with business traceability\n\n## Notes\n\nAlma's position as a continuous authentication SaaS company creates a unique dynamic where the product mission and security mission are tightly coupled. Assessment should verify this linkage is formalized, not just assumed.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OC-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Data Classification Policy"
     ],
     "linkedFindings": [
-      "FND-1034"
+      "FND-1037"
     ],
     "remediation": {
       "ownerId": null,
@@ -1335,14 +1460,21 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OC-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review stakeholder identification documentation\n2. Validate customer-facing security expectations\n3. Interview Gerry (IT/Security Manager) on stakeholder engagement\n4. Review investor and Board expectations",
+    "testProcedures": "# GV.OC-02: Stakeholder Needs Test Procedures\n\n**CSF Subcategory:** GV.OC-02 - Internal and external stakeholders are understood, and their needs and expectations regarding cybersecurity risk management are determined\n\n---\n\n## Test Procedures\n\n1. **Review stakeholder identification documentation**\n   - Request stakeholder registry or equivalent mapping\n   - Verify internal stakeholders identified (engineering, product, sales, legal, HR)\n   - Verify external stakeholders identified (customers, regulators, partners, investors)\n   - Confirm cybersecurity expectations documented per stakeholder group\n\n2. **Validate customer-facing security expectations**\n   - Review customer security questionnaire responses and patterns\n   - Check enterprise customer contract security requirements\n   - Verify SOC 2 roadmap addresses documented customer expectations\n\n3. **Interview Gerry (IT/Security Manager) on stakeholder engagement**\n   - Ask how internal departments communicate security needs\n   - Verify process exists for collecting and prioritizing stakeholder requirements\n   - Confirm security team tracks regulatory expectations (SOC 2, privacy)\n\n4. **Review investor and Board expectations**\n   - Examine Board Audit and Risk Committee charter for security expectations\n   - Review investor due diligence security requirements from Series B\n\n## Evidence Requests\n\n- [ ] Stakeholder registry or mapping document\n- [ ] Customer security questionnaire response templates\n- [ ] SOC 2 scoping documentation showing stakeholder requirements\n- [ ] Board committee charter referencing cybersecurity expectations\n\n## Notes\n\nAs a Series B company with enterprise customers, Alma faces multi-directional stakeholder expectations. Assessment should verify these are systematically captured rather than addressed ad hoc.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OC-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
       "Quarterly Access Recertification Procedure"
     ],
     "linkedFindings": [
-      "FND-1035"
+      "FND-1038"
     ],
     "remediation": {
       "ownerId": null,
@@ -1394,13 +1526,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OC-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review regulatory obligations inventory\n2. Examine compliance tracking process\n3. Interview CISO on regulatory alignment\n4. Validate contractual obligation management",
+    "testProcedures": "# GV.OC-03: Legal and Regulatory Requirements Test Procedures\n\n**CSF Subcategory:** GV.OC-03 - Legal, regulatory, and contractual requirements regarding cybersecurity - including privacy and civil liberties obligations - are understood and managed\n\n---\n\n## Test Procedures\n\n1. **Review regulatory obligations inventory**\n   - Request documented list of applicable laws, regulations, and standards\n   - Verify coverage of SOC 2, California privacy laws (CCPA/CPRA), and any sector-specific requirements\n   - Confirm contractual security obligations from enterprise customers are tracked\n\n2. **Examine compliance tracking process**\n   - Review how regulatory changes are monitored and communicated\n   - Verify assigned ownership for each compliance domain\n   - Check that legal counsel reviews cybersecurity obligations periodically\n\n3. **Interview CISO on regulatory alignment**\n   - Ask how cybersecurity strategy aligns with legal requirements\n   - Verify awareness of privacy obligations given continuous authentication data handling\n   - Confirm contractual security clauses are reviewed before customer agreements are signed\n\n4. **Validate contractual obligation management**\n   - Sample 3-5 enterprise customer contracts for security clauses\n   - Verify security team has visibility into contractual commitments\n   - Check for SLA tracking related to security obligations\n\n## Evidence Requests\n\n- [ ] Regulatory obligations inventory or compliance matrix\n- [ ] Legal review records for cybersecurity requirements\n- [ ] Sample enterprise customer contracts with security clauses\n- [ ] CCPA/CPRA compliance documentation\n\n## Notes\n\nAlma handles biometric and authentication data, which carries heightened privacy obligations. Assessment must verify the organization tracks these obligations systematically given the sensitivity of continuous authentication data.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OC-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Data Classification Policy"
     ],
     "linkedFindings": [
-      "FND-1036"
+      "FND-1039"
     ],
     "remediation": {
       "ownerId": null,
@@ -1452,13 +1591,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OC-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review business impact analysis (BIA)\n2. Validate critical service identification\n3. Interview engineering leadership on resilience objectives\n4. Examine customer communication on service expectations",
+    "testProcedures": "# GV.OC-04: Critical Objectives and Services Test Procedures\n\n**CSF Subcategory:** GV.OC-04 - Critical objectives, capabilities, and services that external stakeholders depend on or expect from the organization are understood and communicated\n\n---\n\n## Test Procedures\n\n1. **Review business impact analysis (BIA)**\n   - Request current BIA or equivalent criticality assessment\n   - Verify continuous authentication platform identified as mission-critical service\n   - Confirm recovery time objectives (RTOs) and recovery point objectives (RPOs) documented\n   - Check that dependencies are mapped for critical services\n\n2. **Validate critical service identification**\n   - Verify customer-facing services are cataloged with criticality ratings\n   - Confirm API uptime and authentication service availability targets are defined\n   - Check SLA commitments against documented RTOs\n\n3. **Interview engineering leadership on resilience objectives**\n   - Ask how critical service requirements inform architecture decisions\n   - Verify awareness of customer-facing SLA obligations\n   - Confirm disaster recovery planning covers identified critical services\n\n4. **Examine customer communication on service expectations**\n   - Review customer-facing status page or trust center\n   - Verify incident communication protocols for critical service disruptions\n   - Check that service level commitments are documented and measurable\n\n## Evidence Requests\n\n- [ ] Business impact analysis or criticality assessment\n- [ ] RTO/RPO documentation for critical services\n- [ ] Customer-facing SLA documentation\n- [ ] Service catalog with criticality ratings\n\n## Notes\n\nAs a continuous authentication provider, Alma's platform availability is directly tied to customer security posture. Downtime in Alma's service could leave customer environments without authentication enforcement.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OC-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Authorized Software Inventory"
     ],
     "linkedFindings": [
-      "FND-1037"
+      "FND-1040"
     ],
     "remediation": {
       "ownerId": null,
@@ -1510,14 +1656,21 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OC-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review external dependency inventory\n2. Validate single points of failure analysis\n3. Interview Gerry on dependency management\n4. Examine contingency planning for key dependencies",
+    "testProcedures": "# GV.OC-05: External Dependencies Test Procedures\n\n**CSF Subcategory:** GV.OC-05 - Outcomes, capabilities, and services that the organization depends on are understood and communicated\n\n---\n\n## Test Procedures\n\n1. **Review external dependency inventory**\n   - Request documented inventory of external dependencies (cloud providers, SaaS tools, ISPs)\n   - Verify AWS as primary cloud provider is documented with dependency mapping\n   - Confirm critical third-party services identified (e.g., SentinelOne, ServiceNow, PagerDuty)\n\n2. **Validate single points of failure analysis**\n   - Review whether external dependencies have been assessed for single points of failure\n   - Verify redundancy or contingency plans exist for critical dependencies\n   - Check that dependency risks are reflected in the risk register\n\n3. **Interview Gerry on dependency management**\n   - Ask how new external dependencies are evaluated and approved\n   - Verify process exists for monitoring dependency health and availability\n   - Confirm awareness of supply chain risks from critical dependencies\n\n4. **Examine contingency planning for key dependencies**\n   - Review business continuity plans for critical external service failures\n   - Verify contractual protections (SLAs, escrow) with critical providers\n   - Check that dependency failure scenarios are included in tabletop exercises\n\n## Evidence Requests\n\n- [ ] External dependency inventory\n- [ ] Dependency risk assessment or single point of failure analysis\n- [ ] Business continuity plans addressing external service failures\n- [ ] Critical vendor SLA documentation\n\n## Notes\n\nAlma's reliance on AWS infrastructure for both hosting and security monitoring (CloudTrail, GuardDuty) and on SentinelOne for EDR/MDR creates concentrated dependency risk. Assessment should verify these dependencies are formally tracked beyond the vendor risk program.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OC-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "Third Party Risk Management Policy",
       "Alma Security Hardware Inventory"
     ],
     "linkedFindings": [
-      "FND-1038"
+      "FND-1041"
     ],
     "remediation": {
       "ownerId": null,
@@ -1569,13 +1722,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OV-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review audit findings integration\n2. Examine personnel performance oversight\n3. Validate incident-driven strategy review\n4. Interview CISO on strategy coverage assessment",
+    "testProcedures": "# GV.OV-02: Strategy Coverage Review Test Procedures\n\n**CSF Subcategory:** GV.OV-02 - The cybersecurity risk management strategy is reviewed and adjusted to ensure coverage of organizational requirements and risks\n\n---\n\n## Test Procedures\n\n1. **Review audit findings integration**\n   - Request recent audit findings (internal or SOC 2 readiness)\n   - Verify findings are mapped to cybersecurity strategy adjustments\n   - Confirm compliance gaps are addressed in strategy updates\n\n2. **Examine personnel performance oversight**\n   - Review performance evaluations for cybersecurity-related roles\n   - Verify security responsibilities are included in role descriptions\n   - Confirm Nadia Khan (D&R Lead) and Chris Magann (VM Lead) have defined security performance metrics\n\n3. **Validate incident-driven strategy review**\n   - Request evidence of strategy reviews triggered by security incidents\n   - Verify post-incident lessons learned feed into strategy updates\n   - Check that incident trends are analyzed for strategic implications\n\n4. **Interview CISO on strategy coverage assessment**\n   - Ask how completeness of the cybersecurity strategy is evaluated\n   - Verify regular gap assessments against CSF 2.0 or other frameworks\n   - Confirm strategy review cadence (at minimum annually and after significant events)\n\n## Evidence Requests\n\n- [ ] Audit findings with strategy adjustment mapping\n- [ ] Personnel performance evaluations for security roles\n- [ ] Post-incident strategy review documentation\n- [ ] Strategy gap assessment against CSF 2.0\n\n## Notes\n\nStrategy coverage should be assessed holistically. Alma's progression toward SOC 2 Type II provides a natural forcing function for strategy review, but assessment should verify this extends beyond compliance-driven adjustments.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OV-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1039"
+      "FND-1042"
     ],
     "remediation": {
       "ownerId": null,
@@ -1627,13 +1787,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.OV-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review KPI measurement and reporting\n2. Examine KRI (Key Risk Indicator) tracking\n3. Validate senior leadership communication\n4. Assess adjustment process based on performance data",
+    "testProcedures": "# GV.OV-03: Risk Management Performance Test Procedures\n\n**CSF Subcategory:** GV.OV-03 - Organizational cybersecurity risk management performance is evaluated and reviewed for adjustments needed\n\n---\n\n## Test Procedures\n\n1. **Review KPI measurement and reporting**\n   - Request documented KPIs and their measurement methodology\n   - Verify TTD (7hrs), TTI (11hrs), TTR-CJC (6 days), TTR-C (9 days) are formally tracked\n   - Confirm KPI targets are defined and performance against targets is measured\n   - Check reporting frequency and distribution\n\n2. **Examine KRI (Key Risk Indicator) tracking**\n   - Request documented KRIs and risk trend analysis\n   - Verify KRIs are linked to the five documented risks (R1-R5)\n   - Confirm thresholds are defined that trigger escalation or response\n\n3. **Validate senior leadership communication**\n   - Review how cybersecurity metrics are communicated to CEO and Board\n   - Verify quarterly Board reporting includes performance trends\n   - Confirm metrics drive resource and priority decisions at leadership level\n\n4. **Assess adjustment process based on performance data**\n   - Request examples of adjustments made based on KPI/KRI review\n   - Verify feedback loop exists between performance measurement and operational changes\n   - Check that underperforming areas receive documented remediation plans\n\n## Evidence Requests\n\n- [ ] KPI documentation with targets and actuals\n- [ ] KRI documentation with thresholds\n- [ ] Board reporting materials with cybersecurity metrics\n- [ ] Evidence of performance-driven adjustments (meeting minutes, action items)\n\n## Notes\n\nAlma tracks strong operational KPIs. Assessment should verify that performance measurement extends beyond detection and response metrics to cover governance, risk management, and supply chain domains as well.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.OV-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Q4 2025 Access Recertification Report"
     ],
     "linkedFindings": [
-      "FND-1040"
+      "FND-1043"
     ],
     "remediation": {
       "ownerId": null,
@@ -1685,12 +1852,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.PO-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review information security policy framework\n2. Validate policy alignment with strategy\n3. Examine policy communication and acknowledgment\n4. Interview non-security personnel on policy awareness",
+    "testProcedures": "# GV.PO-01: Cybersecurity Policy Test Procedures\n\n**CSF Subcategory:** GV.PO-01 - Policy for managing cybersecurity risks is established based on organizational context, cybersecurity strategy, and priorities\n\n---\n\n## Test Procedures\n\n1. **Review information security policy framework**\n   - Request master information security policy and supporting policies\n   - Verify policies cover access management, data classification, incident response, third-party risk\n   - Confirm policies include scope, roles, enforcement mechanisms, and review dates\n   - Check for senior management approval signatures\n\n2. **Validate policy alignment with strategy**\n   - Cross-reference policy statements with cybersecurity strategy objectives (G1-G8)\n   - Verify policies reflect current risk appetite and tolerance statements\n   - Confirm policies address the five documented risks (R1-R5) where applicable\n\n3. **Examine policy communication and acknowledgment**\n   - Request evidence of policy dissemination to all employees\n   - Verify acknowledgment tracking (new hire and annual re-acknowledgment)\n   - Check that policies are accessible (intranet, shared drive, or policy management tool)\n\n4. **Interview non-security personnel on policy awareness**\n   - Ask 2-3 employees outside security team about key policy requirements\n   - Verify they can identify where to find policies\n   - Confirm understanding of their responsibilities under the policies\n\n## Evidence Requests\n\n- [ ] Information security policy and sub-policies\n- [ ] Policy approval records (signatures, dates)\n- [ ] Employee acknowledgment tracking records\n- [ ] Policy distribution or accessibility evidence\n\n## Notes\n\nAlma has policies in place but review cycles have been inconsistent. Assessment should pay particular attention to whether policies have current review dates and whether the review cadence is formalized.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.PO-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1041"
+      "FND-1044"
     ],
     "remediation": {
       "ownerId": null,
@@ -1742,12 +1916,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.PO-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review policy revision history\n2. Validate change-driven policy updates\n3. Examine policy enforcement mechanisms\n4. Interview CISO on policy lifecycle management",
+    "testProcedures": "# GV.PO-02: Policy Review and Update Test Procedures\n\n**CSF Subcategory:** GV.PO-02 - Policy for managing cybersecurity risks is reviewed, updated, communicated, and enforced to reflect changes in requirements, threats, technology, and organizational mission\n\n---\n\n## Test Procedures\n\n1. **Review policy revision history**\n   - Request revision history for all cybersecurity policies\n   - Verify policies have been reviewed within the documented review cycle\n   - Identify any policies that are overdue for review\n   - Check that revision triggers include regulatory changes, incidents, and technology shifts\n\n2. **Validate change-driven policy updates**\n   - Request examples of policy updates triggered by environmental changes\n   - Verify that SOC 2 readiness findings drove policy improvements\n   - Check whether threat landscape changes (e.g., AI-driven attacks) prompted policy updates\n\n3. **Examine policy enforcement mechanisms**\n   - Review how policy compliance is monitored and enforced\n   - Verify consequences for non-compliance are documented\n   - Check for automated enforcement where applicable (e.g., access controls enforcing access policy)\n\n4. **Interview CISO on policy lifecycle management**\n   - Ask about the policy review and approval workflow\n   - Verify ownership is assigned for each policy\n   - Confirm timeline exists for addressing identified policy gaps\n\n## Evidence Requests\n\n- [ ] Policy revision history and change logs\n- [ ] Examples of change-triggered policy updates\n- [ ] Policy compliance monitoring evidence\n- [ ] Policy ownership and review schedule\n\n## Notes\n\nGV.PO-02 specifically tests whether policies are living documents. Alma's inconsistent review cycles are a known gap. Assessment should document which policies are current and which are overdue.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.PO-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1042"
+      "FND-1045"
     ],
     "remediation": {
       "ownerId": null,
@@ -1799,12 +1980,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "Alma Security updates cybersecurity risk management objectives annually during Q4 strategic planning, with the CISO presenting proposed objectives to the CEO and Board. Near-term objectives align with the SOC 2 Type II roadmap and quarterly KPI targets (TTD, TTI, TTR). Long-term objectives map to the 3-year security strategy. Major business changes (funding rounds, acquisitions) trigger off-cycle objective reviews.",
+    "testProcedures": "# GV.RM — Risk Management Strategy: Test Procedures\n## Alma Security Case Study — Issue #30\n\n**CSF 2.0 Category:** GV.RM (GOVERN: Risk Management Strategy)  \n**Subcategories covered:** GV.RM-01, GV.RM-02, GV.RM-03  \n**Assessment period:** Q1–Q2 2026  \n**Methodology:** Inquiry, inspection, and observation consistent with NIST SP 800-53A and CSF 2.0 guidance.\n\n---\n\n## GV.RM-01 — Risk management objectives are established and agreed to by organizational stakeholders\n\n**What we are testing:** Whether Alma Security has formally documented cybersecurity risk\nmanagement objectives, whether those objectives are understood by key stakeholders (not just\nthe security team), and whether they are connected to business strategy.\n\n---\n\n**Test Procedure 1.1 — Document review: Risk register**\n\n- Request the current risk register. Confirm it is dated within the last 90 days.\n- Verify each entry includes: risk description, likelihood rating, impact rating, risk owner\n  (by name and role), treatment plan, and target resolution date.\n- Check that at least Alma's five documented risks (R-01 through R-05) are present and\n  reflect current status (e.g., R-03 TTD improvement should be noted).\n- Flag any risks rated High/High with no treatment plan or no assigned owner.\n\n---\n\n**Test Procedure 1.2 — Interview: CISO**\n\n- Ask: *\"How were the cybersecurity risk management objectives established? Who had input?\"*\n- Expected: CISO can describe a process involving input from engineering leads, legal, and\n  executive team. Objectives should reference Alma's growth targets (10K customers, 20% market share).\n- Ask: *\"When were these objectives last reviewed, and what prompted any changes?\"*\n- Expected: Answer references a specific event or calendar cycle (e.g., \"we updated after the\n  SOC 2 scoping exercise in Q4 2025\").\n\n---\n\n**Test Procedure 1.3 — Interview: non-security stakeholder (e.g., VP Engineering or CFO)**\n\n- Ask: *\"Are you aware of Alma's cybersecurity risk management objectives? Can you describe them?\"*\n- Pass: Stakeholder can accurately describe at least 2 of the 5 major risks and their\n  connection to business outcomes without being prompted.\n- Fail: Stakeholder is unaware of the risk register or believes \"security handles that.\"\n\n---\n\n**Test Procedure 1.4 — Board/committee reporting review**\n\n- Request the most recent Board Audit and Risk Committee meeting minutes or materials.\n- Confirm cybersecurity risk was on the agenda and that the risk register (or a summary) was\n  presented.\n- Check whether the Board acknowledged or formally approved the risk objectives.\n\n---\n\n## GV.RM-02 — Risk strategy is established, agreed to, and managed\n\n**What we are testing:** Whether Alma has a documented, reviewed risk management strategy (not\njust a risk register) that describes *how* risk decisions are made — including risk identification\nmethodology, assessment cadence, treatment options, and governance process.\n\n---\n\n**Test Procedure 2.1 — Document review: Risk Management Strategy document**\n\n- Request the risk management strategy or policy document.\n- Confirm it includes: scope, risk identification process, assessment methodology (qualitative\n  or quantitative), treatment options (accept, avoid, mitigate, transfer), escalation path,\n  and review cadence.\n- Check whether it references NIST CSF 2.0, or another recognized framework, as its basis.\n- Verify the document has a revision date, document owner, and approval signature.\n\n---\n\n**Test Procedure 2.2 — Inspection: Risk treatment evidence**\n\nFor each of the five risks in the register, request evidence that the stated treatment is\nbeing executed:\n\n- R-01 (Understaffing): Job requisitions or offer letters for security roles. SentinelOne\n  MDR SOW as compensating control documentation.\n- R-02 (Asset inventory): AWS Config dashboard screenshot showing resource coverage. Export\n  from asset management tool (e.g., Orca Security, or AWS Systems Manager Inventory).\n- R-03 (Slow TTD): AWS-native monitoring dashboard (CloudTrail/GuardDuty) showing TTD trend\n  data (Oct 2024 baseline vs. Mar 2026 current state). GuardDuty findings summary.\n- R-04 (Customer trust): Customer-facing SOC 2 roadmap document or trust center page.\n  Evidence of customer communication sent post-incident.\n- R-05 (Vendor risk): Vendor questionnaire tracker or spreadsheet showing Tier 1 coverage\n  percentage (target: 60%+ assessed as of Q1 2026).\n\n---\n\n**Test Procedure 2.3 — Interview: CISO or Risk Lead**\n\n- Ask: *\"Walk me through how a new risk gets added to the register. Who can identify risks?\n  What is the assessment process?\"*\n- Expected: A defined process — not just \"CISO decides.\" At minimum, there should be a way for\n  engineering leads, legal, or product to surface risks, with the CISO validating and rating.\n- Ask: *\"How do you decide between accepting and mitigating a risk?\"*\n- Expected: Reference to risk tolerance thresholds (e.g., \"we accept risks below a certain\n  likelihood/impact combination\") connected to the risk appetite statement.\n\n---\n\n**Test Procedure 2.4 — Verify strategy communication**\n\n- Ask three employees outside the security team (e.g., a software engineer, an account executive,\n  and a customer success manager): *\"Do you know who to contact if you identify a potential\n  security risk?\"*\n- Pass: All three can name the CISO, security team email alias, or a documented reporting channel.\n- Partial pass: 2 of 3 can answer.\n- Fail: No consistent awareness of how to surface risks to the security team.\n\n---\n\n## GV.RM-03 — Risk appetite and tolerance statements are defined and communicated\n\n**What we are testing:** Whether Alma has explicitly stated what risks it is willing to accept\n(appetite) versus the maximum level of risk it can operate within before action is required\n(tolerance), and whether this is known beyond the security team.\n\n---\n\n**Test Procedure 3.1 — Document review: Risk Appetite/Tolerance Statement**\n\n- Request the risk appetite statement or policy section that defines tolerance thresholds.\n- Confirm it distinguishes between risk appetite (what Alma *wants* to take on) and risk\n  tolerance (the boundary beyond which action is mandatory).\n- Check whether thresholds are defined in terms that connect to the business — e.g., \"Alma will\n  not accept any risk that could result in customer data exfiltration, regardless of likelihood\"\n  or \"Risks with likelihood >Medium AND impact >High must have treatment plans within 30 days.\"\n- Verify the statement is approved by at least the CISO and CEO. Board ratification is the\n  target state; note if it is still pending.\n\n---\n\n**Test Procedure 3.2 — Validate alignment between risk appetite and risk register ratings**\n\n- Cross-reference the risk register against the tolerance statement.\n- For each High/High risk (R-01 and R-03 as of Q1 2026): verify an active treatment plan\n  exists and has a target date. If the tolerance statement says High/High risks require treatment\n  within 30 days, verify the register shows treatment was initiated within that window.\n- Flag any High/High risk with no active treatment as a direct gap against GV.RM-03.\n\n---\n\n**Test Procedure 3.3 — Interview: CFO or CEO**\n\n- Ask: *\"How does Alma decide how much cybersecurity risk is acceptable? Has that been documented\n  and communicated to you?\"*\n- Pass: Executive can describe the risk appetite concept and confirms they reviewed or approved\n  the statement.\n- Gap indicator: Executive says \"that's a security team decision\" — shows risk appetite has not\n  been elevated to organizational leadership as GV.RM-03 requires.\n\n---\n\n**Test Procedure 3.4 — Verify tolerance drives prioritization decisions**\n\n- Review the last 90 days of risk register updates. Look for at least one example where a risk\n  exceeded the stated tolerance threshold and triggered a formal treatment response.\n- If Alma's tolerance statement was drafted but no decisions have yet been visibly driven by it,\n  note this as a maturity gap: the statement exists but is not yet operationalized.\n\n---\n\n## References\n\n- NIST Cybersecurity Framework 2.0: GV.RM — https://www.nist.gov/cyberframework\n- NIST SP 800-53A: Assessing Security and Privacy Controls\n- NIST SP 800-30 Rev 1: Guide for Conducting Risk Assessments\n- Alma Security Case Study Materials: ../../1_Case_Study/",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1043"
+      "FND-1046"
     ],
     "remediation": {
       "ownerId": null,
@@ -1815,7 +2003,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       "Q1": {
         "actualScore": 6,
         "targetScore": 7,
-        "observations": "### Strengths - Risk management objectives established annually during Q4 strategic planning - Measurable KPI targets defined (TTD, TTI, TTR) and agreed upon by CISO and CEO - Senior leaders formally agree on objectives documented in Board meeting minutes ### Gaps - Objectives not updated after Series C funding discussion that shifted business priorities - Department-level awareness of risk management objectives limited below VP level",
+        "observations": "### Strengths - Risk management objectives established annually during Q4 strategic planning - Measurable KPI targets defined (TTD, TTI, TTR) and agreed upon by CISO and CEO - Senior leaders formally agree on objectives documented in Board meeting minutes ### Gaps - Objectives not updated after the ongoing Series C funding discussions (Series C is not yet raised) shifted business priorities - Department-level awareness of risk management objectives limited below VP level",
         "observationDate": "2026-03-08",
         "testingStatus": "Complete",
         "examine": true,
@@ -1856,12 +2044,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review risk appetite statement\n2. Validate risk tolerance communication\n3. Examine tolerance-driven decisions\n4. Interview CEO or CFO on risk appetite governance",
+    "testProcedures": "# GV.RM-02: Risk Appetite and Tolerance Test Procedures\n\n**CSF Subcategory:** GV.RM-02 - Risk appetite and risk tolerance statements are established, communicated, and maintained\n\n---\n\n## Test Procedures\n\n1. **Review risk appetite statement**\n   - Request the documented risk appetite statement\n   - Verify it distinguishes between risk appetite and risk tolerance\n   - Confirm thresholds are expressed in measurable, business-relevant terms\n   - Check approval by CISO, CEO, and CFO (Board ratification status)\n\n2. **Validate risk tolerance communication**\n   - Verify risk appetite is communicated to department heads\n   - Check whether risk tolerance thresholds are embedded in operational procedures\n   - Confirm non-security leadership can articulate organizational risk appetite\n\n3. **Examine tolerance-driven decisions**\n   - Request examples where risk tolerance thresholds triggered treatment decisions\n   - Cross-reference High/High risks (R-01, R-03) against tolerance thresholds\n   - Verify escalation procedures activate when tolerance is exceeded\n\n4. **Interview CEO or CFO on risk appetite governance**\n   - Ask how risk appetite was determined and who was involved\n   - Verify executive awareness and agreement with stated tolerance levels\n   - Confirm periodic review process for appetite refinement\n\n## Evidence Requests\n\n- [ ] Risk appetite and tolerance statement\n- [ ] Evidence of communication to leadership\n- [ ] Examples of tolerance-driven treatment decisions\n- [ ] Approval records (CISO, CEO, CFO, Board)\n\n## Notes\n\nAlma has a drafted risk appetite statement reviewed by CISO, CEO, and CFO, but Board ratification is pending. Assessment should document the current approval status and any evidence that tolerance thresholds are actively driving decisions.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1044"
+      "FND-1047"
     ],
     "remediation": {
       "ownerId": null,
@@ -1913,10 +2108,17 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review enterprise risk management framework\n2. Validate cybersecurity risk escalation to ERM\n3. Examine cross-functional risk governance\n4. Interview CISO on ERM integration",
+    "testProcedures": "# GV.RM-03: Enterprise Risk Integration Test Procedures\n\n**CSF Subcategory:** GV.RM-03 - Cybersecurity risk management activities and outcomes are included in enterprise risk management processes\n\n---\n\n## Test Procedures\n\n1. **Review enterprise risk management framework**\n   - Request enterprise risk management (ERM) documentation\n   - Verify cybersecurity risks are included alongside financial, operational, and compliance risks\n   - Confirm common risk taxonomy and rating methodology across domains\n\n2. **Validate cybersecurity risk escalation to ERM**\n   - Review risk register for evidence of cybersecurity risks in enterprise context\n   - Verify escalation criteria are defined for elevating cybersecurity risks\n   - Check that the five documented risks (R1-R5) appear in enterprise risk reporting\n\n3. **Examine cross-functional risk governance**\n   - Verify cybersecurity risk managers participate in enterprise risk discussions\n   - Check for integrated risk committee or cross-functional risk review meetings\n   - Confirm CISO reports to CEO with enterprise risk context\n\n4. **Interview CISO on ERM integration**\n   - Ask how cybersecurity risks are aggregated with other enterprise risks\n   - Verify process for ensuring cybersecurity risks are not siloed\n   - Confirm regular touchpoints between security team and enterprise risk function\n\n## Evidence Requests\n\n- [ ] Enterprise risk management framework or policy\n- [ ] Enterprise risk register showing cybersecurity risks\n- [ ] Cross-functional risk committee meeting minutes\n- [ ] Risk escalation criteria documentation\n\n## Notes\n\nThe CISO reports directly to the CEO, which supports strong ERM integration. Assessment should verify this reporting line translates into practical integration of cybersecurity risks into enterprise-level decision-making.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [],
     "linkedFindings": [
-      "FND-1045"
+      "FND-1048"
     ],
     "remediation": {
       "ownerId": null,
@@ -1968,13 +2170,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review risk response framework\n2. Validate response option implementation\n3. Examine shared responsibility documentation\n4. Interview CISO on risk response decision-making",
+    "testProcedures": "# GV.RM-04: Risk Response Options Test Procedures\n\n**CSF Subcategory:** GV.RM-04 - Strategic direction that describes appropriate risk response options is established and communicated\n\n---\n\n## Test Procedures\n\n1. **Review risk response framework**\n   - Request documentation of approved risk response options (accept, avoid, mitigate, transfer)\n   - Verify criteria for selecting each response option are defined\n   - Confirm response options are aligned with risk appetite and tolerance statements\n\n2. **Validate response option implementation**\n   - For each of the five documented risks, verify the chosen response option is documented\n   - Check that R-01 (understaffing) uses both mitigation (hiring) and transfer (SentinelOne MDR)\n   - Verify cybersecurity insurance status and coverage decisions\n\n3. **Examine shared responsibility documentation**\n   - Review conditions under which shared responsibility models are acceptable\n   - Verify cloud shared responsibility (AWS) is documented and understood\n   - Check that outsourced security functions have clear responsibility delineation\n\n4. **Interview CISO on risk response decision-making**\n   - Ask how risk response options are selected for new risks\n   - Verify decision authority levels for different risk magnitudes\n   - Confirm communication of risk response decisions to affected stakeholders\n\n## Evidence Requests\n\n- [ ] Risk response framework or strategy document\n- [ ] Risk register showing response options per risk\n- [ ] Cybersecurity insurance policy or decision documentation\n- [ ] Shared responsibility model documentation\n\n## Notes\n\nAlma demonstrates practical risk response diversification (R-01 uses both mitigation and transfer). Assessment should verify this approach is formalized as a framework rather than being ad hoc per risk.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Data Classification Policy"
     ],
     "linkedFindings": [
-      "FND-1046"
+      "FND-1049"
     ],
     "remediation": {
       "ownerId": null,
@@ -2026,12 +2235,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review communication structure documentation\n2. Validate upward reporting mechanisms\n3. Examine cross-functional communication\n4. Interview non-security department heads on risk communication",
+    "testProcedures": "# GV.RM-05: Risk Communication Lines Test Procedures\n\n**CSF Subcategory:** GV.RM-05 - Lines of communication across the organization are established for cybersecurity risks, including risks from suppliers and other third parties\n\n---\n\n## Test Procedures\n\n1. **Review communication structure documentation**\n   - Request org chart and communication flow for cybersecurity risk reporting\n   - Verify reporting lines from security team to CISO to CEO to Board\n   - Confirm cross-departmental communication channels are defined\n\n2. **Validate upward reporting mechanisms**\n   - Review quarterly Board reporting process and materials\n   - Verify CISO has direct access to CEO for urgent risk communication\n   - Check that cybersecurity risk escalation bypasses are defined for critical issues\n\n3. **Examine cross-functional communication**\n   - Verify engineering, product, legal, and HR have defined touchpoints with security\n   - Check for regular cross-functional security meetings or briefings\n   - Confirm third-party/supply chain risks are communicated to relevant business owners\n\n4. **Interview non-security department heads on risk communication**\n   - Ask 2-3 department leaders how they receive cybersecurity risk information\n   - Verify awareness of how to escalate potential security risks\n   - Confirm bidirectional communication (not just top-down from security)\n\n## Evidence Requests\n\n- [ ] Organizational communication structure for cybersecurity risk\n- [ ] Board reporting cadence and materials\n- [ ] Cross-functional meeting schedules and minutes\n- [ ] Risk escalation procedures\n\n## Notes\n\nCISO reports directly to CEO, which enables strong upward communication. Assessment should verify that lateral communication across departments is equally well-established.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1047"
+      "FND-1050"
     ],
     "remediation": {
       "ownerId": null,
@@ -2083,12 +2299,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review risk assessment methodology\n2. Validate risk register consistency\n3. Examine risk documentation templates\n4. Interview risk management personnel on methodology application",
+    "testProcedures": "# GV.RM-06: Risk Calculation Methodology Test Procedures\n\n**CSF Subcategory:** GV.RM-06 - A standardized method for calculating, documenting, categorizing, and prioritizing cybersecurity risks is established and used\n\n---\n\n## Test Procedures\n\n1. **Review risk assessment methodology**\n   - Request documented risk assessment methodology (qualitative, quantitative, or hybrid)\n   - Verify consistent rating scales for likelihood and impact\n   - Confirm risk categorization taxonomy is defined\n   - Check for risk prioritization criteria at enterprise level\n\n2. **Validate risk register consistency**\n   - Sample 5+ risks from the register and verify consistent application of methodology\n   - Check that likelihood and impact ratings use the documented scale\n   - Verify risk scores are calculated consistently across all entries\n\n3. **Examine risk documentation templates**\n   - Request risk register template or ServiceNow risk module configuration\n   - Verify template captures: description, likelihood, impact, owner, treatment, timeline\n   - Check that risk categories support aggregation and cross-domain comparison\n\n4. **Interview risk management personnel on methodology application**\n   - Ask how new risks are rated using the established methodology\n   - Verify training on risk assessment methodology for security team members\n   - Confirm methodology is applied consistently regardless of who identifies the risk\n\n## Evidence Requests\n\n- [ ] Risk assessment methodology document\n- [ ] Risk register with consistent rating application\n- [ ] Risk documentation template or ServiceNow configuration\n- [ ] Risk categorization taxonomy\n\n## Notes\n\nConsistency in risk calculation enables meaningful trending and prioritization. Assessment should verify the methodology produces comparable results across different risk domains and assessors.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1048"
+      "FND-1051"
     ],
     "remediation": {
       "ownerId": null,
@@ -2140,12 +2363,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RM-07 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review positive risk documentation\n2. Validate opportunity-risk integration\n3. Examine innovation-security balance\n4. Interview CISO on positive risk management",
+    "testProcedures": "# GV.RM-07: Strategic Opportunities Test Procedures\n\n**CSF Subcategory:** GV.RM-07 - Strategic opportunities (i.e., positive risks) are characterized and are included in organizational cybersecurity risk discussions and strategies\n\n---\n\n## Test Procedures\n\n1. **Review positive risk documentation**\n   - Request evidence that strategic opportunities are documented alongside threats\n   - Verify the risk register or equivalent includes positive risk entries\n   - Check for stretch goals related to security capabilities\n\n2. **Validate opportunity-risk integration**\n   - Review whether security investments are framed as business enablers\n   - Verify SOC 2 certification is documented as a positive risk (competitive advantage)\n   - Check that security capabilities are positioned as sales enablement tools\n\n3. **Examine innovation-security balance**\n   - Review how security strategy balances risk mitigation with enabling innovation\n   - Verify the approach avoids security-as-blocker mentality\n   - Check for documented examples of security enabling new business capabilities\n\n4. **Interview CISO on positive risk management**\n   - Ask how strategic opportunities are identified and prioritized\n   - Verify positive risks receive similar governance as threats\n   - Confirm leadership reviews include both threats and opportunities\n\n## Evidence Requests\n\n- [ ] Risk register entries for positive risks or opportunities\n- [ ] Documentation of security as business enabler\n- [ ] Strategic planning materials showing opportunity-risk balance\n- [ ] SOC 2 business case documentation\n\n## Notes\n\nAlma's position as a security company creates natural positive risk opportunities. Their SOC 2 roadmap and trust-building initiatives serve dual purposes as risk mitigation and competitive differentiation.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RM-07",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1049"
+      "FND-1052"
     ],
     "remediation": {
       "ownerId": null,
@@ -2197,12 +2427,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RR-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review leadership accountability documentation\n2. Examine security culture initiatives\n3. Validate ethical security practices\n4. Interview CEO or Board member on cybersecurity governance",
+    "testProcedures": "# GV.RR-01: Leadership Accountability Test Procedures\n\n**CSF Subcategory:** GV.RR-01 - Organizational leadership is responsible and accountable for cybersecurity risk and fosters a culture that is risk-aware, ethical, and continually improving\n\n---\n\n## Test Procedures\n\n1. **Review leadership accountability documentation**\n   - Request Board charter and committee assignments for cybersecurity oversight\n   - Verify CISO role and reporting line (CISO reports to CEO)\n   - Confirm leadership roles and responsibilities for cybersecurity risk are documented\n   - Check for documented authority and coordination mechanisms\n\n2. **Examine security culture initiatives**\n   - Review security awareness training program and participation rates\n   - Verify leadership communications that promote security culture\n   - Check for recognition programs or incentives related to security behavior\n\n3. **Validate ethical security practices**\n   - Review code of conduct or ethics policy for cybersecurity provisions\n   - Verify vulnerability disclosure and reporting channels are established\n   - Confirm leadership models expected security behaviors\n\n4. **Interview CEO or Board member on cybersecurity governance**\n   - Ask about Board's role in cybersecurity risk oversight\n   - Verify quarterly reporting cadence is maintained\n   - Confirm leadership investment in continual security improvement\n\n## Evidence Requests\n\n- [ ] Board charter with cybersecurity oversight provisions\n- [ ] CISO role description and reporting structure\n- [ ] Security awareness training records and completion rates\n- [ ] Leadership communications on security culture\n\n## Notes\n\nCISO reporting directly to CEO is a strong governance indicator. Assessment should verify this structure translates into genuine accountability rather than just organizational chart placement.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RR-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1050"
+      "FND-1053"
     ],
     "remediation": {
       "ownerId": null,
@@ -2254,12 +2491,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RR-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review documented roles and responsibilities\n2. Validate job descriptions include security responsibilities\n3. Examine responsibility communication\n4. Interview team leads on role clarity",
+    "testProcedures": "# GV.RR-02: Roles and Responsibilities Test Procedures\n\n**CSF Subcategory:** GV.RR-02 - Roles, responsibilities, and authorities related to cybersecurity risk management are established, communicated, understood, and enforced\n\n---\n\n## Test Procedures\n\n1. **Review documented roles and responsibilities**\n   - Request cybersecurity RACI matrix or equivalent responsibility assignment\n   - Verify roles documented in policy for key positions (CISO, Gerry, Nadia Khan, Chris Magann, Tigan Wang)\n   - Confirm authorities are defined for risk acceptance, incident declaration, and escalation\n\n2. **Validate job descriptions include security responsibilities**\n   - Sample 3-5 job descriptions for security and non-security roles\n   - Verify cybersecurity responsibilities are included in personnel descriptions\n   - Check that performance goals include security-related metrics where applicable\n\n3. **Examine responsibility communication**\n   - Verify roles and responsibilities are communicated during onboarding\n   - Check for annual review or re-communication of security responsibilities\n   - Confirm responsibilities are articulated across operations, risk, and audit functions\n\n4. **Interview team leads on role clarity**\n   - Ask Nadia Khan (D&R Lead) and Chris Magann (VM Lead) about their documented authorities\n   - Verify they understand their scope of responsibility and escalation paths\n   - Confirm coordination mechanisms between security sub-teams\n\n## Evidence Requests\n\n- [ ] Cybersecurity RACI matrix or responsibility assignment\n- [ ] Job descriptions with security responsibilities\n- [ ] Performance evaluation criteria including security metrics\n- [ ] Onboarding materials with security role communication\n\n## Notes\n\nWith a 15-person security team supporting a 300-person organization, clear role delineation is essential. Assessment should verify responsibilities are not just documented but actively understood by role holders.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RR-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1051"
+      "FND-1054"
     ],
     "remediation": {
       "ownerId": null,
@@ -2311,12 +2555,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RR-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review security budget and staffing\n2. Validate resource-to-risk alignment\n3. Examine management review of resource adequacy\n4. Interview CISO on resource constraints",
+    "testProcedures": "# GV.RR-03: Resource Allocation Test Procedures\n\n**CSF Subcategory:** GV.RR-03 - Adequate resources are allocated commensurate with the cybersecurity risk strategy, roles, responsibilities, and policies\n\n---\n\n## Test Procedures\n\n1. **Review security budget and staffing**\n   - Request cybersecurity budget documentation and allocation breakdown\n   - Verify staffing levels against documented requirements (15-person team vs. targets)\n   - Confirm R-01 (understaffing risk) treatment plan includes budget for additional hires\n\n2. **Validate resource-to-risk alignment**\n   - Cross-reference resource allocation with risk treatment plans\n   - Verify tools and technology investments support risk mitigation goals\n   - Check that compensating controls (SentinelOne MDR) are funded when staffing gaps exist\n\n3. **Examine management review of resource adequacy**\n   - Request evidence of periodic management reviews of resource sufficiency\n   - Verify CISO raises resource gaps to CEO and Board\n   - Check for documented resource requests and approval/denial decisions\n\n4. **Interview CISO on resource constraints**\n   - Ask whether current resources are adequate for the cybersecurity strategy\n   - Verify process for requesting additional resources when needs change\n   - Confirm resource allocation considers people, processes, and technology\n\n## Evidence Requests\n\n- [ ] Cybersecurity budget documentation\n- [ ] Staffing plan and current vs. target headcount\n- [ ] Resource request and approval records\n- [ ] Compensating control funding documentation\n\n## Notes\n\nR-01 (understaffing at ~50% of target) is a documented High/High risk. Assessment should evaluate whether resource allocation decisions are responsive to this known gap and whether interim compensating controls are adequately funded.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RR-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1052"
+      "FND-1055"
     ],
     "remediation": {
       "ownerId": null,
@@ -2368,13 +2619,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.RR-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review HR-security integration\n2. Examine background check practices\n3. Validate personnel security obligations\n4. Interview HR on cybersecurity integration",
+    "testProcedures": "# GV.RR-04: Human Resources Practices Test Procedures\n\n**CSF Subcategory:** GV.RR-04 - Cybersecurity is included in human resources practices\n\n---\n\n## Test Procedures\n\n1. **Review HR-security integration**\n   - Request HR policies that include cybersecurity provisions\n   - Verify cybersecurity is factored into hiring criteria for relevant roles\n   - Confirm onboarding includes security awareness training and policy acknowledgment\n\n2. **Examine background check practices**\n   - Verify background checks are conducted for personnel in sensitive roles\n   - Check for periodic re-screening requirements for privileged access holders\n   - Confirm process covers both employees and contractors with system access\n\n3. **Validate personnel security obligations**\n   - Review employee handbook or policy for security behavior expectations\n   - Verify personnel acknowledge security policies at hire and annually\n   - Check that consequences for policy violations are documented\n\n4. **Interview HR on cybersecurity integration**\n   - Ask how cybersecurity knowledge factors into hiring and promotion decisions\n   - Verify training and retention strategies consider security skill development\n   - Confirm termination procedures include security-relevant steps (access revocation, asset return)\n\n## Evidence Requests\n\n- [ ] HR policies with cybersecurity provisions\n- [ ] Background check policy and recent completion evidence\n- [ ] Security policy acknowledgment records\n- [ ] Termination checklist with security steps\n\n## Notes\n\nAs a security company, Alma should demonstrate above-average integration of cybersecurity into HR practices. Assessment should verify this extends beyond the security team to all personnel with system access.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.RR-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Access Management Policy",
       "Quarterly Access Recertification Procedure"
     ],
     "linkedFindings": [
-      "FND-1053"
+      "FND-1056"
     ],
     "remediation": {
       "ownerId": null,
@@ -2426,12 +2684,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review SCRM program documentation\n2. Validate program maturity against objectives\n3. Examine stakeholder agreement\n4. Interview Gerry on C-SCRM program execution",
+    "testProcedures": "# GV.SC-01: Supply Chain Risk Management Program Test Procedures\n\n**CSF Subcategory:** GV.SC-01 - A cybersecurity supply chain risk management program, strategy, objectives, policies, and processes are established and agreed to by organizational stakeholders\n\n---\n\n## Test Procedures\n\n1. **Review SCRM program documentation**\n   - Request cybersecurity supply chain risk management (C-SCRM) strategy document\n   - Verify program includes objectives, milestones, and resource allocation\n   - Confirm policies and procedures are documented for supply chain risk management\n   - Check for cross-organizational alignment mechanisms\n\n2. **Validate program maturity against objectives**\n   - Review program plan milestones and current progress\n   - Verify 60% Tier 1 vendor assessment target and actual completion rate\n   - Confirm ServiceNow is configured to support C-SCRM processes\n\n3. **Examine stakeholder agreement**\n   - Verify C-SCRM strategy is approved by CISO and relevant leadership\n   - Check that procurement, legal, and engineering understand their C-SCRM roles\n   - Confirm cross-functional coordination mechanisms are operational\n\n4. **Walkthrough of C-SCRM execution in ServiceNow**\n   - Ask Gerry to navigate to the C-SCRM module and demonstrate how a vendor assessment is initiated, tracked, and closed\n   - Observe whether the workflow enforces approval gates and captures evidence at each stage\n   - Confirm escalation path for vendors that fail assessment criteria\n   - Document any manual workarounds that bypass the configured workflow (Completeness + Recurrence assertions)\n\n5. **Compute vendor coverage KPIs from ServiceNow data**\n   - Export all Tier 1 vendors from the full vendor register (not a filtered view)\n   - Cross-reference against completed assessments to calculate actual coverage rate (target: 60%+)\n   - Calculate average time to complete a vendor assessment (KPI)\n   - Identify vendors with assessments overdue for renewal (KRI: % overdue)\n   - Flag any Tier 1 vendors not in the assessment queue with no documented exception (Completeness assertion)\n   - Verify assessments are recurring on a defined schedule, not a one-time initial batch (Recurrence assertion)\n\n## Evidence Requests\n\n- [ ] C-SCRM strategy and program plan\n- [ ] Full Tier 1 vendor register (unfiltered)\n- [ ] ServiceNow C-SCRM module configuration\n- [ ] ServiceNow export of all C-SCRM assessment records (open + closed)\n- [ ] Assessment cadence/schedule documentation\n- [ ] Stakeholder approval documentation\n- [ ] Program milestone tracking\n\n## Notes\n\nAlma initiated the vendor questionnaire program in Q4 2025 and has achieved 60% Tier 1 vendor assessment coverage. Assessment should evaluate whether the program has matured beyond initial implementation to a sustainable operating model. Step 4 replaces a prior inquiry-only interview step: per 15.6 ERA audit principles, inquiry alone is weak standalone evidence. A walkthrough (inquiry + observation) of the live ServiceNow workflow provides corroborating evidence. Step 5 adds analytical procedures to compute vendor coverage as a KPI rather than accepting a stated percentage at face value. The Completeness assertion requires verifying coverage against the full vendor register, not just the assessed subset.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1054"
+      "FND-1057"
     ],
     "remediation": {
       "ownerId": null,
@@ -2483,12 +2748,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review C-SCRM role assignments\n2. Validate supplier and partner role communication\n3. Examine internal C-SCRM role communication\n4. Interview procurement and security personnel",
+    "testProcedures": "# GV.SC-02: Supply Chain Roles and Responsibilities Test Procedures\n\n**CSF Subcategory:** GV.SC-02 - Cybersecurity roles and responsibilities for suppliers, customers, and partners are established, communicated, understood, and enforced\n\n---\n\n## Test Procedures\n\n1. **Review C-SCRM role assignments**\n   - Request documentation of roles responsible for supply chain risk management\n   - Verify named individuals are accountable for C-SCRM activities\n   - Confirm RACI or responsibility matrix exists for supply chain cybersecurity\n\n2. **Validate supplier and partner role communication**\n   - Review contracts or agreements that define supplier cybersecurity responsibilities\n   - Verify information sharing protocols are established with critical suppliers\n   - Check that customer-facing security responsibilities are documented\n\n3. **Examine internal C-SCRM role communication**\n   - Verify C-SCRM responsibilities are communicated internally\n   - Check that job descriptions for relevant roles include supply chain risk duties\n   - Confirm performance goals include C-SCRM metrics where applicable\n\n4. **Interview procurement and security personnel**\n   - Ask about clarity of C-SCRM roles between procurement and security teams\n   - Verify understanding of escalation paths for supplier risk issues\n   - Confirm coordination mechanisms between internal C-SCRM stakeholders\n\n## Evidence Requests\n\n- [ ] C-SCRM RACI matrix or responsibility assignments\n- [ ] Supplier contracts with cybersecurity clauses\n- [ ] Internal communication of C-SCRM roles\n- [ ] Job descriptions with C-SCRM responsibilities\n\n## Notes\n\nWith ServiceNow managing vendor relationships, assessment should verify that C-SCRM roles and responsibilities extend beyond tool administration to active risk management accountability.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1055"
+      "FND-1058"
     ],
     "remediation": {
       "ownerId": null,
@@ -2499,7 +2771,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       "Q1": {
         "actualScore": 6,
         "targetScore": 7,
-        "observations": "### Strengths - C-SCRM roles documented in TPRM policy with designated GRC Manager as program lead - RACI matrix maps activities across security, procurement, legal, and engineering - Supplier cybersecurity responsibilities defined in contractual agreements - Information sharing rules established with TLP classifications ### Gaps - Performance goals for C-SCRM roles not consistently measured in reviews - Information sharing protocols not tested through tabletop or simulation",
+        "observations": "### Strengths - C-SCRM roles documented in TPRM policy with designated Security GRC Lead as program lead - RACI matrix maps activities across security, procurement, legal, and engineering - Supplier cybersecurity responsibilities defined in contractual agreements - Information sharing rules established with TLP classifications ### Gaps - Performance goals for C-SCRM roles not consistently measured in reviews - Information sharing protocols not tested through tabletop or simulation",
         "observationDate": "2026-03-13",
         "testingStatus": "Complete",
         "examine": true,
@@ -2540,13 +2812,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review integration with enterprise risk management\n2. Validate risk assessment integration\n3. Examine improvement process integration\n4. Interview CISO on C-SCRM integration approach",
+    "testProcedures": "# GV.SC-03: SCRM Integration Test Procedures\n\n**CSF Subcategory:** GV.SC-03 - Cybersecurity supply chain risk management is integrated into cybersecurity and enterprise risk management, risk assessment, and improvement processes\n\n---\n\n## Test Procedures\n\n1. **Review integration with enterprise risk management**\n   - Verify supply chain risks (R-05) are included in enterprise risk register\n   - Check for common risk taxonomy between C-SCRM and ERM\n   - Confirm integrated control sets for cybersecurity and supply chain risk\n\n2. **Validate risk assessment integration**\n   - Review whether supplier risk assessments use the same methodology as internal risk assessments\n   - Verify supply chain risk findings feed into the enterprise risk register\n   - Check for escalation of material supply chain risks to senior management\n\n3. **Examine improvement process integration**\n   - Verify supply chain risk management is included in continuous improvement processes\n   - Check for lessons learned from vendor assessments driving program improvements\n   - Confirm supply chain risk trends are analyzed alongside other risk domains\n\n4. **Interview CISO on C-SCRM integration approach**\n   - Ask how supply chain risks are aggregated with other cybersecurity risks\n   - Verify supply chain risks receive equal governance attention as internal risks\n   - Confirm integration approach is documented and not ad hoc\n\n## Evidence Requests\n\n- [ ] Enterprise risk register showing supply chain risk entries\n- [ ] Integrated risk assessment methodology documentation\n- [ ] Continuous improvement documentation including C-SCRM\n- [ ] Risk escalation records for supply chain issues\n\n## Notes\n\nR-05 (third-party vendor risk) is documented in the enterprise risk register, which demonstrates baseline integration. Assessment should verify the integration extends to assessment methodology, reporting, and improvement processes.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1056"
+      "FND-1059"
     ],
     "remediation": {
       "ownerId": null,
@@ -2598,7 +2877,14 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review supplier inventory in ServiceNow\n2. Verify criticality ratings against documented criteria\n3. Interview procurement team on tiering process\n4. Sample quarterly review documentation",
+    "testProcedures": "# GV.SC-04: Supplier Criticality Test Procedures\n\n**CSF Subcategory:** GV.SC-04 - Suppliers are known and prioritized by criticality\n\n**Scope:** Alma Security 2025 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Review supplier inventory in ServiceNow**\n   - Export complete supplier list from ServiceNow\n   - Verify all active suppliers are documented\n   - Check for orphaned or inactive supplier records\n\n2. **Verify criticality ratings against documented criteria**\n   - Review Third Party Risk Management Policy for tiering criteria\n   - Sample 5-10 suppliers across tiers and validate classification\n   - Confirm criteria include: data sensitivity, system access level, mission importance\n\n3. **Interview procurement team on tiering process**\n   - Understand workflow for new supplier classification\n   - Document escalation process for high-risk suppliers\n   - Verify training on SCRM responsibilities\n\n4. **Sample quarterly review documentation**\n   - Pull last two quarterly supplier review reports\n   - Verify stakeholder sign-off on criticality ratings\n   - Check for rating changes and justification documentation\n\n---\n\n## Evidence Requests\n\n- [ ] ServiceNow supplier inventory export\n- [ ] Third Party Risk Management Policy\n- [ ] Supplier criticality rating matrix\n- [ ] Quarterly review meeting minutes\n- [ ] Procurement team training records\n\n---\n\n## Related Artifacts\n\n- [Third Party Risk Management Policy](../../5_Artifacts/Policies/POL-third-party-risk.md)\n\n---\n\n## Notes\n\nThis test procedure validates that the organization maintains an accurate inventory of suppliers and prioritizes them based on risk. The \"No PO No Pay\" policy ensures all paid suppliers are captured in the inventory.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
@@ -2612,8 +2898,8 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       "Q1": {
         "actualScore": 5,
         "targetScore": 5,
-        "observations": "The IT Manager explained that GRC verified that: - Supplier risk tiers documented in Third Party Risk Management Policy - No PO No Pay policy ensures all suppliers paid were identified - Suppliers ranked by data sensitivity, system access level, and mission importance",
-        "observationDate": "2025-01-10",
+        "observations": "Suppliers are known and prioritized by criticality. Risk tiers are documented in the Third Party Risk Management Policy, and suppliers are ranked by data sensitivity, system access level, and mission importance. The supplier population is anchored by the company's \"No PO, No Pay\" policy — no supplier gets paid without a purchase order, which means every active supplier necessarily appears in the ServiceNow supplier inventory. Quarterly supplier reviews operate against that inventory, and the criticality framework is integrated with the ServiceNow vendor workflows rather than maintained as a standalone spreadsheet. ### Strengths - Supplier risk tiers are defined in policy with explicit criteria (data sensitivity, access level, mission importance) - \"No PO, No Pay\" gives structural assurance that the supplier population in ServiceNow is complete - Quarterly supplier reviews are documented and integrated with ServiceNow vendor workflows ### Gaps - Criticality re-tiering is calendar-driven (quarterly) rather than event-driven; a supplier whose access expands mid-quarter keeps its old tier until the next review - Tiering has not yet been re-performed by an independent party; Internal Audit plans re-performance testing in a later quarter",
+        "observationDate": "2026-01-10",
         "testingStatus": "Complete",
         "examine": true,
         "interview": true,
@@ -2653,12 +2939,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review cybersecurity requirements for suppliers\n2. Validate contractual security provisions\n3. Examine requirement prioritization\n4. Interview legal/procurement on contract security clauses",
+    "testProcedures": "# GV.SC-05: Supply Chain Requirements Test Procedures\n\n**CSF Subcategory:** GV.SC-05 - Requirements to address cybersecurity risks in supply chains are established, prioritized, and integrated into contracts and other agreements with suppliers and other relevant third parties\n\n---\n\n## Test Procedures\n\n1. **Review cybersecurity requirements for suppliers**\n   - Request standard security requirements included in supplier agreements\n   - Verify requirements are tiered based on supplier criticality\n   - Confirm requirements cover data protection, access controls, incident notification, and compliance\n\n2. **Validate contractual security provisions**\n   - Sample 3-5 supplier contracts for cybersecurity clauses\n   - Verify right-to-audit provisions are included for critical suppliers\n   - Check for SLA requirements related to security (vulnerability disclosure, incident notification timelines)\n   - Confirm component inventory (SBOM) requirements for software suppliers\n\n3. **Examine requirement prioritization**\n   - Review how security requirements are prioritized based on supplier risk tier\n   - Verify critical suppliers face more stringent requirements than low-risk suppliers\n   - Check for information sharing and reporting protocols\n\n4. **Interview legal/procurement on contract security clauses**\n   - Ask how security requirements are incorporated into procurement process\n   - Verify legal review of cybersecurity contract terms\n   - Confirm process for updating requirements as threats and regulations evolve\n\n## Evidence Requests\n\n- [ ] Standard supplier security requirements document\n- [ ] Sample supplier contracts with security clauses\n- [ ] Supplier tiering criteria and requirement mapping\n- [ ] Right-to-audit and SLA provisions\n\n## Notes\n\nAssessment should verify requirements are not just boilerplate but are tailored to supplier criticality and enforced through ongoing monitoring.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1057"
+      "FND-1060"
     ],
     "remediation": {
       "ownerId": null,
@@ -2710,12 +3003,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review due diligence process documentation\n2. Validate supplier risk assessment execution\n3. Examine product and technology assessment\n4. Interview procurement team on due diligence practices",
+    "testProcedures": "# GV.SC-06: Supplier Due Diligence Test Procedures\n\n**CSF Subcategory:** GV.SC-06 - Planning and due diligence are performed to reduce risks before entering into formal supplier or other third-party relationships\n\n---\n\n## Test Procedures\n\n1. **Review due diligence process documentation**\n   - Request documented due diligence procedures for new suppliers\n   - Verify process includes cybersecurity assessment before contract execution\n   - Confirm assessment criteria are consistent with procurement planning\n\n2. **Validate supplier risk assessment execution**\n   - Sample 3 recently onboarded suppliers and review pre-engagement assessments\n   - Verify risk assessments evaluate cybersecurity capabilities and risk management practices\n   - Check that assessment results inform contracting decisions\n\n3. **Examine product and technology assessment**\n   - Review process for assessing authenticity and security of acquired products\n   - Verify software supply chain risks are evaluated (SBOMs, vulnerability history)\n   - Check for technology suitability assessments before adoption\n\n4. **Interview procurement team on due diligence practices**\n   - Ask how due diligence integrates with vendor selection workflow\n   - Verify security team involvement in supplier evaluation\n   - Confirm due diligence findings can block or modify procurement decisions\n\n## Evidence Requests\n\n- [ ] Due diligence procedure documentation\n- [ ] Completed supplier risk assessments (recent samples)\n- [ ] Product/technology security evaluation records\n- [ ] Procurement workflow showing security checkpoint\n\n## Notes\n\nDue diligence should be proportional to supplier criticality. Assessment should verify the process is consistently applied and not bypassed under time pressure.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1058"
+      "FND-1061"
     ],
     "remediation": {
       "ownerId": null,
@@ -2767,12 +3067,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-07 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review ongoing supplier risk assessment program\n2. Validate continuous monitoring practices\n3. Examine supplier risk response process\n4. Validate business continuity planning for supplier disruptions",
+    "testProcedures": "# GV.SC-07: Supplier Risk Assessment and Monitoring Test Procedures\n\n**CSF Subcategory:** GV.SC-07 - The risks posed by a supplier, their products and services, and other third parties are understood, recorded, prioritized, assessed, responded to, and monitored over the lifecycle of the relationship\n\n---\n\n## Test Procedures\n\n1. **Review ongoing supplier risk assessment program**\n   - Request supplier risk assessment schedule and methodology\n   - Verify assessment frequency is based on supplier criticality\n   - Confirm assessments cover compliance with contractual cybersecurity requirements\n\n2. **Validate continuous monitoring practices**\n   - Review monitoring mechanisms for critical suppliers (security ratings, threat intelligence)\n   - Verify process for detecting changes in supplier risk profiles\n   - Check for automated monitoring where applicable (e.g., security scorecard services)\n\n3. **Examine supplier risk response process**\n   - Request evidence of risk findings communicated to suppliers\n   - Verify remediation tracking for identified supplier risks\n   - Check for escalation process when suppliers fail to meet requirements\n\n4. **Validate business continuity planning for supplier disruptions**\n   - Review contingency plans for critical supplier failures\n   - Verify alternative supplier identification for critical services\n   - Check that supplier disruption scenarios are included in continuity planning\n\n## Evidence Requests\n\n- [ ] Supplier risk assessment schedule and completed assessments\n- [ ] Continuous monitoring evidence (security ratings, alerts)\n- [ ] Supplier risk remediation tracking\n- [ ] Business continuity plans for supplier disruptions\n\n## Notes\n\nWith 60% of Tier 1 vendors assessed, Alma is building assessment coverage. Assessment should evaluate whether ongoing monitoring complements point-in-time assessments for already-evaluated suppliers.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-07",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1059"
+      "FND-1062"
     ],
     "remediation": {
       "ownerId": null,
@@ -2824,12 +3131,19 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-08 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review supplier incident response integration\n2. Validate supplier participation in exercises\n3. Examine crisis communication with suppliers\n4. Interview Nadia Khan (D&R Lead) on supplier incident coordination",
+    "testProcedures": "# GV.SC-08: Supplier Incident Planning Test Procedures\n\n**CSF Subcategory:** GV.SC-08 - Relevant suppliers and other third parties are included in incident planning, response, and recovery activities\n\n---\n\n## Test Procedures\n\n1. **Review supplier incident response integration**\n   - Request incident response plan sections addressing third-party involvement\n   - Verify roles and responsibilities for supplier-related incidents are documented\n   - Confirm communication protocols for incident notification between Alma and suppliers\n\n2. **Validate supplier participation in exercises**\n   - Check whether critical suppliers are included in tabletop exercises or simulations\n   - Review exercise participation records for supplier involvement\n   - Verify lessons learned are shared with participating suppliers\n\n3. **Examine crisis communication with suppliers**\n   - Review defined communication methods and escalation paths for supplier incidents\n   - Verify contact information is current for critical supplier security contacts\n   - Check for pre-established communication templates for supplier-related incidents\n\n4. **Interview Nadia Khan (D&R Lead) on supplier incident coordination**\n   - Ask about supplier involvement in incident response procedures\n   - Verify SentinelOne MDR coordination is documented and tested\n   - Confirm post-incident lessons learned include supplier perspectives\n\n## Evidence Requests\n\n- [ ] Incident response plan with supplier provisions\n- [ ] Exercise records showing supplier participation\n- [ ] Supplier incident communication protocols\n- [ ] SentinelOne MDR coordination documentation\n\n## Notes\n\nSentinelOne MDR as a compensating control for R-01 (understaffing) makes supplier incident coordination particularly important. Assessment should verify this relationship is integrated into incident planning.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-08",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1060"
+      "FND-1063"
     ],
     "remediation": {
       "ownerId": null,
@@ -2881,13 +3195,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-09 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review supply chain security integration in policies\n2. Validate provenance and integrity practices\n3. Examine risk reporting on supply chain security\n4. Interview Chris Magann (VM Lead) on supply chain vulnerability management",
+    "testProcedures": "# GV.SC-09: Supply Chain Security Practices Test Procedures\n\n**CSF Subcategory:** GV.SC-09 - Supply chain security practices are integrated into cybersecurity and enterprise risk management programs, and their performance is monitored throughout the technology product and service life cycle\n\n---\n\n## Test Procedures\n\n1. **Review supply chain security integration in policies**\n   - Request policies requiring provenance records for acquired technology\n   - Verify policies address supply chain security across the product lifecycle\n   - Confirm policies require approved personnel for maintenance of critical systems\n\n2. **Validate provenance and integrity practices**\n   - Check whether software provenance is tracked (SBOMs, signed artifacts)\n   - Verify hardware procurement includes authenticity verification for critical components\n   - Review upgrade and patch processes for unauthorized change detection\n\n3. **Examine risk reporting on supply chain security**\n   - Request evidence of supply chain security reporting to leadership\n   - Verify acquired component security status is tracked and communicated\n   - Check for regular communication between risk managers and operations on supply chain needs\n\n4. **Interview Chris Magann (VM Lead) on supply chain vulnerability management**\n   - Ask how third-party component vulnerabilities are tracked and remediated\n   - Verify SBOM or equivalent tracking for critical software dependencies\n   - Confirm patch management covers supply chain components\n\n## Evidence Requests\n\n- [ ] Policies on technology provenance and supply chain security\n- [ ] SBOM or software provenance records\n- [ ] Supply chain security reporting to leadership\n- [ ] Patch management records for third-party components\n\n## Notes\n\nAs a SaaS company, Alma's software supply chain is particularly relevant. Assessment should verify that dependency management and vulnerability tracking extend to third-party libraries and services.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-09",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy",
       "Authorized Software Inventory"
     ],
     "linkedFindings": [
-      "FND-1061"
+      "FND-1064"
     ],
     "remediation": {
       "ownerId": null,
@@ -2939,13 +3260,20 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "GV.SC-10 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review supplier termination procedures\n2. Validate access deactivation practices\n3. Examine end-of-life and obsolescence planning\n4. Interview Gerry on supplier offboarding process",
+    "testProcedures": "# GV.SC-10: Supplier Termination Provisions Test Procedures\n\n**CSF Subcategory:** GV.SC-10 - Cybersecurity supply chain risk management plans include provisions for activities that occur after the conclusion of a partnership or service agreement\n\n---\n\n## Test Procedures\n\n1. **Review supplier termination procedures**\n   - Request documented procedures for terminating supplier relationships\n   - Verify procedures address both normal and adverse termination circumstances\n   - Confirm data return and disposal requirements are defined\n\n2. **Validate access deactivation practices**\n   - Check process for deactivating supplier access upon relationship termination\n   - Verify timeliness requirements for access revocation\n   - Review recent termination examples for evidence of prompt access removal\n\n3. **Examine end-of-life and obsolescence planning**\n   - Request plans for component end-of-life maintenance and obsolescence\n   - Verify critical dependencies have transition plans\n   - Check that supplier termination risks are assessed and mitigated\n\n4. **Interview Gerry on supplier offboarding process**\n   - Ask about the supplier termination workflow in ServiceNow\n   - Verify data leakage risks are addressed during termination\n   - Confirm asset return or disposal verification processes\n\n## Evidence Requests\n\n- [ ] Supplier termination procedures\n- [ ] Access revocation evidence from recent terminations\n- [ ] End-of-life and obsolescence planning documentation\n- [ ] Data disposal verification records\n\n## Notes\n\nPost-relationship risk management is often overlooked. Assessment should verify Alma has proactive procedures rather than ad hoc responses to supplier terminations.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "GV.SC-10",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1062",
-      "FND-1063"
+      "FND-1065",
+      "FND-1066"
     ],
     "remediation": {
       "ownerId": null,
@@ -2995,19 +3323,1353 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       }
     }
   },
+  "ID.AM-01 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-01: Hardware-Inventory Test Procedures\n\n**Assessment Scope:** Alma Security 2026 CSF Assessment \n\n**Control:** ID.AM-01 - Inventories of hardware managed by the organization are maintained \n\n**Assessor:** [Your Name]\n\n---\n\n## Inquiry\n\n- [x] **IT Desktop Manager** - Interviewed regarding endpoint inventory processes, refresh cycles, and tracking methods for laptops/workstations\n- [x] **IT Infrastructure Manager** - Interviewed regarding server inventory, network device tracking, and data center asset management\n- [x] **Cloud Platform Principal Architect** - Interviewed regarding AWS resource inventory, tagging standards, and automated discovery mechanisms\n\n**Sample Interview Questions:**\n\n* How frequently is the hardware inventory updated?\n* What triggers an inventory update (new purchases, decommissions, audits)?\n* Who owns the asset management process?\n* What tagging standards are enforced for cloud resources?\n* How do you detect untagged or orphaned resources?\n\n---\n\n## Inspection\n\n### Review Hardware Inventory (On-Premises)\n\n1. Obtain the most recent hardware inventory list from the IT department or asset management system\n2. Use network scanning tools (e.g., Nmap) to discover all connected devices on the network\n3. Cross-reference the scanned results with the documented inventory\n4. Document any discrepancies (devices on network not in inventory, inventory items not found on network)\n5. **Sampling:** Select 5 assets from the inventory at random. For each sampled asset:\n    * Verify the device exists at the documented location\n    * Confirm serial number matches inventory record\n    * Validate owner/custodian information is current\n    * Check that asset tag is physically present on device\n\n**Evidence to Collect:**\n\n* Hardware Inventory Spreadsheet\n* Nmap scan results\n* Reconciliation report\n* Sampling walkthrough documentation (5 assets inspected)\n\n### Review AWS Tagging Completeness\n\n1. Access AWS Config and review the `required-tags` rule compliance status\n2. Verify the following minimum tags are enforced across EC2, RDS, S3, and Lambda resources:\n    * `Environment` (prod / staging / dev / test)\n    * `Owner` (team or individual responsible)\n    * `Application` (system/service the resource supports)\n    * `Name` (resource identifier)\n3. Pull list of non-compliant resources missing required tags\n4. Validate tag values are meaningful (not garbage data like \"test\" or \"asdf\")\n5. Cross-reference Cost Explorer to identify untagged spend\n\n**Evidence to Collect:**\n\n* AWS Config Rules dashboard screenshot\n* Non-compliant resources export\n* Cost Explorer tag coverage report\n\n#### Why Cloud Inventory is Different:\nCloud environments have a built-in advantage for inventory - the pay-per-use model means organizations *have* to track what's running or the bill gets ugly. AWS Config, tagging policies, and Cost Explorer become your inventory validation tools instead of Nmap.\n\n## Linked Artifacts\n* [Alma Security Hardware Inventory](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Hardware_Inventory_Sample.md)\n* [Network Discovery Scan Results](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Nmap_Scan_Results.md)\n* [AWS Tag Compliance Report](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/AWS_Tag_Compliance_Report.md)\n* [Hardware Inventory Sampling Walkthrough](https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/Sampling_Walkthrough.md)",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Alma Security Hardware Inventory",
+      "AWS Config Compliance Snapshot"
+    ],
+    "linkedFindings": [
+      "FND-1067",
+      "FND-1068",
+      "FND-1069"
+    ],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 4,
+        "targetScore": 6,
+        "observations": "Alma Security maintains a hardware inventory in ServiceNow CMDB, but the inventory is incomplete and not regularly reconciled with actual network assets. Cloud resource tagging exists but is not consistently enforced: 55 of 847 AWS resources (6.5%) are missing one or more required tags (Environment, Owner, Application). Physical sampling revealed 1 of 5 assets could not be located and 1 had stale ownership data. Network scanning identified 3 devices not present in the CMDB, and 2 assets marked \"Active\" in inventory did not respond to network scans, suggesting decommissioning without an inventory update. Reconciliation between the CMDB, network scans, and AWS Config data is performed manually on an ad-hoc basis; there is no scheduled process, so inventory drift accumulates over time. An asset that could not be physically verified (HW-007) remained unlocated at fieldwork close, and one sampled asset carried outdated owner information following an employee transfer. ### Strengths - Hardware inventory is centralized in ServiceNow CMDB rather than spreadsheets - AWS resource tagging standard (Environment, Owner, Application) is defined and 93.5% adopted - Physical asset sampling was fully supportable — 4 of 5 sampled assets verified on location, serial, and asset tag ### Gaps - 3 network-discovered devices absent from the CMDB; 2 CMDB-active assets unreachable on the network (untracked assets may miss patching or represent shadow IT) - 55 AWS resources (6.5%) missing required tags, leaving ownership unclear and incident response slower for those resources - 1 of 5 physically sampled assets (20%) could not be located; ownership data not updated on employee transfer - No automated or scheduled reconciliation between CMDB, network scans, and AWS Config",
+        "observationDate": "2026-02-15",
+        "testingStatus": "Complete",
+        "examine": true,
+        "interview": true,
+        "test": true
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.AM-02 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-02: Software and Service Inventory Test Procedures\n\n**CSF Subcategory:** ID.AM-02 - Inventories of software, services, and systems managed by the organization are maintained\n\n---\n\n## Test Procedures\n\n1. **Obtain Software Inventory Records**\n   - Request the current software inventory from ServiceNow CMDB\n   - Request AWS Systems Manager software inventory reports\n   - Obtain SaaS application registry from IT procurement\n\n2. **Validate Inventory Completeness**\n   - Compare CMDB software records against endpoint agent discovery data\n   - Cross-reference AWS Systems Manager inventory with EC2 instance list\n   - Verify SaaS applications against SSO/IdP authentication logs\n   - Identify any software discovered by agents not present in CMDB\n\n3. **Sample Verification**\n   - Select 5 software entries from the inventory at random\n   - Confirm license status, version, and owner for each sampled entry\n   - Verify the software is installed on the documented systems\n   - Check that end-of-life software is flagged appropriately\n\n4. **Assess Container and Cloud Service Coverage**\n   - Review container image registry for completeness\n   - Verify cloud service inventory includes IaaS, PaaS, and SaaS\n   - Check for automated discovery mechanisms for new services\n\n5. **Review Update Processes**\n   - Verify inventory update triggers (new installs, decommissions, audits)\n   - Confirm frequency of automated inventory reconciliation\n   - Review change management integration for software changes\n\n## Evidence Requests\n\n- [ ] ServiceNow CMDB software inventory export\n- [ ] AWS Systems Manager inventory report\n- [ ] SaaS application registry\n- [ ] Endpoint agent discovery report\n- [ ] Container image registry listing\n- [ ] Software lifecycle tracking records\n\n## Notes\n\nFocus on identifying shadow IT and unapproved software installations. Pay particular attention to SaaS applications that may bypass centralized procurement.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Authorized Software Inventory",
+      "AWS Config Compliance Snapshot"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 6,
+        "observations": "### Strengths ServiceNow CMDB tracks licensed software with renewal dates. AWS Systems Manager collects software inventory across EC2 fleet. Endpoint management agents provide installed application visibility. ### Gaps No automated SaaS discovery tool deployed to identify shadow IT. Container runtime inventory not automated. Open-source software components not tracked in a software bill of materials (SBOM).",
+        "observationDate": "2026-03-15",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.AM-03 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-03: Network Communication and Data Flow Test Procedures\n\n**CSF Subcategory:** ID.AM-03 - Representations of the organization's authorized network communication and internal and external network data flows are maintained\n\n---\n\n## Test Procedures\n\n1. **Review Network Architecture Documentation**\n   - Obtain current network architecture diagrams from Confluence\n   - Verify diagrams include internal network segments, VPCs, and subnets\n   - Confirm external connectivity points are documented\n   - Check that diagrams include third-party connections\n\n2. **Validate Data Flow Documentation**\n   - Review documented data flows between internal systems\n   - Verify third-party data flow agreements and documentation\n   - Check that data flow diagrams include classification levels\n   - Confirm cloud (IaaS) network flows are documented\n\n3. **Compare Documentation to Actual State**\n   - Review AWS VPC Flow Logs for active traffic patterns\n   - Compare security group rules against documented allowed flows\n   - Identify undocumented network connections or data flows\n   - Verify firewall rules align with documented architecture\n\n4. **Assess Currency of Documentation**\n   - Check last update date on network diagrams\n   - Review change management records for recent network changes\n   - Verify documentation was updated following recent changes\n   - Confirm review cadence for third-party data flow documentation\n\n5. **Review Port and Protocol Documentation**\n   - Obtain documentation of expected network ports and protocols\n   - Compare against actual traffic observed in flow logs\n   - Identify any unexpected ports or protocols in use\n\n## Evidence Requests\n\n- [ ] Network architecture diagrams (current version)\n- [ ] Data flow documentation (internal and external)\n- [ ] AWS VPC Flow Log samples\n- [ ] Security group configuration export\n- [ ] Firewall rule documentation\n- [ ] Third-party connectivity agreements\n\n## Notes\n\nNetwork documentation accuracy degrades rapidly in cloud environments with frequent infrastructure changes. Prioritize validation of cloud network flows against documentation.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "AWS Config Compliance Snapshot"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths AWS VPC Flow Logs enabled across all production VPCs. Network architecture diagrams maintained in Confluence. Security group rules documented and reviewed during change management. ### Gaps Network diagrams updated only during major changes, not continuously. No automated network flow baseline tool deployed. Third-party data flow documentation reviewed only annually and may be stale.",
+        "observationDate": "2026-03-16",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.AM-04 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-04: Supplier Service Inventory Test Procedures\n\n**CSF Subcategory:** ID.AM-04 - Inventories of services provided by suppliers are maintained\n\n---\n\n## Test Procedures\n\n1. **Obtain Supplier Service Inventory**\n   - Request the current supplier service inventory from ServiceNow\n   - Obtain vendor contract management records\n   - Request AWS Marketplace purchase history\n\n2. **Validate Inventory Completeness**\n   - Cross-reference supplier inventory against accounts payable vendor list\n   - Check SSO/IdP for SaaS applications not in the supplier inventory\n   - Review department expense reports for cloud service subscriptions\n   - Verify all IaaS, PaaS, and SaaS providers are inventoried\n\n3. **Sample Verification**\n   - Select 5 supplier services at random from the inventory\n   - Confirm contract status, renewal date, and service owner\n   - Verify security assessment status for each sampled supplier\n   - Check that service criticality classification is assigned\n\n4. **Assess Onboarding Process**\n   - Review the vendor onboarding process documentation\n   - Verify that new vendor requests require security review\n   - Check for recent examples of vendors that completed onboarding\n   - Identify any vendors that bypassed the onboarding process\n\n5. **Review Inventory Maintenance**\n   - Confirm inventory update triggers and frequency\n   - Verify decommissioned services are removed from inventory\n   - Check for sub-processor (fourth-party) documentation\n\n## Evidence Requests\n\n- [ ] ServiceNow supplier service inventory export\n- [ ] Vendor contract management records\n- [ ] AWS Marketplace purchase history\n- [ ] Vendor onboarding process documentation\n- [ ] Recent vendor onboarding examples (2-3)\n- [ ] Accounts payable vendor list for cross-reference\n\n## Notes\n\nDepartment-level SaaS purchases that bypass centralized procurement represent a significant gap. Cross-referencing expense reports and SSO logs helps identify untracked supplier services.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Third Party Risk Management Policy",
+      "Authorized Software Inventory"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths ServiceNow tracks major vendor relationships with contract details. New vendor onboarding requires security questionnaire completion. AWS Marketplace purchases are tracked through consolidated billing. ### Gaps Department-level SaaS purchases sometimes bypass centralized procurement. No automated CASB or SaaS discovery to detect unapproved cloud services. Supplier inventory does not include fourth-party (sub-processor) relationships.",
+        "observationDate": "2026-03-16",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.AM-05 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-05: Asset Classification and Prioritization Test Procedures\n\n**CSF Subcategory:** ID.AM-05 - Assets are prioritized based on classification, criticality, resources, and impact on the mission\n\n---\n\n## Test Procedures\n\n1. **Review Classification Framework**\n   - Obtain the asset classification policy and criteria\n   - Verify classification tiers are defined (Critical, High, Medium, Low)\n   - Confirm criteria include business impact, data sensitivity, and regulatory requirements\n   - Check that crown jewel assets are explicitly identified\n\n2. **Validate Classification Application**\n   - Sample 10 assets from the inventory across different tiers\n   - Verify each sampled asset has an assigned classification\n   - Confirm classification rationale is documented\n   - Check that AWS resource criticality tags match documented classifications\n\n3. **Assess Prioritization Process**\n   - Review the process for prioritizing assets\n   - Verify business impact analysis completion rates\n   - Confirm asset owners have validated classifications\n   - Check that non-production environments have assigned classifications\n\n4. **Review Classification Currency**\n   - Verify classification review cadence (quarterly risk review)\n   - Check for classification updates following organizational changes\n   - Confirm reclassification triggers are defined\n   - Review recent examples of classification changes\n\n5. **Validate Crown Jewel Documentation**\n   - Obtain the crown jewel asset list\n   - Verify each crown jewel has documented business impact\n   - Confirm protective controls are mapped to crown jewel assets\n   - Check that crown jewel list is reviewed and approved by leadership\n\n## Evidence Requests\n\n- [ ] Asset classification policy\n- [ ] Crown jewel asset register\n- [ ] Business impact analysis records\n- [ ] AWS resource criticality tagging report\n- [ ] Quarterly risk review minutes showing asset classification discussion\n- [ ] Asset classification change log\n\n## Notes\n\nPay attention to gaps between production and non-production classification. Development environments often contain production data copies and should be classified accordingly.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Alma Security Hardware Inventory"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 4,
+        "targetScore": 6,
+        "observations": "### Strengths Crown jewels defined with documented business impact. Tiered classification scheme (Critical/High/Medium/Low) established. Quarterly risk review includes asset priority reassessment. ### Gaps Classification criteria not consistently applied to development and staging environments. Some asset owners have not completed business impact assessments for their systems. No automated enforcement of criticality tagging in non-production AWS accounts.",
+        "observationDate": "2026-03-16",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.AM-07 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-07: Data Inventory and Classification Test Procedures\n\n**CSF Subcategory:** ID.AM-07 - Inventories of data and corresponding metadata for designated data types are maintained\n\n---\n\n## Test Procedures\n\n1. **Review Data Classification Policy**\n   - Obtain the data classification policy defining designated data types\n   - Verify classification tiers (Public, Internal, Confidential, Restricted)\n   - Confirm handling requirements for each classification tier\n   - Check that designated data types (PII, PHI, financial) are defined\n\n2. **Validate Data Discovery Results**\n   - Review data discovery scan results for primary databases\n   - Review S3 bucket scanning results for sensitive data\n   - Verify discovered data instances match expected locations\n   - Identify any unexpected sensitive data locations\n\n3. **Assess Metadata and Tagging**\n   - Sample 5 data stores from the inventory\n   - Verify each has assigned data classification tags\n   - Confirm data owner, provenance, and location metadata\n   - Check for unclassified data stores containing sensitive data\n\n4. **Review Data Inventory Completeness**\n   - Compare data inventory against system inventory\n   - Verify all databases and storage services are included\n   - Check that structured and unstructured data sources are covered\n   - Identify data stores not yet scanned by discovery tools\n\n5. **Assess Ongoing Discovery Process**\n   - Review data discovery scan schedule and coverage\n   - Verify new data stores are scanned upon provisioning\n   - Check for continuous versus ad hoc discovery processes\n   - Confirm discovery results feed into the data inventory\n\n## Evidence Requests\n\n- [ ] Data classification policy\n- [ ] Data discovery scan results\n- [ ] Data inventory with metadata\n- [ ] S3 bucket classification report\n- [ ] Data owner assignments\n- [ ] Data discovery tool configuration\n\n## Notes\n\nThe pilot nature of Alma's data classification program means coverage gaps are expected. Focus on whether the methodology is sound and scalable, and identify the highest-priority gaps for formalization.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-07",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Data Classification Policy",
+      "AWS Config Compliance Snapshot"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths Data classification policy defines four tiers with handling requirements. Pilot data discovery scan completed against primary databases and S3. PII data types identified and cataloged. ### Gaps Data classification not formalized beyond pilot scope. Metadata tagging inconsistently applied. No continuous data discovery process; scans are ad hoc. Two S3 buckets found with unclassified customer data.",
+        "observationDate": "2026-03-17",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.AM-08 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.AM-08: Asset Lifecycle Management Test Procedures\n\n**CSF Subcategory:** ID.AM-08 - Systems, hardware, software, services, and data are managed throughout their life cycles\n\n---\n\n## Test Procedures\n\n1. **Review Lifecycle Management Policies**\n   - Obtain SDLC documentation including security review gates\n   - Review hardware provisioning and decommissioning procedures\n   - Verify data retention and destruction policies\n   - Check for end-of-life tracking processes\n\n2. **Validate Change Management Integration**\n   - Review ServiceNow change management compliance metrics\n   - Sample 5 recent changes and verify lifecycle documentation\n   - Check that security review is included in change workflow\n   - Identify changes that bypassed formal process\n\n3. **Assess Decommissioning Procedures**\n   - Review hardware decommissioning procedure documentation\n   - Verify data sanitization steps are included\n   - Check for recent decommissioning examples and evidence\n   - Confirm decommissioned assets are removed from inventory\n\n4. **Review Shadow IT Detection**\n   - Assess mechanisms for identifying unauthorized technology use\n   - Review recent shadow IT discoveries and remediation\n   - Check for automated detection capabilities\n   - Verify policy for handling discovered shadow IT\n\n5. **Validate Data Destruction**\n   - Review data retention policy and destruction timelines\n   - Check for data destruction verification records\n   - Verify media sanitization procedures for hardware disposal\n   - Confirm destruction methods align with data sensitivity\n\n## Evidence Requests\n\n- [ ] SDLC documentation with security gates\n- [ ] Hardware decommissioning procedure\n- [ ] Change management compliance report\n- [ ] Data retention and destruction policy\n- [ ] Data sanitization verification records\n- [ ] End-of-life software tracking report\n\n## Notes\n\nThe 85% change management compliance rate warrants investigation into the 15% gap. Determine whether bypassed changes follow emergency procedures or represent process failures.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.AM-08",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths SDLC includes security review gates. ServiceNow change management tracks lifecycle transitions. Hardware decommissioning procedures documented. Data retention policy established. ### Gaps 15% of changes bypass formal change management. Data destruction verification not consistently documented. Shadow IT identification is reactive, not proactive. No automated end-of-life tracking for software versions.",
+        "observationDate": "2026-03-17",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.IM-01 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.IM-01: Evaluation-Based Improvement Test Procedures\n\n**CSF Subcategory:** ID.IM-01 - Improvements are identified from evaluations\n\n---\n\n## Test Procedures\n\n1. **Review Self-Assessment Program**\n   - Obtain self-assessment methodology documentation\n   - Verify CSF assessment scope and coverage\n   - Confirm assessment findings are documented with evidence\n   - Check that current threats and TTPs are considered\n\n2. **Validate Improvement Identification**\n   - Review assessment findings and improvement recommendations\n   - Verify improvements are prioritized and tracked\n   - Confirm remediation plans are created for identified gaps\n   - Check for improvement implementation evidence\n\n3. **Assess Automated Compliance Monitoring**\n   - Review AWS Config compliance monitoring configuration\n   - Verify automated compliance rules cover key controls\n   - Check compliance monitoring coverage gaps\n   - Confirm non-compliance alerts are acted upon\n\n4. **Review Third-Party Assessment History**\n   - Check for independent audit or assessment reports\n   - Verify plans for third-party assessment\n   - Review peer assessments or benchmarking activities\n   - Assess maturity of evaluation program\n\n5. **Evaluate Assessment Cadence and Coverage**\n   - Verify assessment frequency (annual minimum)\n   - Check for event-driven assessment triggers\n   - Confirm all critical services are in assessment scope\n   - Review assessment program improvement over time\n\n## Evidence Requests\n\n- [ ] Self-assessment methodology documentation\n- [ ] CSF assessment findings and recommendations\n- [ ] AWS Config compliance monitoring reports\n- [ ] Improvement tracking records\n- [ ] Remediation plan status\n- [ ] Third-party assessment plans or reports\n\n## Notes\n\nAs the first structured CSF assessment, focus on methodology soundness and whether the organization has built a repeatable assessment process that can mature over time.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.IM-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "AWS Config Compliance Snapshot"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths NIST CSF self-assessment initiated. AWS Config provides continuous compliance monitoring for infrastructure. Assessment findings documented with remediation plans. ### Gaps No third-party independent security audit performed. Automated compliance monitoring limited to AWS infrastructure controls. Self-assessment methodology not yet mature. No formal cadence for recurring assessments beyond annual.",
+        "observationDate": "2026-03-17",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.IM-02 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.IM-02: Security Test-Based Improvement Test Procedures\n\n**CSF Subcategory:** ID.IM-02 - Improvements are identified from security tests and exercises, including those done in coordination with suppliers\n\n---\n\n## Test Procedures\n\n1. **Review Security Testing Program**\n   - Obtain security testing program documentation\n   - Verify phishing simulation schedule and scope\n   - Review tabletop exercise documentation\n   - Check for penetration testing plans or reports\n\n2. **Validate Improvement Identification from Tests**\n   - Review phishing simulation results and identified improvements\n   - Check tabletop exercise after-action reports\n   - Verify improvements are documented and tracked\n   - Confirm findings inform training and control updates\n\n3. **Assess Exercise Scope and Participation**\n   - Verify internal stakeholder involvement in exercises\n   - Check for supplier coordination in exercises\n   - Review exercise scenario coverage and realism\n   - Assess exercise frequency against industry benchmarks\n\n4. **Review Penetration Testing**\n   - Check for penetration testing history or plans\n   - Verify penetration testing scope and methodology\n   - Review any red team or purple team exercise results\n   - Assess plans for maturing offensive security testing\n\n5. **Evaluate Improvement Tracking**\n   - Verify improvement items from exercises are tracked\n   - Check completion rates for identified improvements\n   - Assess whether improvements are integrated into project management\n   - Review metrics tracking from security tools and services\n\n## Evidence Requests\n\n- [ ] Security testing program documentation\n- [ ] Phishing simulation results and metrics\n- [ ] Tabletop exercise after-action reports\n- [ ] Penetration testing reports (if performed)\n- [ ] Improvement tracking from exercises\n- [ ] Exercise participation records\n\n## Notes\n\nThe absence of penetration testing is a significant gap for identifying technical vulnerabilities that scanning tools may miss. Assess plans for incorporating offensive security testing into the program.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.IM-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Q1 2026 Phishing Simulation Report"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 2,
+        "targetScore": 5,
+        "observations": "### Strengths Quarterly phishing simulations with metrics tracking. Annual incident response tabletop exercises. Exercise findings documented. Phishing results inform security awareness training. ### Gaps No penetration testing performed. No red team or purple team exercises. Improvement tracking from exercises is informal, not integrated into project management. Business continuity exercises limited to tabletop, no functional tests. Supplier coordination in exercises not practiced.",
+        "observationDate": "2026-03-17",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.IM-03 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.IM-03: Operational Process Improvement Test Procedures\n\n**CSF Subcategory:** ID.IM-03 - Improvements are identified from execution of operational processes, procedures, and activities\n\n---\n\n## Test Procedures\n\n1. **Review Policy Review Process**\n   - Obtain policy review schedule and records\n   - Verify annual policy review cycle is maintained\n   - Confirm policy updates incorporate operational lessons\n   - Check for policy review approval documentation\n\n2. **Validate Operational Metrics**\n   - Review vulnerability management operational metrics\n   - Check incident response metrics and trend analysis\n   - Verify metrics are used to identify improvement areas\n   - Assess metric coverage across operational domains\n\n3. **Assess Lessons Learned Process**\n   - Review post-incident lessons learned documentation\n   - Verify lessons learned are tracked to completion\n   - Check for structured lessons learned methodology\n   - Confirm lessons learned inform process updates\n\n4. **Review Supplier Collaboration**\n   - Check for supplier lessons learned sessions\n   - Review collaborative improvement activities with vendors\n   - Assess supplier performance metrics and feedback\n   - Verify supplier feedback is incorporated into improvements\n\n5. **Evaluate Continuous Improvement Program**\n   - Assess whether a formal continuous improvement program exists\n   - Review trend analysis of operational performance\n   - Check for improvement initiative tracking and prioritization\n   - Verify improvement outcomes are measured\n\n## Evidence Requests\n\n- [ ] Policy review schedule and records\n- [ ] Operational metrics dashboards\n- [ ] Post-incident lessons learned reports\n- [ ] Supplier collaboration records\n- [ ] Improvement initiative tracking\n- [ ] Trend analysis reports\n\n## Notes\n\nDistinguish between ad hoc improvements and a structured continuous improvement program. The former is reactive; the latter drives systematic operational maturity.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.IM-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Weekly Vulnerability Scan Summary"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 2,
+        "targetScore": 5,
+        "observations": "### Strengths Annual policy review cycle established. Vulnerability management metrics tracked (scan coverage, remediation times). Incident lessons learned documented post-incident. ### Gaps No structured continuous improvement program. Supplier lessons learned sessions not conducted. Operational metrics not systematically analyzed for trends. Policy updates do not consistently incorporate operational feedback.",
+        "observationDate": "2026-03-18",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.IM-04 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.IM-04: Cybersecurity Plan Management Test Procedures\n\n**CSF Subcategory:** ID.IM-04 - Incident response plans and other cybersecurity plans that affect operations are established, communicated, maintained, and improved\n\n---\n\n## Test Procedures\n\n1. **Review Plan Inventory**\n   - Obtain list of all cybersecurity plans (IR, BC, DR, VMP)\n   - Verify each plan's scope, owner, and last review date\n   - Confirm plans exist for all critical services\n   - Check for supply chain incident scenarios in plans\n\n2. **Validate Plan Content**\n   - Review incident response plan for completeness\n   - Verify contact and communication information is current\n   - Check that common scenario playbooks are included\n   - Confirm plan activation criteria are defined\n\n3. **Assess Plan Communication**\n   - Verify plans are distributed to responsible parties\n   - Check that affected stakeholders have access to plans\n   - Review communication of plan updates\n   - Confirm plan awareness through training or acknowledgment\n\n4. **Review Plan Maintenance**\n   - Verify annual plan review schedule\n   - Check which plans have been reviewed in the current cycle\n   - Identify plans overdue for review\n   - Confirm plan updates are version-controlled\n\n5. **Evaluate Plan Testing**\n   - Review plan testing schedule and history\n   - Check for functional testing beyond tabletop exercises\n   - Verify disaster recovery plan testing evidence\n   - Assess whether test results inform plan improvements\n\n## Evidence Requests\n\n- [ ] Cybersecurity plan inventory\n- [ ] Incident response plan (current version)\n- [ ] Business continuity plan (current version)\n- [ ] Vulnerability management plan\n- [ ] Plan distribution and acknowledgment records\n- [ ] Plan review and update history\n\n## Notes\n\nPlans that are not tested and maintained degrade in value rapidly. Focus on identifying which plans have been tested under realistic conditions and which have only been reviewed on paper.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.IM-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths Incident response plan established and communicated. Vulnerability management plan documents assessment and response procedures. Business continuity plans exist for critical services. Responsible parties identified for each plan. ### Gaps Not all plans reviewed within the past 12 months. Disaster recovery plan not tested through functional exercise. Plans do not include supply chain incident scenarios. No centralized plan management repository; plans scattered across multiple locations.",
+        "observationDate": "2026-03-18",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-01 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-01: Vulnerability Identification and Recording Test Procedures\n\n**CSF Subcategory:** ID.RA-01 - Vulnerabilities in assets are identified, validated, and recorded\n\n---\n\n## Test Procedures\n\n1. **Review Vulnerability Scanning Program**\n   - Obtain Tenable scan configuration and scheduling documentation\n   - Verify weekly scan cadence across all managed assets\n   - Review AWS Inspector assessment configuration\n   - Confirm scan coverage percentage across the asset inventory\n\n2. **Validate Scanning Coverage**\n   - Compare scanned asset list against hardware and software inventory\n   - Identify assets excluded from scanning and document justification\n   - Verify container image scanning coverage\n   - Check for application-level vulnerability testing (SAST/DAST)\n\n3. **Assess Triage and Remediation Process**\n   - Review vulnerability triage criteria (CVSS-based severity)\n   - Verify remediation SLAs by severity level\n   - Sample 5 recent critical/high vulnerabilities and track remediation\n   - Check ServiceNow ticket creation and assignment for findings\n\n4. **Review Vulnerability Recording**\n   - Verify all scan findings are recorded in ServiceNow\n   - Confirm remediation owners are assigned for all findings\n   - Check for vulnerability age tracking and escalation\n   - Review reporting and metrics for vulnerability management\n\n5. **Assess Non-Technical Vulnerability Identification**\n   - Review processes for identifying architectural vulnerabilities\n   - Check for physical facility vulnerability assessments\n   - Verify process and procedure reviews for exploitable weaknesses\n   - Confirm threat intelligence integration for new vulnerability alerts\n\n## Evidence Requests\n\n- [ ] Tenable scan configuration and schedule\n- [ ] AWS Inspector assessment reports\n- [ ] Scan coverage report (assets scanned vs. total)\n- [ ] Vulnerability remediation SLA documentation\n- [ ] Sample critical/high vulnerability tickets with remediation evidence\n- [ ] Vulnerability management metrics dashboard\n\n## Notes\n\nStrong scanning coverage for traditional infrastructure. Focus assessment on gaps in application security testing, container runtime scanning, and non-technical vulnerability identification.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 5,
+        "targetScore": 7,
+        "observations": "### Strengths Weekly Tenable scans across endpoints and cloud. AWS Inspector continuous assessments. CVSS-based triage with defined SLAs. ServiceNow tracking with remediation owners. 95% scan coverage of managed assets. ### Gaps SAST/DAST not integrated into CI/CD pipeline. Container image scanning limited to build-time, not runtime. Physical facility vulnerability assessments not performed. Process and procedure vulnerability reviews not formalized.",
+        "observationDate": "2026-03-14",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-02 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-02: Cyber Threat Intelligence Test Procedures\n\n**CSF Subcategory:** ID.RA-02 - Cyber threat intelligence is received from information sharing forums and sources\n\n---\n\n## Test Procedures\n\n1. **Review Threat Intelligence Sources**\n   - Obtain list of subscribed threat intelligence sources\n   - Verify CISA advisory subscription is active\n   - Confirm vendor security bulletin subscriptions\n   - Check industry ISAC membership and participation\n\n2. **Validate Intelligence Integration**\n   - Review SentinelOne threat feed configuration\n   - Verify detection rules are updated from intelligence sources\n   - Check for automated indicator of compromise (IOC) ingestion\n   - Confirm intelligence feeds are current and active\n\n3. **Assess Intelligence Review Process**\n   - Verify weekly threat briefing cadence and attendance\n   - Review sample threat briefing content and distribution\n   - Confirm advisories are distributed to relevant asset owners\n   - Check for actionable intelligence follow-up tracking\n\n4. **Review Intelligence Sharing Capabilities**\n   - Assess STIX/TAXII implementation status\n   - Check for structured intelligence sharing with partners\n   - Verify information sharing agreements are in place\n   - Review intelligence sharing with suppliers\n\n5. **Evaluate Intelligence Correlation**\n   - Check if threat intelligence is correlated with asset inventory\n   - Verify vulnerability intelligence feeds into scanning priorities\n   - Assess whether intelligence informs risk assessment updates\n   - Review examples of intelligence-driven security actions\n\n## Evidence Requests\n\n- [ ] Threat intelligence source subscription list\n- [ ] SentinelOne threat feed configuration\n- [ ] Sample weekly threat briefing\n- [ ] Advisory distribution records\n- [ ] ISAC membership documentation\n- [ ] Intelligence-driven action examples\n\n## Notes\n\nEvaluate whether threat intelligence is actively consumed and operationalized versus passively received. The gap between receiving intelligence and acting on it determines effectiveness.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Weekly Vulnerability Scan Summary"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 4,
+        "targetScore": 6,
+        "observations": "### Strengths CISA and vendor advisory subscriptions active. SentinelOne integrates commercial threat feeds. Weekly threat briefings conducted by security team. Relevant advisories distributed to asset owners. ### Gaps No STIX/TAXII automated threat intelligence sharing. Threat intelligence not correlated with asset inventory for impact assessment. No dedicated threat intelligence platform (TIP).",
+        "observationDate": "2026-03-14",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-03 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-03: Threat Identification and Recording Test Procedures\n\n**CSF Subcategory:** ID.RA-03 - Internal and external threats to the organization are identified and recorded\n\n---\n\n## Test Procedures\n\n1. **Review Threat Register**\n   - Obtain the current threat register\n   - Verify external threat actors are profiled by industry relevance\n   - Confirm internal threat categories are documented\n   - Check that threat register is updated quarterly\n\n2. **Validate External Threat Identification**\n   - Review threat actor profiles for completeness (TTPs, targets)\n   - Verify threat intelligence sources inform threat identification\n   - Check for industry-specific threat assessments\n   - Confirm threat register reflects current threat landscape\n\n3. **Assess Internal Threat Identification**\n   - Review insider threat awareness training content\n   - Check for formal insider threat program documentation\n   - Verify behavioral detection capabilities (SentinelOne)\n   - Assess processes for identifying internal threat indicators\n\n4. **Review Threat Hunting Activities**\n   - Obtain threat hunting activity logs or reports\n   - Verify threat hunting cadence and coverage\n   - Check for threat hunting playbooks or procedures\n   - Review findings from recent threat hunting activities\n\n5. **Validate Threat-to-Asset Mapping**\n   - Check if threat actors are mapped to targeted assets\n   - Verify threats are mapped to exploitable vulnerabilities\n   - Confirm threat register informs risk assessment updates\n   - Review how threat information drives defensive priorities\n\n## Evidence Requests\n\n- [ ] Threat register (current version)\n- [ ] Threat actor profiles\n- [ ] Insider threat awareness training materials\n- [ ] Threat hunting activity reports\n- [ ] Quarterly threat register update records\n- [ ] Threat-to-asset mapping documentation\n\n## Notes\n\nThe absence of a formal insider threat program is a notable gap. Assess whether existing behavioral detection tools provide adequate compensating capability for internal threat identification.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Weekly Vulnerability Scan Summary"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 4,
+        "targetScore": 6,
+        "observations": "### Strengths Threat register maintained and updated quarterly. External threat actors profiled by industry relevance. Security training addresses insider threat awareness. SentinelOne provides behavioral detection capabilities. ### Gaps No formal insider threat program. Threat hunting performed ad hoc, not on a regular cadence. Threat register does not map threat actors to specific organizational assets or vulnerabilities.",
+        "observationDate": "2026-03-14",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-04 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-04: Impact and Likelihood Assessment Test Procedures\n\n**CSF Subcategory:** ID.RA-04 - Potential impacts and likelihoods of threats exploiting vulnerabilities are identified and recorded\n\n---\n\n## Test Procedures\n\n1. **Review Risk Assessment Methodology**\n   - Obtain the risk assessment methodology documentation\n   - Verify likelihood and impact rating scales are defined\n   - Confirm scoring criteria are documented and consistent\n   - Check that methodology includes quantitative elements\n\n2. **Validate Risk Register Entries**\n   - Sample 5 risk register entries\n   - Verify each has documented likelihood and impact ratings\n   - Confirm ratings are supported by evidence or analysis\n   - Check that risk scenarios include threat-vulnerability pairings\n\n3. **Assess Business Impact Analysis**\n   - Review BIA completion status across systems\n   - Verify critical systems have completed BIA\n   - Check that BIA results inform risk ratings\n   - Confirm business leaders participated in BIA\n\n4. **Review Cascading Failure Analysis**\n   - Identify systems with cascading failure analysis\n   - Verify analysis covers dependency chains\n   - Check for systems of systems impact assessment\n   - Confirm analysis is limited to critical systems only\n\n5. **Evaluate Risk Assessment Currency**\n   - Verify risk assessment frequency (annual workshops)\n   - Check for event-driven risk assessment triggers\n   - Review emerging threat scenario evaluation process\n   - Confirm risk ratings are updated following significant changes\n\n## Evidence Requests\n\n- [ ] Risk assessment methodology documentation\n- [ ] Risk register with likelihood and impact ratings\n- [ ] Business impact analysis records\n- [ ] Cascading failure analysis documentation\n- [ ] Annual risk assessment workshop minutes\n- [ ] Risk rating update records\n\n## Notes\n\nAssess whether the annual risk assessment cadence is sufficient given the pace of threat landscape changes. Continuous risk assessment capabilities through automated tools would strengthen this area.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Weekly Vulnerability Scan Summary"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 6,
+        "observations": "### Strengths Risk register maintained with likelihood and impact ratings. Annual risk assessment workshops include business leadership. Quantitative risk scoring methodology documented. ### Gaps Cascading failure analysis limited to top-tier critical systems. Emerging threat scenarios not systematically evaluated. Risk assessments performed annually rather than continuously. Business impact analysis not completed for all systems.",
+        "observationDate": "2026-03-15",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-05 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-05: Risk-Informed Response Prioritization Test Procedures\n\n**CSF Subcategory:** ID.RA-05 - Threats, vulnerabilities, likelihoods, and impacts are used to understand inherent risk and inform risk response prioritization\n\n---\n\n## Test Procedures\n\n1. **Review Risk Prioritization Process**\n   - Obtain documentation of risk response prioritization methodology\n   - Verify risk register entries are prioritized by risk score\n   - Confirm prioritization considers likelihood and impact\n   - Check that resource allocation decisions reference risk priorities\n\n2. **Validate Threat Models**\n   - Review threat models for critical applications\n   - Verify threat models identify data flows and trust boundaries\n   - Check that threat models are maintained after changes\n   - Confirm threat model findings inform risk responses\n\n3. **Assess Risk-Informed Decision Making**\n   - Review examples of security investments driven by risk assessment\n   - Verify budget allocation aligns with identified risk priorities\n   - Check for documented risk-based justification for security projects\n   - Confirm risk prioritization informs vulnerability remediation order\n\n4. **Review Risk Response Tracking**\n   - Verify risk responses have documented timelines\n   - Check completion rates for planned risk responses\n   - Assess tracking mechanisms for response implementation\n   - Confirm overdue responses have escalation procedures\n\n5. **Evaluate Risk Quantification**\n   - Assess whether financial impact estimation is performed\n   - Check for risk quantification methodology (e.g., FAIR)\n   - Verify risk communication uses business-relevant metrics\n   - Review risk reporting to leadership\n\n## Evidence Requests\n\n- [ ] Risk response prioritization methodology\n- [ ] Threat model documentation for critical applications\n- [ ] Security investment justification referencing risk assessment\n- [ ] Risk response timeline and completion tracking\n- [ ] Risk reporting to leadership examples\n- [ ] Budget allocation aligned to risk priorities\n\n## Notes\n\nThe connection between risk assessment outputs and actual resource allocation decisions is the key indicator of maturity. Look for concrete evidence that risk findings drive security spending priorities.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 4,
+        "targetScore": 6,
+        "observations": "### Strengths Risk assessment outputs drive security budget prioritization. Threat models completed for top critical applications. Risk register documents prioritized risk responses with timelines. ### Gaps Threat models not updated after significant application changes. Risk response completion tracking is manual. No formal methodology for quantifying cyber risk in financial terms.",
+        "observationDate": "2026-03-15",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-06 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-06: Risk Response Management Test Procedures\n\n**CSF Subcategory:** ID.RA-06 - Risk responses are chosen, prioritized, planned, tracked, and communicated\n\n---\n\n## Test Procedures\n\n1. **Review Risk Response Framework**\n   - Obtain documentation of risk response options (accept, mitigate, transfer, avoid)\n   - Verify criteria for selecting risk response type\n   - Confirm vulnerability management plan includes response criteria\n   - Check that compensating controls are documented when applicable\n\n2. **Validate Risk Response Documentation**\n   - Sample 5 risk register entries with documented responses\n   - Verify response rationale is documented for each\n   - Confirm risk acceptance decisions include management approval\n   - Check that mitigated risks have implementation evidence\n\n3. **Assess POA&M Tracking**\n   - Review POA&M items for completeness and currency\n   - Identify overdue items and escalation status\n   - Verify milestone tracking and progress updates\n   - Confirm POA&M items are reviewed regularly\n\n4. **Review Stakeholder Communication**\n   - Verify risk response decisions are communicated to stakeholders\n   - Check governance meeting minutes for risk discussions\n   - Assess communication of priority risk responses\n   - Confirm affected parties are notified of risk decisions\n\n5. **Evaluate Response Effectiveness**\n   - Check for post-implementation review of risk responses\n   - Verify accepted risks are periodically re-evaluated\n   - Assess whether risk responses achieve intended risk reduction\n   - Review metrics for risk response program effectiveness\n\n## Evidence Requests\n\n- [ ] Risk response framework documentation\n- [ ] Risk register with response decisions and rationale\n- [ ] POA&M tracking report\n- [ ] Risk acceptance approvals with management signatures\n- [ ] Governance meeting minutes with risk discussions\n- [ ] Compensating control documentation\n\n## Notes\n\nThe 12 overdue POA&M items warrant focused attention. Determine root causes for overdue items and assess whether the tracking and escalation process is functioning effectively.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 6,
+        "observations": "### Strengths Risk responses documented with rationale in risk register. POA&M process tracks remediation progress. Vulnerability management plan defines acceptance criteria. Governance meetings communicate risk decisions. ### Gaps 12 POA&M items overdue beyond original timelines. No automated risk response status reporting. Compensating control documentation inconsistent. Risk acceptance decisions lack periodic re-evaluation schedule.",
+        "observationDate": "2026-03-15",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-07 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-07: Change and Exception Risk Management Test Procedures\n\n**CSF Subcategory:** ID.RA-07 - Changes and exceptions are managed, assessed for risk impact, recorded, and tracked\n\n---\n\n## Test Procedures\n\n1. **Review Change Management Process**\n   - Obtain ServiceNow change management process documentation\n   - Verify risk assessment is a required field in change requests\n   - Confirm CAB review process for high-risk changes\n   - Check change approval workflow and authorization levels\n\n2. **Validate Change Risk Assessment**\n   - Sample 5 recent change requests\n   - Verify each includes completed risk assessment\n   - Confirm high-risk changes received CAB review\n   - Check post-implementation reviews were conducted\n\n3. **Assess Change Compliance**\n   - Review change management compliance metrics (85% target)\n   - Investigate the 15% non-compliant changes\n   - Check if emergency change process is used appropriately\n   - Verify unauthorized changes are detected and remediated\n\n4. **Review Exception Management**\n   - Obtain exception request process documentation\n   - Sample exception requests and verify risk documentation\n   - Confirm management approval for each exception\n   - Check that exception risks are periodically re-evaluated\n\n5. **Evaluate Change Tracking and Reporting**\n   - Verify all changes are recorded in ServiceNow\n   - Check for change metrics reporting and trend analysis\n   - Assess change failure rate tracking\n   - Confirm change audit trail completeness\n\n## Evidence Requests\n\n- [ ] Change management process documentation\n- [ ] ServiceNow change compliance report\n- [ ] Sample change requests with risk assessments (5)\n- [ ] CAB meeting minutes (recent 3)\n- [ ] Exception request examples with approvals\n- [ ] Change management metrics dashboard\n\n## Notes\n\nThe 85% change compliance rate is the key finding. Investigate whether the 15% gap represents emergency changes, process circumvention, or specific teams/systems that bypass change management.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-07",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "AWS Config Compliance Snapshot"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 4,
+        "targetScore": 6,
+        "observations": "### Strengths ServiceNow change management with mandatory risk assessment. CAB reviews for high-risk changes. Exception process requires risk documentation and approval. Change metrics tracked and reported. ### Gaps 15% of changes bypass formal change management. Emergency change process sometimes used to avoid CAB review. Accepted risk exceptions not reviewed on a scheduled basis. Post-implementation risk review not consistently performed.",
+        "observationDate": "2026-03-16",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-08 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-08: Vulnerability Disclosure Management Test Procedures\n\n**CSF Subcategory:** ID.RA-08 - Processes for receiving, analyzing, and responding to vulnerability disclosures are established\n\n---\n\n## Test Procedures\n\n1. **Review Disclosure Intake Process**\n   - Verify security contact email is published and monitored\n   - Check for security.txt file publication (RFC 9116)\n   - Review vulnerability disclosure program (VDP) documentation\n   - Confirm disclosure intake channels are documented\n\n2. **Validate Disclosure Handling**\n   - Review the triage process for received disclosures\n   - Verify response SLAs for acknowledging and processing disclosures\n   - Sample recent disclosure reports and track handling\n   - Confirm findings are validated and recorded\n\n3. **Assess Supplier Vulnerability Sharing**\n   - Review vulnerability information sharing with suppliers\n   - Check for formal information sharing agreements\n   - Verify processes for receiving supplier vulnerability notifications\n   - Assess coordination procedures for shared vulnerabilities\n\n4. **Review Disclosure Response**\n   - Verify remediation timelines for disclosed vulnerabilities\n   - Check for coordination with disclosers on fix timelines\n   - Confirm disclosure resolution is communicated\n   - Review processes for public disclosure decisions\n\n5. **Evaluate Program Maturity**\n   - Assess VDP scope and coverage\n   - Check for bug bounty program or plans\n   - Review disclosure handling metrics\n   - Verify responsible disclosure practices\n\n## Evidence Requests\n\n- [ ] Security contact publication evidence\n- [ ] Vulnerability disclosure program documentation\n- [ ] Sample disclosure reports and handling records\n- [ ] Supplier vulnerability sharing agreements\n- [ ] Disclosure response timeline records\n- [ ] security.txt file (if published)\n\n## Notes\n\nThe absence of a formal VDP and security.txt represents a gap in industry best practices. Even without a bug bounty, publishing clear disclosure channels reduces risk of uncoordinated disclosure.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-08",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths Security team contact email published for receiving disclosures. Incoming vulnerability reports are triaged and tracked. Vendor security advisories are monitored. ### Gaps No formal vulnerability disclosure program (VDP). No security.txt published per RFC 9116. No structured vulnerability information sharing agreements with suppliers. Disclosure response SLAs not defined.",
+        "observationDate": "2026-03-16",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-09 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-09: Acquisition Integrity Assessment Test Procedures\n\n**CSF Subcategory:** ID.RA-09 - The authenticity and integrity of hardware and software are assessed prior to acquisition and use\n\n---\n\n## Test Procedures\n\n1. **Review Procurement Security Process**\n   - Obtain vendor security questionnaire template\n   - Verify procurement process includes security evaluation\n   - Review approved vendor list and selection criteria\n   - Check for supply chain integrity requirements\n\n2. **Validate Software Integrity Verification**\n   - Review software integrity verification procedures\n   - Check for checksum or signature verification for critical software\n   - Assess SBOM requirements for procured software\n   - Verify code signing policies for internal development\n\n3. **Assess Hardware Authenticity**\n   - Review hardware procurement from authorized distributors\n   - Check for hardware authenticity verification procedures\n   - Verify counterfeit detection capabilities\n   - Assess supply chain security for hardware components\n\n4. **Review Acquisition Risk Assessment**\n   - Sample 3 recent technology acquisitions\n   - Verify security assessment was completed prior to acquisition\n   - Confirm risk findings were addressed before deployment\n   - Check for post-acquisition security validation\n\n5. **Evaluate Ongoing Integrity Monitoring**\n   - Verify software update integrity verification\n   - Check for file integrity monitoring on critical systems\n   - Assess trusted source policies for software downloads\n   - Review AWS Marketplace usage and approval process\n\n## Evidence Requests\n\n- [ ] Vendor security questionnaire template\n- [ ] Approved vendor list\n- [ ] Software integrity verification records\n- [ ] Recent acquisition security assessments (3)\n- [ ] Hardware procurement authorization records\n- [ ] Code signing policy documentation\n\n## Notes\n\nSoftware supply chain integrity is increasingly critical. Assess whether the organization can verify the provenance of software components through SBOMs and signature verification at scale.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-09",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Third Party Risk Management Policy",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths Vendor security questionnaires required for new acquisitions. AWS Marketplace provides vetted software sources. Critical deployment packages verified via checksums. Approved vendor list maintained. ### Gaps Software integrity verification not standardized for all acquisitions. No SBOM requirement for procured software. Hardware authenticity assessment limited to supply chain trust. No code signing verification policy for internally developed software.",
+        "observationDate": "2026-03-16",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
+  "ID.RA-10 Ex1": {
+    "auditorId": 2,
+    "testProcedures": "# ID.RA-10: Critical Supplier Assessment Test Procedures\n\n**CSF Subcategory:** ID.RA-10 - Critical suppliers are assessed prior to acquisition\n\n---\n\n## Test Procedures\n\n1. **Review Third-Party Risk Management Program**\n   - Obtain third-party risk management policy\n   - Verify supplier assessment criteria and methodology\n   - Confirm critical supplier classification criteria\n   - Check for tiered assessment based on supplier criticality\n\n2. **Validate Pre-Acquisition Assessments**\n   - Sample 3 critical supplier assessments\n   - Verify assessments were completed prior to contract signing\n   - Confirm security questionnaire responses were reviewed\n   - Check SOC 2 or equivalent report review evidence\n\n3. **Assess Supplier Risk Scoring**\n   - Review supplier risk rating methodology\n   - Verify risk ratings are documented for critical suppliers\n   - Check for risk-based conditions in supplier contracts\n   - Confirm unacceptable risk findings result in remediation\n\n4. **Review Ongoing Monitoring**\n   - Verify annual reassessment cadence for critical suppliers\n   - Check for continuous monitoring capabilities\n   - Assess supplier security incident notification requirements\n   - Review fourth-party (sub-processor) risk assessment\n\n5. **Evaluate Program Coverage**\n   - Compare assessed suppliers against full supplier inventory\n   - Identify critical suppliers that have not been assessed\n   - Check for suppliers that bypass the assessment process\n   - Verify new supplier onboarding includes assessment\n\n## Evidence Requests\n\n- [ ] Third-party risk management policy\n- [ ] Critical supplier register\n- [ ] Sample supplier risk assessments (3)\n- [ ] SOC 2 report review documentation\n- [ ] Supplier security questionnaire template\n- [ ] Ongoing monitoring records\n\n## Notes\n\nFocus on whether the assessment process scales to cover all critical suppliers and whether smaller or departmental suppliers are bypassing the assessment. Fourth-party risk is an emerging gap area.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "ID.RA-10",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
+    "linkedArtifacts": [
+      "Third Party Risk Management Policy",
+      "Information Security Policy"
+    ],
+    "linkedFindings": [],
+    "remediation": {
+      "ownerId": null,
+      "actionPlan": "",
+      "dueDate": ""
+    },
+    "quarters": {
+      "Q1": {
+        "actualScore": 3,
+        "targetScore": 5,
+        "observations": "### Strengths Third-party risk management policy established. Security questionnaires and SOC 2 reviews required for critical vendors. Pre-acquisition assessment process documented. Critical supplier register maintained. ### Gaps Smaller suppliers may bypass assessment process. No continuous monitoring of supplier security posture. Fourth-party (sub-processor) risk not systematically assessed. Supplier risk ratings not integrated into the enterprise risk register.",
+        "observationDate": "2026-03-17",
+        "testingStatus": "Complete",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q2": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q3": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      },
+      "Q4": {
+        "actualScore": 0,
+        "targetScore": 0,
+        "observations": "",
+        "observationDate": "",
+        "testingStatus": "Not Started",
+        "examine": false,
+        "interview": false,
+        "test": false
+      }
+    }
+  },
   "PR.AA-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review identity management policy and procedures\n2. Verify user onboarding process\n3. Examine offboarding procedures\n4. Identify orphaned and dormant accounts\n5. Review service account management",
+    "testProcedures": "# PR.AA-01: Identity Lifecycle Management Test Procedures\n\n**CSF Subcategory:** PR.AA-01 - Identities and credentials for authorized users, services, and hardware are managed by the organization\n\n---\n\n## Test Procedures\n\n1. **Map all identity surfaces in scope**\n   - Obtain a list of all systems requiring authentication (identity provider, SaaS applications, VPN, privileged access workstations, CI/CD pipelines)\n   - Confirm the IAM policy explicitly covers each system\n   - Flag any system with independent local user management not governed by the central IdP (Completeness assertion)\n\n2. **Review identity management policy and procedures**\n   - Obtain Identity and Access Management (IAM) policy documentation\n   - Verify policy addresses onboarding, role changes, and offboarding\n   - Confirm credential management requirements (complexity, rotation, expiration)\n\n3. **Verify user onboarding process**\n   - Review onboarding workflow in ticketing system (ServiceNow)\n   - Confirm access requests require manager and asset owner approval\n   - Verify accounts are provisioned based on role-based access control (RBAC)\n   - Check that new hire access is granted within defined SLA\n\n4. **Observe provisioning workflow execution**\n   - Request a live demonstration of creating a test account through the standard provisioning workflow\n   - Verify that all approval gates trigger (manager approval, asset owner approval)\n   - Observe whether RBAC assignment is automatic or manual\n   - Note any steps performed outside the ticketing system (Accuracy + Recurrence assertions)\n\n5. **Examine offboarding procedures**\n   - Pull sample of recent terminations from HR system\n   - Verify access was revoked within required timeframe (e.g., same day for involuntary)\n   - Check for account disablement vs. deletion per retention policy\n   - Confirm return of physical access credentials (badges, tokens)\n\n6. **Compute identity hygiene KPIs**\n   - Calculate orphaned account rate: (orphaned accounts / total accounts) x 100 — target: < 1%\n   - Calculate average time to deprovisioning after termination date (target: same day for involuntary, 24 hours for voluntary)\n   - Export active accounts from the identity provider (Active Directory / corporate SSO) and cross-reference against current HR roster\n   - Identify accounts inactive 90+ days with no documented exception\n   - Calculate access review completion rate and last review date per system (Recurrence assertion)\n\n7. **Review service account management**\n   - Obtain inventory of service accounts and system accounts\n   - Verify each has documented owner and business justification\n   - Check credential rotation schedules for service accounts\n   - Confirm service accounts follow least privilege principle\n\n---\n\n## Evidence Requests\n\n- [ ] Identity and Access Management Policy\n- [ ] Full inventory of all systems with independent user management (not just the primary IdP)\n- [ ] User provisioning workflow documentation\n- [ ] Offboarding checklist and procedures\n- [ ] Sample of recent onboarding tickets (5-10 examples)\n- [ ] Sample of recent termination access revocations (5-10 examples)\n- [ ] Active Directory or identity provider user export with last-login timestamps\n- [ ] HR active employee roster (for cross-reference)\n- [ ] Access review schedule and completion records for the past 12 months\n- [ ] Service account inventory with owners\n\n---\n\n## Notes\n\nThis test procedure validates that the organization maintains accurate identity records throughout the user lifecycle. Key indicators of maturity include automated provisioning/deprovisioning, regular orphaned account reviews, and documented service account ownership. Step 1 was added to apply the 15.6 Completeness assertion: the procedure must verify IAM coverage across ALL identity surfaces, not just the primary IdP. Step 4 adds observation of a live provisioning workflow — inspection of past tickets alone does not confirm the process works as documented. Step 6 adds analytical KPIs to compute orphaned account rate and deprovisioning timeliness rather than relying on qualitative assessment. Cross-referencing identity systems with HR data helps identify access that persists after employment ends.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AA-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
       "Service Account Inventory"
     ],
     "linkedFindings": [
-      "FND-1064",
-      "FND-1065",
-      "FND-1066",
-      "FND-1067"
+      "FND-1070",
+      "FND-1071",
+      "FND-1072",
+      "FND-1073"
     ],
     "remediation": {
       "ownerId": null,
@@ -3059,16 +4721,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AA-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review identity proofing policy and standards\n2. Examine employee onboarding identity verification\n3. Assess credential uniqueness and binding controls\n4. Evaluate remote identity proofing procedures\n5. Test credential lifecycle binding integrity",
+    "testProcedures": "# PR.AA-02: Identity Proofing and Credential Binding Test Procedures\n\n**CSF Subcategory:** PR.AA-02 - Identities are proofed and bound to credentials based on the context of interactions\n\n---\n\n## Test Procedures\n\n1. **Review identity proofing policy and standards**\n   - Obtain the identity proofing policy or relevant sections of the Information Security Policy\n   - Verify policy defines assurance levels for identity proofing based on risk (e.g., NIST SP 800-63A levels)\n   - Confirm policy addresses both employee and contractor identity verification requirements\n   - Check that credential binding procedures specify how verified identities are linked to issued credentials\n\n2. **Examine employee onboarding identity verification**\n   - Review the HR and IT onboarding workflow for identity proofing steps\n   - Verify that government-issued identification is collected and validated before credential issuance\n   - Confirm that identity verification occurs before SSO account creation and MFA enrollment\n   - Sample 5-10 recent onboarding records for evidence of identity proofing completion\n\n3. **Assess credential uniqueness and binding controls**\n   - Verify that each individual receives unique credentials (no shared accounts)\n   - Confirm SSO enforces one-to-one mapping between verified identity and credential set\n   - Check that privileged accounts maintain separate credential binding from standard accounts\n   - Review policy enforcement for shared credential prohibition (e.g., shared SSH keys, shared service accounts)\n\n4. **Evaluate remote identity proofing procedures**\n   - Review procedures for verifying identity of remote employees and contractors\n   - Confirm video or in-person verification is required for high-assurance access\n   - Check that remote identity proofing meets equivalent assurance to in-person verification\n   - Verify that identity proofing records are retained per policy\n\n5. **Test credential lifecycle binding integrity**\n   - Verify that credential resets require identity re-verification (e.g., help desk identity challenge)\n   - Confirm that MFA device replacement requires identity proofing before new device enrollment\n   - Check that credential recovery processes maintain binding integrity\n   - Review self-service password reset for identity verification requirements\n\n---\n\n## Evidence Requests\n\n- [ ] Identity proofing policy or Information Security Policy (relevant sections)\n- [ ] Employee onboarding workflow with identity verification steps\n- [ ] Sample onboarding records showing identity proofing completion (5-10 examples)\n- [ ] SSO configuration showing unique credential enforcement\n- [ ] Shared account exception list with justifications (if any)\n- [ ] Remote identity proofing procedure documentation\n- [ ] Help desk identity verification scripts/procedures\n- [ ] MFA device replacement procedures\n- [ ] Credential recovery workflow documentation\n\n---\n\n## Notes\n\nThis test procedure validates that identities are verified before credentials are issued and that the binding between identity and credential is maintained throughout the lifecycle. Key maturity indicators include risk-based identity proofing assurance levels, prohibition of shared credentials with technical enforcement, and identity re-verification requirements for credential recovery. At Alma Security, the shared developer SSH key on port 45001 represents a known binding gap where multiple identities share a single credential, undermining individual accountability. The MFA Rollout project ($80K) and Apple Passkey partnership (G8) are expected to strengthen credential binding through phishing-resistant authentication factors.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AA-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
       "Third Party Risk Management Policy"
     ],
     "linkedFindings": [
-      "FND-1068",
-      "FND-1069",
-      "FND-1070"
+      "FND-1074",
+      "FND-1075",
+      "FND-1076"
     ],
     "remediation": {
       "ownerId": null,
@@ -3120,18 +4789,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AA-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review authentication policy requirements\n2. Verify MFA implementation coverage\n3. Assess MFA configuration strength\n4. Test password policy enforcement\n5. Review SSH key and certificate management\n6. Assess directory services security",
+    "testProcedures": "# PR.AA-03: Authentication Controls Test Procedures\n\n**CSF Subcategory:** PR.AA-03 - Users, services, and hardware are authenticated\n\n---\n\n## Test Procedures\n\n1. **Review authentication policy requirements**\n   - Obtain authentication and password policy documentation\n   - Verify MFA requirements align with data sensitivity and access level\n   - Confirm policy addresses remote access, privileged access, and cloud applications\n\n2. **Verify MFA implementation coverage**\n   - Export MFA enrollment report from identity provider\n   - Calculate enrollment rate (target: 100% for in-scope users)\n   - Identify users with MFA exceptions and review justifications\n   - Verify MFA is enforced for VPN, cloud applications, and administrative access\n\n3. **Assess MFA configuration strength**\n   - Review approved authentication methods (authenticator apps, hardware tokens, SMS)\n   - Verify phishing-resistant methods are prioritized (FIDO2, hardware keys)\n   - Check that SMS/voice-based MFA is restricted or being phased out\n   - Confirm MFA timeout and re-authentication requirements\n\n4. **Test password policy enforcement**\n   - Review Active Directory or identity provider password settings\n   - Verify minimum length, complexity, and history requirements\n   - Check password expiration policy (or passwordless strategy)\n   - Confirm lockout thresholds and reset procedures\n\n5. **Review SSH key and certificate management**\n   - Obtain inventory of SSH keys with associated users and systems\n   - Verify key rotation schedules and enforcement\n   - Check for use of certificate-based authentication where applicable\n   - Confirm keys are removed upon employee departure\n\n6. **Assess directory services security**\n   - Review Active Directory group policy objects (GPOs) for authentication settings\n   - Verify Kerberos and NTLM configurations align with security standards\n   - Check for legacy protocol restrictions (LM, NTLMv1)\n   - Confirm privileged group memberships are reviewed regularly\n\n---\n\n## Evidence Requests\n\n- [ ] Authentication and password policy documentation\n- [ ] MFA enrollment report (all users)\n- [ ] MFA exception list with business justifications\n- [ ] Identity provider authentication method configuration\n- [ ] Active Directory password policy settings (screenshot or export)\n- [ ] SSH key inventory with owner assignments\n- [ ] Key rotation audit logs (last 12 months)\n- [ ] Active Directory GPO export for authentication settings\n\n---\n\n## Notes\n\nThis test procedure validates that the organization enforces strong authentication across systems and applications. Phishing-resistant MFA methods (FIDO2, hardware tokens) provide stronger protection than SMS or push notifications. SSH key management is often overlooked and represents significant risk if keys persist after personnel changes.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AA-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
       "Q1 2026 Phishing Simulation Report"
     ],
     "linkedFindings": [
-      "FND-1071",
-      "FND-1072",
-      "FND-1073",
-      "FND-1074",
-      "FND-1075"
+      "FND-1077",
+      "FND-1078",
+      "FND-1079",
+      "FND-1080",
+      "FND-1081"
     ],
     "remediation": {
       "ownerId": null,
@@ -3183,18 +4859,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AA-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review identity assertion architecture and standards\n2. Examine SSO token and assertion configuration\n3. Test assertion transport security\n4. Assess federation and cross-domain assertion trust\n5. Evaluate assertion verification at relying parties",
+    "testProcedures": "# PR.AA-04: Identity Assertion Protection Test Procedures\n\n**CSF Subcategory:** PR.AA-04 - Identity assertions are protected, conveyed, and verified\n\n---\n\n## Test Procedures\n\n1. **Review identity assertion architecture and standards**\n   - Obtain documentation of identity assertion mechanisms (SAML, OAuth 2.0, OIDC, Kerberos)\n   - Verify that assertion protocols are documented with supported versions and configurations\n   - Confirm that deprecated or insecure assertion methods are prohibited (e.g., SAML 1.x, unsigned tokens)\n   - Check that assertion standards align with NIST SP 800-63C federation assurance levels\n\n2. **Examine SSO token and assertion configuration**\n   - Review Windows Authenticator SSO configuration for assertion signing and encryption\n   - Verify SAML assertions are digitally signed and optionally encrypted in transit\n   - Confirm OAuth/OIDC tokens use appropriate algorithms (RS256 or ES256, not HS256 for public clients)\n   - Check token expiration settings and refresh token policies across integrated applications\n   - Verify assertion audience restrictions are configured to prevent token reuse across services\n\n3. **Test assertion transport security**\n   - Verify all assertion exchanges occur over TLS 1.2 or higher\n   - Confirm that assertions are not exposed in URL parameters or browser history\n   - Check that redirect URIs are validated and restricted to authorized endpoints\n   - Test for assertion replay protection mechanisms (nonce, timestamp validation)\n\n4. **Assess federation and cross-domain assertion trust**\n   - Review federated identity trust relationships with external partners or cloud services\n   - Verify that AWS IAM role assumption uses properly scoped trust policies\n   - Confirm Kubernetes service account tokens are bound to specific pods and namespaces\n   - Check that cross-account AWS access uses external ID conditions to prevent confused deputy attacks\n\n5. **Evaluate assertion verification at relying parties**\n   - Sample 3-5 critical applications and verify they validate assertion signatures\n   - Confirm relying parties check assertion expiration and issuer claims\n   - Test that invalid or expired assertions are rejected (not silently accepted)\n   - Verify that assertion verification failures generate security logs\n\n---\n\n## Evidence Requests\n\n- [ ] Identity assertion architecture diagram (SSO flow, federation relationships)\n- [ ] SSO configuration export showing assertion signing and encryption settings\n- [ ] OAuth/OIDC client configurations for critical applications\n- [ ] Token expiration and refresh token policy documentation\n- [ ] TLS configuration for identity provider endpoints\n- [ ] AWS IAM trust policies for cross-account roles\n- [ ] Kubernetes RBAC and service account token configuration\n- [ ] Federation trust relationship inventory with external parties\n- [ ] Sample assertion validation logs from relying parties\n\n---\n\n## Notes\n\nThis test procedure validates that identity assertions (tokens, tickets, SAML assertions) are cryptographically protected, securely transmitted, and properly verified by relying parties. Key maturity indicators include signed and encrypted assertions, short-lived tokens with refresh mechanisms, and logged assertion verification failures. At Alma Security, the Windows Authenticator SSO serves as the primary identity provider for on-premises and SaaS applications, while AWS IAM manages cloud identity assertions. The Kubernetes environment introduces service-to-service assertion requirements that must be evaluated alongside user-facing assertions. Weak assertion protection can enable session hijacking, token forgery, and lateral movement across the hybrid infrastructure.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AA-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Information Security Policy",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1076",
-      "FND-1077",
-      "FND-1078",
-      "FND-1079",
-      "FND-1080"
+      "FND-1082",
+      "FND-1083",
+      "FND-1084",
+      "FND-1085",
+      "FND-1086"
     ],
     "remediation": {
       "ownerId": null,
@@ -3246,14 +4929,24 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AA-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review access control policy framework\n2. Audit privileged access accounts\n3. Verify access request and approval workflow\n4. Examine access recertification process\n5. Assess third-party and contractor access controls\n6. Review separation of duties controls",
+    "testProcedures": "# PR.AA-05: Access Authorization Management Test Procedures\n\n**CSF Subcategory:** PR.AA-05 - Access permissions, entitlements, and authorizations are defined in a policy, managed, enforced, and reviewed, and incorporate the principles of least privilege and separation of duties\n\n---\n\n## Test Procedures\n\n1. **Review access control policy framework**\n   - Obtain access management policy and supporting procedures\n   - Verify policy defines role-based access control (RBAC) or attribute-based access control (ABAC)\n   - Confirm least privilege and separation of duties principles are documented\n   - Check that policy addresses emergency/break-glass access procedures\n\n2. **Audit privileged access accounts**\n   - Export list of users with administrator or elevated privileges\n   - Verify each privileged account has documented business justification\n   - Check that privileged accounts are separate from standard user accounts\n   - Review privileged access management (PAM) tool configuration if applicable\n\n3. **Verify access request and approval workflow**\n   - Review access request process documentation\n   - Sample 5-10 recent access requests and verify proper approvals\n   - Confirm access grants align with role definitions\n   - Check that access requests are logged and auditable\n\n4. **Examine access recertification process**\n   - Obtain access certification campaign schedule and results\n   - Verify quarterly or semi-annual reviews are conducted\n   - Sample completed certifications for evidence of manager review\n   - Check that revocations from certifications are implemented timely\n\n5. **Assess third-party and contractor access controls**\n   - Obtain inventory of external users with system access\n   - Verify third-party accounts have expiration dates aligned with contract terms\n   - Check that vendor access is logged and monitored\n   - Confirm third-party access is included in recertification campaigns\n\n6. **Review separation of duties controls**\n   - Identify critical business processes requiring SoD\n   - Verify incompatible duties are enforced through technical controls\n   - Sample users in sensitive roles for SoD violations\n   - Check that SoD conflicts require documented exception approval\n\n---\n\n## Evidence Requests\n\n- [ ] Access Management Policy and procedures\n- [ ] Role definitions and entitlement matrix\n- [ ] List of privileged accounts with justifications\n- [ ] Sample access request tickets with approvals (5-10 examples)\n- [ ] Access certification campaign results (last 2 quarters)\n- [ ] Third-party/contractor access inventory\n- [ ] Separation of duties matrix\n- [ ] PAM tool configuration and usage reports\n\n---\n\n## Notes\n\nThis test procedure validates that the organization manages access permissions through formal processes with appropriate oversight. Key indicators include documented approval workflows, regular access certifications, and privileged access governance. Third-party access often presents elevated risk and should receive heightened scrutiny during assessments.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AA-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Access Management Policy",
       "Quarterly Access Recertification Procedure",
       "Q4 2025 Access Recertification Report",
       "AWS Config Compliance Snapshot"
     ],
-    "linkedFindings": [],
+    "linkedFindings": [
+      "FND-1087",
+      "FND-1088"
+    ],
     "remediation": {
       "ownerId": null,
       "actionPlan": "",
@@ -3263,7 +4956,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       "Q1": {
         "actualScore": 4,
         "targetScore": 5,
-        "observations": "The IT Security Manager confirmed that: - Access Management Policy documents RBAC requirements and least privilege principles - ServiceNow workflow enforces manager and asset owner approval before provisioning - Quarterly access certification campaigns achieve 95%+ completion rate - Privileged accounts are managed through CyberArk PAM solution",
+        "observations": "Access permissions and entitlements are defined in policy and largely managed as designed. The Access Management Policy documents RBAC requirements and least-privilege principles, and the ServiceNow workflow enforces manager and asset-owner approval before provisioning. Quarterly access certification campaigns achieve a 95%+ completion rate, and privileged accounts are vaulted and managed through CyberArk. Testing surfaced boundary-of-process gaps rather than design failures: three vendors' third-party access recertifications were pending past their due window, two legacy service accounts were absent from the service account inventory until discovered during testing, and the separation-of-duties matrix has not been updated for the recently implemented Workday financials module. ### Strengths - Access Management Policy defines RBAC and least privilege, and the provisioning path actually enforces it (manager + asset-owner approval in ServiceNow) - Quarterly access certification campaigns operate at 95%+ completion - Privileged accounts are centrally vaulted in CyberArk with PAM workflows ### Gaps - Third-party access recertification backlog: 3 vendors pending review beyond the due window - Service account inventory missed 2 legacy accounts (discovered only through audit testing) - Separation-of-duties matrix not updated for the Workday financials module implementation",
         "observationDate": "2026-02-15",
         "testingStatus": "Complete",
         "examine": true,
@@ -3304,18 +4997,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AA-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review physical access control policy and procedures\n2. Examine badge and credential management\n3. Assess physical access monitoring and logging\n4. Test data center and server room access controls\n5. Evaluate visitor management process\n6. Assess AWS physical security reliance",
+    "testProcedures": "# PR.AA-06: Physical Access Management Test Procedures\n\n**CSF Subcategory:** PR.AA-06 - Physical access to assets is managed, monitored, and enforced commensurate with risk\n\n---\n\n## Test Procedures\n\n1. **Review physical access control policy and procedures**\n   - Obtain Physical Security Policy and access control procedures\n   - Verify policy defines zones based on asset sensitivity (public, restricted, high-security)\n   - Confirm policy addresses visitor management, escort requirements, and temporary access\n   - Check that physical access requirements are aligned with data classification and risk levels\n\n2. **Examine badge and credential management**\n   - Review the badge issuance process and verify identity proofing occurs before badge activation\n   - Confirm badge access levels correspond to documented role-based physical access matrix\n   - Verify that badge deactivation is included in the employee offboarding workflow\n   - Check for badge inventory reconciliation procedures (lost, stolen, or unreturned badges)\n   - Sample 5-10 recent terminations to verify badge deactivation timing\n\n3. **Assess physical access monitoring and logging**\n   - Review badge reader and access control system (ACS) log retention and monitoring\n   - Verify that access logs capture entry and exit events with timestamps and identity\n   - Confirm that after-hours access to sensitive areas generates alerts or review queues\n   - Check that tailgating prevention measures are in place (mantraps, turnstiles, awareness training)\n   - Verify that physical access logs are available for incident investigation\n\n4. **Test data center and server room access controls**\n   - Verify that the on-premises Windows DC server room requires multi-factor physical access\n   - Confirm that data center access is restricted to authorized IT and security personnel\n   - Review visitor logs for the server room over the past quarter\n   - Check that environmental monitoring (temperature, humidity, water detection) is operational\n   - Verify that security cameras cover entry points and critical infrastructure areas\n\n5. **Evaluate visitor management process**\n   - Review visitor registration and approval procedures\n   - Verify that visitors are logged with name, company, host, purpose, and entry/exit times\n   - Confirm that visitors are escorted in restricted areas\n   - Check that visitor badges are visually distinct and collected upon departure\n   - Sample visitor logs for completeness over the past 30 days\n\n6. **Assess AWS physical security reliance**\n   - Review AWS shared responsibility model documentation for physical security controls\n   - Verify that Alma relies on AWS SOC 2 Type II reports for data center physical security assurance\n   - Confirm that AWS region and availability zone selection considers physical security requirements\n   - Check that physical security of the Redwood City office accounts for hybrid architecture risks\n\n---\n\n## Evidence Requests\n\n- [ ] Physical Security Policy and procedures\n- [ ] Physical access zone map with classification levels\n- [ ] Badge issuance workflow and role-based access matrix\n- [ ] Sample termination badge deactivation records (5-10 examples)\n- [ ] Access control system logs for sensitive areas (last 30 days)\n- [ ] After-hours access alerts or review reports\n- [ ] Server room visitor log (last quarter)\n- [ ] Environmental monitoring system configuration and alert history\n- [ ] Security camera coverage map\n- [ ] Visitor management policy and sample visitor logs (last 30 days)\n- [ ] AWS SOC 2 Type II report (physical security sections)\n\n---\n\n## Notes\n\nThis test procedure validates that physical access controls protect organizational assets commensurate with risk. Key maturity indicators include risk-based zone classification, automated badge lifecycle management tied to HR events, monitored access logging with alerting, and documented visitor management. At Alma Security, the on-premises Windows Domain Controller in Redwood City requires heightened physical protection since it manages Active Directory authentication for the hybrid environment. AWS physical security is inherited through the shared responsibility model and should be validated via AWS compliance reports. The 300-person headcount and Series B growth trajectory mean physical access controls must scale as the Redwood City office grows.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AA-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Physical Security Policy",
       "Access Management Policy",
       "Alma Security Hardware Inventory"
     ],
     "linkedFindings": [
-      "FND-1081",
-      "FND-1082",
-      "FND-1083",
-      "FND-1084",
-      "FND-1085"
+      "FND-1089",
+      "FND-1090",
+      "FND-1091",
+      "FND-1092",
+      "FND-1093"
     ],
     "remediation": {
       "ownerId": null,
@@ -3367,16 +5067,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AT-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review training program documentation\n2. Verify Workday training records\n3. Examine phishing simulation results\n4. Assess new hire onboarding process",
+    "testProcedures": "# PR.AT-01: Security Awareness Training Test Procedures\n\n**CSF Subcategory:** PR.AT-01 - Personnel are provided awareness and training\n\n**Scope:** Alma Security 2025 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Review training program documentation**\n   - Obtain security awareness program charter/policy\n   - Verify training frequency requirements (Alma: quarterly)\n   - Confirm coverage of required topics (social engineering, phishing, data handling)\n\n2. **Verify Workday training records against full personnel roster**\n   - Export training completion report segmented by employee type (FTE, contractor, part-time, temp)\n   - Verify the 90%+ completion target applies to all segments, not just FTEs (Completeness assertion)\n   - For each quarter in the past 12 months, verify a distinct training event was completed per employee (Recurrence: 4 completions per person, not 1 cumulative total)\n   - Identify personnel with overdue training and any exemptions with documented business justification\n\n3. **Examine phishing simulation results**\n   - Review last 3-6 months of phishing simulation campaigns\n   - Document click rates and improvement trends by quarter\n   - Verify remedial training is triggered and tracked for repeat clickers\n\n4. **Assess training content calibration against threat landscape**\n   - Obtain the current threat intelligence summary or risk register for Alma\n   - Verify that training topics are weighted proportionally to actual threats (e.g., if phishing represents the majority of incidents, it should be the primary training focus)\n   - Confirm training content was updated in the past 12 months to reflect new threat vectors (Valuation assertion)\n\n5. **Assess new hire onboarding process**\n   - Review onboarding checklist for security training requirements\n   - Verify training completion timeframe (e.g., within 30 days of start date)\n   - Confirm cyber hygiene training is mandatory before system access is granted\n\n---\n\n## Evidence Requests\n\n- [ ] Security Awareness Program documentation\n- [ ] Workday training completion report segmented by employee type (FTE, contractor, temp)\n- [ ] Quarterly training delivery records for past 12 months (not aggregated annually)\n- [ ] Phishing simulation campaign results (last 3-6 months)\n- [ ] New hire onboarding checklist\n- [ ] Threat intelligence summary or risk register used to inform training content selection\n- [ ] Sample training content/modules\n\n---\n\n## Related Artifacts\n\n- [Security Awareness Program Description](../../5_Artifacts/Evidence/EVD-security-awareness-program.md)\n- [Training Completion Report — Q1 2026](../../5_Artifacts/Evidence/EVD-training-completion-q1.md)\n- [Phishing Campaign Data — May 2025](../../5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx)\n\n---\n\n## Notes\n\nThis test procedure validates that the organization provides appropriate security awareness training to all personnel. Step 2 was expanded to apply the 15.6 Completeness and Recurrence assertions: the 90% completion rate must be verified across all employee types (not just FTEs), and quarterly recurrence must be confirmed as 4 distinct training completions per person in the past 12 months, not as a single annual aggregated report. Step 4 is a new addition applying the Valuation assertion: training content should be calibrated to the actual threat landscape, not just cover a static topic list. Key metrics include training completion rates by population segment, quarterly recurrence, and phishing simulation click rate trends.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AT-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Acceptable Use Policy",
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Q1 2026 Phishing Simulation Report"
     ],
     "linkedFindings": [
-      "FND-1086",
-      "FND-1087",
-      "FND-1088"
+      "FND-1094",
+      "FND-1095",
+      "FND-1096"
     ],
     "remediation": {
       "ownerId": null,
@@ -3428,18 +5135,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.AT-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Identify roles designated as requiring specialized training\n2. Review role-based training curriculum and delivery records\n3. Examine hands-on and technical skill validation\n4. Assess periodic knowledge testing for specialized roles\n5. Verify annual refresher requirements",
+    "testProcedures": "# PR.AT-02: Specialized Role-Based Training Test Procedures\n\n**CSF Subcategory:** PR.AT-02 - Individuals in specialized roles are provided with awareness and training so that they possess the knowledge and skills to perform relevant tasks with cybersecurity risks in mind\n\n**Scope:** Alma Security Q1 2026 CSF Assessment\n\n**Auditor:** Steve Mercer, Internal Audit steve.mercer@almasecurity.com\n\n---\n\n## Test Procedures\n\n1. **Identify roles designated as requiring specialized training**\n   - Obtain the organization's role classification matrix or equivalent documentation\n   - Verify that roles with elevated access, security responsibilities, or regulatory obligations are formally designated (e.g., D&R analysts, vulnerability management, system administrators, developers)\n   - Confirm designation criteria are documented and reviewed at least annually\n\n2. **Review role-based training curriculum and delivery records**\n   - Obtain training plans specific to each designated specialized role\n   - Verify training content maps to role-specific threats, tools, and procedures (e.g., SentinelOne console operation for D&R, Palo Alto firewall management for network ops)\n   - Export Workday training completion records filtered to specialized roles\n   - Calculate completion rates per role and identify overdue personnel\n\n3. **Examine hands-on and technical skill validation**\n   - Review evidence of practical exercises, tabletop scenarios, or tool-specific certifications\n   - Verify D&R team (Nadia Khan) has received training on SentinelOne EDR, incident handling procedures, and Slack-based alert triage\n   - Verify VM team (Chris Magann, Tigan Wang) has received training on vulnerability scanning tools, CVSS scoring, and patch prioritization workflows\n   - Confirm developer security training covers secure coding practices, dependency scanning, and OWASP Top 10\n\n4. **Assess periodic knowledge testing for specialized roles**\n   - Review results of any role-specific assessments, quizzes, or practical evaluations\n   - Determine whether assessment results are tracked and remediation is assigned for below-threshold scores\n   - Verify assessment cadence aligns with policy requirements\n\n5. **Verify annual refresher requirements**\n   - Confirm policy mandates annual refresher training for all specialized roles\n   - Review Workday records to verify refresher completions within the last 12 months\n   - Identify any specialized personnel who have not completed annual refreshers\n\n---\n\n## Evidence Requests\n\n- [ ] Specialized role designation matrix or policy defining which roles require additional training\n- [ ] Role-based training plans/curricula for D&R, VM, DevSec, and system administration\n- [ ] Workday training completion reports filtered to specialized roles (last 12 months)\n- [ ] Tool-specific certification or training records (SentinelOne, Palo Alto, etc.)\n- [ ] Role-based assessment or quiz results\n- [ ] Annual refresher completion records for specialized personnel\n- [ ] Training budget allocation documentation for specialized roles\n\n---\n\n## Notes\n\nThis test procedure validates that individuals in roles with heightened cybersecurity responsibilities receive training beyond general awareness. At Alma Security, key specialized roles include D&R analysts, vulnerability management specialists, DevSecOps engineers, and system/network administrators. The assessment focuses on whether training is role-appropriate, current, and validated through periodic testing. Specialized training maturity is expected to trail general awareness maturity given Alma's growth stage.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.AT-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Acceptable Use Policy",
       "Q1 2026 Phishing Simulation Report"
     ],
     "linkedFindings": [
-      "FND-1089",
-      "FND-1090",
-      "FND-1091",
-      "FND-1092",
-      "FND-1093"
+      "FND-1097",
+      "FND-1098",
+      "FND-1099",
+      "FND-1100",
+      "FND-1101"
     ],
     "remediation": {
       "ownerId": null,
@@ -3491,19 +5205,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.DS-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review data-at-rest encryption policy and standards\n2. Assess encryption implementation across storage systems\n3. Evaluate data integrity controls\n4. Test access restrictions on data-at-rest\n5. Examine removable media controls\n6. Validate secure storage infrastructure",
+    "testProcedures": "# PR.DS-01: Data-at-Rest Protection Test Procedures\n\n**CSF Subcategory:** PR.DS-01 - The confidentiality, integrity, and availability of data-at-rest are protected\n\n---\n\n## Test Procedures\n\n1. **Review data-at-rest encryption policy and standards**\n   - Obtain the organization's data encryption policy and standards documentation\n   - Verify policy mandates encryption for all sensitive data at rest (AES-256 or equivalent)\n   - Confirm policy defines which data classifications require encryption\n   - Validate that the policy addresses key management lifecycle (generation, rotation, revocation, destruction)\n   - Check alignment with NIST SP 800-53 SC-28, SC-12, SC-13\n\n2. **Assess encryption implementation across storage systems**\n   - Inventory all data storage locations (databases, file systems, object storage, backups)\n   - Verify encryption is enabled on PostgreSQL databases (Transparent Data Encryption or column-level)\n   - Confirm AWS S3 bucket encryption settings (SSE-S3, SSE-KMS, or SSE-C) across all buckets\n   - Validate on-premises Windows Domain Controller storage encryption (BitLocker or equivalent)\n   - Check Kubernetes persistent volume encryption configurations\n   - Sample 10-15 storage resources and verify encryption status against policy requirements\n\n3. **Evaluate data integrity controls**\n   - Review integrity verification mechanisms (checksums, hash validation, digital signatures)\n   - Test file integrity monitoring (FIM) configuration and alerting\n   - Verify SentinelOne FIM policy covers critical data repositories\n   - Confirm that integrity baselines are established and deviation alerts are functional\n   - Pull sample of recent integrity alerts and verify investigation/resolution\n\n4. **Test access restrictions on data-at-rest**\n   - Review access control lists on encrypted storage resources\n   - Verify that decryption keys are restricted to authorized personnel and services only\n   - Test separation of duties between storage administrators and key custodians\n   - Confirm access logging is enabled for all encrypted data stores\n   - Sample access logs to verify no unauthorized decryption attempts\n\n5. **Examine removable media controls**\n   - Obtain removable media policy documentation\n   - Verify technical controls blocking unauthorized removable media (USB, external drives)\n   - Test endpoint DLP policies enforcing encryption on approved removable media\n   - Confirm SentinelOne device control policy is deployed across all endpoints\n   - Review exception process and sample approved exceptions for business justification\n\n6. **Validate secure storage infrastructure**\n   - Assess physical security of on-premises storage infrastructure\n   - Verify AWS S3 bucket policies block public access by default\n   - Confirm S3 Access Analyzer is enabled and findings are triaged\n   - Test that deleted data is securely wiped per media sanitization standards (NIST SP 800-88)\n   - Validate data lifecycle rules ensure encrypted data remains protected through retention period\n\n---\n\n## Evidence Requests\n\n- [ ] Data Encryption Policy and Standards document\n- [ ] Data classification schema (or draft if in progress)\n- [ ] AWS S3 bucket encryption configuration report (all buckets)\n- [ ] PostgreSQL database encryption settings documentation\n- [ ] AWS KMS key inventory and rotation schedule\n- [ ] SentinelOne device control policy configuration\n- [ ] Removable media policy and approved exceptions list\n- [ ] File integrity monitoring configuration and recent alert samples\n- [ ] Storage access control lists for critical data repositories\n- [ ] BitLocker or equivalent encryption status for on-premises systems\n- [ ] Kubernetes persistent volume encryption configuration\n- [ ] S3 Access Analyzer findings report\n\n---\n\n## Notes\n\nThis test procedure validates that Alma Security protects data at rest across its hybrid infrastructure (AWS multi-AZ Kubernetes and on-premises Windows Domain Controller). Given the Data Encryption Upgrade project ($95K) and S3 Bucket Security project ($70K) are actively in progress, assessors should document both current state and planned improvements. Biometric data, as the highest sensitivity classification, warrants focused testing to confirm encryption meets or exceeds AES-256 standards. The data classification schema being in development may limit the ability to fully assess whether all sensitive data categories are identified and encrypted appropriately.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.DS-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1094",
-      "FND-1095",
-      "FND-1096",
-      "FND-1097",
-      "FND-1098",
-      "FND-1099"
+      "FND-1102",
+      "FND-1103",
+      "FND-1104",
+      "FND-1105",
+      "FND-1106",
+      "FND-1107"
     ],
     "remediation": {
       "ownerId": null,
@@ -3555,19 +5276,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.DS-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review data-in-transit encryption policy and standards\n2. Assess TLS configuration and enforcement\n3. Evaluate internal service communication encryption\n4. Test VPN and remote access encryption\n5. Validate unencrypted connection blocking",
+    "testProcedures": "# PR.DS-02: Data-in-Transit Protection Test Procedures\n\n**CSF Subcategory:** PR.DS-02 - The confidentiality, integrity, and availability of data-in-transit are protected\n\n---\n\n## Test Procedures\n\n1. **Review data-in-transit encryption policy and standards**\n   - Obtain the organization's network encryption policy and transport security standards\n   - Verify policy mandates TLS 1.2 or higher for all data in transit\n   - Confirm policy addresses VPN requirements for remote access and site-to-site connectivity\n   - Validate that policy covers internal service-to-service communication (east-west traffic)\n   - Check alignment with NIST SP 800-53 SC-08, SC-12, SC-13, SC-23\n\n2. **Assess TLS configuration and enforcement**\n   - Inventory all externally-facing endpoints and services\n   - Verify TLS 1.2+ is enforced on all public-facing load balancers and ingress controllers\n   - Check that TLS 1.0 and 1.1 are disabled across all services\n   - Validate certificate management practices (CA-signed, expiration monitoring, auto-renewal)\n   - Test cipher suite configuration for strong algorithms (no RC4, 3DES, or weak ciphers)\n   - Confirm HSTS headers are enabled on web applications\n   - Sample 5-10 endpoints with SSL Labs or equivalent scanner\n\n3. **Evaluate internal service communication encryption**\n   - Review Kubernetes service mesh or network policy for pod-to-pod encryption\n   - Verify mutual TLS (mTLS) configuration for internal microservices\n   - Test database connection encryption (PostgreSQL SSL mode = require/verify-full)\n   - Confirm API gateway enforces TLS for backend service communication\n   - Check that internal AWS traffic uses encrypted channels (VPC endpoints, PrivateLink)\n\n4. **Test VPN and remote access encryption**\n   - Review VPN configuration for remote employee access\n   - Verify VPN uses strong encryption protocols (IKEv2, WireGuard, or OpenVPN with AES-256)\n   - Confirm split tunneling policies align with security requirements\n   - Test that corporate resources are only accessible through encrypted channels\n   - Validate certificate-based or MFA-based VPN authentication\n\n5. **Validate unencrypted connection blocking**\n   - Test network security groups and firewall rules for plaintext protocol blocking (HTTP, FTP, Telnet)\n   - Verify HTTP-to-HTTPS redirect is enforced on all web properties\n   - Confirm S3 bucket policies enforce ssl:true condition on all API calls\n   - Check that database connections reject non-SSL connections\n   - Review monitoring and alerting for unencrypted connection attempts\n\n---\n\n## Evidence Requests\n\n- [ ] Network encryption policy and transport security standards\n- [ ] TLS configuration documentation for externally-facing services\n- [ ] SSL/TLS scan results for public endpoints (SSL Labs or equivalent)\n- [ ] Certificate inventory and management procedures\n- [ ] Kubernetes network policy or service mesh configuration\n- [ ] VPN configuration and encryption settings\n- [ ] S3 bucket policies enforcing encryption in transit\n- [ ] PostgreSQL SSL configuration settings\n- [ ] Firewall rules demonstrating plaintext protocol blocking\n- [ ] HSTS configuration evidence for web applications\n\n---\n\n## Notes\n\nThis test procedure validates Alma Security's protection of data in transit across its hybrid environment. Given that continuous authentication is Alma's core SaaS product, the integrity and confidentiality of authentication data flowing between clients and the platform is business-critical. Assessors should pay particular attention to east-west traffic encryption within the Kubernetes cluster, as microservice architectures can have significant internal API traffic that may not be encrypted by default. The AWS multi-AZ deployment adds complexity around cross-AZ traffic encryption that should be verified.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.DS-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary"
     ],
     "linkedFindings": [
-      "FND-1100",
-      "FND-1101",
-      "FND-1102",
-      "FND-1103",
-      "FND-1104",
-      "FND-1105"
+      "FND-1108",
+      "FND-1109",
+      "FND-1110",
+      "FND-1111",
+      "FND-1112",
+      "FND-1113"
     ],
     "remediation": {
       "ownerId": null,
@@ -3619,19 +5347,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.DS-10 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review data-in-use protection policies and standards\n2. Assess memory handling for sensitive data\n3. Evaluate process isolation controls\n4. Test unauthorized data-in-use access prevention",
+    "testProcedures": "# PR.DS-10: Data-in-Use Protection Test Procedures\n\n**CSF Subcategory:** PR.DS-10 - The confidentiality, integrity, and availability of data-in-use are protected\n\n---\n\n## Test Procedures\n\n1. **Review data-in-use protection policies and standards**\n   - Obtain policies addressing protection of data during active processing\n   - Verify policy covers memory handling for sensitive data (biometric data, authentication tokens)\n   - Confirm policy addresses process isolation and secure computing requirements\n   - Validate that data-in-use protection is aligned with data classification levels\n   - Check alignment with NIST SP 800-53 SC-04, SC-39, SC-43\n\n2. **Assess memory handling for sensitive data**\n   - Review application code and architecture for secure memory handling practices\n   - Verify that biometric data is cleared from memory after processing (no persistent memory residue)\n   - Confirm authentication tokens and session keys have defined memory lifetimes\n   - Test that sensitive data is not written to swap files or crash dumps unencrypted\n   - Check that debug/logging configurations do not expose sensitive data in memory\n   - Review application frameworks for secure string handling (SecureString equivalents)\n   - Validate heap and stack protections are enabled (ASLR, DEP/NX, stack canaries)\n\n3. **Evaluate process isolation controls**\n   - Verify Kubernetes pod security standards enforce process isolation\n   - Confirm container runtime security settings (read-only root filesystem, no privilege escalation)\n   - Test namespace isolation between workloads of different sensitivity levels\n   - Validate that SentinelOne monitors for memory injection attacks and process hollowing\n   - Check that on-premises Windows Domain Controller enforces credential guard and secure boot\n   - Review application sandboxing for services processing biometric data\n\n4. **Test unauthorized data-in-use access prevention**\n   - Verify controls preventing unauthorized interprocess communication\n   - Test screen capture and clipboard protection for applications handling sensitive data\n   - Confirm DLP controls monitor for data exfiltration through memory scraping\n   - Validate that hypervisor-level isolation is configured for multi-tenant workloads (if applicable)\n   - Review SentinelOne behavioral detection rules for runtime data access anomalies\n\n---\n\n## Evidence Requests\n\n- [ ] Data-in-use protection policy or secure development standards\n- [ ] Application architecture documentation for biometric data processing pipeline\n- [ ] Kubernetes pod security policy/standards configuration\n- [ ] Container runtime security configuration (seccomp profiles, AppArmor/SELinux)\n- [ ] Memory handling procedures for sensitive data types\n- [ ] SentinelOne behavioral detection policy configuration\n- [ ] Windows Credential Guard and Secure Boot configuration evidence\n- [ ] Crash dump and swap file encryption settings\n- [ ] Secure coding guidelines addressing memory management\n\n---\n\n## Notes\n\nThis test procedure addresses an area where most organizations are in early maturity stages, and Alma Security is no exception. Data-in-use protection is inherently more challenging than at-rest or in-transit protection because data must be unencrypted during processing. Given that Alma processes biometric data (its highest sensitivity classification) as part of its continuous authentication platform, the secure handling of this data in memory during active processing is a critical control area. Assessors should focus on the biometric data processing pipeline specifically, and evaluate whether application-level controls compensate for the lack of hardware-based confidential computing (e.g., Intel SGX, AMD SEV). This is an emerging area where establishing baseline practices and a roadmap is more important than achieving full maturity in Q1 2026.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.DS-10",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
       "SentinelOne Application Control Configuration Evidence"
     ],
     "linkedFindings": [
-      "FND-1106",
-      "FND-1107",
-      "FND-1108",
-      "FND-1109",
-      "FND-1110",
-      "FND-1111"
+      "FND-1114",
+      "FND-1115",
+      "FND-1116",
+      "FND-1117",
+      "FND-1118",
+      "FND-1119"
     ],
     "remediation": {
       "ownerId": null,
@@ -3683,21 +5418,28 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.DS-11 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review backup policy and procedures\n2. Assess backup execution and completeness\n3. Evaluate backup confidentiality and integrity protection\n4. Test backup restoration procedures\n5. Verify off-site and geographic backup distribution",
+    "testProcedures": "# PR.DS-11: Backup Management Test Procedures\n\n**CSF Subcategory:** PR.DS-11 - Backups of data are created, protected, maintained, and tested sufficient to support recovery\n\n---\n\n## Test Procedures\n\n1. **Review backup policy and procedures**\n   - Obtain the organization's backup and recovery policy documentation\n   - Verify policy defines backup frequency, retention periods, and scope for each data classification\n   - Confirm policy addresses backup types (full, incremental, differential) and schedules\n   - Validate that policy covers both cloud (AWS) and on-premises environments\n   - Check that backup requirements align with business continuity and disaster recovery objectives\n   - Check alignment with NIST SP 800-53 CP-09, CP-10\n\n2. **Assess backup execution and completeness**\n   - Review automated backup configurations for PostgreSQL databases\n   - Verify AWS RDS automated backup settings (retention window, backup window, multi-AZ)\n   - Confirm S3 versioning and cross-region replication for critical data buckets\n   - Validate Kubernetes persistent volume backup procedures (Velero or equivalent)\n   - Check on-premises Windows Domain Controller backup (Active Directory, system state)\n   - Verify backup job completion reports for the past 30 days\n   - Identify any backup failures and confirm remediation actions\n\n3. **Evaluate backup confidentiality and integrity protection**\n   - Verify backup data is encrypted at rest (AES-256 or equivalent)\n   - Confirm backup encryption keys are managed separately from production keys\n   - Test access controls on backup storage locations (S3 bucket policies, IAM roles)\n   - Validate that backup integrity checksums are generated and verified\n   - Confirm immutable backup copies exist (S3 Object Lock, WORM storage)\n   - Verify that backup access is logged and monitored\n\n4. **Test backup restoration procedures**\n   - Review restoration test documentation and schedule (quarterly cadence)\n   - Verify most recent restoration test results and success criteria\n   - Confirm restoration testing covers critical systems (PostgreSQL databases, application data)\n   - Validate that Recovery Time Objective (RTO) and Recovery Point Objective (RPO) are documented\n   - Test or observe a sample restoration to verify data integrity post-restore\n   - Measure actual restoration time against documented RTO targets\n\n5. **Verify off-site and geographic backup distribution**\n   - Confirm backups are stored in geographically separate location from production\n   - Verify AWS cross-region backup replication configuration\n   - Validate that off-site backup locations meet same security standards as production\n   - Confirm network connectivity and access procedures for off-site backup retrieval\n   - Review DR plan (in development via Cloud Security Optimization project) for backup integration\n\n---\n\n## Evidence Requests\n\n- [ ] Backup and Recovery Policy document\n- [ ] Backup schedule and configuration for all critical systems\n- [ ] AWS RDS automated backup configuration screenshots\n- [ ] S3 versioning and replication configuration\n- [ ] Kubernetes persistent volume backup configuration (Velero or equivalent)\n- [ ] Backup job completion reports (last 30 days)\n- [ ] Backup encryption configuration evidence\n- [ ] Backup access control documentation (IAM policies, bucket policies)\n- [ ] Most recent quarterly restoration test report\n- [ ] RTO and RPO documentation for critical systems\n- [ ] Off-site/cross-region backup configuration evidence\n- [ ] DR plan documentation (current draft if in development)\n\n---\n\n## Notes\n\nThis test procedure validates Alma Security's backup management practices across its hybrid infrastructure. Automated backup verification is a strength, and quarterly restore testing demonstrates proactive validation of recovery capabilities. The DR plan currently in development via the Cloud Security Optimization project ($100K) will formalize recovery objectives and procedures. Assessors should evaluate whether current backup practices adequately protect biometric data given its highest sensitivity classification, and whether the backup encryption aligns with the in-progress Data Encryption Upgrade project standards. The transition from manual to automated restore testing is a positive maturity indicator that should be documented.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.DS-11",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
       "Data Classification Policy"
     ],
     "linkedFindings": [
-      "FND-1112",
-      "FND-1113",
-      "FND-1114",
-      "FND-1115",
-      "FND-1116",
-      "FND-1117",
-      "FND-1118",
-      "FND-1119"
+      "FND-1120",
+      "FND-1121",
+      "FND-1122",
+      "FND-1123",
+      "FND-1124",
+      "FND-1125",
+      "FND-1126",
+      "FND-1127"
     ],
     "remediation": {
       "ownerId": null,
@@ -3749,18 +5491,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.IR-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review network architecture and segmentation design\n2. Examine firewall and gateway security controls\n3. Assess network integrity monitoring capabilities\n4. Evaluate network access control for device connectivity\n5. Test segmentation effectiveness",
+    "testProcedures": "# PR.IR-01: Network Protection from Unauthorized Logical Access\n\n**CSF Subcategory:** PR.IR-01 - Networks and network services are protected from unauthorized logical access and usage\n\n---\n\n## Test Procedures\n\n1. **Review network architecture and segmentation design**\n   - Obtain current network topology diagrams for AWS VPC and on-premises Redwood City data center\n   - Identify network segments, VLANs, subnets, and trust boundaries\n   - Verify that production, development, and management networks are logically separated\n   - Confirm VPC architecture uses private subnets for backend services and public subnets only where required\n\n2. **Examine firewall and gateway security controls**\n   - Review Palo Alto firewall rulebase for the Redwood City data center perimeter\n   - Verify rules follow least-privilege deny-by-default principles\n   - Check for overly permissive rules (any/any, broad CIDR ranges, unused rules)\n   - Review AWS Security Group and Network ACL configurations for production VPCs\n   - Confirm 2FA enforcement via Windows Authenticator for administrative access to network devices\n\n3. **Assess network integrity monitoring capabilities**\n   - Verify VPC Flow Logs are enabled on all production VPCs and subnets\n   - Confirm DNS query logging is active and forwarded to centralized logging\n   - Check for network-based intrusion detection or anomaly detection capabilities\n   - Review alerting thresholds and response procedures for network anomalies\n   - Evaluate whether a WAF is deployed for internet-facing applications\n\n4. **Evaluate network access control for device connectivity**\n   - Determine whether Network Access Control (NAC) is implemented\n   - Review how devices are authenticated before obtaining network access\n   - Check whether rogue device detection exists on the corporate network\n   - Verify Kubernetes pod network policies restrict east-west traffic between namespaces\n\n5. **Test segmentation effectiveness**\n   - Review evidence of segmentation testing or penetration test results targeting lateral movement\n   - Verify that cross-segment traffic is logged and monitored\n   - Confirm that Kubernetes network policies enforce namespace isolation\n   - Check that on-premises Windows domain controllers are segmented from general user networks\n\n---\n\n## Evidence Requests\n\n- [ ] Network topology diagrams (AWS VPC and on-premises)\n- [ ] Palo Alto firewall rulebase export and change management logs\n- [ ] AWS Security Group and Network ACL configurations\n- [ ] VPC Flow Log configuration and sample output\n- [ ] DNS query logging configuration\n- [ ] Kubernetes network policy manifests\n- [ ] NAC solution documentation (if implemented)\n- [ ] Most recent penetration test report (network segmentation findings)\n- [ ] WAF deployment status and project documentation\n- [ ] Windows Authenticator 2FA configuration for network device access\n\n---\n\n## Notes\n\nThis test procedure evaluates how Alma Security protects its hybrid network environment — spanning AWS multi-AZ Kubernetes infrastructure and the Redwood City on-premises data center — from unauthorized logical access. Key areas of focus include the Palo Alto firewall configuration, VPC segmentation design, the absence of a WAF (currently a funded project at $112K), and network monitoring through VPC Flow Logs and DNS query logging. The presence of a Windows Server 2012 R2 fileserver scheduled for Q3 upgrade represents a legacy risk factor that should be examined for network exposure.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.IR-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Physical Security Policy",
       "Backup and Restore Procedure"
     ],
     "linkedFindings": [
-      "FND-1120",
-      "FND-1121",
-      "FND-1122",
-      "FND-1123",
-      "FND-1124"
+      "FND-1128",
+      "FND-1129",
+      "FND-1130",
+      "FND-1131",
+      "FND-1132"
     ],
     "remediation": {
       "ownerId": null,
@@ -3812,18 +5561,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.IR-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review physical environmental protection controls at Redwood City data center\n2. Assess AWS infrastructure environmental resilience\n3. Evaluate environmental monitoring and alerting\n4. Examine environmental controls maintenance program",
+    "testProcedures": "# PR.IR-02: Environmental Threat Protection\n\n**CSF Subcategory:** PR.IR-02 - The organization's technology assets are protected from environmental threats\n\n---\n\n## Test Procedures\n\n1. **Review physical environmental protection controls at Redwood City data center**\n   - Inspect fire suppression system documentation, maintenance records, and last inspection date\n   - Verify HVAC monitoring is active with alerting for temperature and humidity thresholds\n   - Confirm flood detection and water intrusion sensors are deployed in the data center\n   - Review uninterruptible power supply (UPS) configuration and generator backup arrangements\n   - Check physical access controls protecting environmental systems from tampering\n\n2. **Assess AWS infrastructure environmental resilience**\n   - Verify production workloads are deployed across multiple Availability Zones\n   - Confirm that AWS region selection accounts for geographic risk factors\n   - Review the shared responsibility model understanding documented by the infrastructure team\n   - Validate that critical data is replicated across AZs or regions for environmental disaster scenarios\n\n3. **Evaluate environmental monitoring and alerting**\n   - Review HVAC monitoring system dashboards and alert configurations\n   - Verify alert escalation paths for environmental anomalies (temperature spikes, humidity changes, water detection)\n   - Check whether environmental monitoring data is retained for trend analysis\n   - Confirm 24/7 notification capabilities for environmental events at Redwood City\n   - Review AWS health monitoring and region-level incident notification procedures\n\n4. **Examine environmental controls maintenance program**\n   - Obtain fire suppression system inspection and testing schedule\n   - Review HVAC maintenance records and service agreements\n   - Verify generator testing schedule and fuel management procedures (if applicable)\n   - Confirm UPS battery replacement and testing schedule\n\n---\n\n## Evidence Requests\n\n- [ ] Fire suppression system inspection reports and maintenance records\n- [ ] HVAC monitoring system configuration and alerting thresholds\n- [ ] Data center environmental monitoring dashboard screenshots\n- [ ] UPS and power backup configuration documentation\n- [ ] AWS multi-AZ deployment architecture documentation\n- [ ] Flood/water detection sensor placement diagrams\n- [ ] Environmental incident response procedures\n- [ ] Maintenance contracts for environmental systems\n- [ ] Generator testing logs (if applicable)\n\n---\n\n## Notes\n\nAlma Security operates a hybrid infrastructure model. The Redwood City on-premises data center has documented fire suppression and HVAC monitoring capabilities, which provides a baseline for environmental threat protection. The AWS multi-AZ architecture inherently provides environmental resilience through geographic distribution of availability zones. The assessment should focus on verifying that on-premises environmental controls are maintained, tested, and monitored continuously, and that the team understands AWS's shared responsibility model for environmental protection at the cloud infrastructure layer.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.IR-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Physical Security Policy",
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report"
     ],
     "linkedFindings": [
-      "FND-1125",
-      "FND-1126",
-      "FND-1127",
-      "FND-1128",
-      "FND-1129"
+      "FND-1133",
+      "FND-1134",
+      "FND-1135",
+      "FND-1136",
+      "FND-1137"
     ],
     "remediation": {
       "ownerId": null,
@@ -3875,18 +5631,25 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.IR-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review redundancy and failover architecture\n2. Assess disaster recovery planning and testing\n3. Evaluate high-availability component implementation\n4. Test failover capabilities\n5. Review resilience monitoring and incident response integration",
+    "testProcedures": "# PR.IR-03: Resilience Mechanisms for Normal and Adverse Situations\n\n**CSF Subcategory:** PR.IR-03 - Mechanisms are implemented to achieve resilience requirements in normal and adverse situations\n\n---\n\n## Test Procedures\n\n1. **Review redundancy and failover architecture**\n   - Obtain architecture documentation for production systems showing redundancy design\n   - Verify multi-AZ deployment configuration for AWS production workloads\n   - Confirm Kubernetes pod redundancy with replica sets and anti-affinity rules\n   - Review auto-scaling policies and triggers for Kubernetes workloads\n   - Validate that single points of failure have been identified and addressed\n\n2. **Assess disaster recovery planning and testing**\n   - Obtain the current DR plan documentation (note: DR plan is reported as in development)\n   - Review the Cloud Security Optimization project ($100K) scope related to DR capabilities\n   - Determine recovery time objectives (RTO) and recovery point objectives (RPO) for critical systems\n   - Check whether DR scenarios have been documented and prioritized\n   - Verify backup strategy and retention policies for critical data\n\n3. **Evaluate high-availability component implementation**\n   - Review Kubernetes cluster configuration for high availability (control plane and worker nodes)\n   - Verify database and storage tier redundancy (multi-AZ RDS, replicated storage)\n   - Confirm load balancer configuration distributes traffic across healthy instances\n   - Check that redundant storage and compute are provisioned for critical systems\n   - Review service mesh or service discovery configuration for automatic failover\n\n4. **Test failover capabilities**\n   - Obtain results from completed failover testing\n   - Review failover test scenarios, success criteria, and outcomes\n   - Identify any failures or degraded performance observed during failover testing\n   - Verify that failover testing is scheduled to recur on a defined cadence\n   - Check whether chaos engineering or fault injection testing is practiced\n\n5. **Review resilience monitoring and incident response integration**\n   - Verify health check and readiness probe configuration for Kubernetes workloads\n   - Confirm automated recovery actions (pod restart, node replacement) are configured\n   - Review how resilience events are escalated to incident response\n   - Check SLA/SLO definitions for availability and their measurement\n\n---\n\n## Evidence Requests\n\n- [ ] Production architecture diagrams showing redundancy and failover design\n- [ ] AWS multi-AZ deployment configuration evidence\n- [ ] Kubernetes deployment manifests showing replica counts and auto-scaling policies\n- [ ] Disaster recovery plan (current draft or in-development documentation)\n- [ ] Cloud Security Optimization project scope and timeline\n- [ ] RTO/RPO definitions for critical systems\n- [ ] Failover test results and after-action reports\n- [ ] Backup configuration and retention policy documentation\n- [ ] SLA/SLO definitions and availability metrics\n- [ ] Health check and readiness probe configurations\n\n---\n\n## Notes\n\nAlma Security has demonstrated meaningful investment in resilience through multi-AZ AWS deployment, Kubernetes pod redundancy with auto-scaling, and completed failover testing. These are strong indicators of operational maturity. However, the DR plan is currently in development as part of the Cloud Security Optimization project ($100K), which represents a significant gap. The assessment should distinguish between the strong operational resilience already in place (high-availability components, tested failover) and the strategic resilience gap (incomplete DR planning). The completed failover testing is a positive signal that the organization tests its assumptions rather than relying on architectural promises alone.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.IR-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
       "Incident Response Playbook (Excerpt)"
     ],
     "linkedFindings": [
-      "FND-1130",
-      "FND-1131",
-      "FND-1132",
-      "FND-1133",
-      "FND-1134"
+      "FND-1138",
+      "FND-1139",
+      "FND-1140",
+      "FND-1141",
+      "FND-1142"
     ],
     "remediation": {
       "ownerId": null,
@@ -3938,7 +5701,14 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.IR-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review capacity planning processes and documentation\n2. Evaluate auto-scaling and elastic capacity mechanisms\n3. Assess DDoS mitigation capabilities\n4. Review infrastructure monitoring for capacity events\n5. Evaluate power and environmental capacity",
+    "testProcedures": "# PR.IR-04: Adequate Resource Capacity Maintenance\n\n**CSF Subcategory:** PR.IR-04 - Adequate resource capacity to ensure availability is maintained\n\n---\n\n## Test Procedures\n\n1. **Review capacity planning processes and documentation**\n   - Determine whether a formal capacity planning process exists\n   - Review capacity planning documentation, models, or forecasts for production systems\n   - Verify whether capacity thresholds and growth projections are documented\n   - Check whether capacity planning is integrated into change management and product roadmap processes\n   - Assess whether historical utilization data informs capacity decisions\n\n2. **Evaluate auto-scaling and elastic capacity mechanisms**\n   - Review Kubernetes Horizontal Pod Autoscaler (HPA) configurations\n   - Verify auto-scaling triggers, thresholds, minimum/maximum pod counts, and cooldown periods\n   - Check AWS Auto Scaling Group or node auto-scaling configurations\n   - Confirm that scaling policies account for both CPU/memory and application-specific metrics\n   - Test whether auto-scaling responds appropriately to load changes\n\n3. **Assess DDoS mitigation capabilities**\n   - Determine whether AWS Shield (Standard or Advanced) is enabled\n   - Review any DDoS mitigation strategy or runbook\n   - Check whether rate limiting is configured at the load balancer or application layer\n   - Verify DNS-level protections (e.g., Route 53 health checks, CloudFront distribution)\n   - Assess the WAF project's ($112K) scope regarding DDoS mitigation capabilities\n   - Review incident response procedures specific to volumetric or application-layer attacks\n\n4. **Review infrastructure monitoring for capacity events**\n   - Verify monitoring dashboards track CPU, memory, storage, and network utilization\n   - Check alerting thresholds for capacity-related metrics (disk space, connection pools, queue depths)\n   - Confirm trending and forecasting capabilities for resource utilization\n   - Review on-call escalation procedures for capacity-related alerts\n   - Verify log storage capacity and retention are adequate for audit and investigation needs (AU-04)\n\n5. **Evaluate power and environmental capacity**\n   - Review power capacity planning for Redwood City data center\n   - Verify UPS capacity meets current and projected load\n   - Confirm cooling capacity is adequate for current equipment density\n   - Check whether power and cooling capacity are considered in hardware procurement decisions\n\n---\n\n## Evidence Requests\n\n- [ ] Capacity planning documentation or forecasting models\n- [ ] Kubernetes HPA configurations and auto-scaling policies\n- [ ] AWS Auto Scaling configuration for node groups\n- [ ] DDoS mitigation strategy or runbook\n- [ ] AWS Shield configuration status\n- [ ] Infrastructure monitoring dashboards (CPU, memory, storage, network)\n- [ ] Capacity alerting thresholds and escalation procedures\n- [ ] Historical resource utilization reports (3-6 months)\n- [ ] WAF project scope documentation (DDoS components)\n- [ ] Power and cooling capacity documentation for Redwood City data center\n\n---\n\n## Notes\n\nAlma Security leverages Kubernetes auto-scaling for elastic capacity in its AWS environment, which provides reactive capacity management for production workloads. However, the assessment should determine whether proactive capacity planning exists beyond auto-scaling — including growth forecasting, capacity modeling, and planned capacity reviews. The absence of a WAF creates exposure to application-layer DDoS attacks that auto-scaling alone cannot mitigate cost-effectively. The Redwood City data center introduces physical capacity planning requirements (power, cooling, rack space) that differ from cloud elastic capacity. The Windows Server 2012 R2 fileserver planned for Q3 upgrade may also present capacity constraints given its age.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.IR-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -3946,13 +5716,13 @@ export const COMPREHENSIVE_OBSERVATIONS = {
       "Incident Response Playbook (Excerpt)"
     ],
     "linkedFindings": [
-      "FND-1135",
-      "FND-1136",
-      "FND-1137",
-      "FND-1138",
-      "FND-1139",
-      "FND-1140",
-      "FND-1141"
+      "FND-1143",
+      "FND-1144",
+      "FND-1145",
+      "FND-1146",
+      "FND-1147",
+      "FND-1148",
+      "FND-1149"
     ],
     "remediation": {
       "ownerId": null,
@@ -4004,17 +5774,24 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.PS-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review configuration management policy and standards\n2. Examine hardened baseline documentation and enforcement\n3. Validate automated configuration compliance monitoring\n4. Test configuration drift detection and remediation\n5. Assess lifecycle management of baseline configurations",
+    "testProcedures": "# PR.PS-01: Configuration Management Practices Test Procedures\n\n**CSF Subcategory:** PR.PS-01 - Configuration management practices are established and applied\n\n---\n\n## Test Procedures\n\n1. **Review configuration management policy and standards**\n   - Obtain the organization's configuration management policy documentation\n   - Verify the policy defines hardened baseline standards for each platform type (servers, workstations, containers, network devices)\n   - Confirm the policy specifies an authoritative source for baseline configurations (e.g., CIS Benchmarks, DISA STIGs, vendor hardening guides)\n   - Verify the policy addresses baseline exceptions and the approval process for deviations\n\n2. **Examine hardened baseline documentation and enforcement**\n   - Obtain documented baseline configurations for each major platform (Linux, Windows, Kubernetes nodes, containers)\n   - Verify baselines are derived from an industry-recognized source and tailored for the organization's environment\n   - Confirm baselines are version-controlled and maintained in an infrastructure-as-code repository\n   - Check that baseline changes follow a change management process with review and approval\n\n3. **Validate automated configuration compliance monitoring**\n   - Identify the tools used for continuous configuration compliance checking (e.g., AWS Config, Chef InSpec, Ansible, SCAP scanners)\n   - Verify compliance rules are mapped to the documented baseline standards\n   - Review compliance dashboards or reports showing current compliance rates across the environment\n   - Confirm non-compliant resources generate alerts routed to responsible owners\n   - Verify deviation alerting thresholds and escalation procedures\n\n4. **Test configuration drift detection and remediation**\n   - Select a sample of 10-15 systems across platform types\n   - Compare actual configurations against documented baselines using automated tooling\n   - Identify any configuration drift and verify it was detected by monitoring tools\n   - Review remediation records for previously detected drift to confirm timely correction\n   - Verify that remediation actions restore systems to compliant state without operational disruption\n\n5. **Assess lifecycle management of baseline configurations**\n   - Review the schedule for baseline review and updates (at minimum annually and upon significant change)\n   - Verify baselines have been updated to address new vulnerabilities or platform changes\n   - Confirm retired or decommissioned platforms have their baselines archived appropriately\n   - Check that new platform types are assigned baselines before deployment to production\n\n---\n\n## Evidence Requests\n\n- [ ] Configuration management policy document\n- [ ] Hardened baseline standards for each platform (Amazon Linux 2, Ubuntu, Windows Server, Kubernetes)\n- [ ] Infrastructure-as-code repository access or export showing baseline definitions\n- [ ] AWS Config rules inventory and compliance dashboard screenshots\n- [ ] Configuration compliance scan reports (most recent 3 months)\n- [ ] Deviation alert samples and remediation tickets (5-10 examples)\n- [ ] Change management records for baseline modifications\n- [ ] Baseline review schedule and last review date evidence\n\n---\n\n## Notes\n\nThis test procedure validates that configuration management is not just documented but actively enforced and monitored. Key maturity indicators include infrastructure-as-code enforcement of baselines, automated compliance checking with drift detection, and evidence that deviations are detected and remediated within defined SLAs. Organizations with high compliance rates (90%+) but no automated drift detection may still have blind spots in dynamic environments like Kubernetes clusters.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.PS-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Patch Management Procedure",
       "Weekly Vulnerability Scan Summary"
     ],
     "linkedFindings": [
-      "FND-1142",
-      "FND-1143",
-      "FND-1144",
-      "FND-1145"
+      "FND-1150",
+      "FND-1151",
+      "FND-1152",
+      "FND-1153"
     ],
     "remediation": {
       "ownerId": null,
@@ -4066,19 +5843,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.PS-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review software lifecycle management policy\n2. Examine software asset inventory and tracking\n3. Validate patch management operations\n4. Assess end-of-life and unsupported software tracking\n5. Verify software authenticity and integrity controls\n6. Test unauthorized software detection and removal",
+    "testProcedures": "# PR.PS-02: Software Maintenance and Lifecycle Test Procedures\n\n**CSF Subcategory:** PR.PS-02 - Software is maintained, replaced, and removed commensurate with risk\n\n---\n\n## Test Procedures\n\n1. **Review software lifecycle management policy**\n   - Obtain the software maintenance and lifecycle management policy\n   - Verify the policy defines requirements for patch management, end-of-life tracking, and software removal\n   - Confirm the policy establishes risk-based timelines for patching (critical, high, medium, low)\n   - Check that the policy addresses both operating system and application-layer software\n   - Verify procurement requirements include software supportability and vendor lifecycle commitments\n\n2. **Examine software asset inventory and tracking**\n   - Obtain the organization's software inventory or CMDB export\n   - Verify the inventory includes operating systems, middleware, applications, and container images\n   - Confirm each software asset has a documented version, owner, and support status\n   - Cross-reference the inventory against deployed systems to identify untracked software\n   - Check that container image registries are included in the inventory scope\n\n3. **Validate patch management operations**\n   - Review the patch management process documentation and tooling (e.g., WSUS, yum/apt automation, container image rebuilds)\n   - Obtain patch compliance reports for the most recent 90-day period\n   - Verify critical and high-severity patches are applied within defined SLAs\n   - Select a sample of 10-15 systems and verify current patch levels\n   - Check that patching includes both OS-level and application-level updates\n   - Verify container base images are rebuilt when upstream patches are available\n\n4. **Assess end-of-life and unsupported software tracking**\n   - Obtain a list of all software with known end-of-life or end-of-support dates\n   - Verify the organization maintains a forward-looking calendar of upcoming EOL milestones\n   - Identify any currently deployed software that has passed its EOL date\n   - For EOL software still in production, verify compensating controls and documented risk acceptance\n   - Review migration or replacement plans for software approaching EOL within 12 months\n\n5. **Verify software authenticity and integrity controls**\n   - Review processes for verifying software authenticity before deployment (digital signatures, checksums, trusted repositories)\n   - Confirm container images are pulled only from approved registries with image signing\n   - Verify software procurement processes include vendor security assessment\n   - Check that package managers are configured to use only approved and verified sources\n\n6. **Test unauthorized software detection and removal**\n   - Review the process for identifying and removing unauthorized or unapproved software\n   - Verify application control or software restriction policies are configured to detect unauthorized installations\n   - Obtain records of unauthorized software discoveries and resulting remediation actions\n   - Confirm that removed software is verified as fully uninstalled including residual configurations\n\n---\n\n## Evidence Requests\n\n- [ ] Software lifecycle management policy\n- [ ] Software asset inventory / CMDB export\n- [ ] Patch management process documentation\n- [ ] Patch compliance reports (last 90 days)\n- [ ] Sample patch verification on 10-15 systems\n- [ ] End-of-life software tracking report or calendar\n- [ ] Risk acceptance documentation for any EOL software in production\n- [ ] EOL migration/replacement project plans\n- [ ] Software authenticity verification procedures\n- [ ] Container image registry policies and signing configuration\n- [ ] Unauthorized software detection logs and remediation tickets\n\n---\n\n## Notes\n\nThis test procedure covers the complete software lifecycle from procurement through decommissioning. A critical area of focus is the gap between patch management policy and actual compliance rates, particularly for legacy systems. Organizations running end-of-life software must demonstrate compensating controls and active migration plans. Container environments require special attention as traditional patch management approaches may not cover ephemeral workloads effectively.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.PS-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
       "Weekly Vulnerability Scan Summary"
     ],
     "linkedFindings": [
-      "FND-1146",
-      "FND-1147",
-      "FND-1148",
-      "FND-1149",
-      "FND-1150",
-      "FND-1151"
+      "FND-1154",
+      "FND-1155",
+      "FND-1156",
+      "FND-1157",
+      "FND-1158",
+      "FND-1159"
     ],
     "remediation": {
       "ownerId": null,
@@ -4130,19 +5914,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.PS-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review hardware lifecycle management policy\n2. Examine hardware asset inventory and tracking\n3. Validate hardware maintenance and warranty management\n4. Assess end-of-life hardware tracking and replacement\n5. Test secure hardware disposal and decommissioning",
+    "testProcedures": "# PR.PS-03: Hardware Maintenance and Lifecycle Test Procedures\n\n**CSF Subcategory:** PR.PS-03 - Hardware is maintained, replaced, and removed commensurate with risk\n\n---\n\n## Test Procedures\n\n1. **Review hardware lifecycle management policy**\n   - Obtain the hardware lifecycle and asset management policy\n   - Verify the policy defines requirements for hardware procurement, maintenance, replacement, and disposal\n   - Confirm the policy establishes lifecycle timelines based on hardware type and criticality\n   - Check that the policy addresses both on-premises and cloud-hosted infrastructure (including reserved instances and dedicated hosts)\n   - Verify the policy includes secure disposal and data sanitization requirements\n\n2. **Examine hardware asset inventory and tracking**\n   - Obtain the hardware asset inventory or CMDB export\n   - Verify the inventory includes servers, networking equipment, workstations, mobile devices, and IoT/OT devices\n   - Confirm each hardware asset has a documented owner, location, warranty status, and expected end-of-life date\n   - Cross-reference the physical inventory against the asset database for accuracy\n   - For cloud infrastructure, verify instance types and reserved capacity are tracked alongside physical assets\n   - Check that the inventory is updated when hardware is provisioned, moved, or decommissioned\n\n3. **Validate hardware maintenance and warranty management**\n   - Review maintenance schedules and vendor support contracts for critical infrastructure\n   - Verify warranty and support coverage for production hardware systems\n   - Confirm that hardware failures are tracked in a ticketing system with mean-time-to-repair metrics\n   - Check that spare parts or replacement hardware is available for critical systems within defined SLAs\n   - Review evidence of preventive maintenance activities (firmware updates, disk health checks, UPS battery tests)\n\n4. **Assess end-of-life hardware tracking and replacement**\n   - Obtain a list of hardware approaching or past end-of-life / end-of-support\n   - Verify the organization maintains a replacement calendar or roadmap\n   - Identify any production hardware running past vendor support dates\n   - For unsupported hardware still in production, verify compensating controls and documented risk acceptance\n   - Review capital expenditure plans or cloud migration strategies for hardware replacement\n\n5. **Test secure hardware disposal and decommissioning**\n   - Review the hardware decommissioning and disposal process\n   - Verify data sanitization procedures comply with NIST SP 800-88 or equivalent standard\n   - Obtain certificates of destruction or sanitization for recently decommissioned hardware\n   - Confirm that decommissioned hardware is removed from the asset inventory and access control systems\n   - Verify that leased equipment return processes include data wiping verification\n\n---\n\n## Evidence Requests\n\n- [ ] Hardware lifecycle management policy\n- [ ] Hardware asset inventory / CMDB export with warranty and EOL dates\n- [ ] Vendor maintenance and support contracts for critical infrastructure\n- [ ] Hardware failure and repair tickets (last 6 months)\n- [ ] End-of-life hardware tracking report or replacement roadmap\n- [ ] Risk acceptance documentation for any unsupported hardware in production\n- [ ] Data sanitization procedures and certificates of destruction\n- [ ] Capital expenditure plan or cloud migration strategy for hardware refresh\n- [ ] Preventive maintenance schedule and completion records\n\n---\n\n## Notes\n\nThis test procedure evaluates hardware lifecycle management from procurement through disposal. For organizations with significant cloud infrastructure, the focus shifts from physical hardware maintenance to capacity planning, instance type lifecycle management, and cloud provider deprecation tracking. Hybrid environments require both physical and cloud hardware to be tracked in a unified inventory. Secure disposal is a frequently overlooked area that carries significant data breach risk if not properly managed.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.PS-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1152",
-      "FND-1153",
-      "FND-1154",
-      "FND-1155",
-      "FND-1156",
-      "FND-1157"
+      "FND-1160",
+      "FND-1161",
+      "FND-1162",
+      "FND-1163",
+      "FND-1164",
+      "FND-1165"
     ],
     "remediation": {
       "ownerId": null,
@@ -4194,19 +5985,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.PS-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review logging policy and requirements\n2. Examine log source coverage and collection\n3. Validate centralized log aggregation and management\n4. Test monitoring and anomaly detection\n5. Assess log integrity and access controls",
+    "testProcedures": "# PR.PS-04: Log Record Generation and Monitoring Test Procedures\n\n**CSF Subcategory:** PR.PS-04 - Log records are generated and made available for continuous monitoring\n\n---\n\n## Test Procedures\n\n1. **Review logging policy and requirements**\n   - Obtain the organization's logging and monitoring policy\n   - Verify the policy defines what events must be logged across system types (authentication, authorization, configuration changes, data access, errors)\n   - Confirm the policy specifies log retention requirements aligned with regulatory and business needs\n   - Check that the policy addresses log integrity protection (tamper-evidence, write-once storage)\n   - Verify the policy defines roles and responsibilities for log management and review\n\n2. **Examine log source coverage and collection**\n   - Obtain an inventory of all systems, applications, and infrastructure that generate security-relevant logs\n   - Verify log collection is configured for critical asset categories: identity providers, firewalls, WAFs, operating systems, databases, applications, cloud control planes\n   - Confirm cloud-native logging services are enabled (CloudTrail, VPC Flow Logs, GuardDuty, EKS audit logs)\n   - Identify any systems or applications that are not forwarding logs to the central collection point\n   - Verify Kubernetes cluster audit logging is enabled and captures API server events\n   - Check that container runtime logs are collected and correlated with orchestration events\n\n3. **Validate centralized log aggregation and management**\n   - Identify the centralized log management platform (SIEM, log aggregation tool)\n   - Verify logs from all identified sources are successfully ingested into the central platform\n   - Confirm log parsing and normalization produces structured, searchable records\n   - Review log storage capacity planning and retention configuration\n   - Verify that log ingestion failures generate alerts to the operations team\n   - Check that log data is indexed for query performance adequate for incident investigation\n\n4. **Test monitoring and anomaly detection**\n   - Review configured monitoring rules, alerts, and correlation logic\n   - Verify alerts are generated for high-priority events (privilege escalation, unauthorized access attempts, configuration changes, data exfiltration indicators)\n   - Test a sample alert by reviewing recent triggered alerts and confirming appropriate response\n   - Assess whether monitoring covers 24/7 or business-hours-only and document any coverage gaps\n   - Verify alert routing reaches the appropriate response team (SOC, on-call engineer)\n   - Check false positive rates and alert tuning practices\n\n5. **Assess log integrity and access controls**\n   - Verify log storage has appropriate access controls (read-only for analysts, write restricted to log collection systems)\n   - Confirm logs cannot be modified or deleted by the systems or users they monitor\n   - Check for log integrity mechanisms (checksums, immutable storage, CloudTrail log file validation)\n   - Verify that administrative access to log systems is audited and monitored\n   - Review backup and disaster recovery procedures for log data\n\n---\n\n## Evidence Requests\n\n- [ ] Logging and monitoring policy\n- [ ] Log source inventory with collection status for each source\n- [ ] SIEM or log aggregation platform configuration documentation\n- [ ] CloudTrail, VPC Flow Logs, and EKS audit log configuration evidence\n- [ ] Log ingestion and coverage dashboard screenshots\n- [ ] Monitoring rule inventory with alert routing configuration\n- [ ] Sample of recent triggered alerts and response actions (5-10 examples)\n- [ ] Log retention configuration and capacity planning documentation\n- [ ] Log access control configuration and audit logs\n- [ ] 24/7 monitoring coverage documentation or on-call rotation schedule\n\n---\n\n## Notes\n\nThis test procedure validates that logging is comprehensive, centralized, and actively monitored. Key maturity indicators include complete log source coverage, centralized aggregation with structured parsing, real-time alerting on high-priority events, and 24/7 monitoring capability. Organizations often have strong cloud-native logging but gaps in application-layer logging and on-premises systems. The transition from log collection to active monitoring and anomaly detection is a critical maturity threshold.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.PS-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1158",
-      "FND-1159",
-      "FND-1160",
-      "FND-1161",
-      "FND-1162",
-      "FND-1163"
+      "FND-1166",
+      "FND-1167",
+      "FND-1168",
+      "FND-1169",
+      "FND-1170",
+      "FND-1171"
     ],
     "remediation": {
       "ownerId": null,
@@ -4258,19 +6056,26 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.PS-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review application control policy and standards\n2. Examine application control deployment and coverage\n3. Validate the authorized software inventory\n4. Test application control enforcement effectiveness\n5. Assess administrative privilege restrictions for software installation",
+    "testProcedures": "# PR.PS-05: Installation and Execution of Unauthorized Software Prevention Test Procedures\n\n**CSF Subcategory:** PR.PS-05 - Installation and execution of unauthorized software is prevented\n\n---\n\n## Test Procedures\n\n1. **Review application control policy and standards**\n   - Obtain the organization's application control or software restriction policy\n   - Verify the policy defines what constitutes authorized versus unauthorized software\n   - Confirm the policy specifies the enforcement mechanism (allowlisting, blocklisting, or hybrid approach)\n   - Check that the policy addresses all endpoint types (workstations, laptops, servers, Kubernetes nodes)\n   - Verify the policy establishes an exception process for legitimate software not on the approved list\n\n2. **Examine application control deployment and coverage**\n   - Identify the application control solution(s) in use (e.g., SentinelOne, AppLocker, SELinux, Kubernetes admission controllers)\n   - Verify deployment coverage across the endpoint population (workstations, laptops, servers)\n   - Confirm the solution is operating in enforcement mode, not just audit/monitor mode\n   - Identify any endpoints or system types excluded from application control and document the justification\n   - Verify Kubernetes nodes have restrictions on unauthorized container execution\n   - Check that container admission controllers enforce image source and signing policies\n\n3. **Validate the authorized software inventory**\n   - Obtain the organization's authorized software list or application catalog\n   - Verify the list is maintained and updated on a regular cadence\n   - Confirm each authorized application has a documented business justification and owner\n   - Check that the authorized list is synchronized with the application control enforcement tool\n   - Review the process for adding new software to the authorized list (approval workflow, security review)\n\n4. **Test application control enforcement effectiveness**\n   - Attempt to install or execute a benign unauthorized application on a sample workstation (with prior authorization from system owner)\n   - Verify the application control solution blocks the execution and generates an alert\n   - Review recent application control block/deny logs to confirm the solution is actively preventing unauthorized software\n   - Test that users cannot bypass application control through common techniques (portable executables, script interpreters, alternate execution paths)\n   - Verify that blocked execution events are logged and reviewed by security operations\n\n5. **Assess administrative privilege restrictions for software installation**\n   - Verify that standard users do not have administrative privileges to install software\n   - Confirm that local administrator access is restricted and monitored\n   - Review the process for granting temporary elevated privileges for legitimate software installation needs\n   - Check that developer workstations have appropriate controls even with elevated privileges\n   - Verify that server environments restrict software installation to authorized deployment pipelines\n\n---\n\n## Evidence Requests\n\n- [ ] Application control / software restriction policy\n- [ ] SentinelOne (or equivalent) deployment dashboard showing coverage percentage\n- [ ] Application control configuration showing enforcement mode status\n- [ ] Authorized software inventory or application catalog\n- [ ] Software approval workflow documentation\n- [ ] Application control block/deny logs (last 30 days)\n- [ ] Kubernetes admission controller configuration\n- [ ] Container image registry allowlist configuration\n- [ ] Local administrator privilege audit report\n- [ ] Exception requests and approvals for non-standard software (5-10 examples)\n\n---\n\n## Notes\n\nThis test procedure evaluates the organization's ability to prevent unauthorized software from executing in the environment. Application control is one of the most effective preventive controls but also one of the most operationally challenging to maintain. Key considerations include the balance between security and developer productivity, coverage gaps on servers versus workstations, and the effectiveness of controls in containerized environments where traditional application control may not apply.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.PS-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
       "Acceptable Use Policy"
     ],
     "linkedFindings": [
-      "FND-1164",
-      "FND-1165",
-      "FND-1166",
-      "FND-1167",
-      "FND-1168",
-      "FND-1169"
+      "FND-1172",
+      "FND-1173",
+      "FND-1174",
+      "FND-1175",
+      "FND-1176",
+      "FND-1177"
     ],
     "remediation": {
       "ownerId": null,
@@ -4322,22 +6127,29 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "PR.PS-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review secure development lifecycle (SDLC) policy and standards\n2. Examine security integration in the CI/CD pipeline\n3. Validate third-party component and dependency management\n4. Assess developer security training and awareness\n5. Test security review and code review practices\n6. Validate vulnerability remediation in developed software",
+    "testProcedures": "# PR.PS-06: Secure Software Development Practices Test Procedures\n\n**CSF Subcategory:** PR.PS-06 - Secure software development practices are integrated, and their performance is monitored\n\n---\n\n## Test Procedures\n\n1. **Review secure development lifecycle (SDLC) policy and standards**\n   - Obtain the organization's secure software development lifecycle policy or standards documentation\n   - Verify the policy defines security requirements for each phase of development (design, implementation, testing, deployment, maintenance)\n   - Confirm the policy addresses secure coding standards, threat modeling, and security architecture review\n   - Check that the policy applies to all software developed in-house and customizations to third-party software\n   - Verify the policy establishes roles and responsibilities for security within the development process\n\n2. **Examine security integration in the CI/CD pipeline**\n   - Review the CI/CD pipeline configuration and tooling (e.g., GitHub Actions, Jenkins, GitLab CI)\n   - Verify that automated security testing is integrated into the pipeline (SAST, DAST, dependency scanning, container image scanning)\n   - Confirm that security scan failures block deployment to production (enforced quality gates)\n   - Check that developers receive actionable security findings within their development workflow\n   - Verify that pipeline configurations are version-controlled and changes require review\n   - Review scan tool configurations to ensure they cover OWASP Top 10 and relevant vulnerability categories\n\n3. **Validate third-party component and dependency management**\n   - Verify the organization maintains a software bill of materials (SBOM) or dependency inventory\n   - Confirm automated dependency scanning identifies known vulnerabilities in third-party libraries\n   - Check that dependency updates are tracked and applied within risk-based timelines\n   - Verify container base images are scanned for vulnerabilities before deployment\n   - Review the process for evaluating and approving new third-party dependencies\n   - Confirm that software composition analysis (SCA) covers all active repositories\n\n4. **Assess developer security training and awareness**\n   - Review developer security training requirements and completion records\n   - Verify training covers secure coding practices relevant to the organization's technology stack\n   - Confirm training addresses common vulnerability classes (injection, authentication flaws, access control, cryptographic misuse)\n   - Check that training is updated to reflect new vulnerability patterns and lessons learned from internal security findings\n   - Verify that security champions or advocates are designated within development teams\n\n5. **Test security review and code review practices**\n   - Review code review policies and confirm security is a review criterion\n   - Verify that security-sensitive code changes require review by a security-qualified reviewer\n   - Examine sample pull requests for evidence of security-focused review comments\n   - Confirm that threat modeling or security architecture review is conducted for significant features or system changes\n   - Check that security review findings are tracked to resolution\n\n6. **Validate vulnerability remediation in developed software**\n   - Review the process for triaging and remediating vulnerabilities discovered in internally developed software\n   - Verify SLA definitions for vulnerability remediation based on severity\n   - Obtain metrics on vulnerability remediation timelines for the past 6 months\n   - Confirm that remediated vulnerabilities are verified through retesting\n   - Check that lessons learned from vulnerabilities are fed back into developer training and secure coding standards\n\n---\n\n## Evidence Requests\n\n- [ ] Secure SDLC policy or standards documentation\n- [ ] CI/CD pipeline configuration showing security scan integration\n- [ ] SAST, DAST, and dependency scanning tool configurations\n- [ ] Security quality gate configuration (build-breaking rules)\n- [ ] Software bill of materials (SBOM) or dependency inventory\n- [ ] Container image scanning results (recent examples)\n- [ ] Developer security training program and completion records\n- [ ] Code review policy with security review requirements\n- [ ] Sample pull requests showing security review (5-10 examples)\n- [ ] Vulnerability remediation metrics and SLA compliance reports\n- [ ] Threat modeling documentation for recent features or system changes\n\n---\n\n## Notes\n\nThis test procedure assesses the maturity of security integration across the software development lifecycle. Organizations early in their secure SDLC journey often have some automated scanning but lack formalized processes for threat modeling, security architecture review, and systematic vulnerability remediation. The presence of automated scanning tools alone does not indicate maturity; assessors should look for evidence that findings are actioned, quality gates are enforced, and security practices evolve based on lessons learned. Container and microservice architectures require additional focus on image security and dependency management at the orchestration layer.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "PR.PS-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Weekly Vulnerability Scan Summary",
       "Patch Management Procedure",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1170",
-      "FND-1171",
-      "FND-1172",
-      "FND-1173",
-      "FND-1174",
-      "FND-1175",
-      "FND-1176",
-      "FND-1177",
-      "FND-1178"
+      "FND-1178",
+      "FND-1179",
+      "FND-1180",
+      "FND-1181",
+      "FND-1182",
+      "FND-1183",
+      "FND-1184",
+      "FND-1185",
+      "FND-1186"
     ],
     "remediation": {
       "ownerId": null,
@@ -4389,16 +6201,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.CO-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review recovery communication procedures and channels\n2. Evaluate stakeholder identification and notification lists\n3. Assess recovery information security during communication\n4. Test communication execution history\n5. Evaluate crisis communication coordination with suppliers",
+    "testProcedures": "# RC.CO-03: Communicate Recovery Activities and Progress\n\n**CSF Subcategory:** RC.CO-03 - Recovery activities and progress in restoring operational capabilities are communicated to designated internal and external stakeholders\n\n---\n\n## Test Procedures\n\n1. **Review recovery communication procedures and channels**\n   - Obtain documentation defining how recovery progress is communicated to stakeholders\n   - Verify that communication channels (Slack, direct channels) are documented for different stakeholder groups\n   - Confirm that communication procedures specify frequency, format, and content of recovery updates\n   - Check that communication protocols address both internal teams and external stakeholders (customers, partners)\n\n2. **Evaluate stakeholder identification and notification lists**\n   - Review the stakeholder notification matrix for recovery communications\n   - Verify that internal stakeholders (senior leadership, engineering, support) have defined communication requirements\n   - Confirm that external stakeholders (customers of the continuous authentication service) have notification procedures\n   - Check that supplier and partner communication requirements are documented per contractual obligations\n\n3. **Assess recovery information security during communication**\n   - Verify that recovery information is shared securely and on a need-to-know basis\n   - Confirm that communication procedures prevent premature or unauthorized disclosure of incident details\n   - Check that Slack channels used for recovery coordination have appropriate access controls\n   - Evaluate whether sensitive technical details are filtered from external communications\n\n4. **Test communication execution history**\n   - Review communication records from the 2024 security incident recovery\n   - Verify that stakeholders received timely updates during recovery operations\n   - Confirm that communication cadence was maintained throughout the recovery period\n   - Evaluate whether communication effectiveness was assessed in post-incident reviews\n\n5. **Evaluate crisis communication coordination with suppliers**\n   - Review procedures for coordinating recovery communication with critical suppliers (AWS, other SaaS providers)\n   - Verify that contractual information-sharing requirements are reflected in communication procedures\n   - Confirm that supplier status updates are incorporated into internal recovery communications\n\n---\n\n## Evidence Requests\n\n- [ ] Recovery communication procedures\n- [ ] Stakeholder notification matrix for recovery events\n- [ ] Slack channel configuration for incident/recovery communication\n- [ ] Communication records from 2024 security incident recovery\n- [ ] External stakeholder notification templates\n- [ ] Supplier communication and information-sharing agreements\n- [ ] Post-incident review findings on communication effectiveness\n- [ ] Senior leadership recovery status report template\n\n---\n\n## Notes\n\nThis test procedure evaluates how Alma Security communicates recovery progress to internal and external stakeholders. Incident communication procedures are documented, and stakeholder communication during recovery uses Slack and direct channels. The 2024 security incidents provide evidence of actual recovery communication execution. Key focus areas include whether communication procedures are rehearsed (noted as not rehearsed), whether the Slack-based communication approach is formalized with access controls and templates, and whether external stakeholder communication (particularly customers of the continuous authentication SaaS) is structured. The trust-rebuilding initiatives following the 2024 incidents suggest that communication gaps may have been identified.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.CO-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1179",
-      "FND-1180",
-      "FND-1181",
-      "FND-1182"
+      "FND-1187",
+      "FND-1188",
+      "FND-1189",
+      "FND-1190"
     ],
     "remediation": {
       "ownerId": null,
@@ -4450,16 +6269,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.CO-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review public communication policy and approval process\n2. Evaluate public messaging templates and content guidelines\n3. Assess breach notification compliance\n4. Test public communication execution history",
+    "testProcedures": "# RC.CO-04: Public Recovery Updates\n\n**CSF Subcategory:** RC.CO-04 - Public updates on incident recovery are shared using approved methods and messaging\n\n---\n\n## Test Procedures\n\n1. **Review public communication policy and approval process**\n   - Obtain the organization's breach notification and public communication procedures\n   - Verify that public recovery updates require approval from designated authority before release\n   - Confirm that approved communication methods are defined (status page, email, press release, social media)\n   - Check that legal and compliance review is incorporated into the public communication approval workflow\n\n2. **Evaluate public messaging templates and content guidelines**\n   - Review pre-approved messaging templates for public recovery updates\n   - Verify that templates address incident acknowledgment, recovery steps, prevention measures, and customer guidance\n   - Confirm that messaging is reviewed for accuracy, tone, and legal compliance before publication\n   - Check that public communications explain steps being taken to recover and prevent recurrence\n\n3. **Assess breach notification compliance**\n   - Review breach notification procedures for compliance with applicable regulations (state laws, contractual requirements)\n   - Verify that notification timelines are defined and tracked\n   - Confirm that notification content meets regulatory requirements\n   - Check that the organization maintains records of breach notifications sent\n\n4. **Test public communication execution history**\n   - Review public communications issued during and after the 2024 security incidents\n   - Evaluate whether public messaging effectively supported trust-rebuilding objectives\n   - Verify that public trust score KPI tracking reflects the impact and recovery of public communications\n   - Confirm that post-incident reviews assessed public communication effectiveness\n\n---\n\n## Evidence Requests\n\n- [ ] Breach notification procedure documentation\n- [ ] Public communication approval workflow\n- [ ] Pre-approved messaging templates for incident recovery\n- [ ] Public communications issued during 2024 security incidents\n- [ ] Public trust score KPI tracking data\n- [ ] Breach notification compliance records\n- [ ] Legal/compliance review process for public statements\n- [ ] Post-incident review findings on public communication effectiveness\n\n---\n\n## Notes\n\nThis test procedure evaluates whether Alma Security shares public updates on incident recovery using approved methods and messaging. The 2024 security incidents and subsequent trust-rebuilding initiatives provide direct evidence of public communication practices. The public trust score KPI indicates organizational awareness of the reputational dimension of incident recovery. Key focus areas include whether a formal approval process exists for public statements, whether breach notification procedures comply with applicable regulations, and whether public messaging templates are pre-approved and ready for use. The trust-rebuilding initiatives suggest that public communication was a lesson learned from the 2024 incidents.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.CO-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1183",
-      "FND-1184",
-      "FND-1185"
+      "FND-1191",
+      "FND-1192",
+      "FND-1193"
     ],
     "remediation": {
       "ownerId": null,
@@ -4511,16 +6337,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.RP-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review recovery plan activation criteria and procedures\n2. Evaluate recovery role assignments and communication\n3. Assess recovery plan execution history\n4. Test recovery initiation readiness\n5. Evaluate recovery authorization and decision-making",
+    "testProcedures": "# RC.RP-01: Execute Recovery Plan\n\n**CSF Subcategory:** RC.RP-01 - The recovery portion of the incident response plan is executed once initiated from the incident response process\n\n---\n\n## Test Procedures\n\n1. **Review recovery plan activation criteria and procedures**\n   - Obtain the incident response plan and identify the recovery initiation triggers\n   - Verify that clear criteria exist for transitioning from incident response to recovery operations\n   - Confirm that recovery procedures are documented with specific steps, responsibilities, and escalation paths\n   - Verify the plan references AWS multi-AZ failover and Kubernetes pod recovery procedures\n\n2. **Evaluate recovery role assignments and communication**\n   - Identify all personnel with designated recovery responsibilities\n   - Verify that recovery roles are documented and personnel are aware of their assignments\n   - Confirm that contact lists and communication channels (Slack, direct) are current and tested\n   - Check that backup personnel are designated for critical recovery roles\n\n3. **Assess recovery plan execution history**\n   - Review records from the 2024 security incident recovery to evaluate plan execution effectiveness\n   - Determine whether recovery actions followed documented procedures or were improvised\n   - Verify that lessons learned from 2024 incidents were incorporated into current recovery procedures\n   - Confirm quarterly restore testing includes recovery plan activation steps\n\n4. **Test recovery initiation readiness**\n   - Review most recent quarterly restore test results for recovery plan activation\n   - Verify that automated backup verification completes before recovery procedures begin\n   - Confirm that recovery can be initiated for AWS production systems within defined RTOs\n   - Check that PostgreSQL automated backup recovery procedures are documented and tested\n\n5. **Evaluate recovery authorization and decision-making**\n   - Verify that authority to initiate recovery is clearly defined and delegated\n   - Confirm that decision criteria for recovery scope and prioritization are documented\n   - Review whether the DR plan development (Cloud Security Optimization project) addresses recovery authorization gaps\n\n---\n\n## Evidence Requests\n\n- [ ] Incident response plan with recovery section\n- [ ] Recovery role assignment documentation\n- [ ] 2024 security incident after-action reports showing recovery execution\n- [ ] Quarterly restore test results (most recent)\n- [ ] PostgreSQL automated backup recovery runbook\n- [ ] AWS multi-AZ failover procedures\n- [ ] Kubernetes pod recovery procedures\n- [ ] Cloud Security Optimization project charter ($100K DR plan)\n- [ ] Recovery communication channel documentation (Slack channels, escalation contacts)\n\n---\n\n## Notes\n\nThis test procedure evaluates whether Alma Security can reliably execute recovery operations when triggered by incident response processes. The 2024 security incidents provide real-world evidence of recovery execution. Key areas include the maturity of the incident-to-recovery handoff, quarterly restore testing cadence, AWS multi-AZ and Kubernetes redundancy leveraged during recovery, and the in-progress DR plan under the Cloud Security Optimization project ($100K). PostgreSQL automated backups and automated backup verification represent operational strengths, while the DR plan being in development indicates the recovery framework is not yet fully formalized.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.RP-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report"
     ],
     "linkedFindings": [
-      "FND-1186",
-      "FND-1187",
-      "FND-1188"
+      "FND-1194",
+      "FND-1195",
+      "FND-1196"
     ],
     "remediation": {
       "ownerId": null,
@@ -4572,16 +6405,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.RP-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review recovery action selection and prioritization criteria\n2. Evaluate recovery scoping procedures\n3. Assess recovery action execution capabilities\n4. Test recovery prioritization adaptability",
+    "testProcedures": "# RC.RP-02: Select and Perform Recovery Actions\n\n**CSF Subcategory:** RC.RP-02 - Recovery actions are selected, scoped, prioritized, and performed\n\n---\n\n## Test Procedures\n\n1. **Review recovery action selection and prioritization criteria**\n   - Obtain documentation defining how recovery actions are selected based on incident type and severity\n   - Verify that prioritization criteria consider business impact, data sensitivity, and service criticality\n   - Confirm that the continuous authentication SaaS platform is designated as the highest-priority recovery target\n   - Check that recovery action selection aligns with business impact analysis outputs\n\n2. **Evaluate recovery scoping procedures**\n   - Review how the scope of recovery is determined during active incidents\n   - Verify that scoping considers dependencies across AWS services, Kubernetes workloads, and PostgreSQL databases\n   - Confirm that recovery scope can be adjusted based on evolving situational awareness\n   - Check that the 2024 incident recovery demonstrated appropriate scoping decisions\n\n3. **Assess recovery action execution capabilities**\n   - Review the quarterly restore test process for evidence of structured recovery action execution\n   - Verify that PostgreSQL automated backup restoration follows a defined runbook\n   - Confirm that AWS multi-AZ failover can be initiated as a recovery action for production systems\n   - Evaluate Kubernetes pod restart and redeployment procedures as recovery mechanisms\n\n4. **Test recovery prioritization adaptability**\n   - Determine whether recovery priorities can be adjusted mid-recovery based on new information\n   - Review whether resource constraints (personnel, infrastructure) are factored into recovery sequencing\n   - Verify that the DR plan in development addresses multi-system recovery coordination\n   - Confirm that communication procedures support real-time priority changes during recovery\n\n---\n\n## Evidence Requests\n\n- [ ] Recovery action selection criteria documentation\n- [ ] Business impact analysis or system criticization records\n- [ ] Quarterly restore test procedures and results\n- [ ] PostgreSQL backup restoration runbook\n- [ ] AWS multi-AZ failover runbook\n- [ ] Kubernetes recovery procedures\n- [ ] 2024 incident recovery action logs\n- [ ] DR plan development status (Cloud Security Optimization project)\n\n---\n\n## Notes\n\nThis test procedure evaluates how Alma Security selects, scopes, and prioritizes recovery actions during incident recovery. The quarterly restore testing and PostgreSQL automated backups provide evidence of structured recovery execution. The DR plan under development through the Cloud Security Optimization project will formalize recovery prioritization. The 2024 security incidents offer real-world evidence of recovery action selection under pressure. Key focus areas include whether recovery priorities reflect the criticality of the continuous authentication SaaS platform and whether recovery sequencing accounts for infrastructure dependencies.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.RP-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report"
     ],
     "linkedFindings": [
-      "FND-1189",
-      "FND-1190",
-      "FND-1191"
+      "FND-1197",
+      "FND-1198",
+      "FND-1199"
     ],
     "remediation": {
       "ownerId": null,
@@ -4633,16 +6473,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.RP-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review automated backup verification procedures\n2. Evaluate backup integrity testing during quarterly restore tests\n3. Assess backup security controls\n4. Test restoration asset inventory and currency",
+    "testProcedures": "# RC.RP-03: Verify Backup and Restoration Asset Integrity\n\n**CSF Subcategory:** RC.RP-03 - The integrity of backups and other restoration assets is verified before using them for restoration\n\n---\n\n## Test Procedures\n\n1. **Review automated backup verification procedures**\n   - Obtain documentation for the automated backup verification process\n   - Verify that integrity checks are performed on PostgreSQL automated backups before restoration\n   - Confirm that backup verification includes checksum validation, corruption detection, or test restoration\n   - Check that verification runs automatically and results are logged and alerted on failure\n\n2. **Evaluate backup integrity testing during quarterly restore tests**\n   - Review quarterly restore test procedures for backup integrity verification steps\n   - Verify that restore tests confirm backup completeness and data accuracy\n   - Confirm that test restorations are performed to an isolated environment before production use\n   - Check that quarterly restore test results document any integrity issues discovered\n\n3. **Assess backup security controls**\n   - Verify that backups are protected against unauthorized modification or deletion\n   - Confirm that backup storage (AWS) uses encryption at rest and access controls\n   - Check whether backup assets are scanned for indicators of compromise before restoration\n   - Evaluate whether immutable backup copies exist to protect against ransomware scenarios\n\n4. **Test restoration asset inventory and currency**\n   - Verify that all restoration assets (backup images, configuration snapshots, deployment manifests) are inventoried\n   - Confirm that Kubernetes deployment manifests and infrastructure-as-code templates are version-controlled\n   - Check that restoration assets are current and reflect the production environment\n   - Verify that the automated backup verification covers all critical data stores\n\n---\n\n## Evidence Requests\n\n- [ ] Automated backup verification procedure documentation\n- [ ] Backup verification logs (most recent 90 days)\n- [ ] Quarterly restore test results with integrity verification details\n- [ ] AWS backup encryption configuration\n- [ ] Backup access control and retention policies\n- [ ] PostgreSQL backup configuration and scheduling\n- [ ] Kubernetes deployment manifest version control evidence\n- [ ] Infrastructure-as-code repository access for restoration assets\n\n---\n\n## Notes\n\nThis test procedure evaluates whether Alma Security verifies the integrity of backups and restoration assets before using them for recovery. Automated backup verification is a key strength. Quarterly restore testing provides periodic validation. Key focus areas include whether integrity checks detect corruption or compromise indicators, whether backup security controls prevent tampering, and whether all restoration assets (not just database backups) are inventoried and verified. The PostgreSQL automated backup process and AWS infrastructure provide the technical foundation, but the assessment should confirm verification extends beyond database backups to application configurations and deployment manifests.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.RP-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1192",
-      "FND-1193",
-      "FND-1194"
+      "FND-1200",
+      "FND-1201",
+      "FND-1202"
     ],
     "remediation": {
       "ownerId": null,
@@ -4694,16 +6541,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.RP-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review post-incident operational norm establishment process\n2. Evaluate system restoration confirmation procedures\n3. Assess restored system performance monitoring\n4. Test post-incident risk reassessment",
+    "testProcedures": "# RC.RP-04: Establish Post-Incident Operational Norms\n\n**CSF Subcategory:** RC.RP-04 - Critical mission functions and cybersecurity risk management are considered to establish post-incident operational norms\n\n---\n\n## Test Procedures\n\n1. **Review post-incident operational norm establishment process**\n   - Obtain documentation describing how post-incident operational norms are defined and approved\n   - Verify that business impact analysis and system categorization records inform post-incident priorities\n   - Confirm that the continuous authentication SaaS platform has defined service delivery objectives (RTO, RPO)\n   - Check that post-incident norms address both technical restoration and business process resumption\n\n2. **Evaluate system restoration confirmation procedures**\n   - Review procedures for confirming successful system restoration with system owners\n   - Verify that sign-off or acceptance criteria exist before declaring systems operational\n   - Confirm that restoration verification includes functional testing of the continuous authentication service\n   - Check that AWS multi-AZ and Kubernetes pod health are validated before declaring normal operations\n\n3. **Assess restored system performance monitoring**\n   - Verify that monitoring is enhanced for recently restored systems\n   - Confirm that KPI tracking (including the public trust score) resumes after recovery\n   - Check that performance baselines exist to compare restored system behavior against normal operations\n   - Evaluate whether alerting thresholds are adjusted during the post-recovery stabilization period\n\n4. **Test post-incident risk reassessment**\n   - Review whether cybersecurity risk management activities are updated after incidents\n   - Verify that risk register entries are created or updated based on incident findings\n   - Confirm that the 2024 security incidents resulted in updated risk assessments\n   - Check that post-incident operational norms incorporate lessons learned from previous recoveries\n\n---\n\n## Evidence Requests\n\n- [ ] Post-incident operational norm documentation\n- [ ] Business impact analysis with RTO/RPO for critical systems\n- [ ] System restoration acceptance criteria and sign-off procedures\n- [ ] Post-recovery monitoring configuration and dashboards\n- [ ] KPI tracking documentation (public trust score metrics)\n- [ ] Risk register updates following 2024 security incidents\n- [ ] 2024 incident lessons learned documentation\n- [ ] AWS and Kubernetes health check configurations\n\n---\n\n## Notes\n\nThis test procedure evaluates how Alma Security establishes post-incident operational norms that account for critical mission functions and cybersecurity risk. The 2024 security incidents and subsequent trust-rebuilding initiatives provide direct evidence of post-incident norm establishment. KPI tracking for the public trust score demonstrates awareness of recovery beyond technical restoration. Key focus areas include whether formal RTOs and RPOs exist for the continuous authentication platform, whether system owners participate in restoration confirmation, and whether risk management activities are updated after incidents. The DR plan in development should address formalization of these post-incident processes.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.RP-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Information Security Policy",
       "Incident Response Playbook (Excerpt)",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1195",
-      "FND-1196",
-      "FND-1197"
+      "FND-1203",
+      "FND-1204",
+      "FND-1205"
     ],
     "remediation": {
       "ownerId": null,
@@ -4755,16 +6609,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.RP-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review restored asset integrity verification procedures\n2. Evaluate restoration correctness validation\n3. Assess normal operating status confirmation\n4. Test post-restoration security validation",
+    "testProcedures": "# RC.RP-05: Verify Restored Asset Integrity\n\n**CSF Subcategory:** RC.RP-05 - The integrity of restored assets is verified, systems and services are restored, and normal operating status is confirmed\n\n---\n\n## Test Procedures\n\n1. **Review restored asset integrity verification procedures**\n   - Obtain documentation for verifying restored assets are free of compromise indicators\n   - Verify that restored systems are scanned for indicators of compromise before returning to production\n   - Confirm that root cause remediation is verified before bringing restored assets online\n   - Check that integrity verification procedures address application code, data, and infrastructure layers\n\n2. **Evaluate restoration correctness validation**\n   - Review procedures for validating that restoration actions produced correct results\n   - Verify that functional testing is performed on restored systems before production cutover\n   - Confirm that the continuous authentication service undergoes end-to-end testing after restoration\n   - Check that PostgreSQL data integrity is verified after backup restoration (row counts, checksums, application queries)\n\n3. **Assess normal operating status confirmation**\n   - Verify that criteria exist for declaring restored systems operational\n   - Confirm that monitoring and alerting are fully operational before declaring normal status\n   - Check that Kubernetes pod health checks, AWS resource monitoring, and application-level checks all pass\n   - Review whether a stabilization observation period is defined before full operational declaration\n\n4. **Test post-restoration security validation**\n   - Verify that security controls are confirmed operational on restored systems\n   - Confirm that access controls, encryption, and logging are validated after restoration\n   - Check that restored systems are not reintroduced with the vulnerabilities that enabled the original incident\n   - Evaluate whether the quarterly restore tests include post-restoration security validation steps\n\n---\n\n## Evidence Requests\n\n- [ ] Restored asset integrity verification procedures\n- [ ] Post-restoration IOC scanning procedures and tools\n- [ ] Functional testing procedures for restored systems\n- [ ] PostgreSQL data integrity validation procedures\n- [ ] Normal operating status declaration criteria\n- [ ] Post-restoration monitoring configuration\n- [ ] Quarterly restore test results showing integrity verification\n- [ ] 2024 incident restoration verification evidence\n\n---\n\n## Notes\n\nThis test procedure evaluates whether Alma Security verifies the integrity of restored assets and confirms normal operating status after recovery. The quarterly restore testing provides evidence of restoration validation practices. Key focus areas include whether IOC scanning occurs before restored systems return to production, whether functional testing verifies the continuous authentication service operates correctly, and whether a defined stabilization period exists before declaring normal operations. The 2024 security incidents provide real-world evidence of how restoration integrity was (or was not) verified. The automated backup verification capability should extend to post-restoration integrity checks.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.RP-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report"
     ],
     "linkedFindings": [
-      "FND-1198",
-      "FND-1199",
-      "FND-1200"
+      "FND-1206",
+      "FND-1207",
+      "FND-1208"
     ],
     "remediation": {
       "ownerId": null,
@@ -4816,15 +6677,22 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RC.RP-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review recovery closure criteria\n2. Evaluate after-action reporting process\n3. Assess lessons learned integration\n4. Test recovery documentation completeness",
+    "testProcedures": "# RC.RP-06: Declare Recovery End and Document\n\n**CSF Subcategory:** RC.RP-06 - The end of incident recovery is declared based on criteria, and incident-related documentation is completed\n\n---\n\n## Test Procedures\n\n1. **Review recovery closure criteria**\n   - Obtain documentation defining the criteria for declaring the end of incident recovery\n   - Verify that closure criteria include system restoration confirmation, security validation, and stakeholder sign-off\n   - Confirm that criteria are measurable and objective rather than subjective\n   - Check that recovery closure requires verification of normal operating status per RC.RP-05\n\n2. **Evaluate after-action reporting process**\n   - Review the post-incident review process for completeness and formalization\n   - Verify that after-action reports document the incident, response actions, recovery actions, and lessons learned\n   - Confirm that after-action reports include timeline reconstruction, root cause analysis, and corrective actions\n   - Check that the existing post-incident review process (noted as not formalized) produces consistent documentation\n\n3. **Assess lessons learned integration**\n   - Verify that lessons learned from after-action reports are incorporated into recovery plans and procedures\n   - Confirm that the 2024 security incident after-action findings drove updates to recovery procedures\n   - Check that lessons learned are tracked to completion with assigned owners and deadlines\n   - Evaluate whether lessons learned are shared across teams to improve organizational resilience\n\n4. **Test recovery documentation completeness**\n   - Review a sample after-action report (preferably from a 2024 incident) for completeness\n   - Verify that incident timeline, impact assessment, recovery actions, and costs are documented\n   - Confirm that documentation is retained per the organization's records management requirements\n   - Check that recovery documentation feeds into risk register updates and security improvement planning\n\n---\n\n## Evidence Requests\n\n- [ ] Recovery closure criteria documentation\n- [ ] After-action report template\n- [ ] Sample after-action report from 2024 security incident\n- [ ] Lessons learned tracking register\n- [ ] Evidence of procedure updates driven by post-incident lessons\n- [ ] Post-incident review process documentation\n- [ ] Recovery documentation retention policy\n- [ ] Risk register updates linked to incident findings\n\n---\n\n## Notes\n\nThis test procedure evaluates whether Alma Security formally declares the end of recovery and completes incident documentation. The post-incident review process exists but is noted as not formalized, which is a key gap to assess. The 2024 security incidents provide concrete examples to evaluate the completeness of after-action documentation and lessons learned integration. Key focus areas include whether recovery closure uses objective criteria, whether after-action reports are thorough and actionable, and whether lessons learned actually drive improvements to recovery procedures. Formalizing the post-incident review process should be a priority recommendation.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RC.RP-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1201",
-      "FND-1202",
-      "FND-1203"
+      "FND-1209",
+      "FND-1210",
+      "FND-1211"
     ],
     "remediation": {
       "ownerId": null,
@@ -4876,16 +6744,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.AN-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review incident analysis methodology and procedures\n2. Examine completed incident analysis reports\n3. Validate analysis tooling and capabilities\n4. Test analyst competency and process adherence",
+    "testProcedures": "# RS.AN-03: Incident Root Cause Analysis Test Procedures\n\n**CSF Subcategory:** RS.AN-03 - Analysis is performed to establish what has taken place during an incident and the root cause of the incident\n\n---\n\n## Test Procedures\n\n1. **Review incident analysis methodology and procedures**\n   - Obtain documented incident analysis procedures from the incident response playbook\n   - Verify procedures address event sequencing, asset impact identification, and root cause determination\n   - Confirm procedures include timeline reconstruction requirements and evidence preservation standards\n   - Check that analysis methodology accounts for multi-vector and multi-stage attacks\n\n2. **Examine completed incident analysis reports**\n   - Pull 3-5 recent incident analysis reports from ServiceNow SOC tickets\n   - Verify each report documents the sequence of events and affected assets\n   - Confirm root cause analysis was performed and documented with supporting evidence\n   - Check that vulnerability and threat actor identification was attempted for each incident\n\n3. **Validate analysis tooling and capabilities**\n   - Review SIEM correlation rules and log retention supporting incident investigation\n   - Verify SentinelOne provides endpoint telemetry sufficient for timeline reconstruction\n   - Confirm GuardDuty findings are correlated with other data sources during analysis\n   - Check whether cyber deception technology is deployed and integrated into analysis workflows\n\n4. **Test analyst competency and process adherence**\n   - Interview SOC analysts on their investigation methodology for a recent incident\n   - Walk through a specific incident to verify the documented process was followed\n   - Assess whether systemic root causes are identified beyond immediate technical causes\n   - Verify findings are communicated to stakeholders for remediation tracking\n\n---\n\n## Evidence Requests\n\n- [ ] Incident Response Playbook (analysis section)\n- [ ] 3-5 completed incident investigation reports from ServiceNow\n- [ ] SIEM correlation rules and log retention configuration\n- [ ] SentinelOne investigation workflow documentation\n- [ ] GuardDuty finding integration procedures\n- [ ] SOC analyst training records on investigation methodology\n- [ ] Root cause analysis templates or frameworks in use\n\n---\n\n## Notes\n\nThis test procedure validates that the organization performs structured incident analysis to determine event sequences, identify affected resources, and establish root causes. Key maturity indicators include consistent use of analysis frameworks, correlation across multiple data sources, and identification of systemic root causes rather than surface-level technical failures. The time-to-investigate metric (currently 11 hours) provides a quantitative baseline for improvement tracking.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.AN-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SentinelOne Application Control Configuration Evidence"
     ],
     "linkedFindings": [
-      "FND-1204",
-      "FND-1205",
-      "FND-1206"
+      "FND-1212",
+      "FND-1213",
+      "FND-1214"
     ],
     "remediation": {
       "ownerId": null,
@@ -4937,16 +6812,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.AN-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review investigation documentation requirements\n2. Examine investigation records for completeness\n3. Validate record integrity and preservation controls\n4. Test provenance tracking for collected evidence",
+    "testProcedures": "# RS.AN-06: Investigation Action Recording Test Procedures\n\n**CSF Subcategory:** RS.AN-06 - Actions performed during an investigation are recorded, and the records' integrity and provenance are preserved\n\n---\n\n## Test Procedures\n\n1. **Review investigation documentation requirements**\n   - Obtain incident response policy sections governing investigation record-keeping\n   - Verify requirements for individual responder action logging during incidents\n   - Confirm the incident lead role and responsibilities for documentation oversight are defined\n   - Check that evidence chain-of-custody procedures are documented\n\n2. **Examine investigation records for completeness**\n   - Pull 3-5 recent incident tickets from ServiceNow (TKT-SOC series)\n   - Verify each ticket contains timestamped action logs from individual responders\n   - Confirm the incident lead documented the incident narrative with supporting evidence\n   - Check that all investigation steps are traceable and attributed to specific personnel\n\n3. **Validate record integrity and preservation controls**\n   - Review ServiceNow audit logging configuration for SOC ticket modifications\n   - Verify incident records cannot be altered without audit trail\n   - Confirm evidence storage locations have access controls and integrity verification\n   - Check retention periods for investigation records against policy requirements\n\n4. **Test provenance tracking for collected evidence**\n   - Select a recent incident and trace evidence from collection through analysis\n   - Verify evidence items are cataloged with source, collector, timestamp, and hash values\n   - Confirm digital evidence handling follows documented forensic procedures\n   - Check that evidence is stored in tamper-evident or write-once storage\n\n---\n\n## Evidence Requests\n\n- [ ] Incident response policy (investigation documentation section)\n- [ ] 3-5 ServiceNow SOC tickets with investigation action logs\n- [ ] ServiceNow audit log configuration for incident tickets\n- [ ] Evidence chain-of-custody procedures\n- [ ] Evidence storage access control configuration\n- [ ] Incident record retention policy\n- [ ] Sample evidence catalog from a recent incident\n\n---\n\n## Notes\n\nThis test procedure validates that investigation actions are systematically recorded with integrity and provenance controls. Mature organizations maintain detailed, tamper-evident investigation logs attributed to individual responders, with the incident lead responsible for comprehensive documentation. The integrity of these records is critical for post-incident reviews, legal proceedings, and regulatory compliance. ServiceNow ticket audit trails provide a baseline, but dedicated evidence management may be needed for complex incidents.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.AN-06",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1207",
-      "FND-1208",
-      "FND-1209"
+      "FND-1215",
+      "FND-1216",
+      "FND-1217"
     ],
     "remediation": {
       "ownerId": null,
@@ -4998,16 +6880,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.AN-07 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review incident data collection procedures\n2. Examine data collection tooling and capabilities\n3. Validate integrity preservation mechanisms\n4. Test provenance documentation for collected data",
+    "testProcedures": "# RS.AN-07: Incident Data Collection and Integrity Test Procedures\n\n**CSF Subcategory:** RS.AN-07 - Incident data and metadata are collected, and their integrity and provenance are preserved\n\n---\n\n## Test Procedures\n\n1. **Review incident data collection procedures**\n   - Obtain documented procedures for collecting incident data and metadata\n   - Verify procedures specify data types to collect (logs, network captures, disk images, memory dumps)\n   - Confirm procedures address metadata preservation including timestamps, source systems, and collection methods\n   - Check that procedures account for volatile data collection priority and sequencing\n\n2. **Examine data collection tooling and capabilities**\n   - Review SentinelOne endpoint data collection capabilities for incident response\n   - Verify SIEM log aggregation includes all relevant data sources for incident reconstruction\n   - Confirm GuardDuty finding metadata is preserved with original context\n   - Check that network traffic capture capabilities exist for incident analysis\n\n3. **Validate integrity preservation mechanisms**\n   - Verify cryptographic hashing is applied to collected evidence\n   - Confirm write-once or tamper-evident storage is used for incident data\n   - Review access controls on evidence repositories\n   - Check that integrity verification is performed before evidence is used in analysis\n\n4. **Test provenance documentation for collected data**\n   - Select a recent incident and trace data collection chain\n   - Verify each evidence item has documented source, collection time, collector identity, and method\n   - Confirm chain-of-custody records exist for evidence transferred between systems or personnel\n   - Check that automated collection tools log their actions and outputs\n\n---\n\n## Evidence Requests\n\n- [ ] Incident data collection procedures and checklists\n- [ ] SentinelOne incident response data collection configuration\n- [ ] SIEM log source inventory and retention configuration\n- [ ] Evidence hashing and integrity verification procedures\n- [ ] Evidence storage access control lists\n- [ ] Sample chain-of-custody documentation from recent incident\n- [ ] Automated collection tool output logs\n\n---\n\n## Notes\n\nThis test procedure validates that incident data and metadata are collected systematically with integrity and provenance controls. The distinction from RS.AN-06 is that this subcategory focuses on the raw data and metadata collected as evidence, while RS.AN-06 addresses the recording of investigation actions themselves. Mature organizations automate evidence collection where possible, apply cryptographic integrity verification, and maintain detailed provenance records. The quality of collected data directly impacts the effectiveness of root cause analysis under RS.AN-03.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.AN-07",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SentinelOne Application Control Configuration Evidence"
     ],
     "linkedFindings": [
-      "FND-1210",
-      "FND-1211",
-      "FND-1212"
+      "FND-1218",
+      "FND-1219",
+      "FND-1220"
     ],
     "remediation": {
       "ownerId": null,
@@ -5059,16 +6948,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.AN-08 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review magnitude estimation criteria and procedures\n2. Examine magnitude estimation in recent incidents\n3. Validate automated IOC scanning capabilities\n4. Test magnitude validation process",
+    "testProcedures": "# RS.AN-08: Incident Magnitude Estimation Test Procedures\n\n**CSF Subcategory:** RS.AN-08 - An incident's magnitude is estimated and validated\n\n---\n\n## Test Procedures\n\n1. **Review magnitude estimation criteria and procedures**\n   - Obtain documented criteria for estimating incident scope, impact, and magnitude\n   - Verify procedures include searching additional targets for indicators of compromise (IOCs)\n   - Confirm criteria address lateral movement detection and blast radius assessment\n   - Check that estimation procedures are integrated into the incident response playbook workflow\n\n2. **Examine magnitude estimation in recent incidents**\n   - Pull 3-5 recent incident reports from ServiceNow SOC tickets\n   - Verify each incident includes a documented scope assessment with affected systems and data\n   - Confirm investigators searched beyond the initial indicator for additional compromise\n   - Check that magnitude estimates were updated as new information emerged during investigation\n\n3. **Validate automated IOC scanning capabilities**\n   - Review SentinelOne threat hunting capabilities for IOC-based sweeps across endpoints\n   - Verify GuardDuty can automatically scan for IOCs across AWS infrastructure\n   - Confirm SIEM rules exist for retroactive IOC matching against historical log data\n   - Check that automated scanning results are documented within incident tickets\n\n4. **Test magnitude validation process**\n   - Walk through a specific incident to verify the scope was validated, not just estimated\n   - Confirm that magnitude estimates informed containment and resource allocation decisions\n   - Verify that initial estimates were compared against final determinations in post-incident review\n   - Check that magnitude estimation feeds into severity classification under RS.MA-03\n\n---\n\n## Evidence Requests\n\n- [ ] Incident severity and magnitude estimation criteria documentation\n- [ ] 3-5 incident reports showing magnitude estimation and validation\n- [ ] SentinelOne threat hunting query examples for IOC sweeps\n- [ ] GuardDuty automated remediation configuration\n- [ ] SIEM retroactive IOC search procedures\n- [ ] Post-incident review reports showing initial vs. final magnitude assessment\n- [ ] Incident response playbook (magnitude estimation section)\n\n---\n\n## Notes\n\nThis test procedure validates that the organization systematically estimates and validates incident magnitude rather than relying solely on initial indicators. Key maturity indicators include automated IOC scanning across the environment, iterative scope refinement as investigation progresses, and validation of estimates through comprehensive analysis. Organizations that only assess the initially detected system without proactively hunting for additional compromise frequently underestimate incident magnitude, leading to incomplete containment and recurring incidents.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.AN-08",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SentinelOne Application Control Configuration Evidence",
       "Weekly Vulnerability Scan Summary"
     ],
     "linkedFindings": [
-      "FND-1213",
-      "FND-1214",
-      "FND-1215"
+      "FND-1221",
+      "FND-1222",
+      "FND-1223"
     ],
     "remediation": {
       "ownerId": null,
@@ -5120,16 +7016,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.CO-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review notification policies and procedures\n2. Examine notification criteria and triggers\n3. Validate notification execution for recent incidents\n4. Test notification workflow and escalation chains",
+    "testProcedures": "# RS.CO-02: Incident Stakeholder Notification Test Procedures\n\n**CSF Subcategory:** RS.CO-02 - Internal and external stakeholders are notified of incidents\n\n---\n\n## Test Procedures\n\n1. **Review notification policies and procedures**\n   - Obtain breach notification procedures and incident communication plans\n   - Verify procedures address data breach notification requirements (state laws, GDPR, contractual)\n   - Confirm notification timelines are defined for each stakeholder category\n   - Check that notification templates exist for customers, regulators, law enforcement, and partners\n\n2. **Examine notification criteria and triggers**\n   - Review incident classification criteria that trigger external notification\n   - Verify criteria align with applicable regulatory requirements (e.g., 72-hour GDPR, state breach laws)\n   - Confirm the incident response playbook includes decision trees for notification requirements\n   - Check that Legal and PR coordination steps are documented for customer-impacting incidents\n\n3. **Compute notification timeliness KPIs for recent incidents**\n   - For each incident in the past 12 months that required stakeholder notification, calculate time from detection to first notification\n   - For incidents with regulatory notification requirements, verify actual notification time vs. required timeline (e.g., GDPR 72-hour window)\n   - Calculate average notification time and flag any instances where required timelines were missed (Accuracy + Valuation assertions)\n\n4. **Validate notification execution for recent incidents**\n   - Pull records of incidents that required stakeholder notification\n   - Verify notifications were sent within required timeframes\n   - Confirm notification content met regulatory requirements (nature of breach, data affected, remediation steps)\n   - Check that business partner and customer notifications met contractual SLA requirements\n\n5. **Reperformance: simulate incident notification trigger**\n   - Request a tabletop walkthrough of the notification workflow for a hypothetical P1 incident\n   - Verify the escalation chain is reachable by testing current phone numbers and email addresses in the contact list\n   - Confirm that notification procedures can be executed outside business hours without relying on systems that may be compromised during the incident\n   - Document any gaps in the on-call contact list or missing coverage windows (Recurrence assertion)\n\n---\n\n## Evidence Requests\n\n- [ ] Breach notification procedures\n- [ ] Incident communication plan with stakeholder categories\n- [ ] Notification templates (customer, regulator, law enforcement, partner)\n- [ ] Notification timeline requirements by regulation and contract\n- [ ] Records of notifications sent for recent incidents with timestamps\n- [ ] Escalation chain documentation with current contact information\n- [ ] Legal/PR coordination procedures for customer-impacting incidents\n\n---\n\n## Notes\n\nThis test procedure validates that the organization has established and follows notification procedures for internal and external stakeholders when incidents occur. Given the 2024 security incidents that damaged public trust, the maturity and timeliness of notification processes is particularly critical for Alma Security. Step 3 is a new analytical procedure: verifying that notifications were sent is insufficient; the procedure must compute whether they were sent within required timelines. Step 5 is a new reperformance step: reviewing past records only tests what was documented; simulating a notification trigger tests what the team would actually do. Note: this procedure focuses on notification TO stakeholders. Information sharing WITH designated external parties (ISACs, regulatory bodies, threat intel platforms) is covered separately in RS.CO-03.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.CO-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1216",
-      "FND-1217",
-      "FND-1218"
+      "FND-1224",
+      "FND-1225",
+      "FND-1226"
     ],
     "remediation": {
       "ownerId": null,
@@ -5181,16 +7084,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.CO-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review information sharing policies and agreements\n2. Examine internal communication and escalation practices\n3. Validate external information sharing practices\n4. Test information sharing workflow execution",
+    "testProcedures": "# RS.CO-03: Incident Information Sharing Test Procedures\n\n**CSF Subcategory:** RS.CO-03 - Information is shared with designated internal and external stakeholders\n\n---\n\n## Test Procedures\n\n1. **Review information sharing policies and agreements**\n   - Obtain incident information sharing procedures from the response plan\n   - Verify information sharing agreements exist with key external partners and ISACs\n   - Confirm procedures address data sanitization before sharing threat intelligence externally\n   - Check that sharing protocols specify classification levels and handling requirements\n\n2. **Inventory all external sharing obligations**\n   - Obtain a complete list of all information sharing obligations: ISAC memberships, regulatory disclosure requirements, and contractual sharing obligations with customers and partners\n   - Verify each obligation has a corresponding documented procedure and named owner\n   - Confirm sharing agreements include data sanitization requirements before external disclosure\n   - Check that the obligations list was reviewed and updated in the past 12 months (Completeness + Recurrence assertions)\n   - Note: internal stakeholder notification (Slack, leadership escalation) is covered in RS.CO-02 and should not be re-examined here\n\n3. **Validate external information sharing practices**\n   - Review evidence of TTP sharing with external parties (ISACs, sector peers, threat intel platforms)\n   - Verify sensitive data is removed before external sharing\n   - Confirm contractual information sharing obligations with customers and partners are met\n   - Check that supplier/vendor crisis communication protocols are documented and tested\n\n4. **Test information sharing workflow execution**\n   - Walk through a recent incident to verify external information sharing steps were followed\n   - Verify that sharing decisions were documented with justification\n   - Confirm that information sharing did not compromise the ongoing investigation or legal proceedings\n\n5. **Confirmation: verify external sharing relationships are active**\n   - Request confirmation from ISAC contact(s) that Alma's membership is current and that sharing has occurred in the past 6 months\n   - If contractual sharing obligations exist with key customers, verify at least one customer can confirm they received required notifications for applicable incidents (Confirmation assertion)\n   - Confirm regulatory bodies in scope have current contact information on file\n\n---\n\n## Evidence Requests\n\n- [ ] Incident information sharing procedures\n- [ ] Complete obligations inventory: ISAC memberships, regulatory requirements, contractual sharing obligations\n- [ ] Information sharing agreements with external parties\n- [ ] Data sanitization procedures for external threat intelligence sharing\n- [ ] Named owner documentation for each sharing obligation\n- [ ] Evidence of TTP sharing with ISACs or sector peers (past 6 months)\n- [ ] Supplier crisis communication protocols\n- [ ] ISAC membership confirmation or correspondence\n\n---\n\n## Notes\n\nThis test procedure validates that the organization shares incident information appropriately with designated external stakeholders. Effective information sharing requires balancing transparency with operational security. Step 2 replaces a prior step that duplicated RS.CO-02's examination of internal Slack communications: RS.CO-03 is scoped to external and bilateral sharing only. Step 2 applies the 15.6 Completeness assertion by requiring a full obligations inventory rather than spot-checking known agreements. Step 5 is a new Confirmation step: self-attestation from ISAC contacts and customers provides independent evidence that sharing relationships are active, not just documented. Key maturity indicators include voluntary external threat intelligence sharing with sensitive data sanitized, current ISAC membership, and documented procedures for all regulatory and contractual sharing obligations.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.CO-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1219",
-      "FND-1220",
-      "FND-1221"
+      "FND-1227",
+      "FND-1228",
+      "FND-1229"
     ],
     "remediation": {
       "ownerId": null,
@@ -5242,16 +7152,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MA-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review incident declaration criteria and authority\n2. Examine incident response plan execution procedures\n3. Validate third-party coordination capabilities\n4. Test plan execution through recent incidents or exercises",
+    "testProcedures": "# RS.MA-01: Incident Response Plan Execution Test Procedures\n\n**CSF Subcategory:** RS.MA-01 - The incident response plan is executed in coordination with relevant third parties once an incident is declared\n\n---\n\n## Test Procedures\n\n1. **Review incident declaration criteria and authority**\n   - Obtain incident response plan including declaration criteria and authority matrix\n   - Verify SOC Manager authority to declare incidents is documented and communicated\n   - Confirm criteria distinguish between events, alerts, and declared incidents\n   - Check that declaration triggers are integrated into detection technology workflows\n\n2. **Examine incident response plan execution procedures**\n   - Review the incident response playbook for completeness and currency\n   - Verify procedures address automated reporting from detection technologies (SentinelOne, GuardDuty)\n   - Confirm incident lead designation process is documented and followed\n   - Check that procedures reference activation of supporting plans (BCDR, crisis communication)\n\n3. **Validate third-party coordination capabilities**\n   - Review contracts and procedures for engaging incident response outsourcers or retainers\n   - Verify contact information and engagement procedures for third-party IR services are current\n   - Confirm coordination procedures with ISPs, MSSPs, and law enforcement are documented\n   - Check that third-party roles and responsibilities are defined in the response plan\n\n4. **Test plan execution through recent incidents or exercises**\n   - Pull 3-5 recent incident records from ServiceNow to verify plan execution\n   - Verify an incident lead was designated for each declared incident\n   - Confirm detection technology automatic reporting functioned as designed\n   - Check that supporting plans were activated when criteria were met\n\n---\n\n## Evidence Requests\n\n- [ ] Incident Response Plan (current version)\n- [ ] Incident declaration criteria and authority matrix\n- [ ] Incident response playbook (all playbooks)\n- [ ] Third-party IR retainer agreement\n- [ ] Third-party contact and engagement procedures\n- [ ] 3-5 recent incident records showing plan execution\n- [ ] Incident lead assignment records\n- [ ] Detection technology auto-reporting configuration (SentinelOne, GuardDuty)\n\n---\n\n## Notes\n\nThis test procedure validates that the incident response plan is actually executed when incidents are declared, not just documented. Key maturity indicators include clear declaration criteria, designated incident leads, automated detection reporting, and documented third-party coordination. The SOC Manager's authority to declare incidents should be widely understood across the organization. Gaps in 24/7 coverage may impact the ability to execute the plan outside business hours, which should be specifically examined during testing.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MA-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1222",
-      "FND-1223",
-      "FND-1224"
+      "FND-1230",
+      "FND-1231",
+      "FND-1232"
     ],
     "remediation": {
       "ownerId": null,
@@ -5303,16 +7220,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MA-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review triage and validation procedures\n2. Examine triage execution for recent incidents\n3. Validate severity estimation accuracy\n4. Test triage workflow and tooling",
+    "testProcedures": "# RS.MA-02: Incident Triage and Validation Test Procedures\n\n**CSF Subcategory:** RS.MA-02 - Incident reports are triaged and validated\n\n---\n\n## Test Procedures\n\n1. **Review triage and validation procedures**\n   - Obtain documented triage procedures from the incident response playbook\n   - Verify procedures include preliminary review criteria to confirm cybersecurity relevance\n   - Confirm severity estimation criteria are documented with clear thresholds\n   - Check that triage procedures address false positive identification and dismissal\n\n2. **Examine triage execution for recent incidents**\n   - Pull 5-10 recent SOC tickets from ServiceNow showing triage decisions\n   - Verify each incident report was reviewed for cybersecurity relevance before escalation\n   - Confirm severity was estimated using documented criteria at the triage stage\n   - Check triage decision turnaround times against defined SLAs\n\n3. **Validate severity estimation accuracy**\n   - Compare initial severity estimates against final severity determinations for closed incidents\n   - Identify patterns of over-estimation or under-estimation\n   - Verify that severity estimation criteria account for data sensitivity, system criticality, and blast radius\n   - Check that severity estimates are updated as additional information becomes available\n\n4. **Test triage workflow and tooling**\n   - Review ServiceNow SOC ticket workflow for triage stages and required fields\n   - Verify triage decisions are documented with rationale\n   - Confirm automated alert enrichment supports triage decisions (e.g., asset context, threat intel)\n   - Check that dismissed reports (false positives) are tracked for detection tuning\n\n---\n\n## Evidence Requests\n\n- [ ] Incident triage procedures from response playbook\n- [ ] Severity estimation criteria and classification matrix\n- [ ] 5-10 ServiceNow SOC tickets showing triage decisions and rationale\n- [ ] Triage SLA metrics (time from report to triage decision)\n- [ ] Comparison of initial vs. final severity for recent incidents\n- [ ] ServiceNow SOC ticket workflow configuration\n- [ ] Alert enrichment and automation documentation\n- [ ] False positive tracking records and detection tuning evidence\n\n---\n\n## Notes\n\nThis test procedure validates that incident reports are systematically triaged and validated before resources are committed to response. Effective triage prevents resource exhaustion from false positives while ensuring genuine incidents receive prompt attention. Key maturity indicators include documented triage criteria, consistent severity estimation, tracked triage SLAs, and feedback loops from false positive tracking to detection tuning. The accuracy of initial severity estimates directly impacts resource allocation and response effectiveness.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MA-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1225",
-      "FND-1226",
-      "FND-1227"
+      "FND-1233",
+      "FND-1234",
+      "FND-1235"
     ],
     "remediation": {
       "ownerId": null,
@@ -5364,16 +7288,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MA-03 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review categorization and prioritization framework\n2. Examine categorization and prioritization for recent incidents\n3. Validate prioritization decision-making\n4. Test categorization consistency",
+    "testProcedures": "# RS.MA-03: Incident Categorization and Prioritization Test Procedures\n\n**CSF Subcategory:** RS.MA-03 - Incidents are categorized and prioritized\n\n---\n\n## Test Procedures\n\n1. **Review categorization and prioritization framework**\n   - Obtain incident categorization taxonomy (e.g., data breach, ransomware, DDoS, insider threat)\n   - Verify prioritization criteria are documented addressing scope, impact, and time-critical nature\n   - Confirm the framework includes guidance for selecting response strategies based on category\n   - Check that the categorization taxonomy aligns with industry standards and regulatory requirements\n\n2. **Examine categorization and prioritization for recent incidents**\n   - Pull 5-10 recent incident records from ServiceNow\n   - Verify each incident was categorized by type using the documented taxonomy\n   - Confirm prioritization was applied based on scope, likely impact, and urgency\n   - Check that response strategy selection was documented and justified for each incident\n\n3. **Validate prioritization decision-making**\n   - Review incidents where multiple active incidents required resource allocation decisions\n   - Verify prioritization decisions balanced rapid recovery needs against evidence preservation\n   - Confirm response strategies considered operational impact of containment and recovery actions\n   - Check that re-prioritization occurred when incident scope or impact changed during response\n\n4. **Test categorization consistency**\n   - Compare categorization decisions across different analysts for similar incident types\n   - Verify that categorization drives appropriate playbook selection\n   - Confirm that the taxonomy covers incident types relevant to Alma Security's environment\n   - Check that categorization data supports trending and metrics reporting\n\n---\n\n## Evidence Requests\n\n- [ ] Incident categorization taxonomy documentation\n- [ ] Prioritization criteria with scope, impact, and urgency factors\n- [ ] Response strategy selection guidance\n- [ ] 5-10 incident records showing categorization and prioritization decisions\n- [ ] Evidence of re-prioritization during active incidents\n- [ ] Incident trending reports using categorization data\n- [ ] Playbook-to-category mapping documentation\n\n---\n\n## Notes\n\nThis test procedure validates that incidents are systematically categorized and prioritized to drive appropriate response actions and resource allocation. Key maturity indicators include a comprehensive categorization taxonomy, documented prioritization criteria balancing multiple factors, and evidence that categorization drives playbook selection and response strategy. The ability to balance rapid recovery against evidence preservation (RS.MA-03 Ex3) reflects advanced maturity in incident management decision-making. Prioritization decisions should be traceable and justified in incident records.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MA-03",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1228",
-      "FND-1229",
-      "FND-1230"
+      "FND-1236",
+      "FND-1237",
+      "FND-1238"
     ],
     "remediation": {
       "ownerId": null,
@@ -5425,16 +7356,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MA-04 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review escalation criteria and procedures\n2. Examine incident status tracking mechanisms\n3. Validate escalation execution for recent incidents\n4. Test escalation communication channels",
+    "testProcedures": "# RS.MA-04: Incident Escalation Test Procedures\n\n**CSF Subcategory:** RS.MA-04 - Incidents are escalated or elevated as needed\n\n---\n\n## Test Procedures\n\n1. **Review escalation criteria and procedures**\n   - Obtain documented escalation criteria from the incident response plan\n   - Verify escalation thresholds are defined by severity, scope expansion, and elapsed time\n   - Confirm escalation paths are documented for internal stakeholders (CISO, Legal, PR, executive)\n   - Check that external escalation procedures are defined (regulators, law enforcement, customers)\n\n2. **Examine incident status tracking mechanisms**\n   - Review ServiceNow SOC ticket workflow for status tracking and update requirements\n   - Verify status updates are recorded at defined intervals during active incidents\n   - Confirm incident status dashboards or reports are available for leadership visibility\n   - Check that status tracking captures changes in scope, severity, and assigned personnel\n\n3. **Validate escalation execution for recent incidents**\n   - Pull records of incidents that triggered escalation\n   - Verify escalation occurred when documented criteria were met\n   - Confirm escalation notifications reached designated stakeholders within required timeframes\n   - Check that escalation included sufficient context for recipients to take informed action\n\n4. **Test escalation communication channels**\n   - Review Slack #security-alerts channel escalation notification configuration\n   - Verify escalation chain contact information is current and tested\n   - Confirm escalation can be executed outside business hours (on-call procedures)\n   - Check that escalation documentation includes response acknowledgment requirements\n\n---\n\n## Evidence Requests\n\n- [ ] Escalation criteria and threshold documentation\n- [ ] Escalation path diagrams (internal and external)\n- [ ] ServiceNow SOC ticket status tracking configuration\n- [ ] Incident status update cadence requirements\n- [ ] Records of recent incident escalations with timeline\n- [ ] Slack escalation notification configuration\n- [ ] On-call rotation and after-hours escalation procedures\n- [ ] Escalation acknowledgment records\n\n---\n\n## Notes\n\nThis test procedure validates that incidents are tracked and escalated appropriately when criteria are met. Key maturity indicators include defined escalation thresholds, documented escalation paths for both internal and external stakeholders, and evidence that escalation occurred promptly when warranted. The 24/7 coverage gap is a particular concern for escalation effectiveness, as incidents occurring outside business hours may experience delayed escalation. ServiceNow ticket workflow should enforce status updates and escalation checkpoints at defined intervals.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MA-04",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "SOC Incident Ticket"
     ],
     "linkedFindings": [
-      "FND-1231",
-      "FND-1232",
-      "FND-1233"
+      "FND-1239",
+      "FND-1240",
+      "FND-1241"
     ],
     "remediation": {
       "ownerId": null,
@@ -5486,16 +7424,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MA-05 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review incident recovery initiation criteria\n2. Examine recovery decision-making for recent incidents\n3. Validate coordination between response and recovery phases\n4. Test recovery readiness assessment",
+    "testProcedures": "# RS.MA-05: Incident Recovery Criteria Test Procedures\n\n**CSF Subcategory:** RS.MA-05 - The criteria for initiating incident recovery are applied\n\n---\n\n## Test Procedures\n\n1. **Review incident recovery initiation criteria**\n   - Obtain documented criteria for determining when to transition from response to recovery\n   - Verify criteria address containment confirmation, eradication validation, and environmental stability\n   - Confirm criteria account for the operational disruption that recovery activities may cause\n   - Check that recovery criteria are integrated into the incident response playbook decision flow\n\n2. **Examine recovery decision-making for recent incidents**\n   - Pull 3-5 incidents that progressed to recovery phase from ServiceNow\n   - Verify recovery criteria were formally evaluated and documented before recovery initiation\n   - Confirm the decision to initiate recovery was made by authorized personnel\n   - Check that potential operational disruption from recovery was assessed and communicated\n\n3. **Validate coordination between response and recovery phases**\n   - Review handoff procedures between incident response and recovery teams\n   - Verify that response findings (root cause, scope, IOCs) are communicated to recovery teams\n   - Confirm recovery actions do not conflict with ongoing investigation or evidence preservation\n   - Check that business continuity plans are activated when recovery timeline exceeds defined thresholds\n\n4. **Test recovery readiness assessment**\n   - Review criteria for validating that the environment is safe for recovery operations\n   - Verify procedures for confirming threat actor is no longer present before rebuilding\n   - Confirm backup integrity is validated before restoration\n   - Check that recovery milestones and success criteria are predefined\n\n---\n\n## Evidence Requests\n\n- [ ] Incident recovery initiation criteria documentation\n- [ ] Response-to-recovery transition procedures\n- [ ] 3-5 incident records showing recovery decision documentation\n- [ ] Recovery authorization records\n- [ ] Operational disruption assessment for recovery activities\n- [ ] Response-to-recovery handoff documentation\n- [ ] Backup integrity validation procedures\n- [ ] Recovery milestone and success criteria definitions\n\n---\n\n## Notes\n\nThis test procedure validates that the organization applies defined criteria before initiating incident recovery, rather than rushing to restore operations prematurely. Premature recovery before complete containment and eradication is a common failure mode that leads to recurring incidents. Key maturity indicators include documented recovery criteria, formal assessment of operational disruption from recovery activities, coordination between response and recovery teams, and validation that the threat has been eradicated before rebuilding. The balance between rapid recovery and thorough response is a critical decision point.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MA-05",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
       "Information Security Policy"
     ],
     "linkedFindings": [
-      "FND-1234",
-      "FND-1235",
-      "FND-1236"
+      "FND-1242",
+      "FND-1243",
+      "FND-1244"
     ],
     "remediation": {
       "ownerId": null,
@@ -5547,16 +7492,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MI-01 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review containment procedures and capabilities\n2. Examine automated containment capabilities\n3. Validate manual containment procedures for complex scenarios\n4. Test containment effectiveness through recent incidents",
+    "testProcedures": "# RS.MI-01: Incident Containment Test Procedures\n\n**CSF Subcategory:** RS.MI-01 - Incidents are contained\n\n---\n\n## Test Procedures\n\n1. **Review containment procedures and capabilities**\n   - Obtain documented containment procedures from the incident response playbook\n   - Verify procedures address both automated and manual containment actions\n   - Confirm containment strategies are defined for different incident types (malware, data exfiltration, unauthorized access)\n   - Check that third-party containment coordination procedures are documented (ISP, MSSP)\n\n2. **Examine automated containment capabilities**\n   - Review SentinelOne automated quarantine and network isolation configuration\n   - Verify GuardDuty auto-remediation actions for AWS infrastructure containment\n   - Confirm automated containment triggers and thresholds are documented\n   - Check that automated containment actions are logged and reversible\n\n3. **Validate manual containment procedures for complex scenarios**\n   - Review procedures for manually selecting and performing containment actions\n   - Verify SOC analysts have documented authority and procedures for manual containment\n   - Confirm manual containment playbooks exist for scenarios beyond automated capabilities\n   - Check that manual containment includes network segmentation, account disablement, and system isolation options\n\n4. **Test containment effectiveness through recent incidents**\n   - Pull 3-5 recent incidents requiring containment from ServiceNow\n   - Verify containment was applied promptly after incident declaration\n   - Confirm containment actions matched incident type and severity\n   - Check that containment prevented further damage without unnecessary operational disruption\n   - Verify remediation VLAN or equivalent isolation capability is operational\n\n---\n\n## Evidence Requests\n\n- [ ] Incident containment procedures from response playbook\n- [ ] SentinelOne quarantine and network isolation configuration\n- [ ] GuardDuty auto-remediation configuration\n- [ ] Manual containment playbooks for complex scenarios\n- [ ] Containment authority matrix (who can authorize what actions)\n- [ ] 3-5 incident records showing containment actions taken\n- [ ] Remediation VLAN or network isolation architecture documentation\n- [ ] Third-party containment coordination procedures\n\n---\n\n## Notes\n\nThis test procedure validates that the organization can effectively contain incidents through both automated and manual means. SentinelOne automated quarantine provides rapid endpoint containment, while GuardDuty auto-remediation addresses AWS infrastructure. Manual containment procedures are critical for complex, multi-vector incidents that exceed automated response capabilities. Key maturity indicators include rapid automated containment for known patterns, documented manual procedures for complex scenarios, and evidence that containment actions were effective without excessive operational disruption. The availability of a remediation VLAN for automatic endpoint isolation indicates advanced containment capability.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MI-01",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
       "AWS Config Compliance Snapshot"
     ],
     "linkedFindings": [
-      "FND-1237",
-      "FND-1238",
-      "FND-1239"
+      "FND-1245",
+      "FND-1246",
+      "FND-1247"
     ],
     "remediation": {
       "ownerId": null,
@@ -5608,16 +7560,23 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.MI-02 Ex1": {
     "auditorId": 2,
-    "testProcedures": "1. Review eradication procedures and capabilities\n2. Examine automated eradication capabilities\n3. Validate manual eradication procedures for complex scenarios\n4. Test eradication effectiveness through recent incidents",
+    "testProcedures": "# RS.MI-02: Incident Eradication Test Procedures\n\n**CSF Subcategory:** RS.MI-02 - Incidents are eradicated\n\n---\n\n## Test Procedures\n\n1. **Review eradication procedures and capabilities**\n   - Obtain documented eradication procedures from the incident response playbook\n   - Verify procedures address removal of malware, unauthorized access, and persistence mechanisms\n   - Confirm eradication strategies are defined for different incident types\n   - Check that procedures include verification steps to confirm successful eradication\n\n2. **Examine automated eradication capabilities**\n   - Review SentinelOne automated remediation and rollback capabilities\n   - Verify endpoint protection features can automatically remove known threats\n   - Confirm automated eradication actions are logged with details for post-incident review\n   - Check that OS-level and application-level security features support threat removal\n\n3. **Validate manual eradication procedures for complex scenarios**\n   - Review procedures for manually selecting and performing eradication actions\n   - Verify procedures address advanced persistent threats requiring manual intervention\n   - Confirm procedures include credential reset, patch application, and configuration hardening\n   - Check that third-party eradication support engagement procedures are documented\n\n4. **Test eradication effectiveness through recent incidents**\n   - Pull 3-5 recent incidents requiring eradication from ServiceNow\n   - Verify eradication actions were performed after containment was confirmed\n   - Confirm eradication was validated through follow-up scanning and monitoring\n   - Check that incidents did not recur after eradication, indicating completeness\n   - Verify that eradication findings informed preventive control improvements\n\n---\n\n## Evidence Requests\n\n- [ ] Incident eradication procedures from response playbook\n- [ ] SentinelOne automated remediation configuration\n- [ ] Manual eradication playbooks for complex threats\n- [ ] Eradication verification procedures (post-eradication scanning)\n- [ ] 3-5 incident records showing eradication actions and verification\n- [ ] Third-party eradication support contracts or retainer agreements\n- [ ] Evidence of credential resets following account compromise incidents\n- [ ] Post-eradication monitoring procedures and duration\n\n---\n\n## Notes\n\nThis test procedure validates that the organization can effectively eradicate threats after containment. Eradication goes beyond containment to remove the threat entirely from the environment, including persistence mechanisms, compromised credentials, and exploited vulnerabilities. Key maturity indicators include automated eradication for known threats, documented manual procedures for advanced threats, verification scanning after eradication, and absence of incident recurrence. The distinction between containment (RS.MI-01) and eradication (RS.MI-02) should be clear in incident records, with eradication occurring after containment is confirmed.",
+    "procedureSource": {
+      "bank": "community",
+      "bankId": "RS.MI-02",
+      "bankVersion": "d4d01974620a920e",
+      "attachedAt": "2026-04-30T00:00:00.000Z",
+      "modified": false
+    },
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)"
     ],
     "linkedFindings": [
-      "FND-1240",
-      "FND-1241",
-      "FND-1242"
+      "FND-1248",
+      "FND-1249",
+      "FND-1250"
     ],
     "remediation": {
       "ownerId": null,
@@ -5672,6 +7631,72 @@ export const COMPREHENSIVE_OBSERVATIONS = {
 export const COMPREHENSIVE_FINDINGS = [
   {
     "id": "FND-1001",
+    "summary": "Limited cross-source correlation: CloudTrail, GuardDuty, SentinelOne, and O365 ATP operate as independent detection silo",
+    "description": "**Limited cross-source correlation:** CloudTrail, GuardDuty, SentinelOne, and O365 ATP operate as independent detection silos. Custom correlation scripts are planned but not yet deployed, limiting the ability to identify attacks that span cloud infrastructure and endpoints.",
+    "complianceRequirement": "DE.AE-02 Ex1",
+    "controlId": "DE.AE-02 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Complete Incident Response Enhancement project to establish 24/7 SOC monitoring coverage with defined on-call paging criteria for after-hours critical findings | Deploy custom cross-source correlation scripts to enable detection of attacks spanning AWS infrastructure and endpoints | Expand automated log analysis to on-premises Windows DC and SaaS applications currently dependent on manual review | Conduct full Examine-method configuration review in Q2 to validate CloudTrail, GuardDuty, and SentinelOne configurations against documented standards | Define and document TTD sub-targets by detection source (GuardDuty automated vs. manual review) to track improvement granularity",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1001",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "AWS Config Compliance Snapshot",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1002",
+    "summary": "SIEM coverage limited to AWS-native systems: On-premises Windows domain controller at Redwood City and several SaaS appl",
+    "description": "**SIEM coverage limited to AWS-native systems:** On-premises Windows domain controller at Redwood City and several SaaS applications lack automated log analysis integration. Manual review is the compensating control, but review cadence (weekly) means detection latency for these systems is measured in days.",
+    "complianceRequirement": "DE.AE-02 Ex1",
+    "controlId": "DE.AE-02 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Complete Incident Response Enhancement project to establish 24/7 SOC monitoring coverage with defined on-call paging criteria for after-hours critical findings | Deploy custom cross-source correlation scripts to enable detection of attacks spanning AWS infrastructure and endpoints | Expand automated log analysis to on-premises Windows DC and SaaS applications currently dependent on manual review | Conduct full Examine-method configuration review in Q2 to validate CloudTrail, GuardDuty, and SentinelOne configurations against documented standards | Define and document TTD sub-targets by detection source (GuardDuty automated vs. manual review) to track improvement granularity",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1002",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "AWS Config Compliance Snapshot",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1003",
+    "summary": "No document examination performed: Configuration review was deferred to Q2",
+    "description": "**No document examination performed:** Configuration review was deferred to Q2. Scoring is based on interview and test only, which may overstate or understate the actual configuration posture.",
+    "complianceRequirement": "DE.AE-02 Ex1",
+    "controlId": "DE.AE-02 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Complete Incident Response Enhancement project to establish 24/7 SOC monitoring coverage with defined on-call paging criteria for after-hours critical findings | Deploy custom cross-source correlation scripts to enable detection of attacks spanning AWS infrastructure and endpoints | Expand automated log analysis to on-premises Windows DC and SaaS applications currently dependent on manual review | Conduct full Examine-method configuration review in Q2 to validate CloudTrail, GuardDuty, and SentinelOne configurations against documented standards | Define and document TTD sub-targets by detection source (GuardDuty automated vs. manual review) to track improvement granularity",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1003",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "AWS Config Compliance Snapshot",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1004",
     "summary": "Cross-source correlation is manual and analyst-dependent, increasing investigation time",
     "description": "Cross-source correlation is manual and analyst-dependent, increasing investigation time",
     "complianceRequirement": "DE.AE-03 Ex1",
@@ -5685,7 +7710,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1001",
+    "jiraKey": "FND-1004",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -5693,7 +7718,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1002",
+    "id": "FND-1005",
     "summary": "Threat intelligence feed integration limited to GuardDuty built-in threat lists",
     "description": "Threat intelligence feed integration limited to GuardDuty built-in threat lists",
     "complianceRequirement": "DE.AE-03 Ex1",
@@ -5707,7 +7732,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1002",
+    "jiraKey": "FND-1005",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -5715,7 +7740,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1003",
+    "id": "FND-1006",
     "summary": "No automated correlation with physical access or identity management event sources",
     "description": "No automated correlation with physical access or identity management event sources",
     "complianceRequirement": "DE.AE-03 Ex1",
@@ -5729,7 +7754,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1003",
+    "jiraKey": "FND-1006",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -5737,7 +7762,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1004",
+    "id": "FND-1007",
     "summary": "No automated tool to map blast radius across interconnected systems",
     "description": "No automated tool to map blast radius across interconnected systems",
     "complianceRequirement": "DE.AE-04 Ex1",
@@ -5751,7 +7776,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1004",
+    "jiraKey": "FND-1007",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Weekly Vulnerability Scan Summary",
@@ -5759,7 +7784,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1005",
+    "id": "FND-1008",
     "summary": "Inconsistent scope documentation detail across different SOC analysts",
     "description": "Inconsistent scope documentation detail across different SOC analysts",
     "complianceRequirement": "DE.AE-04 Ex1",
@@ -5773,7 +7798,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1005",
+    "jiraKey": "FND-1008",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Weekly Vulnerability Scan Summary",
@@ -5781,7 +7806,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1006",
+    "id": "FND-1009",
     "summary": "Business impact quantification (revenue, customers affected) not systematically captured",
     "description": "Business impact quantification (revenue, customers affected) not systematically captured",
     "complianceRequirement": "DE.AE-04 Ex1",
@@ -5795,7 +7820,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1006",
+    "jiraKey": "FND-1009",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Weekly Vulnerability Scan Summary",
@@ -5803,7 +7828,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1007",
+    "id": "FND-1010",
     "summary": "No automated daily digest or summary report of accumulated findings for leadership",
     "description": "No automated daily digest or summary report of accumulated findings for leadership",
     "complianceRequirement": "DE.AE-06 Ex1",
@@ -5817,7 +7842,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1007",
+    "jiraKey": "FND-1010",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -5825,7 +7850,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1008",
+    "id": "FND-1011",
     "summary": "Alert distribution limited to security team; business unit stakeholders not included in relevant notifications",
     "description": "Alert distribution limited to security team; business unit stakeholders not included in relevant notifications",
     "complianceRequirement": "DE.AE-06 Ex1",
@@ -5839,7 +7864,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1008",
+    "jiraKey": "FND-1011",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -5847,7 +7872,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1009",
+    "id": "FND-1012",
     "summary": "No mechanism to confirm alert acknowledgment or track mean time to acknowledge",
     "description": "No mechanism to confirm alert acknowledgment or track mean time to acknowledge",
     "complianceRequirement": "DE.AE-06 Ex1",
@@ -5861,7 +7886,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1009",
+    "jiraKey": "FND-1012",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -5869,75 +7894,9 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1010",
+    "id": "FND-1013",
     "summary": "No formal CTI program or dedicated threat intelligence function",
     "description": "No formal CTI program or dedicated threat intelligence function",
-    "complianceRequirement": "DE.AE-07 Ex1",
-    "controlId": "DE.AE-07 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Evaluate ISAC membership and commercial CTI feed subscription for Alma's industry vertical | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Develop lightweight threat modeling process aligned to Alma's threat landscape",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1010",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "Information Security Policy",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1011",
-    "summary": "Vulnerability disclosure tracking is informal and reactive",
-    "description": "Vulnerability disclosure tracking is informal and reactive",
-    "complianceRequirement": "DE.AE-07 Ex1",
-    "controlId": "DE.AE-07 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Evaluate ISAC membership and commercial CTI feed subscription for Alma's industry vertical | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Develop lightweight threat modeling process aligned to Alma's threat landscape",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1011",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "Information Security Policy",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1012",
-    "summary": "Asset inventory context not systematically integrated into detection tuning decisions",
-    "description": "Asset inventory context not systematically integrated into detection tuning decisions",
-    "complianceRequirement": "DE.AE-07 Ex1",
-    "controlId": "DE.AE-07 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Evaluate ISAC membership and commercial CTI feed subscription for Alma's industry vertical | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Develop lightweight threat modeling process aligned to Alma's threat landscape",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1012",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "Information Security Policy",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1013",
-    "summary": "No threat modeling process to prioritize intelligence relevant to Alma's specific threat landscape",
-    "description": "No threat modeling process to prioritize intelligence relevant to Alma's specific threat landscape",
     "complianceRequirement": "DE.AE-07 Ex1",
     "controlId": "DE.AE-07 Ex1",
     "assessmentId": "ASM-2026-comprehensive-alma",
@@ -5958,6 +7917,72 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1014",
+    "summary": "Vulnerability disclosure tracking is informal and reactive",
+    "description": "Vulnerability disclosure tracking is informal and reactive",
+    "complianceRequirement": "DE.AE-07 Ex1",
+    "controlId": "DE.AE-07 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Evaluate ISAC membership and commercial CTI feed subscription for Alma's industry vertical | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Develop lightweight threat modeling process aligned to Alma's threat landscape",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1014",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Information Security Policy",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1015",
+    "summary": "Asset inventory context not systematically integrated into detection tuning decisions",
+    "description": "Asset inventory context not systematically integrated into detection tuning decisions",
+    "complianceRequirement": "DE.AE-07 Ex1",
+    "controlId": "DE.AE-07 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Evaluate ISAC membership and commercial CTI feed subscription for Alma's industry vertical | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Develop lightweight threat modeling process aligned to Alma's threat landscape",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1015",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Information Security Policy",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1016",
+    "summary": "No threat modeling process to prioritize intelligence relevant to Alma's specific threat landscape",
+    "description": "No threat modeling process to prioritize intelligence relevant to Alma's specific threat landscape",
+    "complianceRequirement": "DE.AE-07 Ex1",
+    "controlId": "DE.AE-07 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Evaluate ISAC membership and commercial CTI feed subscription for Alma's industry vertical | Establish formal vulnerability disclosure rapid assessment process for critical technology stack | Integrate asset inventory context into detection rule tuning to prioritize alerts for crown jewel systems | Develop lightweight threat modeling process aligned to Alma's threat landscape",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1016",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Information Security Policy",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1017",
     "summary": "Incident criteria review cycle not defined; criteria may not reflect evolving threat landscape",
     "description": "Incident criteria review cycle not defined; criteria may not reflect evolving threat landscape",
     "complianceRequirement": "DE.AE-08 Ex1",
@@ -5971,7 +7996,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1014",
+    "jiraKey": "FND-1017",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -5979,7 +8004,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1015",
+    "id": "FND-1018",
     "summary": "Declaration threshold calibration relies on individual analyst interpretation for borderline cases",
     "description": "Declaration threshold calibration relies on individual analyst interpretation for borderline cases",
     "complianceRequirement": "DE.AE-08 Ex1",
@@ -5993,7 +8018,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1015",
+    "jiraKey": "FND-1018",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -6001,7 +8026,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1016",
+    "id": "FND-1019",
     "summary": "No metric tracking false positive rate or missed incident rate for criteria effectiveness",
     "description": "No metric tracking false positive rate or missed incident rate for criteria effectiveness",
     "complianceRequirement": "DE.AE-08 Ex1",
@@ -6015,7 +8040,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1016",
+    "jiraKey": "FND-1019",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -6023,7 +8048,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1017",
+    "id": "FND-1020",
     "summary": "No organization-specific network baselines for deviation comparison",
     "description": "No organization-specific network baselines for deviation comparison",
     "complianceRequirement": "DE.CM-01 Ex1",
@@ -6037,7 +8062,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1017",
+    "jiraKey": "FND-1020",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -6045,7 +8070,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1018",
+    "id": "FND-1021",
     "summary": "Wireless network monitoring limited to corporate office; no rogue AP detection capability",
     "description": "Wireless network monitoring limited to corporate office; no rogue AP detection capability",
     "complianceRequirement": "DE.CM-01 Ex1",
@@ -6059,7 +8084,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1018",
+    "jiraKey": "FND-1021",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -6067,7 +8092,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1019",
+    "id": "FND-1022",
     "summary": "No automated network flow baseline comparison beyond GuardDuty anomaly models",
     "description": "No automated network flow baseline comparison beyond GuardDuty anomaly models",
     "complianceRequirement": "DE.CM-01 Ex1",
@@ -6081,7 +8106,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1019",
+    "jiraKey": "FND-1022",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -6089,7 +8114,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1020",
+    "id": "FND-1023",
     "summary": "No integration between physical access logs and logical security monitoring",
     "description": "No integration between physical access logs and logical security monitoring",
     "complianceRequirement": "DE.CM-02 Ex1",
@@ -6103,14 +8128,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1020",
+    "jiraKey": "FND-1023",
     "linkedArtifacts": [
       "Information Security Policy",
       "Incident Response Playbook (Excerpt)"
     ]
   },
   {
-    "id": "FND-1021",
+    "id": "FND-1024",
     "summary": "Physical access anomaly detection is manual and monthly, not real-time",
     "description": "Physical access anomaly detection is manual and monthly, not real-time",
     "complianceRequirement": "DE.CM-02 Ex1",
@@ -6124,14 +8149,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1021",
+    "jiraKey": "FND-1024",
     "linkedArtifacts": [
       "Information Security Policy",
       "Incident Response Playbook (Excerpt)"
     ]
   },
   {
-    "id": "FND-1022",
+    "id": "FND-1025",
     "summary": "No tamper detection on physical access control hardware",
     "description": "No tamper detection on physical access control hardware",
     "complianceRequirement": "DE.CM-02 Ex1",
@@ -6145,82 +8170,16 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1022",
+    "jiraKey": "FND-1025",
     "linkedArtifacts": [
       "Information Security Policy",
       "Incident Response Playbook (Excerpt)"
     ]
   },
   {
-    "id": "FND-1023",
+    "id": "FND-1026",
     "summary": "Data exfiltration pattern monitoring not implemented",
     "description": "Data exfiltration pattern monitoring not implemented",
-    "complianceRequirement": "DE.CM-03 Ex1",
-    "controlId": "DE.CM-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Evaluate UEBA platform to correlate user activity across AD, AWS, and endpoint sources | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | Configure geographic and temporal anomaly alerts for user authentication events | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1023",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1024",
-    "summary": "No monitoring for anomalous working hours or geographic access patterns",
-    "description": "No monitoring for anomalous working hours or geographic access patterns",
-    "complianceRequirement": "DE.CM-03 Ex1",
-    "controlId": "DE.CM-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Evaluate UEBA platform to correlate user activity across AD, AWS, and endpoint sources | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | Configure geographic and temporal anomaly alerts for user authentication events | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1024",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1025",
-    "summary": "Deception technology (honeypots, honey tokens) not deployed",
-    "description": "Deception technology (honeypots, honey tokens) not deployed",
-    "complianceRequirement": "DE.CM-03 Ex1",
-    "controlId": "DE.CM-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Evaluate UEBA platform to correlate user activity across AD, AWS, and endpoint sources | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | Configure geographic and temporal anomaly alerts for user authentication events | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1025",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1026",
-    "summary": "User activity monitoring does not correlate across AD, AWS, and endpoint sources",
-    "description": "User activity monitoring does not correlate across AD, AWS, and endpoint sources",
     "complianceRequirement": "DE.CM-03 Ex1",
     "controlId": "DE.CM-03 Ex1",
     "assessmentId": "ASM-2026-comprehensive-alma",
@@ -6241,6 +8200,72 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1027",
+    "summary": "No monitoring for anomalous working hours or geographic access patterns",
+    "description": "No monitoring for anomalous working hours or geographic access patterns",
+    "complianceRequirement": "DE.CM-03 Ex1",
+    "controlId": "DE.CM-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Evaluate UEBA platform to correlate user activity across AD, AWS, and endpoint sources | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | Configure geographic and temporal anomaly alerts for user authentication events | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1027",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1028",
+    "summary": "Deception technology (honeypots, honey tokens) not deployed",
+    "description": "Deception technology (honeypots, honey tokens) not deployed",
+    "complianceRequirement": "DE.CM-03 Ex1",
+    "controlId": "DE.CM-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Evaluate UEBA platform to correlate user activity across AD, AWS, and endpoint sources | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | Configure geographic and temporal anomaly alerts for user authentication events | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1028",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1029",
+    "summary": "User activity monitoring does not correlate across AD, AWS, and endpoint sources",
+    "description": "User activity monitoring does not correlate across AD, AWS, and endpoint sources",
+    "complianceRequirement": "DE.CM-03 Ex1",
+    "controlId": "DE.CM-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Evaluate UEBA platform to correlate user activity across AD, AWS, and endpoint sources | Implement data exfiltration monitoring for bulk download, USB, and cloud storage upload patterns | Configure geographic and temporal anomaly alerts for user authentication events | Deploy honey tokens in sensitive data stores to detect unauthorized access attempts",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1029",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1030",
     "summary": "No specific alerting rules for AWS service provider access events",
     "description": "No specific alerting rules for AWS service provider access events",
     "complianceRequirement": "DE.CM-06 Ex1",
@@ -6254,7 +8279,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1027",
+    "jiraKey": "FND-1030",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -6262,7 +8287,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1028",
+    "id": "FND-1031",
     "summary": "Inconsistent monitoring coverage across different types of external service providers",
     "description": "Inconsistent monitoring coverage across different types of external service providers",
     "complianceRequirement": "DE.CM-06 Ex1",
@@ -6276,7 +8301,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1028",
+    "jiraKey": "FND-1031",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -6284,7 +8309,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1029",
+    "id": "FND-1032",
     "summary": "No automated baseline for expected third-party activity patterns",
     "description": "No automated baseline for expected third-party activity patterns",
     "complianceRequirement": "DE.CM-06 Ex1",
@@ -6298,7 +8323,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1029",
+    "jiraKey": "FND-1032",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Incident Response Playbook (Excerpt)",
@@ -6306,75 +8331,9 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1030",
+    "id": "FND-1033",
     "summary": "No advanced email sandboxing or detonation for zero-day attachment analysis",
     "description": "No advanced email sandboxing or detonation for zero-day attachment analysis",
-    "complianceRequirement": "DE.CM-09 Ex1",
-    "controlId": "DE.CM-09 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Remediate 3 legacy endpoint coverage gaps through OS upgrade or compensating controls | Deploy email sandboxing capability for advanced attachment and URL analysis | Implement continuous patch compliance monitoring rather than monthly scanning | Establish on-premises software configuration baselines with automated drift detection",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1030",
-    "linkedArtifacts": [
-      "SentinelOne Application Control Configuration Evidence",
-      "SOC Incident Ticket",
-      "Incident Response Playbook (Excerpt)"
-    ]
-  },
-  {
-    "id": "FND-1031",
-    "summary": "On-premises software configuration baseline enforcement limited to SentinelOne application control",
-    "description": "On-premises software configuration baseline enforcement limited to SentinelOne application control",
-    "complianceRequirement": "DE.CM-09 Ex1",
-    "controlId": "DE.CM-09 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Remediate 3 legacy endpoint coverage gaps through OS upgrade or compensating controls | Deploy email sandboxing capability for advanced attachment and URL analysis | Implement continuous patch compliance monitoring rather than monthly scanning | Establish on-premises software configuration baselines with automated drift detection",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1031",
-    "linkedArtifacts": [
-      "SentinelOne Application Control Configuration Evidence",
-      "SOC Incident Ticket",
-      "Incident Response Playbook (Excerpt)"
-    ]
-  },
-  {
-    "id": "FND-1032",
-    "summary": "Hardware tamper detection not implemented for on-premises equipment",
-    "description": "Hardware tamper detection not implemented for on-premises equipment",
-    "complianceRequirement": "DE.CM-09 Ex1",
-    "controlId": "DE.CM-09 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Remediate 3 legacy endpoint coverage gaps through OS upgrade or compensating controls | Deploy email sandboxing capability for advanced attachment and URL analysis | Implement continuous patch compliance monitoring rather than monthly scanning | Establish on-premises software configuration baselines with automated drift detection",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1032",
-    "linkedArtifacts": [
-      "SentinelOne Application Control Configuration Evidence",
-      "SOC Incident Ticket",
-      "Incident Response Playbook (Excerpt)"
-    ]
-  },
-  {
-    "id": "FND-1033",
-    "summary": "Patch compliance monitoring is monthly rather than continuous",
-    "description": "Patch compliance monitoring is monthly rather than continuous",
     "complianceRequirement": "DE.CM-09 Ex1",
     "controlId": "DE.CM-09 Ex1",
     "assessmentId": "ASM-2026-comprehensive-alma",
@@ -6395,6 +8354,72 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1034",
+    "summary": "On-premises software configuration baseline enforcement limited to SentinelOne application control",
+    "description": "On-premises software configuration baseline enforcement limited to SentinelOne application control",
+    "complianceRequirement": "DE.CM-09 Ex1",
+    "controlId": "DE.CM-09 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Remediate 3 legacy endpoint coverage gaps through OS upgrade or compensating controls | Deploy email sandboxing capability for advanced attachment and URL analysis | Implement continuous patch compliance monitoring rather than monthly scanning | Establish on-premises software configuration baselines with automated drift detection",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1034",
+    "linkedArtifacts": [
+      "SentinelOne Application Control Configuration Evidence",
+      "SOC Incident Ticket",
+      "Incident Response Playbook (Excerpt)"
+    ]
+  },
+  {
+    "id": "FND-1035",
+    "summary": "Hardware tamper detection not implemented for on-premises equipment",
+    "description": "Hardware tamper detection not implemented for on-premises equipment",
+    "complianceRequirement": "DE.CM-09 Ex1",
+    "controlId": "DE.CM-09 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Remediate 3 legacy endpoint coverage gaps through OS upgrade or compensating controls | Deploy email sandboxing capability for advanced attachment and URL analysis | Implement continuous patch compliance monitoring rather than monthly scanning | Establish on-premises software configuration baselines with automated drift detection",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1035",
+    "linkedArtifacts": [
+      "SentinelOne Application Control Configuration Evidence",
+      "SOC Incident Ticket",
+      "Incident Response Playbook (Excerpt)"
+    ]
+  },
+  {
+    "id": "FND-1036",
+    "summary": "Patch compliance monitoring is monthly rather than continuous",
+    "description": "Patch compliance monitoring is monthly rather than continuous",
+    "complianceRequirement": "DE.CM-09 Ex1",
+    "controlId": "DE.CM-09 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Remediate 3 legacy endpoint coverage gaps through OS upgrade or compensating controls | Deploy email sandboxing capability for advanced attachment and URL analysis | Implement continuous patch compliance monitoring rather than monthly scanning | Establish on-premises software configuration baselines with automated drift detection",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1036",
+    "linkedArtifacts": [
+      "SentinelOne Application Control Configuration Evidence",
+      "SOC Incident Ticket",
+      "Incident Response Playbook (Excerpt)"
+    ]
+  },
+  {
+    "id": "FND-1037",
     "summary": "New hires do not receive mission-security alignment briefing during onboarding",
     "description": "New hires do not receive mission-security alignment briefing during onboarding",
     "complianceRequirement": "GV.OC-01 Ex1",
@@ -6408,14 +8433,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1034",
+    "jiraKey": "FND-1037",
     "linkedArtifacts": [
       "Information Security Policy",
       "Data Classification Policy"
     ]
   },
   {
-    "id": "FND-1035",
+    "id": "FND-1038",
     "summary": "Partner ecosystem security expectations not yet documented",
     "description": "Partner ecosystem security expectations not yet documented",
     "complianceRequirement": "GV.OC-02 Ex1",
@@ -6429,7 +8454,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1035",
+    "jiraKey": "FND-1038",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -6437,7 +8462,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1036",
+    "id": "FND-1039",
     "summary": "Contractual obligation tracking incomplete for Tier 2 and Tier 3 customer agreements",
     "description": "Contractual obligation tracking incomplete for Tier 2 and Tier 3 customer agreements",
     "complianceRequirement": "GV.OC-03 Ex1",
@@ -6451,14 +8476,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1036",
+    "jiraKey": "FND-1039",
     "linkedArtifacts": [
       "Information Security Policy",
       "Data Classification Policy"
     ]
   },
   {
-    "id": "FND-1037",
+    "id": "FND-1040",
     "summary": "RTO/RPO objectives not tested against actual recovery capabilities in 6+ months",
     "description": "RTO/RPO objectives not tested against actual recovery capabilities in 6+ months",
     "complianceRequirement": "GV.OC-04 Ex1",
@@ -6472,14 +8497,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1037",
+    "jiraKey": "FND-1040",
     "linkedArtifacts": [
       "Information Security Policy",
       "Authorized Software Inventory"
     ]
   },
   {
-    "id": "FND-1038",
+    "id": "FND-1041",
     "summary": "Failure mode analysis not completed for three recently onboarded critical SaaS tools",
     "description": "Failure mode analysis not completed for three recently onboarded critical SaaS tools",
     "complianceRequirement": "GV.OC-05 Ex1",
@@ -6493,7 +8518,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1038",
+    "jiraKey": "FND-1041",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "Third Party Risk Management Policy",
@@ -6501,7 +8526,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1039",
+    "id": "FND-1042",
     "summary": "Performance reviews for non-security personnel with cyber responsibilities lack consistency",
     "description": "Performance reviews for non-security personnel with cyber responsibilities lack consistency",
     "complianceRequirement": "GV.OV-02 Ex1",
@@ -6515,14 +8540,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1039",
+    "jiraKey": "FND-1042",
     "linkedArtifacts": [
       "Information Security Policy",
       "AWS Config Compliance Snapshot"
     ]
   },
   {
-    "id": "FND-1040",
+    "id": "FND-1043",
     "summary": "Some KRI thresholds set based on initial estimates, not validated against operational data",
     "description": "Some KRI thresholds set based on initial estimates, not validated against operational data",
     "complianceRequirement": "GV.OV-03 Ex1",
@@ -6536,14 +8561,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1040",
+    "jiraKey": "FND-1043",
     "linkedArtifacts": [
       "Information Security Policy",
       "Q4 2025 Access Recertification Report"
     ]
   },
   {
-    "id": "FND-1041",
+    "id": "FND-1044",
     "summary": "Supporting procedures referenced in policy not all updated to match latest policy revision",
     "description": "Supporting procedures referenced in policy not all updated to match latest policy revision",
     "complianceRequirement": "GV.PO-01 Ex1",
@@ -6557,13 +8582,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1041",
+    "jiraKey": "FND-1044",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1042",
+    "id": "FND-1045",
     "summary": "Two supporting procedures overdue for annual review by 30+ days",
     "description": "Two supporting procedures overdue for annual review by 30+ days",
     "complianceRequirement": "GV.PO-02 Ex1",
@@ -6577,13 +8602,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1042",
+    "jiraKey": "FND-1045",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1043",
+    "id": "FND-1046",
     "summary": "Department-level awareness of risk management objectives limited below VP level",
     "description": "Department-level awareness of risk management objectives limited below VP level",
     "complianceRequirement": "GV.RM-01 Ex1",
@@ -6597,13 +8622,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1043",
+    "jiraKey": "FND-1046",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1044",
+    "id": "FND-1047",
     "summary": "No documented example of tolerance thresholds actively driving a risk acceptance or escalation decision",
     "description": "No documented example of tolerance thresholds actively driving a risk acceptance or escalation decision",
     "complianceRequirement": "GV.RM-02 Ex1",
@@ -6617,13 +8642,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1044",
+    "jiraKey": "FND-1047",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1045",
+    "id": "FND-1048",
     "summary": "Bottom-up risk identification from non-security teams not formalized",
     "description": "Bottom-up risk identification from non-security teams not formalized",
     "complianceRequirement": "GV.RM-03 Ex1",
@@ -6637,11 +8662,11 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1045",
+    "jiraKey": "FND-1048",
     "linkedArtifacts": []
   },
   {
-    "id": "FND-1046",
+    "id": "FND-1049",
     "summary": "Shared responsibility matrices not completed for three recently onboarded cloud services",
     "description": "Shared responsibility matrices not completed for three recently onboarded cloud services",
     "complianceRequirement": "GV.RM-04 Ex1",
@@ -6655,14 +8680,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1046",
+    "jiraKey": "FND-1049",
     "linkedArtifacts": [
       "Information Security Policy",
       "Data Classification Policy"
     ]
   },
   {
-    "id": "FND-1047",
+    "id": "FND-1050",
     "summary": "No formal mechanism for non-security staff to report emerging cyber risks upward",
     "description": "No formal mechanism for non-security staff to report emerging cyber risks upward",
     "complianceRequirement": "GV.RM-05 Ex1",
@@ -6676,13 +8701,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1047",
+    "jiraKey": "FND-1050",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1048",
+    "id": "FND-1051",
     "summary": "Two risk entries in register missing required fields (treatment plan, target date)",
     "description": "Two risk entries in register missing required fields (treatment plan, target date)",
     "complianceRequirement": "GV.RM-06 Ex1",
@@ -6696,13 +8721,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1048",
+    "jiraKey": "FND-1051",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1049",
+    "id": "FND-1052",
     "summary": "No systematic method for identifying new strategic opportunities beyond CISO-driven process",
     "description": "No systematic method for identifying new strategic opportunities beyond CISO-driven process",
     "complianceRequirement": "GV.RM-07 Ex1",
@@ -6716,13 +8741,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1049",
+    "jiraKey": "FND-1052",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1050",
+    "id": "FND-1053",
     "summary": "Security culture messaging could be more frequent (currently quarterly)",
     "description": "Security culture messaging could be more frequent (currently quarterly)",
     "complianceRequirement": "GV.RR-01 Ex1",
@@ -6736,13 +8761,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1050",
+    "jiraKey": "FND-1053",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1051",
+    "id": "FND-1054",
     "summary": "Performance goals for department heads' cybersecurity responsibilities not consistently measured",
     "description": "Performance goals for department heads' cybersecurity responsibilities not consistently measured",
     "complianceRequirement": "GV.RR-02 Ex1",
@@ -6756,13 +8781,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1051",
+    "jiraKey": "FND-1054",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1052",
+    "id": "FND-1055",
     "summary": "Training budget underutilized (60% spent) due to operational workload constraints",
     "description": "Training budget underutilized (60% spent) due to operational workload constraints",
     "complianceRequirement": "GV.RR-03 Ex1",
@@ -6776,13 +8801,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1052",
+    "jiraKey": "FND-1055",
     "linkedArtifacts": [
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1053",
+    "id": "FND-1056",
     "summary": "Offboarding access revocation took 48+ hours for 2 of 10 sampled departures (target: 24 hours)",
     "description": "Offboarding access revocation took 48+ hours for 2 of 10 sampled departures (target: 24 hours)",
     "complianceRequirement": "GV.RR-04 Ex1",
@@ -6796,14 +8821,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1053",
+    "jiraKey": "FND-1056",
     "linkedArtifacts": [
       "Access Management Policy",
       "Quarterly Access Recertification Procedure"
     ]
   },
   {
-    "id": "FND-1054",
+    "id": "FND-1057",
     "summary": "C-SCRM strategy not reviewed since initial publication (Q2 2025)",
     "description": "C-SCRM strategy not reviewed since initial publication (Q2 2025)",
     "complianceRequirement": "GV.SC-01 Ex1",
@@ -6817,13 +8842,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1054",
+    "jiraKey": "FND-1057",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1055",
+    "id": "FND-1058",
     "summary": "Information sharing protocols not tested through tabletop or simulation",
     "description": "Information sharing protocols not tested through tabletop or simulation",
     "complianceRequirement": "GV.SC-02 Ex1",
@@ -6837,13 +8862,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1055",
+    "jiraKey": "FND-1058",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1056",
+    "id": "FND-1059",
     "summary": "C-SCRM improvement process findings not systematically fed back into enterprise improvement cycle",
     "description": "C-SCRM improvement process findings not systematically fed back into enterprise improvement cycle",
     "complianceRequirement": "GV.SC-03 Ex1",
@@ -6857,14 +8882,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1056",
+    "jiraKey": "FND-1059",
     "linkedArtifacts": [
       "Third Party Risk Management Policy",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1057",
+    "id": "FND-1060",
     "summary": "SBOM requirements only enforced for vendors onboarded after Q3 2025",
     "description": "SBOM requirements only enforced for vendors onboarded after Q3 2025",
     "complianceRequirement": "GV.SC-05 Ex1",
@@ -6878,13 +8903,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1057",
+    "jiraKey": "FND-1060",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1058",
+    "id": "FND-1061",
     "summary": "Product integrity checks not formalized for hardware components",
     "description": "Product integrity checks not formalized for hardware components",
     "complianceRequirement": "GV.SC-06 Ex1",
@@ -6898,13 +8923,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1058",
+    "jiraKey": "FND-1061",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1059",
+    "id": "FND-1062",
     "summary": "Vendor disruption scenario not included in most recent tabletop exercise",
     "description": "Vendor disruption scenario not included in most recent tabletop exercise",
     "complianceRequirement": "GV.SC-07 Ex1",
@@ -6918,13 +8943,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1059",
+    "jiraKey": "FND-1062",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1060",
+    "id": "FND-1063",
     "summary": "Crisis communication contact directory not updated since Q3 2025",
     "description": "Crisis communication contact directory not updated since Q3 2025",
     "complianceRequirement": "GV.SC-08 Ex1",
@@ -6938,13 +8963,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1060",
+    "jiraKey": "FND-1063",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1061",
+    "id": "FND-1064",
     "summary": "Supplier maintenance access logs not reviewed systematically (only on-demand)",
     "description": "Supplier maintenance access logs not reviewed systematically (only on-demand)",
     "complianceRequirement": "GV.SC-09 Ex1",
@@ -6958,14 +8983,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1061",
+    "jiraKey": "FND-1064",
     "linkedArtifacts": [
       "Third Party Risk Management Policy",
       "Authorized Software Inventory"
     ]
   },
   {
-    "id": "FND-1062",
+    "id": "FND-1065",
     "summary": "Data leakage risk assessment not documented for either sampled termination",
     "description": "Data leakage risk assessment not documented for either sampled termination",
     "complianceRequirement": "GV.SC-10 Ex1",
@@ -6979,13 +9004,13 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1062",
+    "jiraKey": "FND-1065",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1063",
+    "id": "FND-1066",
     "summary": "Transition plan template not formalized for Tier 1 vendor transitions",
     "description": "Transition plan template not formalized for Tier 1 vendor transitions",
     "complianceRequirement": "GV.SC-10 Ex1",
@@ -6999,13 +9024,76 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1063",
+    "jiraKey": "FND-1066",
     "linkedArtifacts": [
       "Third Party Risk Management Policy"
     ]
   },
   {
-    "id": "FND-1064",
+    "id": "FND-1067",
+    "summary": "55 AWS resources (6.5%) missing required tags, leaving ownership unclear and incident response slower for those resource",
+    "description": "55 AWS resources (6.5%) missing required tags, leaving ownership unclear and incident response slower for those resources",
+    "complianceRequirement": "ID.AM-01 Ex1",
+    "controlId": "ID.AM-01 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Identify owners for the 55 non-compliant AWS resources and locate missing asset HW-007 (30 days) | Implement monthly automated reconciliation between CMDB, network scans, and AWS Config data (60 days) | Enable AWS Config rule enforcement (not just detection) for required tags; target >98% compliance (90 days) | Establish quarterly physical sampling audits (minimum 5 assets) and an ownership-update step in the employee transfer/termination process",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1067",
+    "linkedArtifacts": [
+      "Alma Security Hardware Inventory",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1068",
+    "summary": "1 of 5 physically sampled assets (20%) could not be located; ownership data not updated on employee transfer",
+    "description": "1 of 5 physically sampled assets (20%) could not be located; ownership data not updated on employee transfer",
+    "complianceRequirement": "ID.AM-01 Ex1",
+    "controlId": "ID.AM-01 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Identify owners for the 55 non-compliant AWS resources and locate missing asset HW-007 (30 days) | Implement monthly automated reconciliation between CMDB, network scans, and AWS Config data (60 days) | Enable AWS Config rule enforcement (not just detection) for required tags; target >98% compliance (90 days) | Establish quarterly physical sampling audits (minimum 5 assets) and an ownership-update step in the employee transfer/termination process",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1068",
+    "linkedArtifacts": [
+      "Alma Security Hardware Inventory",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1069",
+    "summary": "No automated or scheduled reconciliation between CMDB, network scans, and AWS Config",
+    "description": "No automated or scheduled reconciliation between CMDB, network scans, and AWS Config",
+    "complianceRequirement": "ID.AM-01 Ex1",
+    "controlId": "ID.AM-01 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Identify owners for the 55 non-compliant AWS resources and locate missing asset HW-007 (30 days) | Implement monthly automated reconciliation between CMDB, network scans, and AWS Config data (60 days) | Enable AWS Config rule enforcement (not just detection) for required tags; target >98% compliance (90 days) | Establish quarterly physical sampling audits (minimum 5 assets) and an ownership-update step in the employee transfer/termination process",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1069",
+    "linkedArtifacts": [
+      "Alma Security Hardware Inventory",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1070",
     "summary": "3 service accounts created during emergency changes not in CMDB inventory",
     "description": "3 service accounts created during emergency changes not in CMDB inventory",
     "complianceRequirement": "PR.AA-01 Ex1",
@@ -7019,7 +9107,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1064",
+    "jiraKey": "FND-1070",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7027,7 +9115,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1065",
+    "id": "FND-1071",
     "summary": "AWS IAM and Kubernetes deprovisioning requires manual intervention (24-48 hour gap after termination)",
     "description": "AWS IAM and Kubernetes deprovisioning requires manual intervention (24-48 hour gap after termination)",
     "complianceRequirement": "PR.AA-01 Ex1",
@@ -7041,7 +9129,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1065",
+    "jiraKey": "FND-1071",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7049,7 +9137,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1066",
+    "id": "FND-1072",
     "summary": "Role-change workflow not fully automated; access creep identified at 12% of AD group memberships",
     "description": "Role-change workflow not fully automated; access creep identified at 12% of AD group memberships",
     "complianceRequirement": "PR.AA-01 Ex1",
@@ -7063,7 +9151,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1066",
+    "jiraKey": "FND-1072",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7071,7 +9159,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1067",
+    "id": "FND-1073",
     "summary": "Credential recovery relies on knowledge-based identity verification, susceptible to social engineering",
     "description": "Credential recovery relies on knowledge-based identity verification, susceptible to social engineering",
     "complianceRequirement": "PR.AA-01 Ex1",
@@ -7085,7 +9173,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1067",
+    "jiraKey": "FND-1073",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7093,7 +9181,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1068",
+    "id": "FND-1074",
     "summary": "No defined identity assurance levels mapped to access sensitivity (all users receive same proofing level)",
     "description": "No defined identity assurance levels mapped to access sensitivity (all users receive same proofing level)",
     "complianceRequirement": "PR.AA-02 Ex1",
@@ -7107,7 +9195,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1068",
+    "jiraKey": "FND-1074",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7115,7 +9203,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1069",
+    "id": "FND-1075",
     "summary": "Remote video verification is not recorded or retained for audit purposes",
     "description": "Remote video verification is not recorded or retained for audit purposes",
     "complianceRequirement": "PR.AA-02 Ex1",
@@ -7129,7 +9217,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1069",
+    "jiraKey": "FND-1075",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7137,7 +9225,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1070",
+    "id": "FND-1076",
     "summary": "Contractor credential expiration not automatically tied to contract end date in Workday",
     "description": "Contractor credential expiration not automatically tied to contract end date in Workday",
     "complianceRequirement": "PR.AA-02 Ex1",
@@ -7151,7 +9239,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1070",
+    "jiraKey": "FND-1076",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7159,7 +9247,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1071",
+    "id": "FND-1077",
     "summary": "Shared developer SSH key on port 45001 bypasses all authentication controls including MFA",
     "description": "Shared developer SSH key on port 45001 bypasses all authentication controls including MFA",
     "complianceRequirement": "PR.AA-03 Ex1",
@@ -7173,7 +9261,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "High",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1071",
+    "jiraKey": "FND-1077",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7181,7 +9269,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1072",
+    "id": "FND-1078",
     "summary": "MFA enrollment at 85%, not 100%; 15% of users authenticate with password only",
     "description": "MFA enrollment at 85%, not 100%; 15% of users authenticate with password only",
     "complianceRequirement": "PR.AA-03 Ex1",
@@ -7195,7 +9283,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "High",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1072",
+    "jiraKey": "FND-1078",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7203,7 +9291,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1073",
+    "id": "FND-1079",
     "summary": "5 AWS IAM accounts using long-lived access keys (14 months oldest, no rotation)",
     "description": "5 AWS IAM accounts using long-lived access keys (14 months oldest, no rotation)",
     "complianceRequirement": "PR.AA-03 Ex1",
@@ -7217,7 +9305,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "High",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1073",
+    "jiraKey": "FND-1079",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7225,7 +9313,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1074",
+    "id": "FND-1080",
     "summary": "No automated network quarantine for SentinelOne non-compliant devices",
     "description": "No automated network quarantine for SentinelOne non-compliant devices",
     "complianceRequirement": "PR.AA-03 Ex1",
@@ -7239,7 +9327,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "High",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1074",
+    "jiraKey": "FND-1080",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7247,7 +9335,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1075",
+    "id": "FND-1081",
     "summary": "Phishing-resistant MFA (FIDO2) limited to security team; not extended to all privileged users",
     "description": "Phishing-resistant MFA (FIDO2) limited to security team; not extended to all privileged users",
     "complianceRequirement": "PR.AA-03 Ex1",
@@ -7261,7 +9349,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "High",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1075",
+    "jiraKey": "FND-1081",
     "linkedArtifacts": [
       "Information Security Policy",
       "Access Management Policy",
@@ -7269,7 +9357,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1076",
+    "id": "FND-1082",
     "summary": "2 SaaS applications have stale federation metadata after January 2026 certificate rotation",
     "description": "2 SaaS applications have stale federation metadata after January 2026 certificate rotation",
     "complianceRequirement": "PR.AA-04 Ex1",
@@ -7283,7 +9371,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1076",
+    "jiraKey": "FND-1082",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Information Security Policy",
@@ -7291,7 +9379,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1077",
+    "id": "FND-1083",
     "summary": "Federation inventory maintained in spreadsheet, not in ServiceNow CMDB",
     "description": "Federation inventory maintained in spreadsheet, not in ServiceNow CMDB",
     "complianceRequirement": "PR.AA-04 Ex1",
@@ -7305,7 +9393,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1077",
+    "jiraKey": "FND-1083",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Information Security Policy",
@@ -7313,7 +9401,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1078",
+    "id": "FND-1084",
     "summary": "Back-channel logout not configured; token caching creates up to 1-hour revocation gap",
     "description": "Back-channel logout not configured; token caching creates up to 1-hour revocation gap",
     "complianceRequirement": "PR.AA-04 Ex1",
@@ -7327,7 +9415,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1078",
+    "jiraKey": "FND-1084",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Information Security Policy",
@@ -7335,7 +9423,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1079",
+    "id": "FND-1085",
     "summary": "Kubernetes service account token expiration not consistently configured across namespaces",
     "description": "Kubernetes service account token expiration not consistently configured across namespaces",
     "complianceRequirement": "PR.AA-04 Ex1",
@@ -7349,7 +9437,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1079",
+    "jiraKey": "FND-1085",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Information Security Policy",
@@ -7357,7 +9445,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1080",
+    "id": "FND-1086",
     "summary": "No automated assertion verification testing at relying parties",
     "description": "No automated assertion verification testing at relying parties",
     "complianceRequirement": "PR.AA-04 Ex1",
@@ -7371,7 +9459,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1080",
+    "jiraKey": "FND-1086",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Information Security Policy",
@@ -7379,7 +9467,53 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1081",
+    "id": "FND-1087",
+    "summary": "Service account inventory missed 2 legacy accounts (discovered only through audit testing)",
+    "description": "Service account inventory missed 2 legacy accounts (discovered only through audit testing)",
+    "complianceRequirement": "PR.AA-05 Ex1",
+    "controlId": "PR.AA-05 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Clear the third-party recertification backlog (3 vendors) and add an escalation trigger for reviews past due | Reconcile the service account inventory against directory and CyberArk data; add the 2 legacy accounts and schedule recurring reconciliation | Update the separation-of-duties matrix for the Workday financials module and make SoD review a standing step in system implementations",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1087",
+    "linkedArtifacts": [
+      "Access Management Policy",
+      "Quarterly Access Recertification Procedure",
+      "Q4 2025 Access Recertification Report",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1088",
+    "summary": "Separation-of-duties matrix not updated for the Workday financials module implementation",
+    "description": "Separation-of-duties matrix not updated for the Workday financials module implementation",
+    "complianceRequirement": "PR.AA-05 Ex1",
+    "controlId": "PR.AA-05 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Clear the third-party recertification backlog (3 vendors) and add an escalation trigger for reviews past due | Reconcile the service account inventory against directory and CyberArk data; add the 2 legacy accounts and schedule recurring reconciliation | Update the separation-of-duties matrix for the Workday financials module and make SoD review a standing step in system implementations",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1088",
+    "linkedArtifacts": [
+      "Access Management Policy",
+      "Quarterly Access Recertification Procedure",
+      "Q4 2025 Access Recertification Report",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1089",
     "summary": "Badge deactivation relies on manual handoff between IT and facilities",
     "description": "Badge deactivation relies on manual handoff between IT and facilities",
     "complianceRequirement": "PR.AA-06 Ex1",
@@ -7393,7 +9527,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1081",
+    "jiraKey": "FND-1089",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Access Management Policy",
@@ -7401,7 +9535,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1082",
+    "id": "FND-1090",
     "summary": "Physical access logs not forwarded to SIEM for logical-physical correlation",
     "description": "Physical access logs not forwarded to SIEM for logical-physical correlation",
     "complianceRequirement": "PR.AA-06 Ex1",
@@ -7415,7 +9549,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1082",
+    "jiraKey": "FND-1090",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Access Management Policy",
@@ -7423,7 +9557,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1083",
+    "id": "FND-1091",
     "summary": "No anti-tailgating measures at main building entrance",
     "description": "No anti-tailgating measures at main building entrance",
     "complianceRequirement": "PR.AA-06 Ex1",
@@ -7437,7 +9571,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1083",
+    "jiraKey": "FND-1091",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Access Management Policy",
@@ -7445,7 +9579,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1084",
+    "id": "FND-1092",
     "summary": "Visitor log is paper-based with no digital visitor management system",
     "description": "Visitor log is paper-based with no digital visitor management system",
     "complianceRequirement": "PR.AA-06 Ex1",
@@ -7459,7 +9593,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1084",
+    "jiraKey": "FND-1092",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Access Management Policy",
@@ -7467,7 +9601,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1085",
+    "id": "FND-1093",
     "summary": "Server room camera footage not integrated with ACS badge logs for automated correlation",
     "description": "Server room camera footage not integrated with ACS badge logs for automated correlation",
     "complianceRequirement": "PR.AA-06 Ex1",
@@ -7481,7 +9615,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1085",
+    "jiraKey": "FND-1093",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Access Management Policy",
@@ -7489,7 +9623,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1086",
+    "id": "FND-1094",
     "summary": "Contractor coverage incomplete. The 12 EMEA-based contractors are enrolled in the same training program but content is n",
     "description": "**Contractor coverage incomplete.** The 12 EMEA-based contractors are enrolled in the same training program but content is not localized. The AUP acknowledgment requirement has not been formally extended to all contractor personnel through the vendor onboarding process.",
     "complianceRequirement": "PR.AT-01 Ex1",
@@ -7503,7 +9637,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1086",
+    "jiraKey": "FND-1094",
     "linkedArtifacts": [
       "Acceptable Use Policy",
       "Q1 2026 Security Awareness Training Completion Evidence",
@@ -7511,7 +9645,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1087",
+    "id": "FND-1095",
     "summary": "No vishing or SMS simulation. Phishing simulations are limited to email-based campaigns",
     "description": "**No vishing or SMS simulation.** Phishing simulations are limited to email-based campaigns. Voice-based (vishing) and SMS-based (smishing) social engineering vectors are not tested, leaving a gap in assessing employee preparedness for non-email attack channels.",
     "complianceRequirement": "PR.AT-01 Ex1",
@@ -7525,7 +9659,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1087",
+    "jiraKey": "FND-1095",
     "linkedArtifacts": [
       "Acceptable Use Policy",
       "Q1 2026 Security Awareness Training Completion Evidence",
@@ -7533,7 +9667,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1088",
+    "id": "FND-1096",
     "summary": "No unified assessment dashboard. Phishing simulation results, Workday completion records, and incident reporting data ex",
     "description": "**No unified assessment dashboard.** Phishing simulation results, Workday completion records, and incident reporting data exist in separate systems with no consolidated view of workforce security awareness posture.",
     "complianceRequirement": "PR.AT-01 Ex1",
@@ -7547,7 +9681,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1088",
+    "jiraKey": "FND-1096",
     "linkedArtifacts": [
       "Acceptable Use Policy",
       "Q1 2026 Security Awareness Training Completion Evidence",
@@ -7555,7 +9689,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1089",
+    "id": "FND-1097",
     "summary": "Training tracked outside Workday. Specialized training completion is tracked in team-level spreadsheets and vendor porta",
     "description": "**Training tracked outside Workday.** Specialized training completion is tracked in team-level spreadsheets and vendor portals rather than the centralized Workday platform. This creates fragmented audit trails and limits management visibility into compliance.",
     "complianceRequirement": "PR.AT-02 Ex1",
@@ -7569,7 +9703,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1089",
+    "jiraKey": "FND-1097",
     "linkedArtifacts": [
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Acceptable Use Policy",
@@ -7577,7 +9711,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1090",
+    "id": "FND-1098",
     "summary": "No formal competency assessments. There are no structured, periodic tests or evaluations to measure whether specialized ",
     "description": "**No formal competency assessments.** There are no structured, periodic tests or evaluations to measure whether specialized personnel have retained and can apply role-specific knowledge. Competency is inferred from operational performance rather than directly assessed.",
     "complianceRequirement": "PR.AT-02 Ex1",
@@ -7591,7 +9725,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1090",
+    "jiraKey": "FND-1098",
     "linkedArtifacts": [
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Acceptable Use Policy",
@@ -7599,7 +9733,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1091",
+    "id": "FND-1099",
     "summary": "No annual specialized refresher policy. While general awareness refreshers are mandated quarterly, there is no distinct ",
     "description": "**No annual specialized refresher policy.** While general awareness refreshers are mandated quarterly, there is no distinct policy requirement for specialized role refreshers covering role-specific content. Refresher activity depends on vendor release cycles and individual initiative.",
     "complianceRequirement": "PR.AT-02 Ex1",
@@ -7613,7 +9747,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1091",
+    "jiraKey": "FND-1099",
     "linkedArtifacts": [
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Acceptable Use Policy",
@@ -7621,7 +9755,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1092",
+    "id": "FND-1100",
     "summary": "Developer security training is optional. Developer and DevSecOps roles are not formally designated as specialized traini",
     "description": "**Developer security training is optional.** Developer and DevSecOps roles are not formally designated as specialized training roles despite having production access and writing security-sensitive code. Security training for these roles is limited to optional lunch-and-learn sessions.",
     "complianceRequirement": "PR.AT-02 Ex1",
@@ -7635,7 +9769,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1092",
+    "jiraKey": "FND-1100",
     "linkedArtifacts": [
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Acceptable Use Policy",
@@ -7643,7 +9777,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1093",
+    "id": "FND-1101",
     "summary": "VM team lacks formal curriculum. While the VM team members are skilled, there is no documented training plan that maps t",
     "description": "**VM team lacks formal curriculum.** While the VM team members are skilled, there is no documented training plan that maps to their specific responsibilities with Alma's AWS and Windows domain controller infrastructure.",
     "complianceRequirement": "PR.AT-02 Ex1",
@@ -7657,7 +9791,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1093",
+    "jiraKey": "FND-1101",
     "linkedArtifacts": [
       "Q1 2026 Security Awareness Training Completion Evidence",
       "Acceptable Use Policy",
@@ -7665,7 +9799,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1094",
+    "id": "FND-1102",
     "summary": "Data classification schema is still in development, meaning encryption requirements cannot be fully mapped to data sensi",
     "description": "Data classification schema is still in development, meaning encryption requirements cannot be fully mapped to data sensitivity levels",
     "complianceRequirement": "PR.DS-01 Ex1",
@@ -7679,7 +9813,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1094",
+    "jiraKey": "FND-1102",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
@@ -7687,7 +9821,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1095",
+    "id": "FND-1103",
     "summary": "No centralized encryption compliance dashboard spanning both cloud and on-premises environments, limiting cross-environm",
     "description": "No centralized encryption compliance dashboard spanning both cloud and on-premises environments, limiting cross-environment visibility",
     "complianceRequirement": "PR.DS-01 Ex1",
@@ -7701,7 +9835,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1095",
+    "jiraKey": "FND-1103",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
@@ -7709,7 +9843,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1096",
+    "id": "FND-1104",
     "summary": "File integrity monitoring via SentinelOne has coverage gaps on some Kubernetes worker nodes",
     "description": "File integrity monitoring via SentinelOne has coverage gaps on some Kubernetes worker nodes",
     "complianceRequirement": "PR.DS-01 Ex1",
@@ -7723,7 +9857,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1096",
+    "jiraKey": "FND-1104",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
@@ -7731,7 +9865,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1097",
+    "id": "FND-1105",
     "summary": "Key rotation cycle of 365 days may be insufficient for keys protecting biometric data (highest sensitivity)",
     "description": "Key rotation cycle of 365 days may be insufficient for keys protecting biometric data (highest sensitivity)",
     "complianceRequirement": "PR.DS-01 Ex1",
@@ -7745,7 +9879,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1097",
+    "jiraKey": "FND-1105",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
@@ -7753,7 +9887,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1098",
+    "id": "FND-1106",
     "summary": "Proactive data integrity validation program is not yet established; reliance on reactive FIM monitoring only",
     "description": "Proactive data integrity validation program is not yet established; reliance on reactive FIM monitoring only",
     "complianceRequirement": "PR.DS-01 Ex1",
@@ -7767,7 +9901,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1098",
+    "jiraKey": "FND-1106",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
@@ -7775,7 +9909,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1099",
+    "id": "FND-1107",
     "summary": "On-premises encryption compliance is not centrally reported, requiring manual verification",
     "description": "On-premises encryption compliance is not centrally reported, requiring manual verification",
     "complianceRequirement": "PR.DS-01 Ex1",
@@ -7789,7 +9923,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1099",
+    "jiraKey": "FND-1107",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "Data Classification Policy",
@@ -7797,7 +9931,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1100",
+    "id": "FND-1108",
     "summary": "No automated TLS certificate expiration monitoring beyond ACM auto-renewal (third-party certificates may lack monitoring",
     "description": "No automated TLS certificate expiration monitoring beyond ACM auto-renewal (third-party certificates may lack monitoring)",
     "complianceRequirement": "PR.DS-02 Ex1",
@@ -7811,7 +9945,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1100",
+    "jiraKey": "FND-1108",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
@@ -7819,7 +9953,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1101",
+    "id": "FND-1109",
     "summary": "VPN split tunnel exceptions are not fully documented with business justifications",
     "description": "VPN split tunnel exceptions are not fully documented with business justifications",
     "complianceRequirement": "PR.DS-02 Ex1",
@@ -7833,7 +9967,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1101",
+    "jiraKey": "FND-1109",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
@@ -7841,7 +9975,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1102",
+    "id": "FND-1110",
     "summary": "Automated SSL scanning does not cover internal-only service mesh endpoints",
     "description": "Automated SSL scanning does not cover internal-only service mesh endpoints",
     "complianceRequirement": "PR.DS-02 Ex1",
@@ -7855,7 +9989,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1102",
+    "jiraKey": "FND-1110",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
@@ -7863,7 +9997,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1103",
+    "id": "FND-1111",
     "summary": "On-premises Windows DC transport encryption policy is not formally documented separately from the general encryption sta",
     "description": "On-premises Windows DC transport encryption policy is not formally documented separately from the general encryption standard",
     "complianceRequirement": "PR.DS-02 Ex1",
@@ -7877,7 +10011,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1103",
+    "jiraKey": "FND-1111",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
@@ -7885,7 +10019,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1104",
+    "id": "FND-1112",
     "summary": "Development and staging environments may allow plaintext connections for debugging purposes without documented exception",
     "description": "Development and staging environments may allow plaintext connections for debugging purposes without documented exception tracking",
     "complianceRequirement": "PR.DS-02 Ex1",
@@ -7899,7 +10033,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1104",
+    "jiraKey": "FND-1112",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
@@ -7907,7 +10041,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1105",
+    "id": "FND-1113",
     "summary": "S3 SecureTransport condition not yet applied to all buckets (in progress via S3 Bucket Security project)",
     "description": "S3 SecureTransport condition not yet applied to all buckets (in progress via S3 Bucket Security project)",
     "complianceRequirement": "PR.DS-02 Ex1",
@@ -7921,7 +10055,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1105",
+    "jiraKey": "FND-1113",
     "linkedArtifacts": [
       "Encryption Standards Policy",
       "AWS Config Compliance Snapshot",
@@ -7929,7 +10063,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1106",
+    "id": "FND-1114",
     "summary": "Application-level memory clearing of biometric data after processing has not been validated through code review or memor",
     "description": "Application-level memory clearing of biometric data after processing has not been validated through code review or memory analysis",
     "complianceRequirement": "PR.DS-10 Ex1",
@@ -7943,7 +10077,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1106",
+    "jiraKey": "FND-1114",
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
@@ -7951,7 +10085,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1107",
+    "id": "FND-1115",
     "summary": "No hardware-based confidential computing (Intel SGX, AMD SEV) for biometric processing workloads; data is unencrypted in",
     "description": "No hardware-based confidential computing (Intel SGX, AMD SEV) for biometric processing workloads; data is unencrypted in memory during processing",
     "complianceRequirement": "PR.DS-10 Ex1",
@@ -7965,7 +10099,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1107",
+    "jiraKey": "FND-1115",
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
@@ -7973,7 +10107,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1108",
+    "id": "FND-1116",
     "summary": "No unified data-in-use protection program; controls exist across multiple tools but are not managed as a coordinated cap",
     "description": "No unified data-in-use protection program; controls exist across multiple tools but are not managed as a coordinated capability with coverage metrics",
     "complianceRequirement": "PR.DS-10 Ex1",
@@ -7987,7 +10121,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1108",
+    "jiraKey": "FND-1116",
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
@@ -7995,7 +10129,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1109",
+    "id": "FND-1117",
     "summary": "DLP monitoring does not specifically cover data-in-use exfiltration vectors (screen capture, clipboard scraping, memory ",
     "description": "DLP monitoring does not specifically cover data-in-use exfiltration vectors (screen capture, clipboard scraping, memory dump extraction)",
     "complianceRequirement": "PR.DS-10 Ex1",
@@ -8009,7 +10143,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1109",
+    "jiraKey": "FND-1117",
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
@@ -8017,7 +10151,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1110",
+    "id": "FND-1118",
     "summary": "Container runtime security has not been independently audited or penetration tested",
     "description": "Container runtime security has not been independently audited or penetration tested",
     "complianceRequirement": "PR.DS-10 Ex1",
@@ -8031,7 +10165,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1110",
+    "jiraKey": "FND-1118",
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
@@ -8039,7 +10173,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1111",
+    "id": "FND-1119",
     "summary": "Data-in-use protection requirements are not yet mapped to data classification levels",
     "description": "Data-in-use protection requirements are not yet mapped to data classification levels",
     "complianceRequirement": "PR.DS-10 Ex1",
@@ -8053,7 +10187,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1111",
+    "jiraKey": "FND-1119",
     "linkedArtifacts": [
       "Data Classification Policy",
       "Encryption Standards Policy",
@@ -8061,7 +10195,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1112",
+    "id": "FND-1120",
     "summary": "RTO and RPO targets are defined informally and have not been formally approved by business stakeholders",
     "description": "RTO and RPO targets are defined informally and have not been formally approved by business stakeholders",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8075,7 +10209,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1112",
+    "jiraKey": "FND-1120",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8083,7 +10217,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1113",
+    "id": "FND-1121",
     "summary": "Q1 2026 quarterly restore test has not yet been conducted (due by end of March)",
     "description": "Q1 2026 quarterly restore test has not yet been conducted (due by end of March)",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8097,7 +10231,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1113",
+    "jiraKey": "FND-1121",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8105,7 +10239,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1114",
+    "id": "FND-1122",
     "summary": "S3 Object Lock (WORM protection) is not yet deployed to all backup buckets; rollout in progress via S3 Bucket Security p",
     "description": "S3 Object Lock (WORM protection) is not yet deployed to all backup buckets; rollout in progress via S3 Bucket Security project",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8119,7 +10253,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1114",
+    "jiraKey": "FND-1122",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8127,7 +10261,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1115",
+    "id": "FND-1123",
     "summary": "Velero backup scope does not cover all Kubernetes namespaces; some non-production workloads with persistent data lack ba",
     "description": "Velero backup scope does not cover all Kubernetes namespaces; some non-production workloads with persistent data lack backup coverage",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8141,7 +10275,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1115",
+    "jiraKey": "FND-1123",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8149,7 +10283,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1116",
+    "id": "FND-1124",
     "summary": "No automated alerting for backup job failures; current monitoring relies on manual log review",
     "description": "No automated alerting for backup job failures; current monitoring relies on manual log review",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8163,7 +10297,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1116",
+    "jiraKey": "FND-1124",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8171,7 +10305,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1117",
+    "id": "FND-1125",
     "summary": "On-premises backup replication to AWS relies on a manual scheduled transfer process without failure alerting",
     "description": "On-premises backup replication to AWS relies on a manual scheduled transfer process without failure alerting",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8185,7 +10319,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1117",
+    "jiraKey": "FND-1125",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8193,7 +10327,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1118",
+    "id": "FND-1126",
     "summary": "DR plan is still in development through the Cloud Security Optimization project ($100K); formal recovery procedures not ",
     "description": "DR plan is still in development through the Cloud Security Optimization project ($100K); formal recovery procedures not yet documented",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8207,7 +10341,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1118",
+    "jiraKey": "FND-1126",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8215,7 +10349,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1119",
+    "id": "FND-1127",
     "summary": "Cross-region backup restoration has not been tested",
     "description": "Cross-region backup restoration has not been tested",
     "complianceRequirement": "PR.DS-11 Ex1",
@@ -8229,7 +10363,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1119",
+    "jiraKey": "FND-1127",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8237,7 +10371,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1120",
+    "id": "FND-1128",
     "summary": "No formal network segmentation policy — Segmentation exists in practice but is not governed by a documented policy defin",
     "description": "**No formal network segmentation policy** — Segmentation exists in practice but is not governed by a documented policy defining trust zones, allowed flows, and review cadence",
     "complianceRequirement": "PR.IR-01 Ex1",
@@ -8251,7 +10385,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1120",
+    "jiraKey": "FND-1128",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Physical Security Policy",
@@ -8259,7 +10393,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1121",
+    "id": "FND-1129",
     "summary": "NAC not implemented — No pre-admission device posture assessment; devices connect to the corporate network based on phys",
     "description": "**NAC not implemented** — No pre-admission device posture assessment; devices connect to the corporate network based on physical access alone",
     "complianceRequirement": "PR.IR-01 Ex1",
@@ -8273,7 +10407,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1121",
+    "jiraKey": "FND-1129",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Physical Security Policy",
@@ -8281,7 +10415,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1122",
+    "id": "FND-1130",
     "summary": "Kubernetes network policies incomplete — Not all namespaces enforce network policies, allowing potential east-west later",
     "description": "**Kubernetes network policies incomplete** — Not all namespaces enforce network policies, allowing potential east-west lateral movement within the cluster",
     "complianceRequirement": "PR.IR-01 Ex1",
@@ -8295,7 +10429,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1122",
+    "jiraKey": "FND-1130",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Physical Security Policy",
@@ -8303,7 +10437,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1123",
+    "id": "FND-1131",
     "summary": "Windows Server 2012 R2 on the network — Legacy fileserver on an unsupported OS increases the attack surface for the netw",
     "description": "**Windows Server 2012 R2 on the network** — Legacy fileserver on an unsupported OS increases the attack surface for the network segment it occupies; Q3 upgrade planned but currently exposed",
     "complianceRequirement": "PR.IR-01 Ex1",
@@ -8317,7 +10451,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1123",
+    "jiraKey": "FND-1131",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Physical Security Policy",
@@ -8325,7 +10459,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1124",
+    "id": "FND-1132",
     "summary": "No regular segmentation testing — Segmentation effectiveness has not been independently validated through penetration te",
     "description": "**No regular segmentation testing** — Segmentation effectiveness has not been independently validated through penetration testing or red team exercises",
     "complianceRequirement": "PR.IR-01 Ex1",
@@ -8339,7 +10473,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1124",
+    "jiraKey": "FND-1132",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Physical Security Policy",
@@ -8347,7 +10481,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1125",
+    "id": "FND-1133",
     "summary": "Fire suppression inspection records not reviewed — Cannot independently confirm testing cadence, last inspection date, o",
     "description": "**Fire suppression inspection records not reviewed** — Cannot independently confirm testing cadence, last inspection date, or system reliability",
     "complianceRequirement": "PR.IR-02 Ex1",
@@ -8361,7 +10495,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1125",
+    "jiraKey": "FND-1133",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Backup and Restore Procedure",
@@ -8369,7 +10503,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1126",
+    "id": "FND-1134",
     "summary": "Flood detection uncertain — Presence of water intrusion sensors in the data center has not been confirmed, relevant give",
     "description": "**Flood detection uncertain** — Presence of water intrusion sensors in the data center has not been confirmed, relevant given Northern California flood risk",
     "complianceRequirement": "PR.IR-02 Ex1",
@@ -8383,7 +10517,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1126",
+    "jiraKey": "FND-1134",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Backup and Restore Procedure",
@@ -8391,7 +10525,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1127",
+    "id": "FND-1135",
     "summary": "UPS capacity and testing undocumented — Battery replacement schedule, load testing cadence, and capacity relative to cur",
     "description": "**UPS capacity and testing undocumented** — Battery replacement schedule, load testing cadence, and capacity relative to current equipment load are not documented",
     "complianceRequirement": "PR.IR-02 Ex1",
@@ -8405,7 +10539,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1127",
+    "jiraKey": "FND-1135",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Backup and Restore Procedure",
@@ -8413,7 +10547,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1128",
+    "id": "FND-1136",
     "summary": "No environmental trend reporting — HVAC monitoring captures events but trends are not analyzed to identify gradual degra",
     "description": "**No environmental trend reporting** — HVAC monitoring captures events but trends are not analyzed to identify gradual degradation or capacity concerns",
     "complianceRequirement": "PR.IR-02 Ex1",
@@ -8427,7 +10561,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1128",
+    "jiraKey": "FND-1136",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Backup and Restore Procedure",
@@ -8435,7 +10569,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1129",
+    "id": "FND-1137",
     "summary": "Environmental monitoring not linked to IT incident management — Environmental alerts may not trigger appropriate IT resp",
     "description": "**Environmental monitoring not linked to IT incident management** — Environmental alerts may not trigger appropriate IT response procedures",
     "complianceRequirement": "PR.IR-02 Ex1",
@@ -8449,7 +10583,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1129",
+    "jiraKey": "FND-1137",
     "linkedArtifacts": [
       "Physical Security Policy",
       "Backup and Restore Procedure",
@@ -8457,7 +10591,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1130",
+    "id": "FND-1138",
     "summary": "RTO/RPO not formally defined — Recovery objectives have not been documented or agreed upon with business stakeholders, m",
     "description": "**RTO/RPO not formally defined** — Recovery objectives have not been documented or agreed upon with business stakeholders, making it impossible to measure DR readiness",
     "complianceRequirement": "PR.IR-03 Ex1",
@@ -8471,7 +10605,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1130",
+    "jiraKey": "FND-1138",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8479,7 +10613,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1131",
+    "id": "FND-1139",
     "summary": "Failover test results not formally documented — While testing was performed, formal documentation of scenarios tested, s",
     "description": "**Failover test results not formally documented** — While testing was performed, formal documentation of scenarios tested, success criteria, observed recovery times, and lessons learned is limited",
     "complianceRequirement": "PR.IR-03 Ex1",
@@ -8493,7 +10627,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1131",
+    "jiraKey": "FND-1139",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8501,7 +10635,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1132",
+    "id": "FND-1140",
     "summary": "No failover testing cadence established — Testing was performed but no recurring schedule ensures continued validation a",
     "description": "**No failover testing cadence established** — Testing was performed but no recurring schedule ensures continued validation as infrastructure evolves",
     "complianceRequirement": "PR.IR-03 Ex1",
@@ -8515,7 +10649,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1132",
+    "jiraKey": "FND-1140",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8523,7 +10657,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1133",
+    "id": "FND-1141",
     "summary": "No DR tabletop exercise — Coordination-level disaster recovery has not been tested; only technical failover has been val",
     "description": "**No DR tabletop exercise** — Coordination-level disaster recovery has not been tested; only technical failover has been validated",
     "complianceRequirement": "PR.IR-03 Ex1",
@@ -8537,7 +10671,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1133",
+    "jiraKey": "FND-1141",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8545,7 +10679,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1134",
+    "id": "FND-1142",
     "summary": "On-premises resilience gap — Redwood City data center does not have equivalent multi-site resilience capabilities",
     "description": "**On-premises resilience gap** — Redwood City data center does not have equivalent multi-site resilience capabilities",
     "complianceRequirement": "PR.IR-03 Ex1",
@@ -8559,7 +10693,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1134",
+    "jiraKey": "FND-1142",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8567,7 +10701,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1135",
+    "id": "FND-1143",
     "summary": "No capacity model for business growth — The relationship between customer growth (targeting 10,000 customers), feature d",
     "description": "**No capacity model for business growth** — The relationship between customer growth (targeting 10,000 customers), feature deployment, and infrastructure resource requirements is not modeled",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8581,7 +10715,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1135",
+    "jiraKey": "FND-1143",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8590,7 +10724,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1136",
+    "id": "FND-1144",
     "summary": "No WAF for application-layer DDoS mitigation — AWS Shield Standard only protects against volumetric Layer 3/4 attacks; a",
     "description": "**No WAF for application-layer DDoS mitigation** — AWS Shield Standard only protects against volumetric Layer 3/4 attacks; application-layer (Layer 7) DDoS attacks are not mitigated; WAF project ($112K) in progress",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8604,7 +10738,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1136",
+    "jiraKey": "FND-1144",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8613,7 +10747,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1137",
+    "id": "FND-1145",
     "summary": "No DDoS response runbook — Procedures for responding to an active DDoS attack are not documented, including escalation p",
     "description": "**No DDoS response runbook** — Procedures for responding to an active DDoS attack are not documented, including escalation paths and decision criteria for engaging AWS Shield Advanced",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8627,7 +10761,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1137",
+    "jiraKey": "FND-1145",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8636,7 +10770,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1138",
+    "id": "FND-1146",
     "summary": "No rate limiting — Neither the load balancer nor the application layer enforces rate limiting, leaving the platform vuln",
     "description": "**No rate limiting** — Neither the load balancer nor the application layer enforces rate limiting, leaving the platform vulnerable to request flooding",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8650,7 +10784,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1138",
+    "jiraKey": "FND-1146",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8659,7 +10793,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1139",
+    "id": "FND-1147",
     "summary": "On-premises capacity not documented — Physical capacity constraints (rack space, power, cooling) for the Redwood City da",
     "description": "**On-premises capacity not documented** — Physical capacity constraints (rack space, power, cooling) for the Redwood City data center are not formally assessed",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8673,7 +10807,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1139",
+    "jiraKey": "FND-1147",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8682,7 +10816,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1140",
+    "id": "FND-1148",
     "summary": "Log storage capacity not assessed — Retention requirements versus available storage for audit and investigation logs hav",
     "description": "**Log storage capacity not assessed** — Retention requirements versus available storage for audit and investigation logs have not been evaluated",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8696,7 +10830,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1140",
+    "jiraKey": "FND-1148",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8705,7 +10839,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1141",
+    "id": "FND-1149",
     "summary": "Windows Server 2012 R2 capacity limitations — Legacy fileserver may present storage and performance constraints given it",
     "description": "**Windows Server 2012 R2 capacity limitations** — Legacy fileserver may present storage and performance constraints given its age; Q3 upgrade planned",
     "complianceRequirement": "PR.IR-04 Ex1",
@@ -8719,7 +10853,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1141",
+    "jiraKey": "FND-1149",
     "linkedArtifacts": [
       "Backup and Restore Procedure",
       "Quarterly Backup Restore Test Report",
@@ -8728,7 +10862,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1142",
+    "id": "FND-1150",
     "summary": "Kubernetes node baselines have not been independently validated against the CIS Kubernetes Benchmark (kube-bench not dep",
     "description": "Kubernetes node baselines have not been independently validated against the CIS Kubernetes Benchmark (kube-bench not deployed)",
     "complianceRequirement": "PR.PS-01 Ex1",
@@ -8742,7 +10876,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1142",
+    "jiraKey": "FND-1150",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Patch Management Procedure",
@@ -8750,7 +10884,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1143",
+    "id": "FND-1151",
     "summary": "On-premises Windows domain controller configurations are managed separately from the IaC workflow and lack equivalent au",
     "description": "On-premises Windows domain controller configurations are managed separately from the IaC workflow and lack equivalent automated compliance monitoring",
     "complianceRequirement": "PR.PS-01 Ex1",
@@ -8764,7 +10898,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1143",
+    "jiraKey": "FND-1151",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Patch Management Procedure",
@@ -8772,7 +10906,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1144",
+    "id": "FND-1152",
     "summary": "Baseline review cadence is ad hoc rather than formally scheduled; no evidence of periodic review aligned with CIS Benchm",
     "description": "Baseline review cadence is ad hoc rather than formally scheduled; no evidence of periodic review aligned with CIS Benchmark update cycles",
     "complianceRequirement": "PR.PS-01 Ex1",
@@ -8786,7 +10920,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1144",
+    "jiraKey": "FND-1152",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Patch Management Procedure",
@@ -8794,7 +10928,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1145",
+    "id": "FND-1153",
     "summary": "Auto-remediation coverage is limited to approximately 30% of AWS Config rules; the majority of deviations require manual",
     "description": "Auto-remediation coverage is limited to approximately 30% of AWS Config rules; the majority of deviations require manual remediation",
     "complianceRequirement": "PR.PS-01 Ex1",
@@ -8808,7 +10942,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1145",
+    "jiraKey": "FND-1153",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Patch Management Procedure",
@@ -8816,7 +10950,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1146",
+    "id": "FND-1154",
     "summary": "No software bill of materials (SBOM) for the SaaS platform; transitive dependency vulnerabilities not systematically tra",
     "description": "No software bill of materials (SBOM) for the SaaS platform; transitive dependency vulnerabilities not systematically tracked",
     "complianceRequirement": "PR.PS-02 Ex1",
@@ -8830,7 +10964,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1146",
+    "jiraKey": "FND-1154",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
@@ -8838,7 +10972,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1147",
+    "id": "FND-1155",
     "summary": "Container image signing (Sigstore/Cosign) not implemented; no cryptographic verification of image integrity between buil",
     "description": "Container image signing (Sigstore/Cosign) not implemented; no cryptographic verification of image integrity between build and deployment",
     "complianceRequirement": "PR.PS-02 Ex1",
@@ -8852,7 +10986,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1147",
+    "jiraKey": "FND-1155",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
@@ -8860,7 +10994,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1148",
+    "id": "FND-1156",
     "summary": "Kubernetes node patching occasionally exceeds SLA due to workload scheduling coordination challenges",
     "description": "Kubernetes node patching occasionally exceeds SLA due to workload scheduling coordination challenges",
     "complianceRequirement": "PR.PS-02 Ex1",
@@ -8874,7 +11008,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1148",
+    "jiraKey": "FND-1156",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
@@ -8882,7 +11016,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1149",
+    "id": "FND-1157",
     "summary": "Application-layer dependency patching (npm, pip) relies on developer-initiated updates rather than automated tooling",
     "description": "Application-layer dependency patching (npm, pip) relies on developer-initiated updates rather than automated tooling",
     "complianceRequirement": "PR.PS-02 Ex1",
@@ -8896,7 +11030,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1149",
+    "jiraKey": "FND-1157",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
@@ -8904,7 +11038,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1150",
+    "id": "FND-1158",
     "summary": "Software procurement process does not consistently capture free/open-source tools used by developers",
     "description": "Software procurement process does not consistently capture free/open-source tools used by developers",
     "complianceRequirement": "PR.PS-02 Ex1",
@@ -8918,7 +11052,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1150",
+    "jiraKey": "FND-1158",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
@@ -8926,7 +11060,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1151",
+    "id": "FND-1159",
     "summary": "Estimated 15-20% of SaaS tools in use have not been through formal security review",
     "description": "Estimated 15-20% of SaaS tools in use have not been through formal security review",
     "complianceRequirement": "PR.PS-02 Ex1",
@@ -8940,7 +11074,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1151",
+    "jiraKey": "FND-1159",
     "linkedArtifacts": [
       "Authorized Software Inventory",
       "SentinelOne Application Control Configuration Evidence",
@@ -8948,7 +11082,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1152",
+    "id": "FND-1160",
     "summary": "CMDB updates lag for asset transfers, relocations, and returns, resulting in stale inventory records identified during r",
     "description": "CMDB updates lag for asset transfers, relocations, and returns, resulting in stale inventory records identified during reconciliation",
     "complianceRequirement": "PR.PS-03 Ex1",
@@ -8962,7 +11096,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1152",
+    "jiraKey": "FND-1160",
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
@@ -8970,7 +11104,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1153",
+    "id": "FND-1161",
     "summary": "Windows Server 2012 R2 fileserver runs on out-of-warranty Dell hardware with no vendor support, compounding the software",
     "description": "Windows Server 2012 R2 fileserver runs on out-of-warranty Dell hardware with no vendor support, compounding the software EOL risk with hardware failure risk",
     "complianceRequirement": "PR.PS-03 Ex1",
@@ -8984,7 +11118,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1153",
+    "jiraKey": "FND-1161",
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
@@ -8992,7 +11126,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1154",
+    "id": "FND-1162",
     "summary": "No standardized lifecycle replacement policy for server and infrastructure hardware; replacement is reactive rather than",
     "description": "No standardized lifecycle replacement policy for server and infrastructure hardware; replacement is reactive rather than planned",
     "complianceRequirement": "PR.PS-03 Ex1",
@@ -9006,7 +11140,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1154",
+    "jiraKey": "FND-1162",
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
@@ -9014,7 +11148,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1155",
+    "id": "FND-1163",
     "summary": "Network infrastructure (switches, access points) has minimal lifecycle tracking in CMDB",
     "description": "Network infrastructure (switches, access points) has minimal lifecycle tracking in CMDB",
     "complianceRequirement": "PR.PS-03 Ex1",
@@ -9028,7 +11162,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1155",
+    "jiraKey": "FND-1163",
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
@@ -9036,7 +11170,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1156",
+    "id": "FND-1164",
     "summary": "Hardware disposal procedure documentation has not been updated since June 2024",
     "description": "Hardware disposal procedure documentation has not been updated since June 2024",
     "complianceRequirement": "PR.PS-03 Ex1",
@@ -9050,7 +11184,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1156",
+    "jiraKey": "FND-1164",
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
@@ -9058,7 +11192,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1157",
+    "id": "FND-1165",
     "summary": "No automated EOL alerting based on vendor lifecycle data; tracking depends on institutional knowledge",
     "description": "No automated EOL alerting based on vendor lifecycle data; tracking depends on institutional knowledge",
     "complianceRequirement": "PR.PS-03 Ex1",
@@ -9072,7 +11206,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1157",
+    "jiraKey": "FND-1165",
     "linkedArtifacts": [
       "Alma Security Hardware Inventory",
       "Authorized Software Inventory",
@@ -9080,7 +11214,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1158",
+    "id": "FND-1166",
     "summary": "On-premises systems (Windows DC, legacy fileserver) forward to local syslog server but are not integrated into the Cloud",
     "description": "On-premises systems (Windows DC, legacy fileserver) forward to local syslog server but are not integrated into the CloudWatch-based monitoring workflow",
     "complianceRequirement": "PR.PS-04 Ex1",
@@ -9094,7 +11228,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1158",
+    "jiraKey": "FND-1166",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
@@ -9102,7 +11236,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1159",
+    "id": "FND-1167",
     "summary": "No 24/7 SOC monitoring; security team operates during business hours with PagerDuty on-call for critical alerts only",
     "description": "No 24/7 SOC monitoring; security team operates during business hours with PagerDuty on-call for critical alerts only",
     "complianceRequirement": "PR.PS-04 Ex1",
@@ -9116,7 +11250,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1159",
+    "jiraKey": "FND-1167",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
@@ -9124,7 +11258,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1160",
+    "id": "FND-1168",
     "summary": "No cross-source correlation capability (e.g., correlating failed auth attempts with subsequent access from different IP)",
     "description": "No cross-source correlation capability (e.g., correlating failed auth attempts with subsequent access from different IP)",
     "complianceRequirement": "PR.PS-04 Ex1",
@@ -9138,7 +11272,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1160",
+    "jiraKey": "FND-1168",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
@@ -9146,7 +11280,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1161",
+    "id": "FND-1169",
     "summary": "Application-layer security logging is limited to error rates and latency; no behavioral analysis or business logic abuse",
     "description": "Application-layer security logging is limited to error rates and latency; no behavioral analysis or business logic abuse detection",
     "complianceRequirement": "PR.PS-04 Ex1",
@@ -9160,7 +11294,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1161",
+    "jiraKey": "FND-1169",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
@@ -9168,7 +11302,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1162",
+    "id": "FND-1170",
     "summary": "Logging policy lacks platform-specific configuration standards (specific Windows Event IDs, Linux auditd rules, K8s audi",
     "description": "Logging policy lacks platform-specific configuration standards (specific Windows Event IDs, Linux auditd rules, K8s audit policy levels)",
     "complianceRequirement": "PR.PS-04 Ex1",
@@ -9182,7 +11316,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1162",
+    "jiraKey": "FND-1170",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
@@ -9190,7 +11324,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1163",
+    "id": "FND-1171",
     "summary": "No proactive threat hunting program; detection is entirely alert-driven",
     "description": "No proactive threat hunting program; detection is entirely alert-driven",
     "complianceRequirement": "PR.PS-04 Ex1",
@@ -9204,7 +11338,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1163",
+    "jiraKey": "FND-1171",
     "linkedArtifacts": [
       "AWS Config Compliance Snapshot",
       "Weekly Vulnerability Scan Summary",
@@ -9212,7 +11346,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1164",
+    "id": "FND-1172",
     "summary": "40% of users (engineering and product teams) have local admin rights on macOS devices, bypassing IT installation restric",
     "description": "40% of users (engineering and product teams) have local admin rights on macOS devices, bypassing IT installation restrictions",
     "complianceRequirement": "PR.PS-05 Ex1",
@@ -9226,7 +11360,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1164",
+    "jiraKey": "FND-1172",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
@@ -9234,7 +11368,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1165",
+    "id": "FND-1173",
     "summary": "Linux server execution control relies on baseline noexec mount options only; no allowlist-level enforcement (SELinux not",
     "description": "Linux server execution control relies on baseline noexec mount options only; no allowlist-level enforcement (SELinux not enabled)",
     "complianceRequirement": "PR.PS-05 Ex1",
@@ -9248,7 +11382,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1165",
+    "jiraKey": "FND-1173",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
@@ -9256,7 +11390,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1166",
+    "id": "FND-1174",
     "summary": "Kubernetes nodes accessible via shared SSH key on port 45001 with root access, allowing arbitrary code execution on clus",
     "description": "Kubernetes nodes accessible via shared SSH key on port 45001 with root access, allowing arbitrary code execution on cluster hosts and bypassing all container-level controls",
     "complianceRequirement": "PR.PS-05 Ex1",
@@ -9270,7 +11404,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1166",
+    "jiraKey": "FND-1174",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
@@ -9278,7 +11412,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1167",
+    "id": "FND-1175",
     "summary": "Kubernetes pod security standards only partially enforced through custom admission webhook",
     "description": "Kubernetes pod security standards only partially enforced through custom admission webhook",
     "complianceRequirement": "PR.PS-05 Ex1",
@@ -9292,7 +11426,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1167",
+    "jiraKey": "FND-1175",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
@@ -9300,7 +11434,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1168",
+    "id": "FND-1176",
     "summary": "Approved software catalog does not cover open-source tools, browser extensions, or developer libraries",
     "description": "Approved software catalog does not cover open-source tools, browser extensions, or developer libraries",
     "complianceRequirement": "PR.PS-05 Ex1",
@@ -9314,7 +11448,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1168",
+    "jiraKey": "FND-1176",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
@@ -9322,7 +11456,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1169",
+    "id": "FND-1177",
     "summary": "No automated sync between ServiceNow catalog and SentinelOne allowlist",
     "description": "No automated sync between ServiceNow catalog and SentinelOne allowlist",
     "complianceRequirement": "PR.PS-05 Ex1",
@@ -9336,7 +11470,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1169",
+    "jiraKey": "FND-1177",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Authorized Software Inventory",
@@ -9344,185 +11478,9 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1170",
+    "id": "FND-1178",
     "summary": "No SAST tooling integrated into CI/CD pipeline; source code is not automatically analyzed for security vulnerabilities b",
     "description": "No SAST tooling integrated into CI/CD pipeline; source code is not automatically analyzed for security vulnerabilities before deployment",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1170",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1171",
-    "summary": "No DAST tooling; the running application is not tested for vulnerabilities like SQL injection or XSS through automated s",
-    "description": "No DAST tooling; the running application is not tested for vulnerabilities like SQL injection or XSS through automated scanning",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1171",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1172",
-    "summary": "No security quality gates in the pipeline; container images with critical CVEs can deploy to production without blocking",
-    "description": "No security quality gates in the pipeline; container images with critical CVEs can deploy to production without blocking",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1172",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1173",
-    "summary": "SQL Injection Mitigation project ($60K budget) has not started despite being identified through vulnerability scanning; ",
-    "description": "SQL Injection Mitigation project ($60K budget) has not started despite being identified through vulnerability scanning; this represents a known, unaddressed vulnerability class in the production application",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1173",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1174",
-    "summary": "No SBOM generation or automated software composition analysis for dependency tracking",
-    "description": "No SBOM generation or automated software composition analysis for dependency tracking",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1174",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1175",
-    "summary": "No threat modeling practice for new features or architectural changes",
-    "description": "No threat modeling practice for new features or architectural changes",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1175",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1176",
-    "summary": "No developer security training program specific to secure coding practices",
-    "description": "No developer security training program specific to secure coding practices",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1176",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1177",
-    "summary": "npm audit not enforced in the pipeline; dependency vulnerability scanning relies on ad-hoc developer initiative",
-    "description": "npm audit not enforced in the pipeline; dependency vulnerability scanning relies on ad-hoc developer initiative",
-    "complianceRequirement": "PR.PS-06 Ex1",
-    "controlId": "PR.PS-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "High",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1177",
-    "linkedArtifacts": [
-      "Weekly Vulnerability Scan Summary",
-      "Patch Management Procedure",
-      "Information Security Policy"
-    ]
-  },
-  {
-    "id": "FND-1178",
-    "summary": "No license compliance scanning for third-party dependencies",
-    "description": "No license compliance scanning for third-party dependencies",
     "complianceRequirement": "PR.PS-06 Ex1",
     "controlId": "PR.PS-06 Ex1",
     "assessmentId": "ASM-2026-comprehensive-alma",
@@ -9543,6 +11501,182 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1179",
+    "summary": "No DAST tooling; the running application is not tested for vulnerabilities like SQL injection or XSS through automated s",
+    "description": "No DAST tooling; the running application is not tested for vulnerabilities like SQL injection or XSS through automated scanning",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1179",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1180",
+    "summary": "No security quality gates in the pipeline; container images with critical CVEs can deploy to production without blocking",
+    "description": "No security quality gates in the pipeline; container images with critical CVEs can deploy to production without blocking",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1180",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1181",
+    "summary": "SQL Injection Mitigation project ($60K budget) has not started despite being identified through vulnerability scanning; ",
+    "description": "SQL Injection Mitigation project ($60K budget) has not started despite being identified through vulnerability scanning; this represents a known, unaddressed vulnerability class in the production application",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1181",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1182",
+    "summary": "No SBOM generation or automated software composition analysis for dependency tracking",
+    "description": "No SBOM generation or automated software composition analysis for dependency tracking",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1182",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1183",
+    "summary": "No threat modeling practice for new features or architectural changes",
+    "description": "No threat modeling practice for new features or architectural changes",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1183",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1184",
+    "summary": "No developer security training program specific to secure coding practices",
+    "description": "No developer security training program specific to secure coding practices",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1184",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1185",
+    "summary": "npm audit not enforced in the pipeline; dependency vulnerability scanning relies on ad-hoc developer initiative",
+    "description": "npm audit not enforced in the pipeline; dependency vulnerability scanning relies on ad-hoc developer initiative",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1185",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1186",
+    "summary": "No license compliance scanning for third-party dependencies",
+    "description": "No license compliance scanning for third-party dependencies",
+    "complianceRequirement": "PR.PS-06 Ex1",
+    "controlId": "PR.PS-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Prioritize and begin SQL Injection Mitigation project immediately; this is a known critical vulnerability in production | Integrate SAST tool (Semgrep, SonarQube, or Snyk Code) into GitLab CI pipeline with quality gates | Implement security quality gates that block deployment on critical/high findings | Develop formal SSDLC policy aligned to NIST SP 800-218 (SSDF); do not wait for Q3 2026 timeline | Add automated dependency scanning (Snyk, Dependabot) and enforce npm audit in pipeline | Implement SBOM generation (Syft, CycloneDX) in CI/CD pipeline | Implement DAST scanning in staging environment (OWASP ZAP or Burp Suite Enterprise) | Establish lightweight threat modeling for security-sensitive features",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "High",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1186",
+    "linkedArtifacts": [
+      "Weekly Vulnerability Scan Summary",
+      "Patch Management Procedure",
+      "Information Security Policy"
+    ]
+  },
+  {
+    "id": "FND-1187",
     "summary": "No formal communication cadence — Recovery status update frequency is ad hoc rather than defined at regular intervals fo",
     "description": "**No formal communication cadence** — Recovery status update frequency is ad hoc rather than defined at regular intervals for different stakeholder groups",
     "complianceRequirement": "RC.CO-03 Ex1",
@@ -9556,14 +11690,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1179",
+    "jiraKey": "FND-1187",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1180",
+    "id": "FND-1188",
     "summary": "Supplier communication not formalized — Crisis communication procedures for coordinating with critical suppliers (AWS, S",
     "description": "**Supplier communication not formalized** — Crisis communication procedures for coordinating with critical suppliers (AWS, SaaS vendors) are not documented",
     "complianceRequirement": "RC.CO-03 Ex1",
@@ -9577,14 +11711,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1180",
+    "jiraKey": "FND-1188",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1181",
+    "id": "FND-1189",
     "summary": "Slack channel access controls not reviewed — Recovery communication channels have not been formally reviewed for appropr",
     "description": "**Slack channel access controls not reviewed** — Recovery communication channels have not been formally reviewed for appropriate access controls and information security",
     "complianceRequirement": "RC.CO-03 Ex1",
@@ -9598,14 +11732,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1181",
+    "jiraKey": "FND-1189",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1182",
+    "id": "FND-1190",
     "summary": "No contractual obligation register — Information-sharing requirements from customer and vendor contracts are not consoli",
     "description": "**No contractual obligation register** — Information-sharing requirements from customer and vendor contracts are not consolidated into a reference register for recovery communication",
     "complianceRequirement": "RC.CO-03 Ex1",
@@ -9619,14 +11753,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1182",
+    "jiraKey": "FND-1190",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1183",
+    "id": "FND-1191",
     "summary": "Approval workflow not formalized — The public communication approval process (legal review, leadership sign-off) is unde",
     "description": "**Approval workflow not formalized** — The public communication approval process (legal review, leadership sign-off) is understood but not documented as a formal workflow with defined roles and timelines",
     "complianceRequirement": "RC.CO-04 Ex1",
@@ -9640,7 +11774,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1183",
+    "jiraKey": "FND-1191",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -9648,7 +11782,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1184",
+    "id": "FND-1192",
     "summary": "Breach notification compliance not independently verified — Compliance with specific regulatory notification timelines a",
     "description": "**Breach notification compliance not independently verified** — Compliance with specific regulatory notification timelines and content requirements has not been independently validated",
     "complianceRequirement": "RC.CO-04 Ex1",
@@ -9662,7 +11796,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1184",
+    "jiraKey": "FND-1192",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -9670,7 +11804,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1185",
+    "id": "FND-1193",
     "summary": "No public communication rehearsal — Public messaging has not been tested through a tabletop or simulation exercise to va",
     "description": "**No public communication rehearsal** — Public messaging has not been tested through a tabletop or simulation exercise to validate the end-to-end approval and release process",
     "complianceRequirement": "RC.CO-04 Ex1",
@@ -9684,7 +11818,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1185",
+    "jiraKey": "FND-1193",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -9692,7 +11826,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1186",
+    "id": "FND-1194",
     "summary": "Recovery plan not rehearsed end-to-end — Quarterly restore tests validate backup restoration but do not exercise the ful",
     "description": "**Recovery plan not rehearsed end-to-end** — Quarterly restore tests validate backup restoration but do not exercise the full recovery plan activation including role notification, decision-making, and communication procedures",
     "complianceRequirement": "RC.RP-01 Ex1",
@@ -9706,7 +11840,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1186",
+    "jiraKey": "FND-1194",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
@@ -9714,7 +11848,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1187",
+    "id": "FND-1195",
     "summary": "No formal recovery training — Personnel with recovery responsibilities have not received dedicated recovery role trainin",
     "description": "**No formal recovery training** — Personnel with recovery responsibilities have not received dedicated recovery role training or participated in tabletop exercises",
     "complianceRequirement": "RC.RP-01 Ex1",
@@ -9728,7 +11862,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1187",
+    "jiraKey": "FND-1195",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
@@ -9736,7 +11870,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1188",
+    "id": "FND-1196",
     "summary": "Recovery authorization criteria informal — The authority and criteria to initiate recovery operations are understood ope",
     "description": "**Recovery authorization criteria informal** — The authority and criteria to initiate recovery operations are understood operationally but not formally documented",
     "complianceRequirement": "RC.RP-01 Ex1",
@@ -9750,7 +11884,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1188",
+    "jiraKey": "FND-1196",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
@@ -9758,7 +11892,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1189",
+    "id": "FND-1197",
     "summary": "Limited multi-system recovery coordination — Procedures for coordinating recovery across multiple interdependent systems",
     "description": "**Limited multi-system recovery coordination** — Procedures for coordinating recovery across multiple interdependent systems are not documented",
     "complianceRequirement": "RC.RP-02 Ex1",
@@ -9772,7 +11906,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1189",
+    "jiraKey": "FND-1197",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
@@ -9780,7 +11914,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1190",
+    "id": "FND-1198",
     "summary": "DR plan incomplete — The Cloud Security Optimization project will formalize recovery action selection criteria, but is n",
     "description": "**DR plan incomplete** — The Cloud Security Optimization project will formalize recovery action selection criteria, but is not yet delivered",
     "complianceRequirement": "RC.RP-02 Ex1",
@@ -9788,182 +11922,6 @@ export const COMPREHENSIVE_FINDINGS = [
     "assessmentId": "ASM-2026-comprehensive-alma",
     "rootCause": "",
     "remediationActionPlan": "Develop a recovery prioritization matrix that maps systems to business impact and defines recovery sequencing | Document multi-system recovery coordination procedures addressing interdependencies between AWS, Kubernetes, and PostgreSQL | Include resource constraint scenarios in recovery planning to address degraded recovery capacity | Incorporate recovery action selection criteria into the DR plan deliverable from the Cloud Security Optimization project",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1190",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "Backup and Restore Procedure",
-      "Quarterly Backup Restore Test Report"
-    ]
-  },
-  {
-    "id": "FND-1191",
-    "summary": "Resource constraint planning absent — No documented approach for adjusting recovery priorities when personnel or infrast",
-    "description": "**Resource constraint planning absent** — No documented approach for adjusting recovery priorities when personnel or infrastructure resources are constrained",
-    "complianceRequirement": "RC.RP-02 Ex1",
-    "controlId": "RC.RP-02 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Develop a recovery prioritization matrix that maps systems to business impact and defines recovery sequencing | Document multi-system recovery coordination procedures addressing interdependencies between AWS, Kubernetes, and PostgreSQL | Include resource constraint scenarios in recovery planning to address degraded recovery capacity | Incorporate recovery action selection criteria into the DR plan deliverable from the Cloud Security Optimization project",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1191",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "Backup and Restore Procedure",
-      "Quarterly Backup Restore Test Report"
-    ]
-  },
-  {
-    "id": "FND-1192",
-    "summary": "Restoration asset inventory incomplete — Not all restoration assets (Kubernetes manifests, infrastructure-as-code templa",
-    "description": "**Restoration asset inventory incomplete** — Not all restoration assets (Kubernetes manifests, infrastructure-as-code templates, application configuration) are covered by integrity verification",
-    "complianceRequirement": "RC.RP-03 Ex1",
-    "controlId": "RC.RP-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Add IOC scanning to the backup verification process to detect compromised backup assets before restoration | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1192",
-    "linkedArtifacts": [
-      "Backup and Restore Procedure",
-      "Quarterly Backup Restore Test Report",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1193",
-    "summary": "No immutable backup copies — Backups are not stored in an immutable or write-once format to protect against ransomware o",
-    "description": "**No immutable backup copies** — Backups are not stored in an immutable or write-once format to protect against ransomware or insider tampering",
-    "complianceRequirement": "RC.RP-03 Ex1",
-    "controlId": "RC.RP-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Add IOC scanning to the backup verification process to detect compromised backup assets before restoration | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1193",
-    "linkedArtifacts": [
-      "Backup and Restore Procedure",
-      "Quarterly Backup Restore Test Report",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1194",
-    "summary": "Verification scope limited to databases — Automated verification focuses on PostgreSQL backups but does not extend to ap",
-    "description": "**Verification scope limited to databases** — Automated verification focuses on PostgreSQL backups but does not extend to application-tier backup assets",
-    "complianceRequirement": "RC.RP-03 Ex1",
-    "controlId": "RC.RP-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Add IOC scanning to the backup verification process to detect compromised backup assets before restoration | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1194",
-    "linkedArtifacts": [
-      "Backup and Restore Procedure",
-      "Quarterly Backup Restore Test Report",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1195",
-    "summary": "System owner sign-off not formalized — Restoration confirmation relies on informal communication rather than documented ",
-    "description": "**System owner sign-off not formalized** — Restoration confirmation relies on informal communication rather than documented acceptance criteria and sign-off procedures",
-    "complianceRequirement": "RC.RP-04 Ex1",
-    "controlId": "RC.RP-04 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Define and document RTO and RPO values for all critical systems, starting with the continuous authentication platform | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Establish a systematic process for updating the risk register after incidents, with tracking to closure",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1195",
-    "linkedArtifacts": [
-      "Information Security Policy",
-      "Incident Response Playbook (Excerpt)",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1196",
-    "summary": "No post-restoration monitoring enhancement procedure — Enhanced monitoring during post-recovery stabilization is applied",
-    "description": "**No post-restoration monitoring enhancement procedure** — Enhanced monitoring during post-recovery stabilization is applied ad hoc rather than following a documented procedure",
-    "complianceRequirement": "RC.RP-04 Ex1",
-    "controlId": "RC.RP-04 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Define and document RTO and RPO values for all critical systems, starting with the continuous authentication platform | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Establish a systematic process for updating the risk register after incidents, with tracking to closure",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1196",
-    "linkedArtifacts": [
-      "Information Security Policy",
-      "Incident Response Playbook (Excerpt)",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1197",
-    "summary": "Risk register updates not systematic — Post-incident risk reassessment occurs but is not systematically linked to risk r",
-    "description": "**Risk register updates not systematic** — Post-incident risk reassessment occurs but is not systematically linked to risk register entries with tracking and closure",
-    "complianceRequirement": "RC.RP-04 Ex1",
-    "controlId": "RC.RP-04 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Define and document RTO and RPO values for all critical systems, starting with the continuous authentication platform | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Establish a systematic process for updating the risk register after incidents, with tracking to closure",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1197",
-    "linkedArtifacts": [
-      "Information Security Policy",
-      "Incident Response Playbook (Excerpt)",
-      "AWS Config Compliance Snapshot"
-    ]
-  },
-  {
-    "id": "FND-1198",
-    "summary": "End-to-end functional testing not automated — Post-restoration testing of the continuous authentication service relies o",
-    "description": "**End-to-end functional testing not automated** — Post-restoration testing of the continuous authentication service relies on manual verification rather than automated end-to-end tests",
-    "complianceRequirement": "RC.RP-05 Ex1",
-    "controlId": "RC.RP-05 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Add IOC scanning as a required step in the post-restoration procedure before returning systems to production | Develop automated end-to-end functional tests for the continuous authentication service that run after restoration | Define a post-restoration stabilization observation period with monitoring criteria before declaring normal operations | Create a post-restoration security control validation checklist covering access controls, encryption, and logging",
     "remediationOwner": null,
     "dueDate": "",
     "status": "Open",
@@ -9979,13 +11937,13 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1199",
-    "summary": "No defined stabilization period — There is no documented observation period between restoration completion and full oper",
-    "description": "**No defined stabilization period** — There is no documented observation period between restoration completion and full operational declaration",
-    "complianceRequirement": "RC.RP-05 Ex1",
-    "controlId": "RC.RP-05 Ex1",
+    "summary": "Resource constraint planning absent — No documented approach for adjusting recovery priorities when personnel or infrast",
+    "description": "**Resource constraint planning absent** — No documented approach for adjusting recovery priorities when personnel or infrastructure resources are constrained",
+    "complianceRequirement": "RC.RP-02 Ex1",
+    "controlId": "RC.RP-02 Ex1",
     "assessmentId": "ASM-2026-comprehensive-alma",
     "rootCause": "",
-    "remediationActionPlan": "Add IOC scanning as a required step in the post-restoration procedure before returning systems to production | Develop automated end-to-end functional tests for the continuous authentication service that run after restoration | Define a post-restoration stabilization observation period with monitoring criteria before declaring normal operations | Create a post-restoration security control validation checklist covering access controls, encryption, and logging",
+    "remediationActionPlan": "Develop a recovery prioritization matrix that maps systems to business impact and defines recovery sequencing | Document multi-system recovery coordination procedures addressing interdependencies between AWS, Kubernetes, and PostgreSQL | Include resource constraint scenarios in recovery planning to address degraded recovery capacity | Incorporate recovery action selection criteria into the DR plan deliverable from the Cloud Security Optimization project",
     "remediationOwner": null,
     "dueDate": "",
     "status": "Open",
@@ -10001,6 +11959,182 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1200",
+    "summary": "Restoration asset inventory incomplete — Not all restoration assets (Kubernetes manifests, infrastructure-as-code templa",
+    "description": "**Restoration asset inventory incomplete** — Not all restoration assets (Kubernetes manifests, infrastructure-as-code templates, application configuration) are covered by integrity verification",
+    "complianceRequirement": "RC.RP-03 Ex1",
+    "controlId": "RC.RP-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Add IOC scanning to the backup verification process to detect compromised backup assets before restoration | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1200",
+    "linkedArtifacts": [
+      "Backup and Restore Procedure",
+      "Quarterly Backup Restore Test Report",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1201",
+    "summary": "No immutable backup copies — Backups are not stored in an immutable or write-once format to protect against ransomware o",
+    "description": "**No immutable backup copies** — Backups are not stored in an immutable or write-once format to protect against ransomware or insider tampering",
+    "complianceRequirement": "RC.RP-03 Ex1",
+    "controlId": "RC.RP-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Add IOC scanning to the backup verification process to detect compromised backup assets before restoration | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1201",
+    "linkedArtifacts": [
+      "Backup and Restore Procedure",
+      "Quarterly Backup Restore Test Report",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1202",
+    "summary": "Verification scope limited to databases — Automated verification focuses on PostgreSQL backups but does not extend to ap",
+    "description": "**Verification scope limited to databases** — Automated verification focuses on PostgreSQL backups but does not extend to application-tier backup assets",
+    "complianceRequirement": "RC.RP-03 Ex1",
+    "controlId": "RC.RP-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Add IOC scanning to the backup verification process to detect compromised backup assets before restoration | Implement immutable backup copies (AWS S3 Object Lock or equivalent) for critical data stores | Expand backup integrity verification to cover Kubernetes manifests, infrastructure-as-code, and application configuration | Create a comprehensive restoration asset inventory that maps all assets required for full system recovery",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1202",
+    "linkedArtifacts": [
+      "Backup and Restore Procedure",
+      "Quarterly Backup Restore Test Report",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1203",
+    "summary": "System owner sign-off not formalized — Restoration confirmation relies on informal communication rather than documented ",
+    "description": "**System owner sign-off not formalized** — Restoration confirmation relies on informal communication rather than documented acceptance criteria and sign-off procedures",
+    "complianceRequirement": "RC.RP-04 Ex1",
+    "controlId": "RC.RP-04 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Define and document RTO and RPO values for all critical systems, starting with the continuous authentication platform | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Establish a systematic process for updating the risk register after incidents, with tracking to closure",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1203",
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Incident Response Playbook (Excerpt)",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1204",
+    "summary": "No post-restoration monitoring enhancement procedure — Enhanced monitoring during post-recovery stabilization is applied",
+    "description": "**No post-restoration monitoring enhancement procedure** — Enhanced monitoring during post-recovery stabilization is applied ad hoc rather than following a documented procedure",
+    "complianceRequirement": "RC.RP-04 Ex1",
+    "controlId": "RC.RP-04 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Define and document RTO and RPO values for all critical systems, starting with the continuous authentication platform | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Establish a systematic process for updating the risk register after incidents, with tracking to closure",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1204",
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Incident Response Playbook (Excerpt)",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1205",
+    "summary": "Risk register updates not systematic — Post-incident risk reassessment occurs but is not systematically linked to risk r",
+    "description": "**Risk register updates not systematic** — Post-incident risk reassessment occurs but is not systematically linked to risk register entries with tracking and closure",
+    "complianceRequirement": "RC.RP-04 Ex1",
+    "controlId": "RC.RP-04 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Define and document RTO and RPO values for all critical systems, starting with the continuous authentication platform | Formalize system owner restoration sign-off with documented acceptance criteria and a sign-off record | Document a post-restoration enhanced monitoring procedure with defined duration, metrics, and escalation thresholds | Establish a systematic process for updating the risk register after incidents, with tracking to closure",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1205",
+    "linkedArtifacts": [
+      "Information Security Policy",
+      "Incident Response Playbook (Excerpt)",
+      "AWS Config Compliance Snapshot"
+    ]
+  },
+  {
+    "id": "FND-1206",
+    "summary": "End-to-end functional testing not automated — Post-restoration testing of the continuous authentication service relies o",
+    "description": "**End-to-end functional testing not automated** — Post-restoration testing of the continuous authentication service relies on manual verification rather than automated end-to-end tests",
+    "complianceRequirement": "RC.RP-05 Ex1",
+    "controlId": "RC.RP-05 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Add IOC scanning as a required step in the post-restoration procedure before returning systems to production | Develop automated end-to-end functional tests for the continuous authentication service that run after restoration | Define a post-restoration stabilization observation period with monitoring criteria before declaring normal operations | Create a post-restoration security control validation checklist covering access controls, encryption, and logging",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1206",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Backup and Restore Procedure",
+      "Quarterly Backup Restore Test Report"
+    ]
+  },
+  {
+    "id": "FND-1207",
+    "summary": "No defined stabilization period — There is no documented observation period between restoration completion and full oper",
+    "description": "**No defined stabilization period** — There is no documented observation period between restoration completion and full operational declaration",
+    "complianceRequirement": "RC.RP-05 Ex1",
+    "controlId": "RC.RP-05 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Add IOC scanning as a required step in the post-restoration procedure before returning systems to production | Develop automated end-to-end functional tests for the continuous authentication service that run after restoration | Define a post-restoration stabilization observation period with monitoring criteria before declaring normal operations | Create a post-restoration security control validation checklist covering access controls, encryption, and logging",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1207",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "Backup and Restore Procedure",
+      "Quarterly Backup Restore Test Report"
+    ]
+  },
+  {
+    "id": "FND-1208",
     "summary": "Security control validation not explicit — Post-restoration verification does not include an explicit checklist for conf",
     "description": "**Security control validation not explicit** — Post-restoration verification does not include an explicit checklist for confirming security controls (access controls, encryption, logging) are operational",
     "complianceRequirement": "RC.RP-05 Ex1",
@@ -10014,7 +12148,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1200",
+    "jiraKey": "FND-1208",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Backup and Restore Procedure",
@@ -10022,7 +12156,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1201",
+    "id": "FND-1209",
     "summary": "Recovery closure criteria not documented — The end of recovery is declared through informal leadership sign-off rather t",
     "description": "**Recovery closure criteria not documented** — The end of recovery is declared through informal leadership sign-off rather than against documented, measurable criteria",
     "complianceRequirement": "RC.RP-06 Ex1",
@@ -10036,14 +12170,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1201",
+    "jiraKey": "FND-1209",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1202",
+    "id": "FND-1210",
     "summary": "Lessons learned tracking incomplete — Lessons learned are captured but not systematically tracked to completion with ass",
     "description": "**Lessons learned tracking incomplete** — Lessons learned are captured but not systematically tracked to completion with assigned owners, deadlines, and closure verification",
     "complianceRequirement": "RC.RP-06 Ex1",
@@ -10057,14 +12191,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1202",
+    "jiraKey": "FND-1210",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1203",
+    "id": "FND-1211",
     "summary": "No recovery documentation retention policy — Incident recovery documentation retention requirements are not defined",
     "description": "**No recovery documentation retention policy** — Incident recovery documentation retention requirements are not defined",
     "complianceRequirement": "RC.RP-06 Ex1",
@@ -10078,14 +12212,14 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1203",
+    "jiraKey": "FND-1211",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy"
     ]
   },
   {
-    "id": "FND-1204",
+    "id": "FND-1212",
     "summary": "No formal root cause analysis methodology (5-Whys, fault tree, Ishikawa) required",
     "description": "No formal root cause analysis methodology (5-Whys, fault tree, Ishikawa) required",
     "complianceRequirement": "RS.AN-03 Ex1",
@@ -10093,182 +12227,6 @@ export const COMPREHENSIVE_FINDINGS = [
     "assessmentId": "ASM-2026-comprehensive-alma",
     "rootCause": "",
     "remediationActionPlan": "Define minimum root cause documentation standards with required sections (event timeline, attack vector, vulnerability exploited, systemic factors) | Require formal root cause analysis technique (5-Whys or equivalent) for incidents above medium severity | Establish feedback loop from root cause findings to detection rule tuning and control improvement backlog | Conduct quarterly root cause trend analysis to identify systemic security weaknesses",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1204",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SentinelOne Application Control Configuration Evidence"
-    ]
-  },
-  {
-    "id": "FND-1205",
-    "summary": "Systemic root cause identification (beyond immediate technical cause) not consistently performed",
-    "description": "Systemic root cause identification (beyond immediate technical cause) not consistently performed",
-    "complianceRequirement": "RS.AN-03 Ex1",
-    "controlId": "RS.AN-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Define minimum root cause documentation standards with required sections (event timeline, attack vector, vulnerability exploited, systemic factors) | Require formal root cause analysis technique (5-Whys or equivalent) for incidents above medium severity | Establish feedback loop from root cause findings to detection rule tuning and control improvement backlog | Conduct quarterly root cause trend analysis to identify systemic security weaknesses",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1205",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SentinelOne Application Control Configuration Evidence"
-    ]
-  },
-  {
-    "id": "FND-1206",
-    "summary": "Root cause findings not systematically fed back into detection rule tuning or control improvements",
-    "description": "Root cause findings not systematically fed back into detection rule tuning or control improvements",
-    "complianceRequirement": "RS.AN-03 Ex1",
-    "controlId": "RS.AN-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Define minimum root cause documentation standards with required sections (event timeline, attack vector, vulnerability exploited, systemic factors) | Require formal root cause analysis technique (5-Whys or equivalent) for incidents above medium severity | Establish feedback loop from root cause findings to detection rule tuning and control improvement backlog | Conduct quarterly root cause trend analysis to identify systemic security weaknesses",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1206",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SentinelOne Application Control Configuration Evidence"
-    ]
-  },
-  {
-    "id": "FND-1207",
-    "summary": "No checklist of minimum required investigation actions to document",
-    "description": "No checklist of minimum required investigation actions to document",
-    "complianceRequirement": "RS.AN-06 Ex1",
-    "controlId": "RS.AN-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Create standardized investigation documentation template with required action recording fields | Implement investigation documentation completeness checklist required before incident closure | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Add peer review step for investigation documentation quality on incidents above medium severity",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1207",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1208",
-    "summary": "Evidence chain-of-custody documentation not formalized beyond ServiceNow record integrity",
-    "description": "Evidence chain-of-custody documentation not formalized beyond ServiceNow record integrity",
-    "complianceRequirement": "RS.AN-06 Ex1",
-    "controlId": "RS.AN-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Create standardized investigation documentation template with required action recording fields | Implement investigation documentation completeness checklist required before incident closure | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Add peer review step for investigation documentation quality on incidents above medium severity",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1208",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1209",
-    "summary": "No peer review of investigation documentation for completeness before incident closure",
-    "description": "No peer review of investigation documentation for completeness before incident closure",
-    "complianceRequirement": "RS.AN-06 Ex1",
-    "controlId": "RS.AN-06 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Create standardized investigation documentation template with required action recording fields | Implement investigation documentation completeness checklist required before incident closure | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Add peer review step for investigation documentation quality on incidents above medium severity",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1209",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1210",
-    "summary": "No standardized evidence catalog or manifest per incident",
-    "description": "No standardized evidence catalog or manifest per incident",
-    "complianceRequirement": "RS.AN-07 Ex1",
-    "controlId": "RS.AN-07 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Implement standardized evidence manifest template to track all collected data per incident | Extend SentinelOne telemetry retention or implement automated export for active investigations | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification)",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1210",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SentinelOne Application Control Configuration Evidence"
-    ]
-  },
-  {
-    "id": "FND-1211",
-    "summary": "SentinelOne telemetry retention limited to 14 days without manual export",
-    "description": "SentinelOne telemetry retention limited to 14 days without manual export",
-    "complianceRequirement": "RS.AN-07 Ex1",
-    "controlId": "RS.AN-07 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Implement standardized evidence manifest template to track all collected data per incident | Extend SentinelOne telemetry retention or implement automated export for active investigations | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification)",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1211",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SentinelOne Application Control Configuration Evidence"
-    ]
-  },
-  {
-    "id": "FND-1212",
-    "summary": "Evidence provenance documentation (who collected, when, how) not formalized",
-    "description": "Evidence provenance documentation (who collected, when, how) not formalized",
-    "complianceRequirement": "RS.AN-07 Ex1",
-    "controlId": "RS.AN-07 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Implement standardized evidence manifest template to track all collected data per incident | Extend SentinelOne telemetry retention or implement automated export for active investigations | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification)",
     "remediationOwner": null,
     "dueDate": "",
     "status": "Open",
@@ -10284,6 +12242,182 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1213",
+    "summary": "Systemic root cause identification (beyond immediate technical cause) not consistently performed",
+    "description": "Systemic root cause identification (beyond immediate technical cause) not consistently performed",
+    "complianceRequirement": "RS.AN-03 Ex1",
+    "controlId": "RS.AN-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Define minimum root cause documentation standards with required sections (event timeline, attack vector, vulnerability exploited, systemic factors) | Require formal root cause analysis technique (5-Whys or equivalent) for incidents above medium severity | Establish feedback loop from root cause findings to detection rule tuning and control improvement backlog | Conduct quarterly root cause trend analysis to identify systemic security weaknesses",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1213",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SentinelOne Application Control Configuration Evidence"
+    ]
+  },
+  {
+    "id": "FND-1214",
+    "summary": "Root cause findings not systematically fed back into detection rule tuning or control improvements",
+    "description": "Root cause findings not systematically fed back into detection rule tuning or control improvements",
+    "complianceRequirement": "RS.AN-03 Ex1",
+    "controlId": "RS.AN-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Define minimum root cause documentation standards with required sections (event timeline, attack vector, vulnerability exploited, systemic factors) | Require formal root cause analysis technique (5-Whys or equivalent) for incidents above medium severity | Establish feedback loop from root cause findings to detection rule tuning and control improvement backlog | Conduct quarterly root cause trend analysis to identify systemic security weaknesses",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1214",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SentinelOne Application Control Configuration Evidence"
+    ]
+  },
+  {
+    "id": "FND-1215",
+    "summary": "No checklist of minimum required investigation actions to document",
+    "description": "No checklist of minimum required investigation actions to document",
+    "complianceRequirement": "RS.AN-06 Ex1",
+    "controlId": "RS.AN-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Create standardized investigation documentation template with required action recording fields | Implement investigation documentation completeness checklist required before incident closure | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Add peer review step for investigation documentation quality on incidents above medium severity",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1215",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1216",
+    "summary": "Evidence chain-of-custody documentation not formalized beyond ServiceNow record integrity",
+    "description": "Evidence chain-of-custody documentation not formalized beyond ServiceNow record integrity",
+    "complianceRequirement": "RS.AN-06 Ex1",
+    "controlId": "RS.AN-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Create standardized investigation documentation template with required action recording fields | Implement investigation documentation completeness checklist required before incident closure | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Add peer review step for investigation documentation quality on incidents above medium severity",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1216",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1217",
+    "summary": "No peer review of investigation documentation for completeness before incident closure",
+    "description": "No peer review of investigation documentation for completeness before incident closure",
+    "complianceRequirement": "RS.AN-06 Ex1",
+    "controlId": "RS.AN-06 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Create standardized investigation documentation template with required action recording fields | Implement investigation documentation completeness checklist required before incident closure | Formalize evidence chain-of-custody procedures with dedicated tracking documentation | Add peer review step for investigation documentation quality on incidents above medium severity",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1217",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1218",
+    "summary": "No standardized evidence catalog or manifest per incident",
+    "description": "No standardized evidence catalog or manifest per incident",
+    "complianceRequirement": "RS.AN-07 Ex1",
+    "controlId": "RS.AN-07 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Implement standardized evidence manifest template to track all collected data per incident | Extend SentinelOne telemetry retention or implement automated export for active investigations | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification)",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1218",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SentinelOne Application Control Configuration Evidence"
+    ]
+  },
+  {
+    "id": "FND-1219",
+    "summary": "SentinelOne telemetry retention limited to 14 days without manual export",
+    "description": "SentinelOne telemetry retention limited to 14 days without manual export",
+    "complianceRequirement": "RS.AN-07 Ex1",
+    "controlId": "RS.AN-07 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Implement standardized evidence manifest template to track all collected data per incident | Extend SentinelOne telemetry retention or implement automated export for active investigations | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification)",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1219",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SentinelOne Application Control Configuration Evidence"
+    ]
+  },
+  {
+    "id": "FND-1220",
+    "summary": "Evidence provenance documentation (who collected, when, how) not formalized",
+    "description": "Evidence provenance documentation (who collected, when, how) not formalized",
+    "complianceRequirement": "RS.AN-07 Ex1",
+    "controlId": "RS.AN-07 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Implement standardized evidence manifest template to track all collected data per incident | Extend SentinelOne telemetry retention or implement automated export for active investigations | Deploy dedicated forensic evidence repository with chain-of-custody tracking | Document evidence provenance requirements (collector identity, timestamp, collection method, hash verification)",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1220",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SentinelOne Application Control Configuration Evidence"
+    ]
+  },
+  {
+    "id": "FND-1221",
     "summary": "Magnitude estimation is manual and dependent on individual analyst thoroughness",
     "description": "Magnitude estimation is manual and dependent on individual analyst thoroughness",
     "complianceRequirement": "RS.AN-08 Ex1",
@@ -10297,7 +12431,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1213",
+    "jiraKey": "FND-1221",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SentinelOne Application Control Configuration Evidence",
@@ -10305,7 +12439,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1214",
+    "id": "FND-1222",
     "summary": "Cross-platform magnitude assessment (cloud + endpoint + SaaS) not unified",
     "description": "Cross-platform magnitude assessment (cloud + endpoint + SaaS) not unified",
     "complianceRequirement": "RS.AN-08 Ex1",
@@ -10319,7 +12453,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1214",
+    "jiraKey": "FND-1222",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SentinelOne Application Control Configuration Evidence",
@@ -10327,7 +12461,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1215",
+    "id": "FND-1223",
     "summary": "No validated magnitude estimation validation step before determining response scope",
     "description": "No validated magnitude estimation validation step before determining response scope",
     "complianceRequirement": "RS.AN-08 Ex1",
@@ -10341,7 +12475,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1215",
+    "jiraKey": "FND-1223",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SentinelOne Application Control Configuration Evidence",
@@ -10349,7 +12483,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1216",
+    "id": "FND-1224",
     "summary": "Notification templates not tested through simulation",
     "description": "Notification templates not tested through simulation",
     "complianceRequirement": "RS.CO-02 Ex1",
@@ -10363,7 +12497,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1216",
+    "jiraKey": "FND-1224",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -10371,7 +12505,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1217",
+    "id": "FND-1225",
     "summary": "No automated tracking of notification compliance timelines",
     "description": "No automated tracking of notification compliance timelines",
     "complianceRequirement": "RS.CO-02 Ex1",
@@ -10385,7 +12519,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1217",
+    "jiraKey": "FND-1225",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -10393,7 +12527,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1218",
+    "id": "FND-1226",
     "summary": "Customer notification distribution mechanism not pre-staged for rapid deployment",
     "description": "Customer notification distribution mechanism not pre-staged for rapid deployment",
     "complianceRequirement": "RS.CO-02 Ex1",
@@ -10407,7 +12541,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1218",
+    "jiraKey": "FND-1226",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -10415,7 +12549,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1219",
+    "id": "FND-1227",
     "summary": "Crisis communication methods with critical suppliers not formalized beyond existing agreements",
     "description": "Crisis communication methods with critical suppliers not formalized beyond existing agreements",
     "complianceRequirement": "RS.CO-03 Ex1",
@@ -10429,7 +12563,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1219",
+    "jiraKey": "FND-1227",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -10437,7 +12571,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1220",
+    "id": "FND-1228",
     "summary": "HR notification procedures for insider threat incidents not explicitly defined in the playbook",
     "description": "HR notification procedures for insider threat incidents not explicitly defined in the playbook",
     "complianceRequirement": "RS.CO-03 Ex1",
@@ -10451,7 +12585,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1220",
+    "jiraKey": "FND-1228",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -10459,7 +12593,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1221",
+    "id": "FND-1229",
     "summary": "External sharing limited to contractual obligations; no proactive community contribution",
     "description": "External sharing limited to contractual obligations; no proactive community contribution",
     "complianceRequirement": "RS.CO-03 Ex1",
@@ -10473,7 +12607,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1221",
+    "jiraKey": "FND-1229",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "Information Security Policy",
@@ -10481,7 +12615,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1222",
+    "id": "FND-1230",
     "summary": "Playbook lacks explicit triggers for business continuity or disaster recovery plan activation",
     "description": "Playbook lacks explicit triggers for business continuity or disaster recovery plan activation",
     "complianceRequirement": "RS.MA-01 Ex1",
@@ -10495,7 +12629,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1222",
+    "jiraKey": "FND-1230",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
@@ -10503,7 +12637,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1223",
+    "id": "FND-1231",
     "summary": "No defined process for requesting external incident response assistance at scale",
     "description": "No defined process for requesting external incident response assistance at scale",
     "complianceRequirement": "RS.MA-01 Ex1",
@@ -10517,7 +12651,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1223",
+    "jiraKey": "FND-1231",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
@@ -10525,7 +12659,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1224",
+    "id": "FND-1232",
     "summary": "Response plan execution metrics (time to activate, time to contain) not systematically tracked",
     "description": "Response plan execution metrics (time to activate, time to contain) not systematically tracked",
     "complianceRequirement": "RS.MA-01 Ex1",
@@ -10539,7 +12673,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1224",
+    "jiraKey": "FND-1232",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
@@ -10547,7 +12681,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1225",
+    "id": "FND-1233",
     "summary": "No formal triage quality review or calibration process across analysts",
     "description": "No formal triage quality review or calibration process across analysts",
     "complianceRequirement": "RS.MA-02 Ex1",
@@ -10555,182 +12689,6 @@ export const COMPREHENSIVE_FINDINGS = [
     "assessmentId": "ASM-2026-comprehensive-alma",
     "rootCause": "",
     "remediationActionPlan": "Implement automated pre-triage enrichment (asset context, threat intel, historical similar findings) to reduce triage time | Establish triage metrics dashboard tracking volume, time-to-triage, and severity accuracy | Conduct quarterly triage calibration exercises to ensure consistency across analysts | Evaluate options to reduce after-hours triage gap (extended coverage or automated triage for common patterns)",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1225",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1226",
-    "summary": "Triage metrics (volume, accuracy, time-to-triage) not systematically tracked",
-    "description": "Triage metrics (volume, accuracy, time-to-triage) not systematically tracked",
-    "complianceRequirement": "RS.MA-02 Ex1",
-    "controlId": "RS.MA-02 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Implement automated pre-triage enrichment (asset context, threat intel, historical similar findings) to reduce triage time | Establish triage metrics dashboard tracking volume, time-to-triage, and severity accuracy | Conduct quarterly triage calibration exercises to ensure consistency across analysts | Evaluate options to reduce after-hours triage gap (extended coverage or automated triage for common patterns)",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1226",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1227",
-    "summary": "No automated pre-triage enrichment to accelerate analyst review",
-    "description": "No automated pre-triage enrichment to accelerate analyst review",
-    "complianceRequirement": "RS.MA-02 Ex1",
-    "controlId": "RS.MA-02 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Implement automated pre-triage enrichment (asset context, threat intel, historical similar findings) to reduce triage time | Establish triage metrics dashboard tracking volume, time-to-triage, and severity accuracy | Conduct quarterly triage calibration exercises to ensure consistency across analysts | Evaluate options to reduce after-hours triage gap (extended coverage or automated triage for common patterns)",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1227",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1228",
-    "summary": "Response strategy selection not documented for all incidents (3 of 4 reviewed)",
-    "description": "Response strategy selection not documented for all incidents (3 of 4 reviewed)",
-    "complianceRequirement": "RS.MA-03 Ex1",
-    "controlId": "RS.MA-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Expand categorization taxonomy to include cloud-specific incident types (IAM compromise, S3 exposure, Lambda abuse) | Require response strategy selection documentation for all declared incidents | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1228",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1229",
-    "summary": "No automated prioritization assistance based on affected asset criticality",
-    "description": "No automated prioritization assistance based on affected asset criticality",
-    "complianceRequirement": "RS.MA-03 Ex1",
-    "controlId": "RS.MA-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Expand categorization taxonomy to include cloud-specific incident types (IAM compromise, S3 exposure, Lambda abuse) | Require response strategy selection documentation for all declared incidents | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1229",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1230",
-    "summary": "Concurrent incident prioritization (resource allocation across simultaneous incidents) not formally addressed",
-    "description": "Concurrent incident prioritization (resource allocation across simultaneous incidents) not formally addressed",
-    "complianceRequirement": "RS.MA-03 Ex1",
-    "controlId": "RS.MA-03 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Expand categorization taxonomy to include cloud-specific incident types (IAM compromise, S3 exposure, Lambda abuse) | Require response strategy selection documentation for all declared incidents | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1230",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1231",
-    "summary": "No automated escalation based on IOC sweep results or scope expansion detection",
-    "description": "No automated escalation based on IOC sweep results or scope expansion detection",
-    "complianceRequirement": "RS.MA-04 Ex1",
-    "controlId": "RS.MA-04 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Migrate real-time incident status tracking from Slack to ServiceNow to maintain single source of truth | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Add automated escalation triggers based on IOC sweep results indicating scope expansion",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1231",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1232",
-    "summary": "Escalation effectiveness metrics not tracked (time-to-escalate, escalation accuracy)",
-    "description": "Escalation effectiveness metrics not tracked (time-to-escalate, escalation accuracy)",
-    "complianceRequirement": "RS.MA-04 Ex1",
-    "controlId": "RS.MA-04 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Migrate real-time incident status tracking from Slack to ServiceNow to maintain single source of truth | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Add automated escalation triggers based on IOC sweep results indicating scope expansion",
-    "remediationOwner": null,
-    "dueDate": "",
-    "status": "Open",
-    "priority": "Medium",
-    "createdDate": "2026-04-30T00:00:00.000Z",
-    "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1232",
-    "linkedArtifacts": [
-      "Incident Response Playbook (Excerpt)",
-      "SOC Incident Ticket",
-      "SOC Incident Ticket"
-    ]
-  },
-  {
-    "id": "FND-1233",
-    "summary": "Cross-functional stakeholder escalation (legal, communications, HR) coordination procedures underdeveloped",
-    "description": "Cross-functional stakeholder escalation (legal, communications, HR) coordination procedures underdeveloped",
-    "complianceRequirement": "RS.MA-04 Ex1",
-    "controlId": "RS.MA-04 Ex1",
-    "assessmentId": "ASM-2026-comprehensive-alma",
-    "rootCause": "",
-    "remediationActionPlan": "Migrate real-time incident status tracking from Slack to ServiceNow to maintain single source of truth | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Add automated escalation triggers based on IOC sweep results indicating scope expansion",
     "remediationOwner": null,
     "dueDate": "",
     "status": "Open",
@@ -10746,6 +12704,182 @@ export const COMPREHENSIVE_FINDINGS = [
   },
   {
     "id": "FND-1234",
+    "summary": "Triage metrics (volume, accuracy, time-to-triage) not systematically tracked",
+    "description": "Triage metrics (volume, accuracy, time-to-triage) not systematically tracked",
+    "complianceRequirement": "RS.MA-02 Ex1",
+    "controlId": "RS.MA-02 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Implement automated pre-triage enrichment (asset context, threat intel, historical similar findings) to reduce triage time | Establish triage metrics dashboard tracking volume, time-to-triage, and severity accuracy | Conduct quarterly triage calibration exercises to ensure consistency across analysts | Evaluate options to reduce after-hours triage gap (extended coverage or automated triage for common patterns)",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1234",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1235",
+    "summary": "No automated pre-triage enrichment to accelerate analyst review",
+    "description": "No automated pre-triage enrichment to accelerate analyst review",
+    "complianceRequirement": "RS.MA-02 Ex1",
+    "controlId": "RS.MA-02 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Implement automated pre-triage enrichment (asset context, threat intel, historical similar findings) to reduce triage time | Establish triage metrics dashboard tracking volume, time-to-triage, and severity accuracy | Conduct quarterly triage calibration exercises to ensure consistency across analysts | Evaluate options to reduce after-hours triage gap (extended coverage or automated triage for common patterns)",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1235",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1236",
+    "summary": "Response strategy selection not documented for all incidents (3 of 4 reviewed)",
+    "description": "Response strategy selection not documented for all incidents (3 of 4 reviewed)",
+    "complianceRequirement": "RS.MA-03 Ex1",
+    "controlId": "RS.MA-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Expand categorization taxonomy to include cloud-specific incident types (IAM compromise, S3 exposure, Lambda abuse) | Require response strategy selection documentation for all declared incidents | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1236",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1237",
+    "summary": "No automated prioritization assistance based on affected asset criticality",
+    "description": "No automated prioritization assistance based on affected asset criticality",
+    "complianceRequirement": "RS.MA-03 Ex1",
+    "controlId": "RS.MA-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Expand categorization taxonomy to include cloud-specific incident types (IAM compromise, S3 exposure, Lambda abuse) | Require response strategy selection documentation for all declared incidents | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1237",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1238",
+    "summary": "Concurrent incident prioritization (resource allocation across simultaneous incidents) not formally addressed",
+    "description": "Concurrent incident prioritization (resource allocation across simultaneous incidents) not formally addressed",
+    "complianceRequirement": "RS.MA-03 Ex1",
+    "controlId": "RS.MA-03 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Expand categorization taxonomy to include cloud-specific incident types (IAM compromise, S3 exposure, Lambda abuse) | Require response strategy selection documentation for all declared incidents | Integrate asset criticality ratings from CMDB into automated prioritization assistance | Develop concurrent incident resource allocation framework for simultaneous multi-incident scenarios",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1238",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1239",
+    "summary": "No automated escalation based on IOC sweep results or scope expansion detection",
+    "description": "No automated escalation based on IOC sweep results or scope expansion detection",
+    "complianceRequirement": "RS.MA-04 Ex1",
+    "controlId": "RS.MA-04 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Migrate real-time incident status tracking from Slack to ServiceNow to maintain single source of truth | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Add automated escalation triggers based on IOC sweep results indicating scope expansion",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1239",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1240",
+    "summary": "Escalation effectiveness metrics not tracked (time-to-escalate, escalation accuracy)",
+    "description": "Escalation effectiveness metrics not tracked (time-to-escalate, escalation accuracy)",
+    "complianceRequirement": "RS.MA-04 Ex1",
+    "controlId": "RS.MA-04 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Migrate real-time incident status tracking from Slack to ServiceNow to maintain single source of truth | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Add automated escalation triggers based on IOC sweep results indicating scope expansion",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1240",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1241",
+    "summary": "Cross-functional stakeholder escalation (legal, communications, HR) coordination procedures underdeveloped",
+    "description": "Cross-functional stakeholder escalation (legal, communications, HR) coordination procedures underdeveloped",
+    "complianceRequirement": "RS.MA-04 Ex1",
+    "controlId": "RS.MA-04 Ex1",
+    "assessmentId": "ASM-2026-comprehensive-alma",
+    "rootCause": "",
+    "remediationActionPlan": "Migrate real-time incident status tracking from Slack to ServiceNow to maintain single source of truth | Develop cross-functional escalation procedures for legal, communications, and HR engagement | Implement escalation effectiveness metrics (time-to-escalate, escalation accuracy) | Add automated escalation triggers based on IOC sweep results indicating scope expansion",
+    "remediationOwner": null,
+    "dueDate": "",
+    "status": "Open",
+    "priority": "Medium",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "FND-1241",
+    "linkedArtifacts": [
+      "Incident Response Playbook (Excerpt)",
+      "SOC Incident Ticket",
+      "SOC Incident Ticket"
+    ]
+  },
+  {
+    "id": "FND-1242",
     "summary": "No data integrity verification checkpoint before recovery initiation",
     "description": "No data integrity verification checkpoint before recovery initiation",
     "complianceRequirement": "RS.MA-05 Ex1",
@@ -10759,7 +12893,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1234",
+    "jiraKey": "FND-1242",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -10767,7 +12901,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1235",
+    "id": "FND-1243",
     "summary": "System validation testing not required as a pre-recovery gate",
     "description": "System validation testing not required as a pre-recovery gate",
     "complianceRequirement": "RS.MA-05 Ex1",
@@ -10781,7 +12915,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1235",
+    "jiraKey": "FND-1243",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -10789,7 +12923,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1236",
+    "id": "FND-1244",
     "summary": "Stakeholder readiness confirmation not included in recovery criteria",
     "description": "Stakeholder readiness confirmation not included in recovery criteria",
     "complianceRequirement": "RS.MA-05 Ex1",
@@ -10803,7 +12937,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1236",
+    "jiraKey": "FND-1244",
     "linkedArtifacts": [
       "Incident Response Playbook (Excerpt)",
       "SOC Incident Ticket",
@@ -10811,7 +12945,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1237",
+    "id": "FND-1245",
     "summary": "Containment options for SaaS application compromise not defined",
     "description": "Containment options for SaaS application compromise not defined",
     "complianceRequirement": "RS.MI-01 Ex1",
@@ -10825,7 +12959,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1237",
+    "jiraKey": "FND-1245",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
@@ -10833,7 +12967,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1238",
+    "id": "FND-1246",
     "summary": "Automated containment thresholds may need tuning to prevent business disruption from false positives",
     "description": "Automated containment thresholds may need tuning to prevent business disruption from false positives",
     "complianceRequirement": "RS.MI-01 Ex1",
@@ -10847,7 +12981,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1238",
+    "jiraKey": "FND-1246",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
@@ -10855,7 +12989,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1239",
+    "id": "FND-1247",
     "summary": "VLAN-based quarantine for on-premises systems not implemented",
     "description": "VLAN-based quarantine for on-premises systems not implemented",
     "complianceRequirement": "RS.MI-01 Ex1",
@@ -10869,7 +13003,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1239",
+    "jiraKey": "FND-1247",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "Incident Response Playbook (Excerpt)",
@@ -10877,7 +13011,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1240",
+    "id": "FND-1248",
     "summary": "Eradication of advanced persistent threats may require capabilities beyond current tooling",
     "description": "Eradication of advanced persistent threats may require capabilities beyond current tooling",
     "complianceRequirement": "RS.MI-02 Ex1",
@@ -10891,7 +13025,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1240",
+    "jiraKey": "FND-1248",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "AWS Config Compliance Snapshot",
@@ -10899,7 +13033,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1241",
+    "id": "FND-1249",
     "summary": "No automated re-scan or validation after eradication to confirm complete threat removal",
     "description": "No automated re-scan or validation after eradication to confirm complete threat removal",
     "complianceRequirement": "RS.MI-02 Ex1",
@@ -10913,7 +13047,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1241",
+    "jiraKey": "FND-1249",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "AWS Config Compliance Snapshot",
@@ -10921,7 +13055,7 @@ export const COMPREHENSIVE_FINDINGS = [
     ]
   },
   {
-    "id": "FND-1242",
+    "id": "FND-1250",
     "summary": "Gold image inventory for system reimaging not regularly validated",
     "description": "Gold image inventory for system reimaging not regularly validated",
     "complianceRequirement": "RS.MI-02 Ex1",
@@ -10935,7 +13069,7 @@ export const COMPREHENSIVE_FINDINGS = [
     "priority": "Medium",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "FND-1242",
+    "jiraKey": "FND-1250",
     "linkedArtifacts": [
       "SentinelOne Application Control Configuration Evidence",
       "AWS Config Compliance Snapshot",

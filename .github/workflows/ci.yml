@@ -7,6 +7,25 @@ on:
     branches: [main]
 
 jobs:
+  generated-data-sync:
+    name: Generated data matches ASSESSMENT_CATALOG
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # Community contributions to ASSESSMENT_CATALOG must be visible in the
+      # app (issue #224): these fail when the generated bank or the demo
+      # assessment data drifts from the catalog markdown.
+      - name: Procedure bank matches catalog
+        run: node scripts/generate-procedure-bank.mjs --check
+
+      - name: Comprehensive assessment data matches catalog
+        run: node scripts/generate-comprehensive-assessment.mjs --check
+
   private-data-leak-guard:
     name: Private data leak guard
     runs-on: ubuntu-latest
