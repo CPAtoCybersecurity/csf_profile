@@ -63,3 +63,64 @@ describe('index.css overlay/position utilities (issue #279)', () => {
     }
   });
 });
+
+/**
+ * Regression guard for the New Assessment modal scroll bug.
+ *
+ * The modal card is `max-h-[90vh] flex flex-col` with a fixed header, a
+ * `flex-1 overflow-auto` body, and a fixed footer. `.max-h-[90vh]` was never
+ * defined in the hand-written CSS, so the card's max-height computed to `none`,
+ * it grew to full content height, the overlay's `items-center` centered it, and
+ * the header + footer scrolled off-screen with no way to reach them. These
+ * assertions fail if the height-cap utilities the modals/panels depend on are
+ * removed. Values follow the Tailwind spacing scale (N x 0.25rem).
+ */
+describe('index.css max-height utilities (Assessments modal scroll)', () => {
+  test('.max-h-[90vh] caps the modal dialog card at 90% of the viewport', () => {
+    expect(hasRule('.max-h-\\[90vh\\]', 'max-height: 90vh')).toBe(true);
+  });
+
+  const scale = {
+    '.max-h-40': '10rem',
+    '.max-h-48': '12rem',
+    '.max-h-56': '14rem',
+    '.max-h-60': '15rem',
+    '.max-h-64': '16rem',
+    '.max-h-72': '18rem',
+    '.max-h-80': '20rem',
+  };
+
+  test.each(Object.entries(scale))('%s is defined as %s', (sel, value) => {
+    expect(hasRule(sel, `max-height: ${value}`)).toBe(true);
+  });
+
+  test('no max-h-* class used in JSX is left undefined in index.css', () => {
+    const srcDir = __dirname;
+    const files = [];
+    const walk = (dir) => {
+      for (const name of fs.readdirSync(dir)) {
+        const p = path.join(dir, name);
+        const stat = fs.statSync(p);
+        if (stat.isDirectory()) walk(p);
+        else if (/\.(js|jsx)$/.test(name) && !/\.test\.js$/.test(name)) {
+          files.push(fs.readFileSync(p, 'utf8'));
+        }
+      }
+    };
+    walk(srcDir);
+    const used = new Set();
+    for (const content of files) {
+      for (const m of content.matchAll(/\bmax-h-(?:\[[^\]]+\]|[a-z0-9]+)/g)) {
+        used.add(m[0]);
+      }
+    }
+    // CSS escapes brackets in selectors (`.max-h-\[90vh\]`); the JSX class is
+    // raw (`max-h-[90vh]`). Strip the CSS escaping so a raw-class regex matches.
+    const flatNoEsc = flat.replace(/\\/g, '');
+    const missing = [...used].filter((cls) => {
+      const sel = '.' + cls.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return !new RegExp(sel + '\\s*\\{').test(flatNoEsc);
+    });
+    expect(missing).toEqual([]);
+  });
+});
