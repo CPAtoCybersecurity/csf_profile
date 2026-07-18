@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import { quotaSafeLocalStorage } from '../utils/safeStorage';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
@@ -587,8 +588,25 @@ const useAssessmentsStore = create(
         if (!assessment) return;
 
         const currentObservation = get().getObservation(assessmentId, itemId);
+
+        // Bank-attach provenance honesty: hand-editing a community-attached
+        // procedure flips procedureSource.modified so the UI can show a
+        // "customized" badge and share export knows the text diverged.
+        // Callers that set procedureSource themselves (attach/reset) win.
+        let nextProcedureSource;
+        if (observationData.procedureSource !== undefined) {
+          nextProcedureSource = observationData.procedureSource;
+        } else if (currentObservation.procedureSource) {
+          const textChanged = observationData.testProcedures !== undefined &&
+            sanitizeInput(observationData.testProcedures) !== currentObservation.testProcedures;
+          nextProcedureSource = textChanged
+            ? { ...currentObservation.procedureSource, modified: true }
+            : currentObservation.procedureSource;
+        }
+
         const sanitizedData = {
           ...observationData,
+          ...(nextProcedureSource !== undefined ? { procedureSource: nextProcedureSource } : {}),
           testProcedures: observationData.testProcedures !== undefined
             ? sanitizeInput(observationData.testProcedures)
             : currentObservation.testProcedures,
@@ -1685,6 +1703,8 @@ const useAssessmentsStore = create(
     {
       name: 'csf-assessments-storage',
       version: ASSESSMENTS_SCHEMA_VERSION,
+      // Quota failures must be loud: attached procedures add real text volume.
+      storage: createJSONStorage(() => quotaSafeLocalStorage),
       migrate: (persistedState, version) => migrateAssessmentsState(persistedState, version),
       partialize: (state) => ({
         assessments: state.assessments,
