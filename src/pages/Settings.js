@@ -16,7 +16,12 @@ import {
   Cloud,
   Key,
   RefreshCw,
-  Loader2
+  Loader2,
+  Layers,
+  Building2,
+  Database,
+  FileText,
+  RotateCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -732,53 +737,53 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
   }, []);
 
   return (
-    <div className="p-4 bg-white min-h-full">
-      <h1 className="text-2xl font-bold mb-4">Settings</h1>
+    <div className="p-6 min-h-full" style={{ background: 'var(--bg-primary)' }}>
+      <div className="max-w-4xl">
+        {/* Page header */}
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-1">Settings</h1>
+          <p className="settings-section-desc" style={{ fontSize: '13px' }}>
+            Manage backups, your data, and the NIST CSF 2.0 framework for this workspace.
+          </p>
+        </div>
 
-      {/* Experimental Notice for Jira/Confluence */}
-      <div className="mb-6 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg max-w-4xl">
-        <div className="flex items-start gap-3">
-          <span className="text-amber-600 dark:text-amber-400 text-xl">⚠️</span>
+        {/* Experimental Notice for Jira/Confluence */}
+        <div className="callout callout-warning flex items-start gap-3 mb-6">
+          <AlertCircle size={18} style={{ color: '#c97b00', flexShrink: 0, marginTop: '1px' }} />
           <div>
-            <p className="text-amber-800 dark:text-amber-200 font-medium">Experimental Features</p>
-            <p className="text-amber-700 dark:text-amber-300 text-sm mt-1">
+            <p className="settings-section-title" style={{ fontSize: '12px' }}>Experimental Features</p>
+            <p className="settings-section-desc">
               The Jira and Confluence import/export features are experimental and still under development.
               Data formats and functionality may change. Feedback welcome from the community!
             </p>
           </div>
         </div>
-      </div>
 
-      <div className="space-y-8">
-        {/* Backup & Data Persistence Settings */}
-        <div className="max-w-4xl">
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="p-4 border-b">
-              <div className="flex items-center gap-3">
-                <Shield size={24} className="text-blue-600 dark:text-blue-400" />
-                <h2 className="text-lg font-semibold dark:text-white">Backup & Data Persistence</h2>
-              </div>
+        <div className="space-y-6">
+          {/* Backup & Data Persistence Settings */}
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Shield size={16} style={{ color: 'var(--accent)' }} />
+              <h2 className="settings-section-title">Backup &amp; Data Persistence</h2>
             </div>
-            <div className="p-4 space-y-4">
+            <div className="space-y-4">
               {/* Data Storage Warning */}
-              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" size={20} />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Important: Local Data Storage</h3>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
-                      All assessment data is stored in your browser's local storage. This data can be lost if you:
-                    </p>
-                    <ul className="text-sm text-gray-700 dark:text-gray-300 list-disc list-inside space-y-1 mb-3">
-                      <li>Clear your browser cache or site data</li>
-                      <li>Uninstall or reset your browser</li>
-                      <li>Use browser cleanup utilities</li>
-                      <li>Reach browser storage limits</li>
-                    </ul>
-                    <p className="text-sm text-gray-700 dark:text-gray-300 font-medium">
-                      <strong>Always export your data regularly to prevent data loss.</strong>
-                    </p>
-                  </div>
+              <div className="callout callout-warning flex items-start gap-3">
+                <AlertCircle style={{ color: '#c97b00', flexShrink: 0, marginTop: '2px' }} size={18} />
+                <div>
+                  <h3 className="settings-section-title" style={{ fontSize: '12px' }}>Important: Local Data Storage</h3>
+                  <p className="settings-section-desc mb-2">
+                    All assessment data is stored in your browser's local storage. This data can be lost if you:
+                  </p>
+                  <ul className="settings-section-desc list-disc list-inside space-y-1 mb-2">
+                    <li>Clear your browser cache or site data</li>
+                    <li>Uninstall or reset your browser</li>
+                    <li>Use browser cleanup utilities</li>
+                    <li>Reach browser storage limits</li>
+                  </ul>
+                  <p className="settings-section-desc" style={{ fontWeight: 600 }}>
+                    Always export your data regularly to prevent data loss.
+                  </p>
                 </div>
               </div>
 
@@ -802,10 +807,9 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                         exportRequirementsCSV();
                         toast.success('Data exported successfully!');
                       }}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-600 
-                             text-white rounded-lg transition-colors font-medium inline-flex items-center gap-2"
+                      className="btn-terminal"
                     >
-                      <Download size={16} />
+                      <Download size={14} />
                       Export Data Now
                     </button>
                   </div>
@@ -893,13 +897,12 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Framework Management */}
-        <div className="max-w-4xl">
-          <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-            <div className="p-4 border-b">
-              <h2 className="text-lg font-semibold">Framework Management</h2>
+          {/* Framework Management */}
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Layers size={16} style={{ color: 'var(--accent)' }} />
+              <h2 className="settings-section-title">Framework Management</h2>
             </div>
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -921,7 +924,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                         <div className="flex items-center gap-3">
                           <FrameworkBadge frameworkId={framework.id} showName />
                           {framework.isDefault && (
-                            <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded">Default</span>
+                            <span className="badge badge-warning">Default</span>
                           )}
                         </div>
                         <p className="text-xs text-gray-500 mt-1">{framework.description}</p>
@@ -951,18 +954,18 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       </td>
                       <td className="p-3 text-sm">
                         {framework.comingSoon ? (
-                          <span className="inline-flex items-center gap-1 text-amber-600">
-                            <Clock size={14} />
+                          <span className="badge badge-warning">
+                            <Clock size={12} />
                             Coming Soon
                           </span>
                         ) : framework.enabled ? (
-                          <span className="inline-flex items-center gap-1 text-green-600">
-                            <Check size={14} />
+                          <span className="badge badge-success">
+                            <Check size={12} />
                             Enabled
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-gray-500">
-                            <X size={14} />
+                          <span className="badge badge-neutral">
+                            <X size={12} />
                             Disabled
                           </span>
                         )}
@@ -970,33 +973,33 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       <td className="p-3">
                         <div className="flex items-center gap-2">
                           <button
-                            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+                            className="btn-icon"
                             onClick={() => handleImportClick(framework.id)}
                             title="Import requirements CSV"
                           >
-                            <Upload size={16} />
+                            <Upload size={15} />
                           </button>
                           <button
-                            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+                            className="btn-icon"
                             onClick={() => toggleFramework(framework.id)}
                             title={framework.enabled ? 'Disable framework' : 'Enable framework'}
                           >
-                            {framework.enabled ? <EyeOff size={16} /> : <Eye size={16} />}
+                            {framework.enabled ? <EyeOff size={15} /> : <Eye size={15} />}
                           </button>
                           <button
-                            className="p-1.5 hover:bg-gray-100 rounded text-gray-600"
+                            className="btn-icon"
                             onClick={() => setEditingFramework({ ...framework })}
                             title="Edit framework"
                           >
-                            <Edit size={16} />
+                            <Edit size={15} />
                           </button>
                           {!framework.isDefault && (
                             <button
-                              className="p-1.5 hover:bg-red-100 rounded text-red-600"
+                              className="btn-icon btn-icon-danger"
                               onClick={() => handleDeleteFramework(framework.id)}
                               title="Delete framework"
                             >
-                              <Trash2 size={16} />
+                              <Trash2 size={15} />
                             </button>
                           )}
                         </div>
@@ -1008,80 +1011,85 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </table>
           </div>
 
-          {/* Import New Framework */}
-          <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-blue-800">Import New Framework</h3>
+          {/* Import New Framework — bring your own framework */}
+          <div className="card">
+            <div className="card-header flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Upload size={16} style={{ color: 'var(--accent)' }} />
+                <h3 className="settings-section-title">Import Your Own Framework</h3>
+              </div>
               <div className="flex items-center gap-2">
                 <button
-                  className="flex items-center gap-1 text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                  className="btn-terminal"
                   onClick={() => newFrameworkFileInputRef.current?.click()}
                 >
-                  <Upload size={14} />
+                  <Upload size={13} />
                   Import CSV
                 </button>
                 <button
-                  className="flex items-center gap-1 text-sm bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                  className="btn-terminal"
                   onClick={handleDownloadTemplate}
                 >
-                  <Download size={14} />
-                  Download Template
+                  <Download size={13} />
+                  Template
                 </button>
               </div>
             </div>
-            <p className="text-sm text-blue-700 mb-2">
-              Import requirements using a CSV file with the following columns:
+            <p className="settings-section-desc mb-2">
+              NIST CSF 2.0 is the built-in framework. To assess against another framework, import
+              your own requirements using a CSV file with the following columns:
             </p>
-            <code className="text-xs bg-blue-100 p-2 rounded block overflow-x-auto">
+            <code className="callout callout-info block overflow-x-auto" style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>
               FRAMEWORK, CSF FUNCTION, CATEGORY, SUBCATEGORY ID, SUBCATEGORY DESCRIPTION, ID, IMPLEMENTATION EXAMPLE
             </code>
-            <p className="text-xs text-blue-600 mt-2">
+            <p className="settings-section-desc mt-2">
               All frameworks map to CSF Functions (Govern, Identify, Protect, Detect, Respond, Recover).
               The FRAMEWORK column should match a framework ID (e.g., nist-csf-2.0, soc2-2017, iso27001-2022).
             </p>
           </div>
 
           {/* Data Export */}
-          <div className="mt-6 bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Download size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="font-medium text-green-800">Data Export</h3>
-                <p className="text-sm text-green-700 mt-1">Export your assessment data in JSON format for backup, integration, or analysis</p>
+                <h3 className="settings-section-title">Data Export</h3>
+                <p className="settings-section-desc">Export your assessment data in JSON format for backup, integration, or analysis</p>
               </div>
             </div>
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-2">
               <button
-                className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                className="btn-terminal"
                 onClick={handleExportCompleteDatabase}
               >
-                <Download size={16} />
-                Export Complete Database
+                <Download size={14} />
+                Complete Database
               </button>
               <button
-                className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                className="btn-terminal"
                 onClick={handleExportAssessments}
               >
-                <Download size={16} />
-                Export Assessments Only
+                <Download size={14} />
+                Assessments Only
               </button>
               <button
-                className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                className="btn-terminal"
                 onClick={handleExportShareable}
               >
-                <Download size={16} />
-                Export Shareable Copy
+                <Download size={14} />
+                Shareable Copy
               </button>
             </div>
-            <p className="text-xs text-green-600 mt-3">
+            <p className="settings-section-desc mt-3">
               <strong>Complete Database:</strong> Exports all controls, assessments, requirements, frameworks, artifacts, findings, and user data in a single JSON file (csf_assessment_YYYY-MM-DD.json)
             </p>
-            <p className="text-xs text-green-600 mt-2">
+            <p className="settings-section-desc mt-2">
               <strong>Assessments Only:</strong> Exports assessment observations and scores with enhanced readability (assessments_YYYY-MM-DD.json)
             </p>
-            <p className="text-xs text-green-600 mt-2">
+            <p className="settings-section-desc mt-2">
               <strong>Shareable Copy:</strong> Same as Complete Database but excludes private data-pack records by default (csf_share_YYYY-MM-DD.json) — safe for demos and sharing
             </p>
-            <label className="flex items-center gap-2 text-xs text-green-700 mt-2">
+            <label className="flex items-center gap-2 settings-section-desc mt-2" style={{ cursor: 'pointer' }}>
               <input
                 type="checkbox"
                 checked={includePackData}
@@ -1092,34 +1100,36 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
           </div>
 
           {/* Database Restore — destructive, visually distinct from export */}
-          <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="card" style={{ borderLeftWidth: '3px', borderLeftColor: 'var(--terminal-red)' }}>
+            <div className="card-header flex items-center gap-2">
+              <RotateCcw size={16} style={{ color: 'var(--terminal-red)' }} />
               <div>
-                <h3 className="font-medium text-red-800">Restore From Backup</h3>
-                <p className="text-sm text-red-700 mt-1">
+                <h3 className="settings-section-title">Restore From Backup</h3>
+                <p className="settings-section-desc">
                   Replaces ALL current data with the contents of a Complete Database export. A backup of your current data downloads automatically before anything is replaced.
                 </p>
               </div>
             </div>
             <button
-              className="flex items-center gap-2 text-sm bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded"
+              className="btn-terminal btn-terminal-danger"
               onClick={() => restoreImportRef.current?.click()}
             >
-              <Upload size={16} />
+              <Upload size={14} />
               Restore Complete Database
             </button>
-            <p className="text-xs text-red-600 mt-3">
+            <p className="settings-section-desc mt-3">
               Accepts csf_assessment_*.json files created by Export Complete Database. This is a full replace, not a merge.
             </p>
           </div>
 
           {/* Organization profile — optional tailoring input; the most sensitive
               record in the app (crown jewels + tooling). Never in share exports. */}
-          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Building2 size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="font-medium text-amber-800">Organization Profile (optional)</h3>
-                <p className="text-sm text-amber-700 mt-1">
+                <h3 className="settings-section-title">Organization Profile (optional)</h3>
+                <p className="settings-section-desc">
                   Business type, size, key systems, security tools, and crown jewels — used to tailor
                   community test procedures to your environment. Every question is skippable.
                 </p>
@@ -1127,14 +1137,15 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </div>
             <div className="flex items-center gap-3">
               <button
-                className="flex items-center gap-2 text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded"
+                className="btn-terminal"
                 onClick={() => setShowOrgProfileWizard(true)}
               >
                 {orgProfileSet ? 'Edit Profile' : 'Set Up Profile'}
               </button>
               {orgProfileSet && (
                 <button
-                  className="text-sm text-amber-700 hover:underline"
+                  className="text-sm hover:underline"
+                  style={{ color: 'var(--text-muted)' }}
                   onClick={() => {
                     if (window.confirm('Clear the organization profile from this browser? Tailored text already in assessments is not changed.')) {
                       clearOrgProfile();
@@ -1147,20 +1158,20 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
               )}
             </div>
             {orgProfileSet && (
-              <label className="flex items-start gap-2 mt-3 cursor-pointer">
+              <label className="flex items-start gap-2 mt-3" style={{ cursor: 'pointer' }}>
                 <input
                   type="checkbox"
                   checked={orgCloudConsent}
                   onChange={(e) => setOrgCloudConsent(e.target.checked)}
-                  className="w-4 h-4 rounded mt-0.5"
+                  className="w-4 h-4 mt-0.5"
                 />
-                <span className="text-xs text-amber-700">
+                <span className="settings-section-desc">
                   Allow sending my profile to a <strong>cloud</strong> AI provider (Claude API) for procedure
                   tailoring. Local Ollama never needs this — nothing leaves your machine there.
                 </span>
               </label>
             )}
-            <p className="text-xs text-amber-600 mt-3">
+            <p className="settings-section-desc mt-3">
               Stored only in this browser. <strong>Never included in shareable exports</strong> — tailored
               procedure text is swapped back to the community version there. It rides complete backups
               only; password-protect backups that carry it.
@@ -1168,24 +1179,25 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
           </div>
 
           {/* Private data pack — additive import, deliberately distinct from the destructive Restore card above */}
-          <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Database size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="font-medium text-purple-800">Private Data Pack</h3>
-                <p className="text-sm text-purple-700 mt-1">
+                <h3 className="settings-section-title">Private Data Pack</h3>
+                <p className="settings-section-desc">
                   Load your organization's private assessment values and risk entries from a local pack file.
                   Additive: it creates a pack-owned assessment and never touches data you entered by hand.
                 </p>
               </div>
             </div>
             <button
-              className="flex items-center gap-2 text-sm bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded"
+              className="btn-terminal"
               onClick={() => packImportRef.current?.click()}
             >
-              <Upload size={16} />
+              <Upload size={14} />
               Import Data Pack
             </button>
-            <p className="text-xs text-purple-600 mt-3">
+            <p className="settings-section-desc mt-3">
               Accepts *.csfpack.json files — see PRIVATE_DATA.md in the repository for the format.
               You will see a preview before anything is written. Re-importing a pack replaces what that
               pack owns and never duplicates it. Pack data stays on this machine and is excluded from
@@ -1194,27 +1206,25 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
           </div>
 
           {/* Metrics catalogue — bring your own KPIs/KRIs as a local CSV; additive like the pack card */}
-          <div className="mt-6 bg-teal-50 border border-teal-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Gauge size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="font-medium text-teal-800 flex items-center gap-2">
-                  <Gauge size={16} />
-                  Metrics Catalogue (CSV)
-                </h3>
-                <p className="text-sm text-teal-700 mt-1">
+                <h3 className="settings-section-title">Metrics Catalogue (CSV)</h3>
+                <p className="settings-section-desc">
                   Bring your own KPIs, KRIs, and metrics mapped to CSF subcategories. The app ships
                   no metric content — your catalogue is a separate local file that stays on this machine.
                 </p>
               </div>
             </div>
             <button
-              className="flex items-center gap-2 text-sm bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded"
+              className="btn-terminal"
               onClick={() => metricsImportRef.current?.click()}
             >
-              <Upload size={16} />
+              <Upload size={14} />
               Import Metrics Catalogue
             </button>
-            <p className="text-xs text-teal-600 mt-3">
+            <p className="settings-section-desc mt-3">
               Accepts *.csfmetrics.csv files — see PRIVATE_DATA.md for the column format. You will see
               a preview before anything is written. Re-importing a catalogue replaces it, never duplicates.
               Imported metrics are excluded from shareable exports by default, and catalogues with a
@@ -1223,24 +1233,26 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </p>
 
             {metricsCatalogs.length > 0 && (
-              <div className="mt-3 border-t border-teal-200 pt-3 space-y-2">
+              <div className="mt-3 pt-3 space-y-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                 {metricsCatalogs.map((cat) => (
                   <div key={cat.catalogSlug} className="flex items-center justify-between text-sm">
-                    <div className="text-teal-800 min-w-0">
+                    <div className="min-w-0" style={{ color: 'var(--text-secondary)' }}>
                       <span className="font-mono font-medium">{cat.catalogSlug}</span>
-                      <span className="text-teal-600"> — {cat.count} metrics
+                      <span style={{ color: 'var(--text-muted)' }}> — {cat.count} metrics
                         {cat.importedAt ? `, imported ${cat.importedAt.split('T')[0]}` : ''}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
                       <button
-                        className="flex items-center gap-1 text-xs text-teal-700 hover:text-teal-900 border border-teal-300 px-2 py-1 rounded"
+                        className="btn-terminal"
+                        style={{ fontSize: '10px', padding: '2px 8px' }}
                         onClick={() => handleExportCatalog(cat.catalogSlug)}
                       >
                         <Download size={12} />
                         CSV
                       </button>
                       <button
-                        className="flex items-center gap-1 text-xs text-red-700 hover:text-red-900 border border-red-300 px-2 py-1 rounded"
+                        className="btn-terminal btn-terminal-danger"
+                        style={{ fontSize: '10px', padding: '2px 8px' }}
                         onClick={() => handleRemoveCatalog(cat.catalogSlug)}
                       >
                         <Trash2 size={12} />
@@ -1254,20 +1266,21 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
           </div>
 
           {/* Jira/Confluence Integration Export */}
-          <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-3">
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Cloud size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="font-medium text-indigo-800">Jira / Confluence Integration</h3>
-                <p className="text-sm text-indigo-700 mt-1">Export data in formats compatible with Jira and Confluence import</p>
+                <h3 className="settings-section-title">Jira / Confluence Integration</h3>
+                <p className="settings-section-desc">Export data in formats compatible with Jira and Confluence import</p>
               </div>
             </div>
 
             {/* Control Evaluations for Jira EVAL */}
             <div className="mb-4">
-              <h4 className="text-sm font-medium text-indigo-800 mb-2">Control Evaluations (Jira EVAL Project)</h4>
+              <h4 className="settings-section-title mb-2" style={{ fontSize: '11px' }}>Control Evaluations (Jira EVAL Project)</h4>
               <div className="flex flex-wrap gap-2">
                 <button
-                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal"
                   onClick={() => {
                     try {
                       useAssessmentsStore.getState().exportAllForJiraCSV(
@@ -1286,27 +1299,27 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   Export for Jira
                 </button>
                 <button
-                  className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal btn-terminal-success"
                   onClick={() => assessmentsImportRef.current?.click()}
                 >
                   <Upload size={14} />
                   Import from Jira
                 </button>
               </div>
-              <p className="text-xs text-indigo-600 mt-2">
+              <p className="settings-section-desc mt-2">
                 Export: CSV formatted for Jira EVAL project with Work Paper issue type and quarterly scores
               </p>
-              <p className="text-xs text-indigo-600 mt-1">
+              <p className="settings-section-desc mt-1">
                 Import: CSV exported from Jira EVAL project (matches standard assessment format)
               </p>
             </div>
 
             {/* Requirements for Confluence */}
-            <div className="mb-4 pt-3 border-t border-indigo-200">
-              <h4 className="text-sm font-medium text-indigo-800 mb-2">Requirements (Confluence Database)</h4>
+            <div className="mb-4 pt-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <h4 className="settings-section-title mb-2" style={{ fontSize: '11px' }}>Requirements (Confluence Database)</h4>
               <div className="flex flex-wrap gap-2">
                 <button
-                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal"
                   onClick={() => {
                     try {
                       useRequirementsStore.getState().exportForConfluenceCSV(
@@ -1325,17 +1338,17 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   Export for Confluence
                 </button>
               </div>
-              <p className="text-xs text-indigo-600 mt-2">
+              <p className="settings-section-desc mt-2">
                 Creates CSV matching Confluence Requirements database schema with linked controls and stakeholders
               </p>
             </div>
 
             {/* Findings for Jira FND */}
-            <div className="mb-4 pt-3 border-t border-indigo-200">
-              <h4 className="text-sm font-medium text-indigo-800 mb-2">Findings (Jira FND Project)</h4>
+            <div className="mb-4 pt-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <h4 className="settings-section-title mb-2" style={{ fontSize: '11px' }}>Findings (Jira FND Project)</h4>
               <div className="flex flex-wrap gap-2">
                 <button
-                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal"
                   onClick={() => {
                     try {
                       useFindingsStore.getState().exportForJiraCSV(useUserStore);
@@ -1350,27 +1363,27 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   Export for Jira
                 </button>
                 <button
-                  className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal btn-terminal-success"
                   onClick={() => findingsImportRef.current?.click()}
                 >
                   <Upload size={14} />
                   Import from Jira
                 </button>
               </div>
-              <p className="text-xs text-indigo-600 mt-2">
+              <p className="settings-section-desc mt-2">
                 Export: CSV for Jira FND project with Finding issue type, remediation plans, and due dates
               </p>
-              <p className="text-xs text-indigo-600 mt-1">
+              <p className="settings-section-desc mt-1">
                 Import: CSV exported from Jira FND project with findings data
               </p>
             </div>
 
             {/* Artifacts for Jira AR */}
-            <div className="pt-3 border-t border-indigo-200">
-              <h4 className="text-sm font-medium text-indigo-800 mb-2">Artifacts (Jira AR Project)</h4>
+            <div className="pt-3" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <h4 className="settings-section-title mb-2" style={{ fontSize: '11px' }}>Artifacts (Jira AR Project)</h4>
               <div className="flex flex-wrap gap-2">
                 <button
-                  className="flex items-center gap-2 text-sm bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal"
                   onClick={() => {
                     try {
                       useArtifactStore.getState().exportForJiraCSV();
@@ -1385,36 +1398,36 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   Export for Jira
                 </button>
                 <button
-                  className="flex items-center gap-2 text-sm bg-green-600 hover:bg-green-700 text-white font-medium px-3 py-1.5 rounded shadow-sm"
+                  className="btn-terminal btn-terminal-success"
                   onClick={() => artifactsImportRef.current?.click()}
                 >
                   <Upload size={14} />
                   Import from Jira
                 </button>
               </div>
-              <p className="text-xs text-indigo-600 mt-2">
+              <p className="settings-section-desc mt-2">
                 Export: CSV for Jira AR project with Artifact issue type, links, and compliance mappings
               </p>
-              <p className="text-xs text-indigo-600 mt-1">
+              <p className="settings-section-desc mt-1">
                 Import: CSV exported from Jira AR project with artifact data
               </p>
             </div>
           </div>
 
           {/* Atlassian API Configuration */}
-          <div className="mt-6 bg-slate-50 border border-slate-200 rounded-lg p-4">
-            <div className="flex items-center gap-3 mb-4">
-              <Cloud size={24} className="text-slate-600" />
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <Key size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="font-medium text-slate-800">Atlassian API Configuration</h3>
-                <p className="text-sm text-slate-600">Configure credentials for Jira Cloud and Confluence API access</p>
+                <h3 className="settings-section-title">Atlassian API Configuration</h3>
+                <p className="settings-section-desc">Configure credentials for Jira Cloud and Confluence API access</p>
               </div>
             </div>
 
             <div className="space-y-4">
               {/* Site URL */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   Atlassian Site URL
                 </label>
                 <input
@@ -1422,14 +1435,15 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   placeholder="https://your-site.atlassian.net"
                   value={atlassianSiteUrl}
                   onChange={(e) => setAtlassianSiteUrl(e.target.value)}
-                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2"
+                  style={{ border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
                 />
-                <p className="text-xs text-slate-500 mt-1">Your Atlassian Cloud site URL (e.g., https://company.atlassian.net)</p>
+                <p className="settings-section-desc mt-1">Your Atlassian Cloud site URL (e.g., https://company.atlassian.net)</p>
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   Email Address
                 </label>
                 <input
@@ -1437,14 +1451,15 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   placeholder="your-email@company.com"
                   value={atlassianEmail}
                   onChange={(e) => setAtlassianEmail(e.target.value)}
-                  className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2"
+                  style={{ border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
                 />
-                <p className="text-xs text-slate-500 mt-1">Email associated with your Atlassian account</p>
+                <p className="settings-section-desc mt-1">Email associated with your Atlassian account</p>
               </div>
 
               {/* API Token */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-sm font-medium mb-1">
                   API Token
                 </label>
                 <div className="relative flex items-center">
@@ -1453,17 +1468,19 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                     placeholder="Enter your Atlassian API token"
                     value={atlassianApiToken}
                     onChange={(e) => setAtlassianApiToken(e.target.value)}
-                    className="w-full p-2 pr-10 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full p-2 pr-10"
+                    style={{ border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowApiToken(!showApiToken)}
-                    className="absolute right-2 p-1 text-slate-500 hover:text-slate-700 bg-white rounded"
+                    className="absolute right-2 p-1"
+                    style={{ color: 'var(--text-muted)', background: 'var(--bg-primary)' }}
                   >
                     {showApiToken ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
-                <p className="text-xs text-slate-500 mt-2">
+                <p className="settings-section-desc mt-2">
                   Generate at{' '}
                   <a
                     href="https://id.atlassian.com/manage-profile/security/api-tokens"
@@ -1481,11 +1498,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 <button
                   onClick={saveAtlassianConfig}
                   disabled={isSavingConfig || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors
-                    ${isSavingConfig || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
+                  className="btn-terminal"
+                  style={{ padding: '6px 12px' }}
                 >
                   {isSavingConfig ? (
                     <>
@@ -1502,11 +1516,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 <button
                   onClick={() => testAtlassianConnection('jira')}
                   disabled={isTestingConnection || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium shadow-sm transition-colors
-                    ${isTestingConnection || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300'
-                      : 'bg-green-600 hover:bg-green-700 text-white'
-                    }`}
+                  className="btn-terminal btn-terminal-success"
+                  style={{ padding: '6px 12px' }}
                 >
                   {isTestingConnection ? (
                     <>
@@ -1524,13 +1535,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 {(configStatus.jira || configStatus.confluence) && (
                   <div className="flex items-center gap-2 ml-2">
                     {configStatus.jira && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                      <span className="badge badge-success">
                         <Check size={12} />
                         Jira
                       </span>
                     )}
                     {configStatus.confluence && (
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full flex items-center gap-1">
+                      <span className="badge badge-success">
                         <Check size={12} />
                         Confluence
                       </span>
@@ -1538,15 +1549,15 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   </div>
                 )}
               </div>
-              <p className="text-xs text-slate-500 mt-2">
+              <p className="settings-section-desc mt-2">
                 <strong>Security Note:</strong> Credentials are stored securely on the server, not in your browser.
               </p>
             </div>
 
             {/* Entry ID Harvesting */}
-            <div className="mt-6 pt-4 border-t border-slate-200">
-              <h4 className="text-sm font-medium text-slate-800 mb-2">Confluence Entry ID Harvesting</h4>
-              <p className="text-sm text-slate-600 mb-3">
+            <div className="mt-6 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
+              <h4 className="settings-section-title mb-2" style={{ fontSize: '11px' }}>Confluence Entry ID Harvesting</h4>
+              <p className="settings-section-desc mb-3">
                 Harvest entry IDs from your Confluence Requirements database to enable Smart-Embed linking in Jira issues.
               </p>
 
@@ -1554,11 +1565,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 <button
                   onClick={handleHarvestEntryIds}
                   disabled={isHarvesting || !atlassianEmail || !atlassianApiToken}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors shadow-sm
-                    ${isHarvesting || !atlassianEmail || !atlassianApiToken
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white'
-                    }`}
+                  className="btn-terminal"
+                  style={{ padding: '6px 12px' }}
                 >
                   {isHarvesting ? (
                     <>
@@ -1575,7 +1583,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
 
                 <button
                   onClick={() => entryIdImportRef.current?.click()}
-                  className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium shadow-sm"
+                  className="btn-terminal btn-terminal-success"
+                  style={{ padding: '6px 12px' }}
                 >
                   <Upload size={14} />
                   Import CSV
@@ -1584,63 +1593,63 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 <button
                   onClick={handleEntryIdExport}
                   disabled={entryIdCount === 0}
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm
-                    ${entryIdCount === 0
-                      ? 'bg-gray-200 text-gray-500 cursor-not-allowed border border-gray-300'
-                      : 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                    }`}
+                  className="btn-terminal"
+                  style={{ padding: '6px 12px' }}
                 >
                   <Download size={14} />
                   Export CSV
                 </button>
 
                 {entryIdCount > 0 && (
-                  <span className="text-sm text-slate-600 bg-slate-200 px-3 py-1.5 rounded-full">
+                  <span className="badge badge-neutral">
                     {entryIdCount} mapping{entryIdCount !== 1 ? 's' : ''} stored
                   </span>
                 )}
               </div>
 
-              <p className="text-xs text-slate-500 mt-3">
+              <p className="settings-section-desc mt-3">
                 Entry IDs link requirements to their Confluence database entries, enabling Smart-Embed URLs in Jira issue descriptions.
               </p>
             </div>
           </div>
 
           {/* Stats */}
-          <div className="mt-6 grid grid-cols-3 gap-4">
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Requirements</p>
-              <p className="text-2xl font-bold text-blue-600">{requirements.length}</p>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="card">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Total Requirements</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{requirements.length}</p>
             </div>
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Controls</p>
-              <p className="text-2xl font-bold text-green-600">{controls.length}</p>
+            <div className="card">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Total Controls</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{controls.length}</p>
             </div>
-            <div className="bg-white p-4 rounded-lg border">
-              <p className="text-sm text-gray-500">Total Assessments</p>
-              <p className="text-2xl font-bold text-purple-600">{assessments.length}</p>
+            <div className="card">
+              <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Total Assessments</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--accent)' }}>{assessments.length}</p>
             </div>
           </div>
 
           {/* Case Study Materials */}
-          <div className="mt-6 bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="font-medium text-purple-800">Alma Security Case Study Materials</h3>
+          <div className="card">
+            <div className="card-header flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <FileText size={16} style={{ color: 'var(--accent)' }} />
+                <h3 className="settings-section-title">Alma Security Case Study Materials</h3>
+              </div>
               <a
                 href="https://github.com/CPAtoCybersecurity/csf_profile/tree/main/EXAMPLE%20BUSINESS%20CASE%20STUDY%20FOR%20ASSESSMENT"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-1 text-sm bg-purple-600 hover:bg-purple-700 text-white px-3 py-1 rounded"
+                className="btn-terminal"
               >
-                <ExternalLink size={14} />
+                <ExternalLink size={13} />
                 View on GitHub
               </a>
             </div>
-            <p className="text-sm text-purple-700 mb-2">
+            <p className="settings-section-desc mb-2">
               Supplementary materials for the Alma Security fictional business case study, designed for students and practitioners to practice NIST CSF 2.0 control assessments.
             </p>
-            <div className="text-xs text-purple-600 space-y-1">
+            <div className="settings-section-desc space-y-1">
               <p><strong>Includes:</strong> Company background, security policies, risk register, technology environment details</p>
               <p><strong>CSV Exports:</strong> Pre-loaded Alma Security controls and Q1 assessment data for import/export practice</p>
             </div>
@@ -1717,7 +1726,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
       {/* Pack Import Preview Modal — shows exactly what will happen before any write */}
       {packPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="w-full max-w-md" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
             <div className="p-6">
               <h3 className="text-lg font-medium text-gray-900">Import data pack</h3>
               <p className="text-sm text-gray-600 mt-1">
@@ -1767,7 +1776,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   Cancel
                 </button>
                 <button
-                  className="text-sm px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white"
+                  className="btn-terminal"
+                  style={{ padding: '6px 12px' }}
                   onClick={handleConfirmPackImport}
                 >
                   Import Pack
@@ -1781,7 +1791,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
       {/* Metrics Catalogue Preview Modal — shows exactly what will happen before any write */}
       {metricsPreview && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="w-full max-w-md" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
             <div className="p-6">
               <h3 className="text-lg font-medium text-gray-900">Import metrics catalogue</h3>
               <p className="text-sm text-gray-600 mt-1">
@@ -1825,7 +1835,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   Cancel
                 </button>
                 <button
-                  className="text-sm px-4 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white"
+                  className="btn-terminal"
+                  style={{ padding: '6px 12px' }}
                   onClick={handleConfirmMetricsImport}
                 >
                   Import Catalogue
@@ -1839,7 +1850,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
       {/* Edit Framework Modal */}
       {editingFramework && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+          <div className="w-full max-w-md" style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-color)' }}>
             <div className="p-4 border-b flex items-center justify-between">
               <h3 className="text-lg font-bold">Edit Framework</h3>
               <button
@@ -1925,7 +1936,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded"
+                className="btn-terminal"
+                style={{ padding: '6px 12px' }}
                 onClick={handleUpdateFramework}
               >
                 Save Changes

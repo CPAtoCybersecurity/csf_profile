@@ -21,66 +21,12 @@ const defaultFrameworks = [
     },
     importedDate: new Date().toISOString(),
     isDefault: true
-  },
-  {
-    id: 'iso27001-2022',
-    name: 'ISO/IEC 27001:2022',
-    shortName: 'ISO',
-    version: '2022',
-    source: 'CSF 2.0 Informative References',
-    sourceUrl: 'https://www.nist.gov/cyberframework/informative-references',
-    description: 'Information Security Management System',
-    enabled: true,
-    color: '#7c3aed',
-    hierarchyLabels: {
-      level1: 'Clause/Annex',
-      level2: 'Control Category',
-      level3: 'Control',
-      level4: 'Implementation Guidance'
-    },
-    importedDate: null,
-    isDefault: false
-  },
-  {
-    id: 'fedramp-sp800-53',
-    name: 'FedRAMP (SP 800-53)',
-    shortName: 'FedRAMP',
-    version: 'Rev 5',
-    source: 'CSF 2.0 Informative References',
-    sourceUrl: 'https://www.nist.gov/cyberframework/informative-references',
-    description: 'Federal Risk and Authorization Management Program',
-    enabled: true,
-    color: '#dc2626',
-    hierarchyLabels: {
-      level1: 'Control Family',
-      level2: 'Control',
-      level3: 'Control Enhancement',
-      level4: 'Implementation Guidance'
-    },
-    importedDate: null,
-    isDefault: false
-  },
-  {
-    id: 'cmmc-sp800-171',
-    name: 'CMMC (SP 800-171)',
-    shortName: 'CMMC',
-    version: 'Rev 3',
-    source: 'CSF 2.0 Informative References',
-    sourceUrl: 'https://www.nist.gov/cyberframework/informative-references',
-    description: 'Cybersecurity Maturity Model Certification',
-    enabled: true,
-    comingSoon: true,
-    color: '#059669',
-    hierarchyLabels: {
-      level1: 'Domain',
-      level2: 'Capability',
-      level3: 'Practice',
-      level4: 'Assessment Objective'
-    },
-    importedDate: null,
-    isDefault: false
   }
 ];
+
+// Pre-seeded frameworks retired in v6 — the app is NIST CSF 2.0 only.
+// Users bring any additional framework via "Import New Framework" (custom upload).
+const RETIRED_SEED_FRAMEWORK_IDS = ['iso27001-2022', 'fedramp-sp800-53', 'cmmc-sp800-171'];
 
 const useFrameworksStore = create(
   persist(
@@ -208,14 +154,26 @@ const useFrameworksStore = create(
     }),
     {
       name: 'csf-frameworks-storage',
-      version: 5,
+      version: 6,
       migrate: (persistedState, version) => {
         // Version 2: Reset to new default frameworks (removed SOC2, HIPAA, PCI-DSS; updated names; added source)
         // Version 3: Shortened framework names (removed Rev from name since it's in VERSION column)
         // Version 4: Added comingSoon flag to ISO, FedRAMP, CMMC
         // Version 5: Removed comingSoon from ISO 27001 and FedRAMP (cross-framework mappings added)
+        // Version 6: NIST CSF 2.0 only — drop the pre-seeded ISO 27001, FedRAMP, and CMMC
+        //            frameworks. Any user-imported custom frameworks are preserved.
         if (version < 5) {
           return { frameworks: defaultFrameworks };
+        }
+        if (version < 6) {
+          const kept = (persistedState?.frameworks || []).filter(
+            (f) => !RETIRED_SEED_FRAMEWORK_IDS.includes(f.id)
+          );
+          const hasNist = kept.some((f) => f.id === 'nist-csf-2.0');
+          return {
+            ...persistedState,
+            frameworks: hasNist ? kept : [...defaultFrameworks, ...kept]
+          };
         }
         return persistedState;
       },
