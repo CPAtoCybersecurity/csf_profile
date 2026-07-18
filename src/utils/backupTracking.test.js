@@ -10,6 +10,7 @@ import {
   setBackupReminderFrequency,
   getLastReminderDate,
   updateLastReminderDate,
+  ensureFirstUseDate,
   shouldShowBackupReminder,
   getTimeSinceLastExport,
   getBackupWarningLevel
@@ -96,8 +97,35 @@ describe('Backup Tracking Utilities', () => {
   });
 
   describe('shouldShowBackupReminder', () => {
-    test('returns true when never reminded and never exported', () => {
+    test('returns false for a brand-new user (never exported, first use just recorded)', () => {
+      expect(shouldShowBackupReminder()).toBe(false);
+    });
+
+    test('records the first-use date on first evaluation', () => {
+      shouldShowBackupReminder();
+      expect(localStorage.getItem('csf_first_use_date')).not.toBeNull();
+    });
+
+    test('ensureFirstUseDate is idempotent — keeps the original date', () => {
+      const original = ensureFirstUseDate();
+      const second = ensureFirstUseDate();
+      expect(second.getTime()).toBe(original.getTime());
+    });
+
+    test('returns true when never exported and frequency days have passed since first use', () => {
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 8);
+      localStorage.setItem('csf_first_use_date', pastDate.toISOString());
+
       expect(shouldShowBackupReminder()).toBe(true);
+    });
+
+    test('returns false when never exported and first use is within frequency window', () => {
+      const pastDate = new Date();
+      pastDate.setDate(pastDate.getDate() - 3);
+      localStorage.setItem('csf_first_use_date', pastDate.toISOString());
+
+      expect(shouldShowBackupReminder()).toBe(false);
     });
 
     test('returns false when recently reminded', () => {
