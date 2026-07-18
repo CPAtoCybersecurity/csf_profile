@@ -202,6 +202,29 @@ describe('importCompleteDatabase safety semantics', () => {
     expect(restored.observations['GV.SC-04 Ex1'].quarters.Q1.actualScore).toBe(3.25);
   });
 
+  test('a v10 export (no externalTracking) restores with the disabled default stamped (issue #284)', () => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: 10 },
+      data: {
+        assessments: [{
+          id: 'ASM-v10',
+          name: 'Pre-284 export',
+          scopeType: 'requirements',
+          scoringScale: 10,
+          scopeIds: [],
+          observations: {}
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-v10');
+    expect(restored.externalTracking).toEqual({ enabled: false, systemName: '' });
+  });
+
   test('a mid-apply setter failure rolls back every already-applied section', () => {
     const { stores, setters } = makeStores();
     // users applies first, then findings throws

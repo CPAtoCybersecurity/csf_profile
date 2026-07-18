@@ -1,11 +1,13 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar, Shield } from 'lucide-react';
+import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar, Shield, ExternalLink } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useFindingsStore from '../stores/findingsStore';
 import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
+import useAssessmentsStore from '../stores/assessmentsStore';
+import { sanitizeExternalUrl, externalUrlLabel } from '../utils/externalLinks';
 import useSort from '../hooks/useSort';
 import EmptyState from '../components/EmptyState';
 import Markdown from '../components/Markdown';
@@ -23,6 +25,11 @@ const Findings = () => {
   const users = useUserStore((state) => state.users);
   const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
   const requirements = useRequirementsStore((state) => state.requirements);
+  const assessments = useAssessmentsStore((state) => state.assessments);
+
+  // External-tracking config of the assessment a finding belongs to (issue #284)
+  const trackingForAssessment = (assessmentId) =>
+    assessments.find((a) => a.id === assessmentId)?.externalTracking;
 
   const [formData, setFormData] = useState({
     id: null,
@@ -34,7 +41,8 @@ const Findings = () => {
     remediationOwner: null,
     dueDate: '',
     status: 'Not Started',
-    priority: 'Medium'
+    priority: 'Medium',
+    externalUrl: ''
   });
   const [editMode, setEditMode] = useState(false);
   const [errors, setErrors] = useState({});
@@ -239,7 +247,8 @@ const Findings = () => {
       remediationOwner: null,
       dueDate: '',
       status: 'Not Started',
-      priority: 'Medium'
+      priority: 'Medium',
+      externalUrl: ''
     });
     setEditMode(false);
     setErrors({});
@@ -400,8 +409,20 @@ const Findings = () => {
                     </div>
 
                     {/* Summary */}
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 flex items-center gap-1.5">
                       <p className="text-sm text-gray-900 dark:text-white truncate">{finding.summary}</p>
+                      {sanitizeExternalUrl(finding.externalUrl) && (
+                        <a
+                          href={sanitizeExternalUrl(finding.externalUrl)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex-shrink-0 text-blue-600 dark:text-blue-400"
+                          title="Open external ticket"
+                        >
+                          <ExternalLink size={14} />
+                        </a>
+                      )}
                     </div>
 
                     {/* CSF Reference */}
@@ -592,6 +613,43 @@ const Findings = () => {
                       {selectedFinding?.priority}
                     </span>
                   </>
+                )}
+              </div>
+
+              {/* External ticket link (issue #284) */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                  <ChevronRight size={16} className="rotate-90" />
+                  {externalUrlLabel(trackingForAssessment((editMode ? formData : selectedFinding)?.assessmentId), 'ticket')}
+                </h3>
+                {editMode ? (
+                  <input
+                    type="url"
+                    name="externalUrl"
+                    value={formData.externalUrl || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                    placeholder="https://... (ticket in Jira, ServiceNow, etc.)"
+                  />
+                ) : selectedFinding?.externalUrl ? (
+                  sanitizeExternalUrl(selectedFinding.externalUrl) ? (
+                    <a
+                      href={sanitizeExternalUrl(selectedFinding.externalUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline inline-flex items-center gap-1 break-all"
+                    >
+                      <ExternalLink size={14} />
+                      {selectedFinding.externalUrl}
+                    </a>
+                  ) : (
+                    <p className="text-sm text-gray-700 dark:text-gray-300 break-all">
+                      {selectedFinding.externalUrl}
+                      <span className="text-xs text-gray-400 ml-1">(only http/https URLs render as links)</span>
+                    </p>
+                  )
+                ) : (
+                  <p className="text-sm text-gray-400 dark:text-gray-500">No external ticket linked.</p>
                 )}
               </div>
 

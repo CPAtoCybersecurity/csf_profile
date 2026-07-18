@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, ExternalLink, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useArtifactStore from '../stores/artifactStore';
+import { sanitizeExternalUrl } from '../utils/externalLinks';
 
 const ArtifactSelector = ({
   label,
@@ -20,11 +21,11 @@ const ArtifactSelector = ({
     const artifact = artifacts.find(a => a.name === name);
     const chipClass = 'px-2 py-1 bg-blue-600 text-white rounded-full text-xs inline-flex items-center gap-1 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer';
 
-    if (artifact?.link) {
+    if (sanitizeExternalUrl(artifact?.link)) {
       return (
         <a
           key={name}
-          href={artifact.link}
+          href={sanitizeExternalUrl(artifact.link)}
           target="_blank"
           rel="noopener noreferrer"
           className={chipClass}

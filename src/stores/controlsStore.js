@@ -79,6 +79,8 @@ const useControlsStore = create(
           artifacts: controlData.artifacts || '',
           findings: controlData.findings || '',
           controlEvaluationBackLink: controlData.controlEvaluationBackLink || '',
+          // Optional URL to this control in an external compliance/ticketing tool (issue #284)
+          externalUrl: controlData.externalUrl || '',
           createdDate: new Date().toISOString(),
           lastModified: new Date().toISOString()
         };

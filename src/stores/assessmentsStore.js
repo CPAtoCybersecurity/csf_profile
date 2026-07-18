@@ -4,6 +4,7 @@ import { quotaSafeLocalStorage } from '../utils/safeStorage';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
+import { normalizeExternalTracking } from '../utils/externalLinks';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS, ALMA_AUDIT_OBSERVATIONS } from './defaultAssessmentsData';
 import {
@@ -131,7 +132,7 @@ const migrateObservationToQuarterly = (oldObs) => {
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 10;
+export const ASSESSMENTS_SCHEMA_VERSION = 11;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -232,6 +233,19 @@ export const migrateAssessmentsState = (persistedState, version) => {
     const assessments = (state.assessments || []).map(a =>
       a.scoringScale === 5 || a.scoringScale === 10 ? a : { ...a, scoringScale: 10 }
     );
+    state = { ...state, assessments };
+  }
+
+  // Version 11: Stamp externalTracking (issue #284) — the per-assessment
+  // declaration that findings/artifacts/controls are tracked in an external
+  // ticketing/document system. Idempotent: a well-formed value is preserved
+  // (normalize keeps enabled/systemName), a missing/foreign one becomes the
+  // disabled default.
+  if (version < 11) {
+    const assessments = (state.assessments || []).map(a => ({
+      ...a,
+      externalTracking: normalizeExternalTracking(a.externalTracking)
+    }));
     state = { ...state, assessments };
   }
 
@@ -492,6 +506,8 @@ const useAssessmentsStore = create(
           scopeType: assessmentData.scopeType || 'requirements', // 'requirements' or 'controls'
           // 10-point (default) or 5-point CMMI-style scale; locked at creation (issue #277)
           scoringScale: assessmentData.scoringScale === 5 ? 5 : 10,
+          // Optional external ticketing/document system declaration (issue #284)
+          externalTracking: normalizeExternalTracking(assessmentData.externalTracking),
           scopeIds: assessmentData.scopeIds || [], // Array of requirement IDs or control IDs
           frameworkFilter: assessmentData.frameworkFilter || null, // Optional framework filter
           status: 'Not Started', // Not Started, In Progress, Complete

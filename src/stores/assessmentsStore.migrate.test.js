@@ -61,10 +61,15 @@ describe('migrateAssessmentsState', () => {
 
   test('current-version state passes through unchanged', () => {
     const state = {
-      assessments: [{ id: 'ASM-x', observations: {}, scoringScale: 10 }],
+      assessments: [{
+        id: 'ASM-x',
+        observations: {},
+        scoringScale: 10,
+        externalTracking: { enabled: false, systemName: '' }
+      }],
       currentAssessmentId: 'ASM-x'
     };
-    const result = migrateAssessmentsState(state, 10);
+    const result = migrateAssessmentsState(state, 11);
     expect(result).toEqual(state);
   });
 
@@ -115,6 +120,44 @@ describe('migrateAssessmentsState', () => {
     test('a v0 client also receives the scale stamp (fall-through)', () => {
       const result = migrateAssessmentsState(legacyV0State(), 0);
       expect(result.assessments.every(a => a.scoringScale === 5 || a.scoringScale === 10)).toBe(true);
+    });
+  });
+
+  describe('v11: externalTracking stamp (issue #284)', () => {
+    test('a v10 client gets the disabled default stamped on every assessment', () => {
+      const state = {
+        assessments: [
+          { id: 'ASM-a', observations: {}, scoringScale: 10 },
+          { id: 'ASM-b', observations: {}, scoringScale: 5 }
+        ],
+        currentAssessmentId: 'ASM-a'
+      };
+      const result = migrateAssessmentsState(state, 10);
+      expect(result.assessments.every(a =>
+        a.externalTracking && a.externalTracking.enabled === false && a.externalTracking.systemName === ''
+      )).toBe(true);
+    });
+
+    test('idempotent: an assessment already carrying a config keeps enabled + systemName', () => {
+      const state = {
+        assessments: [
+          { id: 'ASM-jira', observations: {}, scoringScale: 10, externalTracking: { enabled: true, systemName: 'Jira' } },
+          { id: 'ASM-junk', observations: {}, scoringScale: 10, externalTracking: 'garbage' }
+        ],
+        currentAssessmentId: 'ASM-jira'
+      };
+      const result = migrateAssessmentsState(state, 10);
+      expect(result.assessments.find(a => a.id === 'ASM-jira').externalTracking)
+        .toEqual({ enabled: true, systemName: 'Jira' });
+      expect(result.assessments.find(a => a.id === 'ASM-junk').externalTracking)
+        .toEqual({ enabled: false, systemName: '' });
+    });
+
+    test('a v0 client also receives the externalTracking stamp (fall-through)', () => {
+      const result = migrateAssessmentsState(legacyV0State(), 0);
+      expect(result.assessments.every(a =>
+        a.externalTracking && typeof a.externalTracking.enabled === 'boolean'
+      )).toBe(true);
     });
   });
 

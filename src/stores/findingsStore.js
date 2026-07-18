@@ -87,6 +87,8 @@ const useFindingsStore = create(
           createdDate: new Date().toISOString(),
           lastModified: new Date().toISOString(),
           jiraKey: findingData.jiraKey || null, // Jira issue key if synced
+          // Optional URL to the finding's ticket in an external system (issue #284)
+          externalUrl: findingData.externalUrl || '',
           linkedArtifacts: findingData.linkedArtifacts || []
         };
 
