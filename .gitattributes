@@ -1,0 +1,3 @@
+# Generated files: LF-only so --check byte-comparison never trips on CRLF
+src/data/communityProcedures.json text eol=lf
+src/stores/comprehensiveAssessmentData.js text eol=lf

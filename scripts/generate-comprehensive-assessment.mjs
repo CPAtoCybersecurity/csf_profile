@@ -78,20 +78,21 @@ function parseControlFile(controlPath) {
   return { artifactRefs, implementation };
 }
 
-// --- 3. Parse a test procedure file --------------------------------
-function parseTestProcedureFile(tpPath) {
-  if (!fs.existsSync(tpPath)) return '';
-  const txt = fs.readFileSync(tpPath, 'utf8');
-  const tpMatch = txt.match(/## Test Procedures\s*\n+([^]*?)(?=\n## |\n---|\n*$)/);
-  if (!tpMatch) return '';
-  // Pull numbered top-level items only
-  const lines = tpMatch[1].split('\n');
-  const procs = [];
-  for (const line of lines) {
-    const m = line.match(/^(\d+)\.\s*\*\*(.+?)\*\*/);
-    if (m) procs.push(`${m[1]}. ${m[2]}`);
-  }
-  return procs.join('\n');
+// --- 3. Community procedure bank -----------------------------------
+// Test-procedure content comes from the generated bank (single source of
+// truth shared with the app's wizard/detail panel) so the full community
+// markdown — pass/fail criteria, interview questions, evidence requests —
+// is preserved instead of the old headings-only flatten.
+// Generate it first: node scripts/generate-procedure-bank.mjs
+const BANK_PATH = path.join(ROOT, 'src', 'data', 'communityProcedures.json');
+if (!fs.existsSync(BANK_PATH)) {
+  console.error('Missing src/data/communityProcedures.json — run: node scripts/generate-procedure-bank.mjs');
+  process.exit(1);
+}
+const PROCEDURE_BANK = JSON.parse(fs.readFileSync(BANK_PATH, 'utf8'));
+
+function bankProcedureText(subId) {
+  return PROCEDURE_BANK.procedures[subId]?.markdown || '';
 }
 
 // --- 4. Parse Q1 observation file ----------------------------------
@@ -152,7 +153,6 @@ function parseObservationFile(obsPath) {
 function buildAssessmentData(artifacts) {
   const obsDir = path.join(CATALOG, '4_Observations');
   const ctlDir = path.join(CATALOG, '2_Controls');
-  const tpDir  = path.join(CATALOG, '3_Test_Procedures');
 
   const artifactByFile = new Map(artifacts.map(a => [a.fileName, a]));
   const artifactByName = new Map(artifacts.map(a => [a.name.toLowerCase(), a]));
@@ -184,7 +184,7 @@ function buildAssessmentData(artifacts) {
 
       // Parse content
       const ctlInfo = parseControlFile(path.join(ctlSubDir, ctlFiles[0]));
-      const tpText = parseTestProcedureFile(path.join(tpDir, fn, `${subId}.md`));
+      const tpText = bankProcedureText(subId);
       const obs = parseObservationFile(path.join(fnDir, file));
       if (!obs) continue;
 
@@ -209,6 +209,19 @@ function buildAssessmentData(artifacts) {
       observations[reqId] = {
         auditorId: AUDITOR_ID,
         testProcedures: tpText || ctlInfo.implementation,
+        // Provenance: this is a build-time attach of the community bank
+        // procedure, same shape the wizard writes (see procedureBank.js).
+        ...(tpText
+          ? {
+              procedureSource: {
+                bank: 'community',
+                bankId: subId,
+                bankVersion: PROCEDURE_BANK.bankVersion,
+                attachedAt: '2026-04-30T00:00:00.000Z',
+                modified: false
+              }
+            }
+          : {}),
         linkedArtifacts: linkedArtifactNames,
         linkedFindings: reqFindingIds,
         remediation: { ownerId: null, actionPlan: '', dueDate: '' },
@@ -294,9 +307,22 @@ export const COMPREHENSIVE_FINDINGS = ${JSON.stringify(findings, null, 2)};
 const artifacts = scanArtifacts();
 const { scopeIds, observations, findings } = buildAssessmentData(artifacts);
 const output = render(artifacts, scopeIds, observations, findings);
-fs.writeFileSync(OUT, output);
-console.log(`Wrote ${OUT}`);
-console.log(`  Artifacts: ${artifacts.length}`);
-console.log(`  Scope items: ${scopeIds.length}`);
-console.log(`  Observations: ${Object.keys(observations).length}`);
-console.log(`  Findings: ${findings.length}`);
+
+if (process.argv.includes('--check')) {
+  const committed = fs.existsSync(OUT) ? fs.readFileSync(OUT, 'utf8') : '';
+  if (committed !== output) {
+    console.error(
+      'DRIFT: src/stores/comprehensiveAssessmentData.js does not match ASSESSMENT_CATALOG/.\n' +
+      'Run: node scripts/generate-procedure-bank.mjs && node scripts/generate-comprehensive-assessment.mjs  (and commit the result)'
+    );
+    process.exit(1);
+  }
+  console.log('OK: comprehensive assessment data matches the catalog.');
+} else {
+  fs.writeFileSync(OUT, output);
+  console.log(`Wrote ${OUT}`);
+  console.log(`  Artifacts: ${artifacts.length}`);
+  console.log(`  Scope items: ${scopeIds.length}`);
+  console.log(`  Observations: ${Object.keys(observations).length}`);
+  console.log(`  Findings: ${findings.length}`);
+}
