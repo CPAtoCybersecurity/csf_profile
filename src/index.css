@@ -270,7 +270,21 @@ code {
 .max-w-3xl { max-width: 48rem; }
 .max-w-4xl { max-width: 56rem; }
 .max-w-none { max-width: none; }
+/* max-height scale (Tailwind spacing: N x 0.25rem). No Tailwind build here, so
+   every utility the JSX uses must be defined by hand — an undefined one computes
+   to `max-height: none`, letting a modal/panel grow past its intended cap. */
+.max-h-40 { max-height: 10rem; }
+.max-h-48 { max-height: 12rem; }
+.max-h-56 { max-height: 14rem; }
 .max-h-60 { max-height: 15rem; }
+.max-h-64 { max-height: 16rem; }
+.max-h-72 { max-height: 18rem; }
+.max-h-80 { max-height: 20rem; }
+/* Arbitrary-value utility on modal dialog cards. Without this the card grows to
+   its full content height; the overlay's `items-center` then centers it and
+   pushes the header/footer off-screen (unreachable, page won't scroll). Capping
+   at 90vh activates the card's existing `flex-1 overflow-auto` body region. */
+.max-h-\[90vh\] { max-height: 90vh; }
 
 /* ==========================================================================
    6. Typography
