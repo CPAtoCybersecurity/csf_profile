@@ -154,9 +154,14 @@ const Metrics = () => {
           as a local CSV file (KPIs, KRIs, and metrics mapped to CSF subcategories) and it
           stays on this machine.
         </p>
+        <p className="mt-3 text-gray-600 dark:text-gray-300">
+          To add metrics, open <strong>Settings</strong> and use the{' '}
+          <strong>Metrics Catalogue (CSV)</strong> card to upload your catalogue.
+        </p>
         <Link
           to="/settings"
-          className="inline-flex items-center gap-2 mt-5 text-sm bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded"
+          className="inline-flex items-center gap-2 mt-4 text-sm px-4 py-2 rounded"
+          style={{ backgroundColor: '#0d9488', color: '#ffffff' }}
         >
           <Upload size={16} />
           Import a metrics catalogue in Settings
