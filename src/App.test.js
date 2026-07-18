@@ -2,7 +2,12 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { act } from 'react';
 import App from './App';
 
-// Mock react-markdown to avoid ES module issues in Jest
+// Mock react-markdown to avoid ES module issues in Jest.
+// Note: remark-gfm (used by src/components/Markdown.js) is NOT mocked here only
+// because the pages that import Markdown are React.lazy-loaded and this test
+// never navigates to their routes. A future eager import, or a test that visits
+// /findings, /controls, etc., would load real remark-gfm ESM and must mock it
+// too (same reason this mocks react-markdown).
 jest.mock('react-markdown', () => {
   return function ReactMarkdown({ children }) {
     return <div>{children}</div>;

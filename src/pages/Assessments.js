@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 
 // Components
 import FrameworkBadge from '../components/FrameworkBadge';
@@ -1511,11 +1511,11 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
                         {/* Bank-attached procedures are real markdown — render as-is;
                             the reformat helper is only for legacy free-text blobs. */}
-                        <ReactMarkdown>
+                        <Markdown>
                           {(currentObservation.procedureSource
                             ? currentObservation.testProcedures
                             : formatTestProcedures(currentObservation.testProcedures)) || 'No test procedures defined'}
-                        </ReactMarkdown>
+                        </Markdown>
                       </div>
                     )}
                   </div>
@@ -1678,7 +1678,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       />
                     ) : (
                       <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300 max-h-48 overflow-auto">
-                        <ReactMarkdown>{formatInlineMarkdown(currentObservation.quarters?.[selectedQuarter]?.observations) || 'None'}</ReactMarkdown>
+                        <Markdown>{formatInlineMarkdown(currentObservation.quarters?.[selectedQuarter]?.observations) || 'None'}</Markdown>
                       </div>
                     )}
                   </div>

@@ -8,7 +8,7 @@ import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useSort from '../hooks/useSort';
 import EmptyState from '../components/EmptyState';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 import { formatInlineMarkdown } from '../utils/markdownText';
 
 const Findings = () => {
@@ -612,7 +612,7 @@ const Findings = () => {
                   />
                 ) : (
                   <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300">
-                    <ReactMarkdown>{formatInlineMarkdown(selectedFinding?.description) || 'No description provided.'}</ReactMarkdown>
+                    <Markdown>{formatInlineMarkdown(selectedFinding?.description) || 'No description provided.'}</Markdown>
                   </div>
                 )}
               </div>
@@ -634,7 +634,7 @@ const Findings = () => {
                   />
                 ) : (
                   <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300">
-                    <ReactMarkdown>{formatInlineMarkdown(selectedFinding?.rootCause) || 'No root cause documented.'}</ReactMarkdown>
+                    <Markdown>{formatInlineMarkdown(selectedFinding?.rootCause) || 'No root cause documented.'}</Markdown>
                   </div>
                 )}
               </div>
@@ -656,7 +656,7 @@ const Findings = () => {
                   />
                 ) : (
                   <div className="prose prose-sm max-w-none text-sm text-gray-700 dark:text-gray-300">
-                    <ReactMarkdown>{formatInlineMarkdown(selectedFinding?.remediationActionPlan) || 'No remediation plan documented.'}</ReactMarkdown>
+                    <Markdown>{formatInlineMarkdown(selectedFinding?.remediationActionPlan) || 'No remediation plan documented.'}</Markdown>
                   </div>
                 )}
               </div>
