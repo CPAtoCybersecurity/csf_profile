@@ -5,7 +5,7 @@ import {
   Calendar
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 
 // Components
 import UserSelector from '../components/UserSelector';
@@ -528,9 +528,9 @@ const Controls = () => {
                         />
                       ) : (
                         <div className="mt-1 prose prose-sm max-w-none">
-                          <ReactMarkdown>
+                          <Markdown>
                             {currentItem['Implementation Description'] || 'No implementation description'}
-                          </ReactMarkdown>
+                          </Markdown>
                         </div>
                       )}
                     </div>
@@ -683,9 +683,9 @@ const Controls = () => {
                         />
                       ) : (
                         <div className="mt-1 prose prose-sm max-w-none">
-                          <ReactMarkdown>
+                          <Markdown>
                             {getQuarterData(currentItem.ID, selectedQuarter)?.observations || 'No observations documented'}
-                          </ReactMarkdown>
+                          </Markdown>
                         </div>
                       )}
                     </div>
@@ -761,9 +761,9 @@ const Controls = () => {
                         />
                       ) : (
                         <div className="mt-1 prose prose-sm max-w-none">
-                          <ReactMarkdown>
+                          <Markdown>
                             {currentItem['Action Plan'] || 'No action plan documented'}
-                          </ReactMarkdown>
+                          </Markdown>
                         </div>
                       )}
                     </div>

@@ -5,7 +5,7 @@ import {
   Upload, Download, Users, User, ChevronRight
 } from 'lucide-react';
 import toast from 'react-hot-toast';
-import ReactMarkdown from 'react-markdown';
+import Markdown from '../components/Markdown';
 
 // Components
 import FrameworkBadge from '../components/FrameworkBadge';
@@ -829,9 +829,9 @@ const UserControls = () => {
                         />
                       ) : (
                         <div className="mt-1 prose prose-sm max-w-none">
-                          <ReactMarkdown>
+                          <Markdown>
                             {currentControl.implementationDescription || 'No description'}
-                          </ReactMarkdown>
+                          </Markdown>
                         </div>
                       )}
                     </div>
