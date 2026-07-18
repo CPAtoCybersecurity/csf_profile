@@ -85,6 +85,18 @@ export const validateDatabaseExport = (parsed) => {
     counts[key] = value.length;
     presentSections += 1;
   });
+
+  // orgProfile (format 4+) is an OBJECT section, not an array. Format-3 and
+  // older files simply don't carry it — the profile is skipped, not erased.
+  const orgProfileSection = parsed.data.orgProfile;
+  if (orgProfileSection !== undefined) {
+    if (typeof orgProfileSection !== 'object' || Array.isArray(orgProfileSection) || orgProfileSection === null) {
+      errors.push('Section "orgProfile" is not an object.');
+    } else {
+      counts.orgProfile = orgProfileSection.profile ? 1 : 0;
+      presentSections += 1;
+    }
+  }
   if (presentSections === 0) {
     errors.push('Export contains none of the known data sections.');
   }
@@ -172,6 +184,24 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
     // Snapshot the current value so a mid-apply failure can roll back.
     writes.push({ key, setFn, value, previous: storeState[key] });
   });
+
+  // orgProfile (format 4+, object section) rides the same resolve-then-apply
+  // pipeline. Absent in older files → skipped, current profile untouched.
+  if (data.orgProfile !== undefined) {
+    const orgState = stores.orgProfileStore?.getState?.();
+    const setProfileState = orgState?.setProfileState;
+    if (typeof setProfileState !== 'function') {
+      throw new Error('Store "orgProfileStore" is missing setProfileState(); restore aborted before any data was changed.');
+    }
+    writes.push({
+      key: 'orgProfile',
+      setFn: setProfileState,
+      value: data.orgProfile,
+      previous: { profile: orgState.profile, cloudConsent: orgState.cloudConsent }
+    });
+  } else {
+    skipped.push('orgProfile');
+  }
 
   try {
     writes.forEach(({ key, setFn, value }) => {

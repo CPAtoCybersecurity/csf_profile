@@ -5,6 +5,7 @@
  */
 
 import { licenseIsRestricted } from './metricsImport';
+import { getBankProcedure } from './procedureBank';
 
 /**
  * Export format version. Bump when the envelope shape changes and teach
@@ -12,8 +13,11 @@ import { licenseIsRestricted } from './metricsImport';
  * Format 1: legacy `version: '1.0'` exports (no storeVersions, no findings).
  * Format 2: adds formatVersion, storeVersions, and the findings section.
  * Format 3: adds the metrics section (imported metrics catalogues).
+ * Format 4: adds the orgProfile section (object, not array) to COMPLETE
+ *   backups. Share exports NEVER carry it, and tailored procedures are
+ *   swapped back to the pristine community text (see PRIVATE_DATA.md).
  */
-export const EXPORT_FORMAT_VERSION = 3;
+export const EXPORT_FORMAT_VERSION = 4;
 
 // zustand persist keys whose schema versions travel with the export so a
 // restore can detect version drift between the exporting and importing app.
@@ -22,7 +26,8 @@ export const PERSIST_KEYS = {
   frameworks: 'csf-frameworks-storage',
   findings: 'csf-findings-storage',
   requirements: 'csf-requirements-storage',
-  metrics: 'csf-metrics-storage'
+  metrics: 'csf-metrics-storage',
+  orgProfile: 'csf-org-profile-storage'
 };
 
 /**
@@ -62,8 +67,11 @@ export const exportAllDataJSON = (stores) => {
     artifactStore,
     userStore,
     findingsStore,
-    metricsStore
+    metricsStore,
+    orgProfileStore
   } = stores;
+
+  const orgProfileState = orgProfileStore?.getState?.();
 
   const jsonData = {
     exportDate: new Date().toISOString(),
@@ -87,7 +95,12 @@ export const exportAllDataJSON = (stores) => {
       frameworks: frameworksStore?.getState?.()?.frameworks || [],
       artifacts: artifactStore?.getState?.()?.artifacts || [],
       findings: findingsStore?.getState?.()?.findings || [],
-      metrics: metricsStore?.getState?.()?.metrics || []
+      metrics: metricsStore?.getState?.()?.metrics || [],
+      // Object section (not an array): the org profile rides COMPLETE
+      // backups only; buildShareableExport strips it unconditionally.
+      orgProfile: orgProfileState
+        ? { profile: orgProfileState.profile, cloudConsent: orgProfileState.cloudConsent }
+        : { profile: null, cloudConsent: false }
     }
   };
 
@@ -139,11 +152,49 @@ const stripMetricLinks = (assessments, excludedIds) => {
 };
 
 /**
+ * Swap tailored procedures back to the pristine community version. The org
+ * profile is excluded from share exports, but tailoring BAKES profile facts
+ * (org name, systems, crown-jewel references) into observation text — a
+ * derived leak path. Provenance (procedureSource.bankId) makes the fix
+ * deterministic: shared copies get the untailored community markdown. If the
+ * bank entry cannot be resolved, the text is dropped entirely — never leaked.
+ * Copies on write; never mutates store objects.
+ */
+const swapTailoredProcedures = (assessments) =>
+  assessments.map((assessment) => {
+    const observations = assessment.observations;
+    if (!observations || typeof observations !== 'object') return assessment;
+
+    let changed = false;
+    const nextObservations = {};
+    Object.entries(observations).forEach(([itemId, obs]) => {
+      if (obs?.procedureSource?.tailored) {
+        const bankEntry = getBankProcedure(obs.procedureSource.bankId);
+        nextObservations[itemId] = {
+          ...obs,
+          testProcedures: bankEntry ? bankEntry.markdown : '',
+          procedureSource: { ...obs.procedureSource, tailored: false, modified: false }
+        };
+        changed = true;
+      } else {
+        nextObservations[itemId] = obs;
+      }
+    });
+
+    return changed ? { ...assessment, observations: nextObservations } : assessment;
+  });
+
+/**
  * Build a shareable export: the complete-database envelope minus private
  * pack data. The filter is LINEAGE-aware, not tag-only — it drops every
  * assessment that originated from a pack import (including all observations
  * nested inside it, which carry no tags of their own) and every finding that
  * either carries pack provenance or points at a pack-owned assessment.
+ *
+ * The org profile is stripped UNCONDITIONALLY — the include-private opt-in
+ * does not restore it (crown jewels + tooling are never share material).
+ * Tailored procedure text (profile-derived) is swapped back to the pristine
+ * community version by default; include-private keeps the tailored text.
  *
  * @param {Object} stores - Same store map exportAllDataJSON receives
  * @param {Object} [options]
@@ -152,6 +203,9 @@ const stripMetricLinks = (assessments, excludedIds) => {
 export const buildShareableExport = (stores, { includePrivate = false } = {}) => {
   const jsonData = exportAllDataJSON(stores);
   const allMetrics = jsonData.data.metrics || [];
+
+  // Org profile: never in a share export, opt-in or not.
+  delete jsonData.data.orgProfile;
 
   // Restricted-license metric definitions (NC/ND/proprietary — e.g. a CIS
   // catalogue an org uses internally) are HARD-BLOCKED from share exports:
@@ -173,7 +227,9 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   const packAssessmentIds = new Set(
     jsonData.data.assessments.filter((a) => a.source === 'pack').map((a) => a.id)
   );
-  jsonData.data.assessments = jsonData.data.assessments.filter((a) => a.source !== 'pack');
+  jsonData.data.assessments = swapTailoredProcedures(
+    jsonData.data.assessments.filter((a) => a.source !== 'pack')
+  );
   jsonData.data.findings = jsonData.data.findings.filter(
     (f) => f.source !== 'pack' && !packAssessmentIds.has(f.assessmentId)
   );

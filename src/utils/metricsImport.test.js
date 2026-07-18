@@ -63,7 +63,8 @@ const makeStores = ({ metrics = [], assessments = [], findings = [] } = {}) => (
   requirementsStore: { getState: () => ({ requirements: REQUIREMENTS, setRequirements: jest.fn() }) },
   controlsStore: { getState: () => ({ controls: [], setControls: jest.fn() }) },
   artifactStore: { getState: () => ({ artifacts: [], setArtifacts: jest.fn() }) },
-  userStore: { getState: () => ({ users: [], setUsers: jest.fn() }) }
+  userStore: { getState: () => ({ users: [], setUsers: jest.fn() }) },
+  orgProfileStore: { getState: () => ({ profile: null, cloudConsent: false, setProfileState: jest.fn() }) }
 });
 
 const importCsv = (text, stores, slug = 'test-catalog') => {

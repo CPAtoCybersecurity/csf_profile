@@ -27,7 +27,8 @@ const makeStores = (data = SAMPLE) => {
     setFrameworks: jest.fn(),
     setArtifacts: jest.fn(),
     setFindings: jest.fn(),
-    setMetrics: jest.fn()
+    setMetrics: jest.fn(),
+    setProfileState: jest.fn()
   };
   const stores = {
     userStore: { getState: () => ({ users: data.users, setUsers: setters.setUsers }) },
@@ -37,7 +38,8 @@ const makeStores = (data = SAMPLE) => {
     frameworksStore: { getState: () => ({ frameworks: data.frameworks, setFrameworks: setters.setFrameworks }) },
     artifactStore: { getState: () => ({ artifacts: data.artifacts, setArtifacts: setters.setArtifacts }) },
     findingsStore: { getState: () => ({ findings: data.findings, setFindings: setters.setFindings }) },
-    metricsStore: { getState: () => ({ metrics: data.metrics, setMetrics: setters.setMetrics }) }
+    metricsStore: { getState: () => ({ metrics: data.metrics, setMetrics: setters.setMetrics }) },
+    orgProfileStore: { getState: () => ({ profile: null, cloudConsent: false, setProfileState: setters.setProfileState }) }
   };
   return { stores, setters };
 };
