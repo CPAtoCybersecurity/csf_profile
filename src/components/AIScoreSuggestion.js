@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import useAIStore from '../stores/aiStore';
+import { snapScore, CMMI_LEVELS } from '../utils/scoringScale';
 
 /**
  * AIScoreSuggestion Component
@@ -17,7 +18,13 @@ import useAIStore from '../stores/aiStore';
  * />
  */
 
-const SCORING_REFERENCE = `
+const scoringReference = (maxScore) => maxScore === 5
+  ? `
+NIST CSF Assessment Scoring (0-5 CMMI-style maturity scale):
+${CMMI_LEVELS.map(l => `${l.level}: ${l.name} - ${l.description}`).join('\n')}
+Quarter-point scores (e.g. 3.25) indicate partial progress toward the next level.
+`
+  : `
 NIST CSF Assessment Scoring (0-10 scale):
 0-1: Not implemented - No evidence of implementation
 2-3: Initial - Ad-hoc, undocumented, reactive
@@ -25,6 +32,7 @@ NIST CSF Assessment Scoring (0-10 scale):
 6-7: Defined - Documented, implemented, minor gaps
 8-9: Managed - Consistently implemented, measured, improved
 10: Optimized - Best-in-class, continuous improvement, integrated
+Quarter-point scores (e.g. 7.25) are allowed.
 `;
 
 const AIScoreSuggestion = ({
@@ -34,6 +42,7 @@ const AIScoreSuggestion = ({
   currentScore,
   targetScore,
   testProcedures,
+  maxScore = 10,
   onAccept,
   onClose
 }) => {
@@ -49,7 +58,7 @@ const AIScoreSuggestion = ({
 
     const prompt = `You are a NIST CSF assessment expert. Analyze the following audit observation and suggest an appropriate score.
 
-${SCORING_REFERENCE}
+${scoringReference(maxScore)}
 
 CONTROL: ${controlId}
 ${controlDescription ? `DESCRIPTION: ${controlDescription}` : ''}
@@ -63,11 +72,11 @@ TARGET SCORE: ${targetScore || 'Not set'}
 
 Based on the observation text and NIST CSF scoring criteria, provide:
 
-1. **Suggested Score**: [0-10]
+1. **Suggested Score**: [0-${maxScore}, quarter points allowed]
 2. **Confidence**: [High/Medium/Low]
 3. **Rationale**: 2-3 sentences explaining why this score is appropriate
 4. **Gaps Identified**: Bullet points of what's preventing a higher score
-5. **To Improve**: Specific actions to reach target score of ${targetScore || 8}
+5. **To Improve**: Specific actions to reach target score of ${targetScore || Math.round(maxScore * 0.8)}
 
 Be specific and reference the observation text in your rationale.`;
 
@@ -79,9 +88,10 @@ Be specific and reference the observation text in your rationale.`;
         response = await generateWithClaude(prompt, 1500);
       }
 
-      // Parse the response to extract score
-      const scoreMatch = response.match(/Suggested Score[:\s]*(\d+)/i);
-      const suggestedScore = scoreMatch ? parseInt(scoreMatch[1]) : null;
+      // Parse the response to extract score (decimals allowed), then snap
+      // to the nearest quarter point and clamp to the scale (issue #277)
+      const scoreMatch = response.match(/Suggested Score[:\s*]*\[?(\d+(?:\.\d+)?)/i);
+      const suggestedScore = scoreMatch ? snapScore(parseFloat(scoreMatch[1]), maxScore) : null;
 
       setSuggestion({
         text: response,

@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify';
+import { getScoringScale, CMMI_LEVELS } from './scoringScale';
 
 // CSF function order and display names
 const FUNCTION_ORDER = ['GOVERN (GV)', 'IDENTIFY (ID)', 'PROTECT (PR)', 'DETECT (DE)', 'RESPOND (RS)', 'RECOVER (RC)'];
@@ -117,17 +118,25 @@ const ratingBadge = (rating) => {
 };
 
 /**
- * Format a numeric score to one decimal place
+ * Format a numeric score to one decimal place; quarter-point scores
+ * (x.25 / x.75) keep two decimals so 7.25 doesn't render as 7.3.
  */
 const formatScore = (value) => {
   if (value === null || value === undefined || isNaN(value)) return '0.0';
-  return Number(value).toFixed(1);
+  const num = Number(value);
+  return (num * 4) % 2 !== 0 ? num.toFixed(2) : num.toFixed(1);
 };
 
 /**
- * Map a maturity score (1-10 scale) to a label
+ * Map a maturity score to a label on the assessment's scale (issue #277).
+ * 10-point keeps the classic bands unchanged; 5-point uses CMMI-style
+ * level names (a score is at level N until it reaches N+1).
  */
-const scoreToMaturityLabel = (score) => {
+const scoreToMaturityLabel = (score, scale = 10) => {
+  if (scale === 5) {
+    const level = Math.min(5, Math.max(0, Math.floor(Number(score) || 0)));
+    return CMMI_LEVELS[level].name;
+  }
   if (score < 2) return 'Insecurity';
   if (score < 5) return 'Some Security';
   if (score < 6) return 'Minimally Acceptable';
@@ -191,6 +200,9 @@ export const generateAuditReportMarkdown = ({
   }
 }) => {
   const quarterKey = `Q${selectedQuarter}`;
+  // Scoring scale for this assessment: 10 (default) or 5-point CMMI-style (issue #277)
+  const scoringScale = getScoringScale(assessment);
+  const scaleRatio = scoringScale / 10;
 
   // ── Step 1: Build requirement lookup ──────────────────────────────────
   const requirementLookup = new Map();
@@ -284,7 +296,7 @@ export const generateAuditReportMarkdown = ({
   const controlsMeetingTarget = controlData.filter(cd => cd.actualScore >= cd.targetScore).length;
   const controlsBelowTarget = totalControls - controlsMeetingTarget;
 
-  const overallMaturity = scoreToMaturityLabel(overallActual);
+  const overallMaturity = scoreToMaturityLabel(overallActual, scoringScale);
 
   // ── Step 6: Compute overall assessment rating ────────────────────────
   const functionsWithData = FUNCTION_ORDER.filter(fn => functionAggregates[fn].count > 0);
@@ -423,7 +435,7 @@ Based on our assessment of ${totalControls} control implementations across all s
 
 | Metric | Value |
 |---|---|
-| **Overall Maturity Score** | ${formatScore(overallActual)} / 10.0 (${overallMaturity}) |
+| **Overall Maturity Score** | ${formatScore(overallActual)} / ${scoringScale}.0 (${overallMaturity}) |
 | **Controls Meeting Target** | ${controlsMeetingTarget} of ${totalControls} (${totalControls > 0 ? ((controlsMeetingTarget / totalControls) * 100).toFixed(0) : 0}%) |
 | **Controls Below Target** | ${controlsBelowTarget} of ${totalControls} |
 | **Critical Findings** | ${findingsByCriticality.Critical} |
@@ -483,7 +495,7 @@ This assessment evaluated ${sanitize(organizationName)}'s implementation of the 
   scopeSection += `
 ### Scoring Framework
 
-Controls were evaluated on a 1-10 scale. See [Appendix B](#appendix-b-assessment-criteria-and-rating-definitions) for full scoring definitions.
+Controls were evaluated on a ${scoringScale === 5 ? '0-5 CMMI-style' : '1-10'} scale. See [Appendix B](#appendix-b-assessment-criteria-and-rating-definitions) for full scoring definitions.
 
 ### Methodology
 
@@ -501,12 +513,12 @@ Assessment procedures included:
 
 ### Current Maturity Profile
 
-The organization's overall cybersecurity maturity is assessed at **${overallMaturity}** (${formatScore(overallActual)} / 10.0).
+The organization's overall cybersecurity maturity is assessed at **${overallMaturity}** (${formatScore(overallActual)} / ${scoringScale}.0).
 
 | Dimension | Average Score | Maturity Level |
 |---|---|---|
-| Governance (GV) | ${formatScore(govAgg.avgActual)} | ${scoreToMaturityLabel(govAgg.avgActual)} |
-| Operations (ID, PR, DE, RS, RC) | ${formatScore(opsAvg)} | ${scoreToMaturityLabel(opsAvg)} |
+| Governance (GV) | ${formatScore(govAgg.avgActual)} | ${scoreToMaturityLabel(govAgg.avgActual, scoringScale)} |
+| Operations (ID, PR, DE, RS, RC) | ${formatScore(opsAvg)} | ${scoreToMaturityLabel(opsAvg, scoringScale)} |
 | **Overall** | **${formatScore(overallActual)}** | **${overallMaturity}** |
 
 ### Governance vs Operations Gap Analysis
@@ -655,8 +667,8 @@ The organization's overall cybersecurity maturity is assessed at **${overallMatu
       const scoreBg = gapCellColor(cd.actualScore, cd.targetScore);
       const scoreTc = gapTextColor(cd.actualScore, cd.targetScore);
       const gapVal = cd.gap;
-      const gapBg = gapVal <= 0 ? '#dcfce7' : gapVal < 2 ? '#fef3c7' : '#fee2e2';
-      const gapTc = gapVal <= 0 ? '#16a34a' : gapVal < 2 ? '#d97706' : '#dc2626';
+      const gapBg = gapVal <= 0 ? '#dcfce7' : gapVal < 2 * scaleRatio ? '#fef3c7' : '#fee2e2';
+      const gapTc = gapVal <= 0 ? '#16a34a' : gapVal < 2 * scaleRatio ? '#d97706' : '#dc2626';
       appendixA += `<tr style="background:${rowBg}"><td style="padding:4px 10px;border-bottom:1px solid #e5e7eb;font-family:monospace;font-size:13px">${sanitize(cd.controlId)}</td><td style="padding:4px 10px;text-align:center;border-bottom:1px solid #e5e7eb;color:${scoreTc};font-weight:600">${formatScore(cd.actualScore)}</td><td style="padding:4px 10px;text-align:center;border-bottom:1px solid #e5e7eb">${formatScore(cd.targetScore)}</td><td style="padding:4px 10px;text-align:center;border-bottom:1px solid #e5e7eb;background:${gapBg};color:${gapTc};font-weight:600">${formatScore(cd.gap)}</td></tr>\n`;
     });
 
@@ -686,7 +698,13 @@ The organization's overall cybersecurity maturity is assessed at **${overallMatu
 | **Needs Improvement** | Function average score is at least 70% of the target but below full target. Controls are partially effective with identified gaps. |
 | **Unsatisfactory** | Function average score is below 70% of the target. Controls have significant deficiencies requiring immediate attention. |
 
-### Scoring Scale (1-10)
+${scoringScale === 5 ? `### Scoring Scale (0-5, CMMI-style)
+
+| Score | Level | Description |
+|---|---|---|
+${CMMI_LEVELS.map(l => `| ${l.level} | ${l.name} | ${l.description} |`).join('\n')}
+
+Quarter-point scores (e.g. 3.25) indicate partial progress toward the next level.` : `### Scoring Scale (1-10)
 
 | Score | Level | How Secure? |
 |---|---|---|
@@ -695,7 +713,7 @@ The organization's overall cybersecurity maturity is assessed at **${overallMatu
 | 5.0 - 5.9 | Minimally Acceptable | Organization does this consistently, with some minor flaws. Just right. |
 | 6.1 - 6.9 | Optimized | Organization does this consistently, with great effectiveness and high quality. Just right. |
 | 7.0 - 7.9 | Fully Optimized | Organization does this consistently, with fully optimized effectiveness and quality. Just right. |
-| 8.1 - 10.0 | Too Much Security (Waste) | Organization does this at excessive financial cost. People can't easily get their work done. |
+| 8.1 - 10.0 | Too Much Security (Waste) | Organization does this at excessive financial cost. People can't easily get their work done. |`}
 
 ---`);
 

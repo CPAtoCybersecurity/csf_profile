@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ClipboardList } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
+import { getScoringScale } from '../utils/scoringScale';
 import {
   RadarChart,
   PolarGrid,
@@ -165,6 +166,9 @@ const Dashboard = () => {
     return assessments.find(a => a.id === selectedAssessmentId);
   }, [assessments, selectedAssessmentId]);
 
+  // Scoring scale of the selected assessment (10 default, 5 CMMI-style) — issue #277
+  const scoringScale = getScoringScale(selectedAssessment);
+
   // Chart colors based on theme
   const chartColors = {
     text: darkMode ? '#e5e7eb' : '#374151',
@@ -290,7 +294,7 @@ const Dashboard = () => {
 
   // Calculate bar chart data for functions (Actual + Gap to Target)
   const functionBarChartData = useMemo(() => {
-    if (!pivotTableData || pivotTableData.length === 0) return { data: [], maxTarget: 5 };
+    if (!pivotTableData || pivotTableData.length === 0) return { data: [], maxTarget: scoringScale / 2 };
 
     const quarterKey = `Q${selectedQuarter}`;
     const actualKey = `${quarterKey}Actual`;
@@ -312,8 +316,8 @@ const Dashboard = () => {
       };
     });
 
-    return { data: chartData, maxTarget: maxTarget || 5 };
-  }, [pivotTableData, selectedQuarter]);
+    return { data: chartData, maxTarget: maxTarget || scoringScale / 2 };
+  }, [pivotTableData, selectedQuarter, scoringScale]);
 
   // Calculate subcategory (Category ID) data for the selected quarter
   const subcategoryData = useMemo(() => {
@@ -724,7 +728,7 @@ const Dashboard = () => {
                       </td>
                       <td className="border border-gray-200 px-3 py-3 text-center">
                         {q1Variance !== null ? (
-                          <span className={`font-semibold ${q1Variance >= 0 ? 'text-green-600' : q1Variance >= -1 ? 'text-amber-600' : 'text-red-600'}`}>
+                          <span className={`font-semibold ${q1Variance >= 0 ? 'text-green-600' : q1Variance >= -1 * (scoringScale / 10) ? 'text-amber-600' : 'text-red-600'}`}>
                             {q1Variance >= 0 ? '+' : ''}{formatScore(q1Variance)}
                           </span>
                         ) : (
@@ -750,7 +754,7 @@ const Dashboard = () => {
                       </td>
                       <td className="border border-gray-200 px-3 py-3 text-center">
                         {q2Variance !== null ? (
-                          <span className={`font-semibold ${q2Variance >= 0 ? 'text-green-600' : q2Variance >= -1 ? 'text-amber-600' : 'text-red-600'}`}>
+                          <span className={`font-semibold ${q2Variance >= 0 ? 'text-green-600' : q2Variance >= -1 * (scoringScale / 10) ? 'text-amber-600' : 'text-red-600'}`}>
                             {q2Variance >= 0 ? '+' : ''}{formatScore(q2Variance)}
                           </span>
                         ) : (
@@ -776,7 +780,7 @@ const Dashboard = () => {
                       </td>
                       <td className="border border-gray-200 px-3 py-3 text-center">
                         {q3Variance !== null ? (
-                          <span className={`font-semibold ${q3Variance >= 0 ? 'text-green-600' : q3Variance >= -1 ? 'text-amber-600' : 'text-red-600'}`}>
+                          <span className={`font-semibold ${q3Variance >= 0 ? 'text-green-600' : q3Variance >= -1 * (scoringScale / 10) ? 'text-amber-600' : 'text-red-600'}`}>
                             {q3Variance >= 0 ? '+' : ''}{formatScore(q3Variance)}
                           </span>
                         ) : (
@@ -802,7 +806,7 @@ const Dashboard = () => {
                       </td>
                       <td className="border border-gray-200 px-3 py-3 text-center">
                         {q4Variance !== null ? (
-                          <span className={`font-semibold ${q4Variance >= 0 ? 'text-green-600' : q4Variance >= -1 ? 'text-amber-600' : 'text-red-600'}`}>
+                          <span className={`font-semibold ${q4Variance >= 0 ? 'text-green-600' : q4Variance >= -1 * (scoringScale / 10) ? 'text-amber-600' : 'text-red-600'}`}>
                             {q4Variance >= 0 ? '+' : ''}{formatScore(q4Variance)}
                           </span>
                         ) : (
@@ -847,7 +851,7 @@ const Dashboard = () => {
                       interval={0}
                     />
                     <YAxis
-                      domain={[0, 10]}
+                      domain={[0, scoringScale]}
                       tick={{ fontSize: 11, fill: chartColors.text }}
                       tickLine={false}
                       axisLine={false}
@@ -972,7 +976,7 @@ const Dashboard = () => {
                             const totalVariance = +(grandTotals.actualScore - grandTotals.desiredTarget).toFixed(1);
                             return (
                               <span className={`${
-                                totalVariance >= 0 ? 'text-green-600' : totalVariance >= -1 ? 'text-amber-600' : 'text-red-600'
+                                totalVariance >= 0 ? 'text-green-600' : totalVariance >= -1 * (scoringScale / 10) ? 'text-amber-600' : 'text-red-600'
                               }`}>
                                 {totalVariance >= 0 ? '+' : ''}{formatScore(totalVariance)}
                               </span>
@@ -1008,7 +1012,7 @@ const Dashboard = () => {
                       />
                       <PolarRadiusAxis
                         angle={90}
-                        domain={[0, 10]}
+                        domain={[0, scoringScale]}
                         tick={{ fontSize: 10, fill: chartColors.text }}
                         tickCount={6}
                       />
@@ -1160,7 +1164,7 @@ const Dashboard = () => {
                     tickLine={false}
                   />
                   <YAxis
-                    domain={[0, 7]}
+                    domain={[0, scoringScale]}
                     tick={{ fontSize: 11, fill: chartColors.text }}
                     tickLine={false}
                     axisLine={false}
@@ -1289,15 +1293,15 @@ const Dashboard = () => {
             <tbody>
               {priorityGaps.map((row, index) => {
                 let scoreClass;
-                if (row.priorityScore >= 3.0) {
+                if (row.priorityScore >= 3.0 * (scoringScale / 10)) {
                   scoreClass = darkMode
                     ? 'text-red-400 bg-red-900/30'
                     : 'text-red-600 bg-red-50';
-                } else if (row.priorityScore >= 2.0) {
+                } else if (row.priorityScore >= 2.0 * (scoringScale / 10)) {
                   scoreClass = darkMode
                     ? 'text-orange-400 bg-orange-900/30'
                     : 'text-orange-600 bg-orange-50';
-                } else if (row.priorityScore >= 1.0) {
+                } else if (row.priorityScore >= 1.0 * (scoringScale / 10)) {
                   scoreClass = darkMode
                     ? 'text-yellow-400 bg-yellow-900/30'
                     : 'text-yellow-600 bg-yellow-50';

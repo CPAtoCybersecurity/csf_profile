@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
+import { CMMI_LEVELS } from '../utils/scoringScale';
 
 const ScoringLegend = () => {
   const [legendData, setLegendData] = useState([]);
@@ -145,6 +146,34 @@ const ScoringLegend = () => {
       </div>
 
       <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Mastering Cyber Resilience by AKYLADE</p>
+
+      <h1 className="text-2xl font-bold mb-4 mt-4">5-Point Maturity Scale (CMMI-Style)</h1>
+      <div className="bg-white p-4 rounded-lg shadow-sm border overflow-x-auto">
+        <p className="text-sm text-gray-700 mb-4">
+          Assessments created with the 5-point scale use CMMI-style maturity levels (0&ndash;5), as popularized
+          for CSF assessments by the NIST CSF Maturity Toolkit. Both scales support quarter-point precision
+          (e.g. 3.25 indicates partial progress toward the next level). The scale is chosen when an assessment
+          is created and locked afterward.
+        </p>
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {CMMI_LEVELS.map((level) => (
+              <tr key={level.level}>
+                <td className="p-3 text-sm font-medium">{level.level}</td>
+                <td className="p-3 text-sm">{level.name}</td>
+                <td className="p-3 text-sm">{level.description}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <h1 className="text-2xl font-bold mb-4 mt-4">NIST SP 800-53A Assessment Methods</h1>
       <div className="bg-white p-4 rounded-lg shadow-sm border">

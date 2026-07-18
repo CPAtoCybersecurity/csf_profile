@@ -150,6 +150,58 @@ describe('importCompleteDatabase safety semantics', () => {
     expect(written.some(a => a.id === 'ASM-audit-2025-alma')).toBe(true);
   });
 
+  test('a v9 export (no scoringScale) restores with scale 10 stamped; scores untouched (issue #277)', () => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: 9 },
+      data: {
+        assessments: [{
+          id: 'ASM-v9',
+          name: 'Pre-scale export',
+          scopeType: 'requirements',
+          scopeIds: ['GV.SC-04 Ex1'],
+          observations: {
+            'GV.SC-04 Ex1': { quarters: { Q1: { actualScore: 7.5, targetScore: 9 } } }
+          }
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-v9');
+    expect(restored.scoringScale).toBe(10);
+    expect(restored.observations['GV.SC-04 Ex1'].quarters.Q1.actualScore).toBe(7.5);
+    expect(restored.observations['GV.SC-04 Ex1'].quarters.Q1.targetScore).toBe(9);
+  });
+
+  test('a 5-point assessment keeps its scale through restore (issue #277)', () => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: 9 },
+      data: {
+        assessments: [{
+          id: 'ASM-cmmi',
+          name: 'CMMI-scale assessment',
+          scopeType: 'requirements',
+          scoringScale: 5,
+          scopeIds: ['GV.SC-04 Ex1'],
+          observations: {
+            'GV.SC-04 Ex1': { quarters: { Q1: { actualScore: 3.25, targetScore: 4 } } }
+          }
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-cmmi');
+    expect(restored.scoringScale).toBe(5);
+    expect(restored.observations['GV.SC-04 Ex1'].quarters.Q1.actualScore).toBe(3.25);
+  });
+
   test('a mid-apply setter failure rolls back every already-applied section', () => {
     const { stores, setters } = makeStores();
     // users applies first, then findings throws

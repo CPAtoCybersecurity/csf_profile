@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import { getScoringScale, CMMI_LEVELS } from './scoringScale';
 
 // CSF function order for consistent display
 const FUNCTION_ORDER = [
@@ -37,9 +38,15 @@ const normalizeFunctionName = (func) => {
 };
 
 /**
- * Map a maturity score (0-7 scale) to a label.
+ * Map a maturity score to a label. Thresholds were authored on the
+ * 10-point scale era and stay unchanged for it; the 5-point CMMI-style
+ * scale uses its level names directly (issue #277).
  */
-const scoreToLabel = (score) => {
+const scoreToLabel = (score, scale = 10) => {
+  if (scale === 5) {
+    const level = Math.min(5, Math.max(0, Math.floor(Number(score) || 0)));
+    return CMMI_LEVELS[level].name;
+  }
   if (score < 1) return 'Initial';
   if (score < 3) return 'Developing';
   if (score < 5) return 'Managed';
@@ -47,13 +54,14 @@ const scoreToLabel = (score) => {
 };
 
 /**
- * Return an RGB color array based on gap size.
- * Green: gap <= 0, Yellow: gap < 2, Red: gap >= 2
+ * Return an RGB color array based on gap size, proportional to the scale
+ * (on the 10-point scale: green <= 0, yellow < 2, red >= 2).
  */
-const gapColor = (gap) => {
-  if (gap <= 0) return [34, 197, 94];    // green-500
-  if (gap < 2)  return [234, 179, 8];   // yellow-500
-  return [239, 68, 68];                 // red-500
+const gapColor = (gap, scale = 10) => {
+  const ratio = scale / 10;
+  if (gap <= 0) return [34, 197, 94];              // green-500
+  if (gap < 2 * ratio) return [234, 179, 8];       // yellow-500
+  return [239, 68, 68];                            // red-500
 };
 
 /**
@@ -106,6 +114,8 @@ export const generateExecutiveSummary = ({
   // ─── Build Data ──────────────────────────────────────────────────────────────
 
   const { scopeIds, observations } = assessment;
+  // Scoring scale for this assessment: 10 (default) or 5-point CMMI-style (issue #277)
+  const scale = getScoringScale(assessment);
 
   // Build a lookup: requirementId → function name
   const reqLookup = new Map();
@@ -248,7 +258,7 @@ export const generateExecutiveSummary = ({
   doc.setFontSize(13);
   doc.setFont('helvetica', 'bold');
   doc.text(
-    `Overall Maturity Score: ${overallActual} / 7.0  —  ${scoreToLabel(overallActual)}`,
+`Overall Maturity Score: ${overallActual} / ${scale}.0  —  ${scoreToLabel(overallActual, scale)}`,
     pageWidth / 2,
     curY + 9,
     { align: 'center' }
@@ -258,7 +268,7 @@ export const generateExecutiveSummary = ({
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(37, 99, 235); // blue-600
   doc.text(
-    `Target: ${overallTarget} / 7.0  |  Gap to target: ${Math.max(0, overallTarget - overallActual).toFixed(1)}  |  ${items.length} items in scope`,
+    `Target: ${overallTarget} / ${scale}.0  |  Gap to target: ${Math.max(0, overallTarget - overallActual).toFixed(1)}  |  ${items.length} items in scope`,
     pageWidth / 2,
     curY + 17,
     { align: 'center' }
@@ -304,7 +314,7 @@ export const generateExecutiveSummary = ({
       if (data.section === 'body' && data.column.index === 3) {
         const gapVal = parseFloat(data.cell.raw);
         if (!isNaN(gapVal)) {
-          const [r, g, b] = gapColor(gapVal);
+          const [r, g, b] = gapColor(gapVal, scale);
           doc.setFillColor(r, g, b);
           doc.setTextColor(255, 255, 255);
           const { x, y, width, height } = data.cell;
@@ -507,12 +517,16 @@ export const generateExecutiveSummary = ({
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(100, 116, 139); // slate-500
   doc.text(
-    'Maturity Scale: 0-1 Initial  |  1-3 Developing  |  3-5 Managed  |  5-7 Optimized',
+    scale === 5
+      ? 'Maturity Scale (CMMI-style): 0 Not Performed | 1 Initial | 2 Repeatable | 3 Defined | 4 Managed | 5 Optimizing'
+      : 'Maturity Scale: 0-1 Initial  |  1-3 Developing  |  3-5 Managed  |  5-7 Optimized',
     marginL,
     curY
   );
   doc.text(
-    'Gap Color: Green (<=0, on/above target)  |  Yellow (<2, minor gap)  |  Red (>=2, significant gap)',
+    scale === 5
+      ? 'Gap Color: Green (<=0, on/above target)  |  Yellow (<1, minor gap)  |  Red (>=1, significant gap)'
+      : 'Gap Color: Green (<=0, on/above target)  |  Yellow (<2, minor gap)  |  Red (>=2, significant gap)',
     marginL,
     curY + 5
   );

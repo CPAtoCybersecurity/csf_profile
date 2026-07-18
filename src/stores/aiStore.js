@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { getScoringScale } from '../utils/scoringScale';
 
 /**
  * AI Assistant Store
@@ -234,6 +235,9 @@ const useAIStore = create(
         set({ isAnalyzing: true, analysisError: null });
 
         try {
+          // Severity thresholds are proportional to the assessment's scoring
+          // scale (>=3 critical / >=2 high on the 10-point scale) — issue #277
+          const gapRatio = getScoringScale(assessmentData) / 10;
           // Extract gaps (controls where actual < target)
           const gaps = [];
           for (const [controlId, observation] of Object.entries(assessmentData.observations || {})) {
@@ -248,8 +252,8 @@ const useAIStore = create(
                 observations: q1.observations,
                 description: control?.description || '',
                 function: controlId.split('.')[0],
-                severity: (q1.targetScore - q1.actualScore) >= 3 ? 'critical' :
-                  (q1.targetScore - q1.actualScore) >= 2 ? 'high' : 'medium'
+                severity: (q1.targetScore - q1.actualScore) >= 3 * gapRatio ? 'critical' :
+                  (q1.targetScore - q1.actualScore) >= 2 * gapRatio ? 'high' : 'medium'
               });
             }
           }
