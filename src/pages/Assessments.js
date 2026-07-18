@@ -27,6 +27,9 @@ import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
+import { tailorMarkdown, canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance } from '../utils/procedureTailor';
+import useOrgProfileStore from '../stores/orgProfileStore';
+import OrgProfileWizard from '../components/OrgProfileWizard';
 
 // File upload security configuration
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -128,6 +131,14 @@ const Assessments = () => {
   const [scopeFilterText, setScopeFilterText] = useState('');
   const [useBankProcedures, setUseBankProcedures] = useState(true);
   const [showBankPreview, setShowBankPreview] = useState(false);
+  const [tailorWithProfile, setTailorWithProfile] = useState(false);
+  const [showProfileWizard, setShowProfileWizard] = useState(false);
+  const [isTailoringItem, setIsTailoringItem] = useState(false);
+
+  // Org profile (optional) — powers deterministic + AI tailoring
+  const orgProfile = useOrgProfileStore((s) => s.profile);
+  const hasOrgProfile = useOrgProfileStore((s) => s.hasProfile)();
+  const cloudConsent = useOrgProfileStore((s) => s.cloudConsent);
   const [generateTestProcedures, setGenerateTestProcedures] = useState(false);
   const [isGeneratingProcedures, setIsGeneratingProcedures] = useState(false);
   const [generatedProcedures, setGeneratedProcedures] = useState({});
@@ -548,6 +559,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setScopeFilterText('');
     setUseBankProcedures(true);
     setShowBankPreview(false);
+    setTailorWithProfile(false);
     setGenerateTestProcedures(false);
     setIsGeneratingProcedures(false);
     setGeneratedProcedures({});
@@ -581,9 +593,15 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       // provenance) for every covered item; AI/manual fills the gaps.
       const bankEntry = useBankProcedures ? getBankProcedure(itemId) : null;
       if (bankEntry) {
+        // Optional deterministic tailoring: substitute the org's name for
+        // the case study's "Alma Security". Tailored text carries the
+        // tailored flag so share export can swap back to pristine.
+        const { text, tailored } = tailorWithProfile && orgProfile
+          ? tailorMarkdown(bankEntry.markdown, orgProfile)
+          : { text: bankEntry.markdown, tailored: false };
         updateObservation(created.id, itemId, {
-          testProcedures: bankEntry.markdown,
-          procedureSource: buildProcedureSource(bankEntry.bankId)
+          testProcedures: text,
+          procedureSource: { ...buildProcedureSource(bankEntry.bankId), tailored }
         });
       } else if (generatedProcedures[itemId]) {
         updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
@@ -608,7 +626,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setCurrentAssessmentId(created.id);
     setView('scope');
     toast.success(`Assessment "${created.name}" created with ${selectedScopeItems.size} items`);
-  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
+  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, tailorWithProfile, orgProfile, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
 
   const handleSelectAssessment = useCallback((assessment) => {
     setCurrentAssessmentId(assessment.id);
@@ -686,6 +704,49 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     });
     toast.success(`Community procedure for ${entry.bankId} attached`);
   }, [currentAssessmentId, selectedItemId, updateObservation]);
+
+  // AI-tailor the selected item's procedure with the org profile.
+  // Consent gate: the profile never goes to a CLOUD provider without the
+  // explicit stored opt-in; local Ollama needs none.
+  const handleTailorWithAI = useCallback(async (currentText) => {
+    if (!currentAssessmentId || !selectedItemId) return;
+    if (!hasOrgProfile) {
+      toast.error('Set up your organization profile first (Settings → Organization profile).');
+      return;
+    }
+    if (!canUseProfileWithProvider(llmProvider, cloudConsent)) {
+      toast.error(
+        'Sending your org profile to a cloud AI provider requires consent — enable it in ' +
+        'Settings → Organization profile, or switch the AI provider to local Ollama.',
+        { duration: 8000 }
+      );
+      return;
+    }
+    if (!isAIReady) {
+      toast.error('AI provider is not ready.');
+      return;
+    }
+
+    setIsTailoringItem(true);
+    try {
+      const prompt = buildTailorPrompt(currentText, orgProfile);
+      const response = llmProvider === 'ollama'
+        ? await generateWithOllama(prompt, 2500)
+        : await generateWithClaude(prompt, 2500);
+      const existing = getObservation(currentAssessmentId, selectedItemId);
+      // ALWAYS stamp tailored provenance — an untagged tailored procedure
+      // would bypass the share-export pristine swap and leak profile facts.
+      updateObservation(currentAssessmentId, selectedItemId, {
+        testProcedures: response,
+        procedureSource: tailoredProvenance(existing?.procedureSource, selectedItemId)
+      });
+      toast.success('Procedure tailored to your organization');
+    } catch (error) {
+      console.error('Tailor error:', error);
+      toast.error('Tailoring failed — the original text is unchanged.');
+    }
+    setIsTailoringItem(false);
+  }, [currentAssessmentId, selectedItemId, hasOrgProfile, llmProvider, cloudConsent, isAIReady, orgProfile, generateWithOllama, generateWithClaude, getObservation, updateObservation]);
 
   const handleQuarterlyChange = useCallback((field, value) => {
     if (!currentAssessmentId || !selectedItemId) return;
@@ -1394,8 +1455,26 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                             {currentObservation.procedureSource.modified ? 'Community · customized' : 'Community'}
                           </span>
                         )}
+                        {currentObservation.procedureSource?.tailored && currentObservation.procedureSource?.bank !== 'community' && (
+                          <span className="px-1.5 py-0.5 rounded text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
+                            Tailored to your org
+                          </span>
+                        )}
                       </label>
                       <div className="flex items-center gap-3">
+                        {editMode && hasOrgProfile && currentObservation.testProcedures && (
+                          <button
+                            type="button"
+                            onClick={() => handleTailorWithAI(currentObservation.testProcedures)}
+                            disabled={isTailoringItem}
+                            className="text-xs text-amber-700 dark:text-amber-400 flex items-center gap-1 hover:underline disabled:opacity-50"
+                            title="Rewrite this procedure for your organization using AI (profile-aware; cloud providers require consent)"
+                          >
+                            {isTailoringItem
+                              ? (<><Loader2 size={12} className="animate-spin" /> Tailoring…</>)
+                              : (<><Sparkles size={12} /> Tailor with AI</>)}
+                          </button>
+                        )}
                         {editMode && getBankProcedure(selectedItemId) && (
                           <button
                             type="button"
@@ -2140,7 +2219,54 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     )}
                   </div>
 
-                  {/* Card 2: AI generation — optional, targets the gaps */}
+                  {/* Card 2: tailor to the organization (optional, needs profile) */}
+                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Settings size={20} className="text-amber-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-amber-900 dark:text-amber-200">Tailor to your organization (optional)</h4>
+                        {hasOrgProfile ? (
+                          <>
+                            <label className="flex items-center gap-2 mt-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={tailorWithProfile}
+                                onChange={(e) => setTailorWithProfile(e.target.checked)}
+                                className="w-4 h-4 rounded"
+                                disabled={!useBankProcedures}
+                              />
+                              <span className="text-sm text-amber-900 dark:text-amber-200">
+                                Substitute my organization's name into attached procedures
+                              </span>
+                            </label>
+                            <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
+                              Uses your saved profile{orgProfile?.orgName ? ` (${orgProfile.orgName})` : ''} —{' '}
+                              <button type="button" className="underline" onClick={() => setShowProfileWizard(true)}>edit</button>.
+                              Per-item AI tailoring is available on each requirement after creation.
+                              {!useBankProcedures && ' (Enable community procedures above to tailor them.)'}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <p className="text-sm text-amber-800 dark:text-amber-300 mt-1">
+                              Answer a few optional questions (business type, size, systems, security
+                              tools, crown jewels) and procedures adapt to your environment. Skippable —
+                              you can set this up any time.
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => setShowProfileWizard(true)}
+                              className="mt-2 px-3 py-1.5 text-sm border border-amber-400 text-amber-800 dark:text-amber-300 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40"
+                            >
+                              Set up org profile (~2 min)
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Card 3: AI generation — optional, targets the gaps */}
                   <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <Bot size={24} className="text-purple-600 mt-0.5" />
@@ -2448,6 +2574,10 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             </div>
           </div>
         </div>
+      )}
+
+      {showProfileWizard && (
+        <OrgProfileWizard onClose={() => setShowProfileWizard(false)} />
       )}
     </div>
   );

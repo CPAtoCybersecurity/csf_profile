@@ -96,6 +96,41 @@ metric_id,name,type,csf_subcategory_ids,description,formula,unit,target,directio
   include-private opt-in does not override it, because redistributing such content would
   violate its license. Backup exports (your own machine) always include everything.
 
+## Organization profile — private data too
+
+The optional organization profile (Settings → Organization Profile: business type, size,
+key systems, security tools, **crown jewels**) is the most sensitive record the app holds —
+the crown-jewel list plus your tooling reads like an attacker's shopping list. Its handling:
+
+- **Lives only in this browser's localStorage** (`csf-org-profile-storage`). Never in the repo,
+  never uploaded anywhere by the app.
+- **Never in shareable exports — unconditionally.** The include-private opt-in restores pack
+  data, but NOT the profile.
+- **The derived-text leak path is closed too.** Tailoring bakes profile facts (org name,
+  crown-jewel references) into procedure text on observations. Shared exports swap every
+  tailored procedure back to the **pristine community version** using its provenance
+  (`procedureSource.bankId`); if the bank entry can't be resolved, the text is dropped, never
+  leaked. Only the include-private opt-in keeps tailored text.
+- **Complete backups DO carry it** (that is their job — restore must round-trip your setup).
+  Password-protect backup files that carry a profile.
+- **Cloud AI consent gate.** Profile text goes to the local Ollama provider freely (nothing
+  leaves your machine). Sending it to a cloud provider (Claude API) requires the explicit
+  consent checkbox in Settings — off by default, and stored consent can be revoked any time.
+- **Own-data exports are NOT scrubbed.** The assessment CSV exports, Jira CSVs, and
+  "Export Assessments Only" JSON are your-own-data files: they keep tailored procedure text
+  as-is (that is what makes them useful to you). The scrubbed artifact is the **Share
+  export** only — hand people `csf_share_*.json`, not a CSV, when org context must stay out.
+
+### Procedure provenance and staleness (v1 non-goal)
+
+Attached community procedures are **copies** (`copy-on-attach`) with a provenance object:
+`procedureSource: { bank, bankId, bankVersion, attachedAt, modified, tailored }`. When the
+community bank ships a corrected procedure, already-attached copies are NOT auto-updated —
+`bankVersion` and `modified` exist for auditability and the share-export swap, not for
+re-sync. The manual refresh affordance is **Reset to community version** on the requirement's
+detail panel; `modified` is what makes a future safe re-sync possible without clobbering
+user edits.
+
 ## Sharing safely
 
 The Settings export card offers two intents:

@@ -32,6 +32,8 @@ import useUserStore from '../stores/userStore';
 import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
 import useMetricsStore from '../stores/metricsStore';
+import useOrgProfileStore from '../stores/orgProfileStore';
+import OrgProfileWizard from '../components/OrgProfileWizard';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON, exportShareableDatabase } from '../utils/dataExport';
@@ -81,6 +83,13 @@ const Settings = () => {
   // Local state
   const [editingFramework, setEditingFramework] = useState(null);
   const [backupFrequency, setBackupFrequency] = useState(getBackupReminderFrequency());
+  const [showOrgProfileWizard, setShowOrgProfileWizard] = useState(false);
+
+  // Organization profile (optional tailoring input; never in share exports)
+  const orgProfileSet = useOrgProfileStore((s) => s.hasProfile)();
+  const orgCloudConsent = useOrgProfileStore((s) => s.cloudConsent);
+  const setOrgCloudConsent = useOrgProfileStore((s) => s.setCloudConsent);
+  const clearOrgProfile = useOrgProfileStore((s) => s.clearProfile);
 
   // Atlassian configuration state
   const [atlassianSiteUrl, setAtlassianSiteUrl] = useState('');
@@ -273,7 +282,8 @@ const Settings = () => {
         artifactStore: useArtifactStore,
         userStore: useUserStore,
         findingsStore: useFindingsStore,
-        metricsStore: useMetricsStore
+        metricsStore: useMetricsStore,
+        orgProfileStore: useOrgProfileStore
       });
       toast.success('Complete database exported as JSON');
     } catch (err) {
@@ -287,7 +297,9 @@ const Settings = () => {
       if (includePackData) {
         const confirmed = window.confirm(
           'Include private pack data in this export?\n\n' +
-          'The file will contain your organization\'s private assessment values and risk entries. ' +
+          'The file will contain your organization\'s private assessment values and risk entries, ' +
+          'AND any procedure text tailored from your org profile (org name, crown-jewel references). ' +
+          'Your org profile itself stays excluded either way. ' +
           'Only do this for a copy you keep to yourself — never for a file you plan to share.'
         );
         if (!confirmed) return;
@@ -300,7 +312,8 @@ const Settings = () => {
         artifactStore: useArtifactStore,
         userStore: useUserStore,
         findingsStore: useFindingsStore,
-        metricsStore: useMetricsStore
+        metricsStore: useMetricsStore,
+        orgProfileStore: useOrgProfileStore
       }, { includePrivate: includePackData });
       toast.success(includePackData
         ? 'Export created WITH private pack data — handle with care'
@@ -372,6 +385,7 @@ const Settings = () => {
       const catalogSlug = catalogSlugFromFilename(file.name);
       const preview = previewMetricsImport(validation, {
         metricsStore: useMetricsStore,
+        orgProfileStore: useOrgProfileStore,
         frameworksStore: useFrameworksStore,
         requirementsStore: useRequirementsStore
       }, { catalogSlug });
@@ -386,7 +400,8 @@ const Settings = () => {
     if (!metricsPreview) return;
     try {
       const result = importMetricsCatalog(metricsPreview.validation, {
-        metricsStore: useMetricsStore
+        metricsStore: useMetricsStore,
+        orgProfileStore: useOrgProfileStore
       }, { catalogSlug: metricsPreview.preview.catalogSlug });
       toast.success(
         `${result.replaced ? 'Replaced' : 'Imported'} catalogue "${metricsPreview.preview.catalogSlug}" — ` +
@@ -443,7 +458,8 @@ const Settings = () => {
         artifactStore: useArtifactStore,
         userStore: useUserStore,
         findingsStore: useFindingsStore,
-        metricsStore: useMetricsStore
+        metricsStore: useMetricsStore,
+        orgProfileStore: useOrgProfileStore
       };
 
       const validation = validateDatabaseExport(parsed);
@@ -1094,6 +1110,60 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </button>
             <p className="text-xs text-red-600 mt-3">
               Accepts csf_assessment_*.json files created by Export Complete Database. This is a full replace, not a merge.
+            </p>
+          </div>
+
+          {/* Organization profile — optional tailoring input; the most sensitive
+              record in the app (crown jewels + tooling). Never in share exports. */}
+          <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-amber-800">Organization Profile (optional)</h3>
+                <p className="text-sm text-amber-700 mt-1">
+                  Business type, size, key systems, security tools, and crown jewels — used to tailor
+                  community test procedures to your environment. Every question is skippable.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                className="flex items-center gap-2 text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded"
+                onClick={() => setShowOrgProfileWizard(true)}
+              >
+                {orgProfileSet ? 'Edit Profile' : 'Set Up Profile'}
+              </button>
+              {orgProfileSet && (
+                <button
+                  className="text-sm text-amber-700 hover:underline"
+                  onClick={() => {
+                    if (window.confirm('Clear the organization profile from this browser? Tailored text already in assessments is not changed.')) {
+                      clearOrgProfile();
+                      toast.success('Organization profile cleared');
+                    }
+                  }}
+                >
+                  Clear profile
+                </button>
+              )}
+            </div>
+            {orgProfileSet && (
+              <label className="flex items-start gap-2 mt-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={orgCloudConsent}
+                  onChange={(e) => setOrgCloudConsent(e.target.checked)}
+                  className="w-4 h-4 rounded mt-0.5"
+                />
+                <span className="text-xs text-amber-700">
+                  Allow sending my profile to a <strong>cloud</strong> AI provider (Claude API) for procedure
+                  tailoring. Local Ollama never needs this — nothing leaves your machine there.
+                </span>
+              </label>
+            )}
+            <p className="text-xs text-amber-600 mt-3">
+              Stored only in this browser. <strong>Never included in shareable exports</strong> — tailored
+              procedure text is swapped back to the community version there. It rides complete backups
+              only; password-protect backups that carry it.
             </p>
           </div>
 
@@ -1863,6 +1933,10 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </div>
           </div>
         </div>
+      )}
+
+      {showOrgProfileWizard && (
+        <OrgProfileWizard onClose={() => setShowOrgProfileWizard(false)} />
       )}
     </div>
   );
