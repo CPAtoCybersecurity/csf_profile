@@ -38,6 +38,7 @@ import OrgProfileWizard from '../components/OrgProfileWizard';
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON, exportShareableDatabase } from '../utils/dataExport';
 import { importCompleteDatabase, validateDatabaseExport } from '../utils/dataImport';
+import { sanitizeExternalUrl } from '../utils/externalLinks';
 import { previewPackImport, importPack } from '../utils/packImport';
 import {
   parseMetricsCSV,
@@ -928,9 +929,9 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                       </td>
                       <td className="p-3 text-sm">{framework.version}</td>
                       <td className="p-3 text-sm">
-                        {framework.sourceUrl ? (
+                        {sanitizeExternalUrl(framework.sourceUrl) ? (
                           <a
-                            href={framework.sourceUrl}
+                            href={sanitizeExternalUrl(framework.sourceUrl)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 hover:underline inline-flex items-center gap-1"

@@ -195,6 +195,9 @@ const swapTailoredProcedures = (assessments) =>
  * does not restore it (crown jewels + tooling are never share material).
  * Tailored procedure text (profile-derived) is swapped back to the pristine
  * community version by default; include-private keeps the tailored text.
+ * External ticketing/document URLs (findings.externalUrl, artifacts.link,
+ * controls.externalUrl) and the external system name are scrubbed by
+ * default; include-private keeps them (issue #284).
  *
  * @param {Object} stores - Same store map exportAllDataJSON receives
  * @param {Object} [options]
@@ -247,6 +250,22 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   const survivorIds = new Set(survivors.map((m) => m.id));
   const excludedIds = new Set(allMetrics.filter((m) => !survivorIds.has(m.id)).map((m) => m.id));
   jsonData.data.assessments = stripMetricLinks(jsonData.data.assessments, excludedIds);
+
+  // External ticketing/document URLs (issue #284) point at internal
+  // infrastructure — Jira/ServiceNow hostnames, SharePoint sites, Drive docs,
+  // project keys in paths. Scrubbed from share exports by default; the
+  // include-private opt-in keeps them, complete backups are unaffected.
+  // This deliberately also scrubs the PRE-EXISTING artifacts.link field,
+  // which previously rode share exports wholesale. Map+spread clones every
+  // record — live store objects are never mutated.
+  jsonData.data.assessments = jsonData.data.assessments.map((a) => (
+    a.externalTracking
+      ? { ...a, externalTracking: { ...a.externalTracking, systemName: '' } }
+      : a
+  ));
+  jsonData.data.findings = jsonData.data.findings.map((f) => ({ ...f, externalUrl: '' }));
+  jsonData.data.artifacts = (jsonData.data.artifacts || []).map((ar) => ({ ...ar, link: '' }));
+  jsonData.data.controls = (jsonData.data.controls || []).map((c) => ({ ...c, externalUrl: '' }));
 
   jsonData.dataType = 'Shareable Assessment Database (private pack data excluded)';
   jsonData.metadata.assessmentCount = jsonData.data.assessments.length;

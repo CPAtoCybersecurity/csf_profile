@@ -30,6 +30,7 @@ import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
+import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -127,7 +128,8 @@ const Assessments = () => {
     name: '',
     description: '',
     scopeType: 'requirements',
-    scoringScale: 10
+    scoringScale: 10,
+    externalTracking: { enabled: false, systemName: '' }
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
   const [scopePreset, setScopePreset] = useState(null); // 'category' | 'subcategory' | 'all' | null (custom)
@@ -564,7 +566,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10 });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, externalTracking: { enabled: false, systemName: '' } });
     setSelectedScopeItems(new Set());
     setScopePreset(null);
     setScopeFilterText('');
@@ -2048,6 +2050,47 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     <p className="text-xs text-gray-500 mt-1">
                       Both scales support quarter-point precision (e.g. 3.25). The scale is locked once the assessment is created.
                     </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">External Tracking (Optional)</label>
+                    <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="checkbox"
+                        checked={newAssessment.externalTracking.enabled}
+                        onChange={(e) => setNewAssessment(prev => ({
+                          ...prev,
+                          externalTracking: { ...prev.externalTracking, enabled: e.target.checked }
+                        }))}
+                      />
+                      <div>
+                        <span className="font-medium">Track findings, artifacts, and controls in your own ticketing system</span>
+                        <p className="text-xs text-gray-500">
+                          Labels the URL fields on findings (ticket link), artifacts (ticket or Google Drive / SharePoint document link),
+                          and controls (compliance-tool link) with your system&apos;s name. The URL fields themselves are always available,
+                          with or without this option.
+                        </p>
+                      </div>
+                    </label>
+                    {newAssessment.externalTracking.enabled && (
+                      <div className="mt-2">
+                        <label className="block text-sm font-medium text-gray-700">System name</label>
+                        <input
+                          type="text"
+                          className="mt-1 w-full p-2 border rounded"
+                          maxLength={SYSTEM_NAME_MAX_LENGTH}
+                          placeholder="e.g., Jira, ServiceNow, SharePoint"
+                          value={newAssessment.externalTracking.systemName}
+                          onChange={(e) => setNewAssessment(prev => ({
+                            ...prev,
+                            externalTracking: { ...prev.externalTracking, systemName: e.target.value }
+                          }))}
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Shown in link-field labels (e.g. &ldquo;Jira ticket URL&rdquo;). Excluded from share exports by default.
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   <div>

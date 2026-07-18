@@ -138,6 +138,10 @@ The Settings export card offers two intents:
 - **Backup** — everything, including pack data and metrics catalogues. For your own machine only. Files are named `*.backup.json` and gitignored.
 - **Share export** — excludes pack-sourced records **and imported metric definitions** by default, including the whole pack-owned assessment and everything inside it (the filter follows lineage, not just tags). Quarter-level `metricId` links pointing at excluded metrics are stripped so no identifier from a private catalogue rides out on your own records, and all envelope counts are recomputed after filtering. Including private data requires ticking a box *and* confirming a warning — and restricted-license metrics stay excluded even then. Default-safe beats remember-to-scrub.
 
+### External ticketing/document URLs — private data too
+
+Findings, artifacts, and controls can carry links into your own systems (a Jira or ServiceNow ticket, a Google Drive or SharePoint document, a control record in your compliance tool — see the External Tracking option in the new-assessment wizard). Those URLs name your internal hostnames, site paths, and project keys, so share exports **scrub them by default**: `findings.externalUrl`, `artifacts.link`, `controls.externalUrl`, and the assessment's external system name are all blanked unless you explicitly include private data. Note this deliberately changed the artifact `link` field's behavior — before issue #284 it rode share exports untouched. Complete backups always keep every URL.
+
 ## Defense in depth
 
 Even though packs and catalogues should never be inside a clone, the repo guards against accidents:

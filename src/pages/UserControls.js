@@ -2,10 +2,11 @@ import React, { useState, useCallback, useRef, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom';
 import {
   Search, Filter, Plus, Edit, Save, Trash2, Link, X,
-  Upload, Download, Users, User, ChevronRight
+  Upload, Download, Users, User, ChevronRight, ExternalLink
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Markdown from '../components/Markdown';
+import { sanitizeExternalUrl } from '../utils/externalLinks';
 
 // Components
 import FrameworkBadge from '../components/FrameworkBadge';
@@ -61,7 +62,8 @@ const UserControls = () => {
     implementationDescription: '',
     ownerId: null,
     stakeholderIds: [],
-    linkedRequirementIds: []
+    linkedRequirementIds: [],
+    externalUrl: ''
   });
 
   // Requirement picker state
@@ -277,7 +279,8 @@ const UserControls = () => {
       implementationDescription: '',
       ownerId: null,
       stakeholderIds: [],
-      linkedRequirementIds: []
+      linkedRequirementIds: [],
+      externalUrl: ''
     });
     setDetailPanelOpen(true);
     setEditMode(true);
@@ -833,6 +836,39 @@ const UserControls = () => {
                             {currentControl.implementationDescription || 'No description'}
                           </Markdown>
                         </div>
+                      )}
+                    </div>
+
+                    {/* External control URL (issue #284) */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">External Control URL</label>
+                      {editMode || isCreating ? (
+                        <input
+                          type="url"
+                          value={currentControl.externalUrl || ''}
+                          onChange={(e) => handleFieldChange('externalUrl', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded"
+                          placeholder="https://... (this control in your compliance or ticketing tool)"
+                        />
+                      ) : currentControl.externalUrl ? (
+                        sanitizeExternalUrl(currentControl.externalUrl) ? (
+                          <a
+                            href={sanitizeExternalUrl(currentControl.externalUrl)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-1 text-sm text-blue-600 hover:underline inline-flex items-center gap-1 break-all"
+                          >
+                            <ExternalLink size={14} />
+                            {currentControl.externalUrl}
+                          </a>
+                        ) : (
+                          <p className="mt-1 text-sm text-gray-700 break-all">
+                            {currentControl.externalUrl}
+                            <span className="text-xs text-gray-400 ml-1">(only http/https URLs render as links)</span>
+                          </p>
+                        )
+                      ) : (
+                        <p className="mt-1 text-sm text-gray-400">No external link</p>
                       )}
                     </div>
 

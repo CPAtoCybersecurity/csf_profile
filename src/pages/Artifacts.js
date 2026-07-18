@@ -9,6 +9,7 @@ import useControlsStore from '../stores/controlsStore';
 import useSort from '../hooks/useSort';
 import { extractArtifactsFromProfile } from '../updateArtifactLinks';
 import EmptyState from '../components/EmptyState';
+import { sanitizeExternalUrl } from '../utils/externalLinks';
 
 const Artifacts = () => {
   const navigate = useNavigate();
@@ -550,18 +551,25 @@ const Artifacts = () => {
                       value={formData.link || ''}
                       onChange={handleChange}
                       className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
-                      placeholder="https://..."
+                      placeholder="https://... (ticket, Google Drive, SharePoint, or other document link)"
                     />
                   ) : selectedArtifact?.link ? (
-                    <a
-                      href={selectedArtifact.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                    >
-                      <LinkIcon size={14} />
-                      {selectedArtifact.link}
-                    </a>
+                    sanitizeExternalUrl(selectedArtifact.link) ? (
+                      <a
+                        href={sanitizeExternalUrl(selectedArtifact.link)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                      >
+                        <LinkIcon size={14} />
+                        {selectedArtifact.link}
+                      </a>
+                    ) : (
+                      <p className="text-sm text-gray-700 dark:text-gray-300 break-all">
+                        {selectedArtifact.link}
+                        <span className="text-xs text-gray-400 ml-1">(only http/https URLs render as links)</span>
+                      </p>
+                    )
                   ) : (
                     <p className="text-sm text-gray-400 dark:text-gray-500">No link provided</p>
                   )}
