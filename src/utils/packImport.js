@@ -251,7 +251,8 @@ const buildQuarter = (quarterData) => ({
   testingStatus: quarterData.testingStatus ?? '',
   examine: quarterData.examine ?? false,
   interview: quarterData.interview ?? false,
-  test: quarterData.test ?? false
+  test: quarterData.test ?? false,
+  metricId: quarterData.metricId ?? ''
 });
 
 const riskPriority = (risk) => {

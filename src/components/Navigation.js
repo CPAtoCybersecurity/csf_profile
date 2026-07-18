@@ -7,6 +7,7 @@ import {
   Award,
   FileArchive,
   ClipboardList,
+  Gauge,
   Shield,
   Settings,
   Bot,
@@ -27,6 +28,7 @@ const NAV_GROUPS = [
       { to: '/requirements', label: 'Requirements', Icon: FileText },
       { to: '/controls', label: 'Controls', Icon: Shield },
       { to: '/assessments', label: 'Assessments', Icon: ClipboardList },
+      { to: '/metrics', label: 'Metrics', Icon: Gauge },
     ],
   },
   {

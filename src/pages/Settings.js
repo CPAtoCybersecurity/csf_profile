@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import {
   Upload,
   Download,
@@ -11,6 +11,7 @@ import {
   ExternalLink,
   Clock,
   AlertCircle,
+  Gauge,
   Shield,
   Cloud,
   Key,
@@ -30,11 +31,20 @@ import useAssessmentsStore from '../stores/assessmentsStore';
 import useUserStore from '../stores/userStore';
 import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
+import useMetricsStore from '../stores/metricsStore';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON, exportShareableDatabase } from '../utils/dataExport';
 import { importCompleteDatabase, validateDatabaseExport } from '../utils/dataImport';
 import { previewPackImport, importPack } from '../utils/packImport';
+import {
+  parseMetricsCSV,
+  validateMetricsCatalog,
+  previewMetricsImport,
+  importMetricsCatalog,
+  catalogSlugFromFilename,
+  downloadMetricsCatalogCSV
+} from '../utils/metricsImport';
 
 // Utils
 import {
@@ -238,6 +248,19 @@ const Settings = () => {
   const packImportRef = useRef(null);
   const [packPreview, setPackPreview] = useState(null); // { parsed, preview }
   const [includePackData, setIncludePackData] = useState(false);
+  const metricsImportRef = useRef(null);
+  const [metricsPreview, setMetricsPreview] = useState(null); // { validation, preview }
+  const importedMetrics = useMetricsStore((s) => s.metrics);
+  const metricsCatalogs = useMemo(() => {
+    const bySlug = new Map();
+    importedMetrics.forEach((m) => {
+      const entry = bySlug.get(m.catalogSlug) || { catalogSlug: m.catalogSlug, count: 0, importedAt: '' };
+      entry.count += 1;
+      if ((m.importedAt || '') > entry.importedAt) entry.importedAt = m.importedAt || '';
+      bySlug.set(m.catalogSlug, entry);
+    });
+    return [...bySlug.values()].sort((a, b) => a.catalogSlug.localeCompare(b.catalogSlug));
+  }, [importedMetrics]);
 
   // Export handlers
   const handleExportCompleteDatabase = useCallback(() => {
@@ -249,7 +272,8 @@ const Settings = () => {
         frameworksStore: useFrameworksStore,
         artifactStore: useArtifactStore,
         userStore: useUserStore,
-        findingsStore: useFindingsStore
+        findingsStore: useFindingsStore,
+        metricsStore: useMetricsStore
       });
       toast.success('Complete database exported as JSON');
     } catch (err) {
@@ -275,7 +299,8 @@ const Settings = () => {
         frameworksStore: useFrameworksStore,
         artifactStore: useArtifactStore,
         userStore: useUserStore,
-        findingsStore: useFindingsStore
+        findingsStore: useFindingsStore,
+        metricsStore: useMetricsStore
       }, { includePrivate: includePackData });
       toast.success(includePackData
         ? 'Export created WITH private pack data — handle with care'
@@ -332,6 +357,66 @@ const Settings = () => {
     }
   }, [packPreview]);
 
+  // Metrics catalogue import — preview first, no writes until the user confirms.
+  const handleMetricsFileSelected = useCallback(async (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+
+    try {
+      const validation = validateMetricsCatalog(parseMetricsCSV(await file.text()));
+      if (!validation.ok) {
+        toast.error(`Catalogue rejected: ${validation.errors.slice(0, 3).join(' ')}`);
+        return;
+      }
+      const catalogSlug = catalogSlugFromFilename(file.name);
+      const preview = previewMetricsImport(validation, {
+        metricsStore: useMetricsStore,
+        frameworksStore: useFrameworksStore,
+        requirementsStore: useRequirementsStore
+      }, { catalogSlug });
+      setMetricsPreview({ validation, preview });
+    } catch (err) {
+      console.error('Metrics catalogue preview error:', err);
+      toast.error(err.message || 'Could not read the catalogue file.');
+    }
+  }, []);
+
+  const handleConfirmMetricsImport = useCallback(() => {
+    if (!metricsPreview) return;
+    try {
+      const result = importMetricsCatalog(metricsPreview.validation, {
+        metricsStore: useMetricsStore
+      }, { catalogSlug: metricsPreview.preview.catalogSlug });
+      toast.success(
+        `${result.replaced ? 'Replaced' : 'Imported'} catalogue "${metricsPreview.preview.catalogSlug}" — ` +
+        `${result.imported} metrics`
+      );
+    } catch (err) {
+      console.error('Metrics catalogue import error:', err);
+      toast.error(err.message || 'Catalogue import failed.');
+    } finally {
+      setMetricsPreview(null);
+    }
+  }, [metricsPreview]);
+
+  const handleRemoveCatalog = useCallback((catalogSlug) => {
+    if (!window.confirm(`Remove catalogue "${catalogSlug}" and all its metrics from this app?`)) return;
+    useMetricsStore.getState().removeCatalog(catalogSlug);
+    toast.success(`Removed catalogue "${catalogSlug}"`);
+  }, []);
+
+  const handleExportCatalog = useCallback((catalogSlug) => {
+    try {
+      const records = useMetricsStore.getState().metrics.filter((m) => m.catalogSlug === catalogSlug);
+      downloadMetricsCatalogCSV(records, catalogSlug);
+      toast.success(`Exported catalogue "${catalogSlug}" as CSV`);
+    } catch (err) {
+      console.error('Catalogue export error:', err);
+      toast.error('Catalogue export failed.');
+    }
+  }, []);
+
   const handleExportAssessments = useCallback(() => {
     try {
       exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore);
@@ -357,7 +442,8 @@ const Settings = () => {
         frameworksStore: useFrameworksStore,
         artifactStore: useArtifactStore,
         userStore: useUserStore,
-        findingsStore: useFindingsStore
+        findingsStore: useFindingsStore,
+        metricsStore: useMetricsStore
       };
 
       const validation = validateDatabaseExport(parsed);
@@ -1037,6 +1123,66 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </p>
           </div>
 
+          {/* Metrics catalogue — bring your own KPIs/KRIs as a local CSV; additive like the pack card */}
+          <div className="mt-6 bg-teal-50 border border-teal-200 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-medium text-teal-800 flex items-center gap-2">
+                  <Gauge size={16} />
+                  Metrics Catalogue (CSV)
+                </h3>
+                <p className="text-sm text-teal-700 mt-1">
+                  Bring your own KPIs, KRIs, and metrics mapped to CSF subcategories. The app ships
+                  no metric content — your catalogue is a separate local file that stays on this machine.
+                </p>
+              </div>
+            </div>
+            <button
+              className="flex items-center gap-2 text-sm bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded"
+              onClick={() => metricsImportRef.current?.click()}
+            >
+              <Upload size={16} />
+              Import Metrics Catalogue
+            </button>
+            <p className="text-xs text-teal-600 mt-3">
+              Accepts *.csfmetrics.csv files — see PRIVATE_DATA.md for the column format. You will see
+              a preview before anything is written. Re-importing a catalogue replaces it, never duplicates.
+              Imported metrics are excluded from shareable exports by default, and catalogues with a
+              restricted license (NC/ND/proprietary) can never leave via a shareable export. Browse them
+              under Metrics in the navigation.
+            </p>
+
+            {metricsCatalogs.length > 0 && (
+              <div className="mt-3 border-t border-teal-200 pt-3 space-y-2">
+                {metricsCatalogs.map((cat) => (
+                  <div key={cat.catalogSlug} className="flex items-center justify-between text-sm">
+                    <div className="text-teal-800 min-w-0">
+                      <span className="font-mono font-medium">{cat.catalogSlug}</span>
+                      <span className="text-teal-600"> — {cat.count} metrics
+                        {cat.importedAt ? `, imported ${cat.importedAt.split('T')[0]}` : ''}</span>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <button
+                        className="flex items-center gap-1 text-xs text-teal-700 hover:text-teal-900 border border-teal-300 px-2 py-1 rounded"
+                        onClick={() => handleExportCatalog(cat.catalogSlug)}
+                      >
+                        <Download size={12} />
+                        CSV
+                      </button>
+                      <button
+                        className="flex items-center gap-1 text-xs text-red-700 hover:text-red-900 border border-red-300 px-2 py-1 rounded"
+                        onClick={() => handleRemoveCatalog(cat.catalogSlug)}
+                      >
+                        <Trash2 size={12} />
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
           {/* Jira/Confluence Integration Export */}
           <div className="mt-6 bg-indigo-50 border border-indigo-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
@@ -1490,6 +1636,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         accept=".json,application/json"
         onChange={handlePackFileSelected}
       />
+      <input
+        type="file"
+        ref={metricsImportRef}
+        style={{ display: 'none' }}
+        accept=".csv,text/csv"
+        onChange={handleMetricsFileSelected}
+      />
 
       {/* Pack Import Preview Modal — shows exactly what will happen before any write */}
       {packPreview && (
@@ -1548,6 +1701,64 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                   onClick={handleConfirmPackImport}
                 >
                   Import Pack
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Metrics Catalogue Preview Modal — shows exactly what will happen before any write */}
+      {metricsPreview && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md">
+            <div className="p-6">
+              <h3 className="text-lg font-medium text-gray-900">Import metrics catalogue</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                Catalogue "{metricsPreview.preview.catalogSlug}" — {metricsPreview.preview.total} metrics
+              </p>
+              <ul className="mt-4 space-y-2 text-sm text-gray-700 list-disc list-inside">
+                <li>
+                  {metricsPreview.preview.countsByType.KPI} KPI, {metricsPreview.preview.countsByType.KRI} KRI,{' '}
+                  {metricsPreview.preview.countsByType.metric} metric.
+                </li>
+                <li>
+                  {metricsPreview.preview.willReplace
+                    ? `Replaces the ${metricsPreview.preview.existingCount} metrics this catalogue currently has.`
+                    : 'New catalogue — nothing existing is touched.'}
+                </li>
+                {metricsPreview.preview.licenses.length > 0 && (
+                  <li>License: {metricsPreview.preview.licenses.join(', ')}</li>
+                )}
+                {metricsPreview.preview.restricted && (
+                  <li className="text-teal-700">
+                    Restricted license detected — this catalogue can never leave via a shareable export.
+                  </li>
+                )}
+                {metricsPreview.preview.unresolved.length > 0 && (
+                  <li className="text-amber-700">
+                    {metricsPreview.preview.unresolved.length} subcategory ID(s) not in the active framework
+                    (imported anyway, shown under Metrics once the framework has them):{' '}
+                    {metricsPreview.preview.unresolved.slice(0, 6).join(', ')}
+                    {metricsPreview.preview.unresolved.length > 6 ? ', …' : ''}
+                  </li>
+                )}
+                {metricsPreview.validation.warnings.slice(0, 4).map((w) => (
+                  <li key={w} className="text-amber-700">{w}</li>
+                ))}
+              </ul>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  className="text-sm px-4 py-2 rounded border border-gray-300 text-gray-700 hover:bg-gray-50"
+                  onClick={() => setMetricsPreview(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="text-sm px-4 py-2 rounded bg-teal-600 hover:bg-teal-700 text-white"
+                  onClick={handleConfirmMetricsImport}
+                >
+                  Import Catalogue
                 </button>
               </div>
             </div>

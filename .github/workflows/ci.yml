@@ -15,11 +15,11 @@ jobs:
 
       - name: Fail if private data files are tracked
         run: |
-          hits=$(git ls-files -- '*.csfpack.json' 'private-data/' '*.backup.json' 'backups/')
+          hits=$(git ls-files -- '*.csfpack.json' 'private-data/' '*.backup.json' 'backups/' '*.csfmetrics.csv')
           if [ -n "$hits" ]; then
             echo "::error::Private data files must never be committed to this repository:"
             echo "$hits"
-            echo "See PRIVATE_DATA.md (data-pack architecture): private packs and backups stay outside the repo tree."
+            echo "See PRIVATE_DATA.md (data-pack architecture): private packs, metrics catalogues, and backups stay outside the repo tree."
             exit 1
           fi
           echo "No private data files tracked."
@@ -39,6 +39,22 @@ jobs:
             exit 1
           fi
           echo "No pack-content files tracked beyond the allowlisted fixture."
+
+      - name: Fail if metrics-catalogue CONTENT is tracked under any filename
+        run: |
+          # Same content-over-filename rule as packs: any tracked CSV whose
+          # header carries the metrics-catalogue signature fails, no matter
+          # what it is named. Exactly one fictional fixture is allowed.
+          # Users' real catalogues (and anything CIS-derived) must never land here.
+          hits=$(git grep -l 'metric_id,name,type,csf_subcategory_ids' -- '*.csv' \
+            ':(exclude)src/utils/alma-security.metricsfixture.csv' || true)
+          if [ -n "$hits" ]; then
+            echo "::error::Files with metrics-catalogue content (schema header signature) must never be committed:"
+            echo "$hits"
+            echo "Only the fictional fixture src/utils/alma-security.metricsfixture.csv is allowed. See PRIVATE_DATA.md."
+            exit 1
+          fi
+          echo "No metrics-catalogue files tracked beyond the allowlisted fixture."
 
   lint-changed:
     name: Lint changed files (new code must be clean)

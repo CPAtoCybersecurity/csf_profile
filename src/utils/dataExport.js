@@ -4,13 +4,16 @@
  * these helpers serialize it to a versioned JSON envelope.
  */
 
+import { licenseIsRestricted } from './metricsImport';
+
 /**
  * Export format version. Bump when the envelope shape changes and teach
  * validateDatabaseExport (dataImport.js) how to handle the older shape.
  * Format 1: legacy `version: '1.0'` exports (no storeVersions, no findings).
  * Format 2: adds formatVersion, storeVersions, and the findings section.
+ * Format 3: adds the metrics section (imported metrics catalogues).
  */
-export const EXPORT_FORMAT_VERSION = 2;
+export const EXPORT_FORMAT_VERSION = 3;
 
 // zustand persist keys whose schema versions travel with the export so a
 // restore can detect version drift between the exporting and importing app.
@@ -18,7 +21,8 @@ export const PERSIST_KEYS = {
   assessments: 'csf-assessments-storage',
   frameworks: 'csf-frameworks-storage',
   findings: 'csf-findings-storage',
-  requirements: 'csf-requirements-storage'
+  requirements: 'csf-requirements-storage',
+  metrics: 'csf-metrics-storage'
 };
 
 /**
@@ -57,7 +61,8 @@ export const exportAllDataJSON = (stores) => {
     frameworksStore,
     artifactStore,
     userStore,
-    findingsStore
+    findingsStore,
+    metricsStore
   } = stores;
 
   const jsonData = {
@@ -71,7 +76,8 @@ export const exportAllDataJSON = (stores) => {
       userCount: userStore?.getState?.()?.users?.length || 0,
       controlCount: controlsStore?.getState?.()?.controls?.length || 0,
       assessmentCount: assessmentsStore?.getState?.()?.assessments?.length || 0,
-      findingCount: findingsStore?.getState?.()?.findings?.length || 0
+      findingCount: findingsStore?.getState?.()?.findings?.length || 0,
+      metricCount: metricsStore?.getState?.()?.metrics?.length || 0
     },
     data: {
       users: userStore?.getState?.()?.users || [],
@@ -80,11 +86,56 @@ export const exportAllDataJSON = (stores) => {
       requirements: requirementsStore?.getState?.()?.requirements || [],
       frameworks: frameworksStore?.getState?.()?.frameworks || [],
       artifacts: artifactStore?.getState?.()?.artifacts || [],
-      findings: findingsStore?.getState?.()?.findings || []
+      findings: findingsStore?.getState?.()?.findings || [],
+      metrics: metricsStore?.getState?.()?.metrics || []
     }
   };
 
   return jsonData;
+};
+
+/**
+ * Remove quarter-level `metricId` links that point at metric definitions the
+ * share export dropped — the ID itself (e.g. a licensed catalogue's key) is a
+ * linkage token that would leak the catalogue's identity through otherwise
+ * shareable, user-authored assessments. Copies on write; never mutates store
+ * objects.
+ */
+const stripMetricLinks = (assessments, excludedIds) => {
+  if (excludedIds.size === 0) return assessments;
+  return assessments.map((assessment) => {
+    const observations = assessment.observations;
+    if (!observations || typeof observations !== 'object') return assessment;
+
+    let changed = false;
+    const nextObservations = {};
+    Object.entries(observations).forEach(([reqId, obs]) => {
+      const quarters = obs?.quarters;
+      if (!quarters || typeof quarters !== 'object') {
+        nextObservations[reqId] = obs;
+        return;
+      }
+      let obsChanged = false;
+      const nextQuarters = {};
+      Object.entries(quarters).forEach(([q, quarter]) => {
+        if (quarter && excludedIds.has(quarter.metricId)) {
+          const { metricId, ...rest } = quarter;
+          nextQuarters[q] = rest;
+          obsChanged = true;
+        } else {
+          nextQuarters[q] = quarter;
+        }
+      });
+      if (obsChanged) {
+        nextObservations[reqId] = { ...obs, quarters: nextQuarters };
+        changed = true;
+      } else {
+        nextObservations[reqId] = obs;
+      }
+    });
+
+    return changed ? { ...assessment, observations: nextObservations } : assessment;
+  });
 };
 
 /**
@@ -100,8 +151,22 @@ export const exportAllDataJSON = (stores) => {
  */
 export const buildShareableExport = (stores, { includePrivate = false } = {}) => {
   const jsonData = exportAllDataJSON(stores);
+  const allMetrics = jsonData.data.metrics || [];
+
+  // Restricted-license metric definitions (NC/ND/proprietary — e.g. a CIS
+  // catalogue an org uses internally) are HARD-BLOCKED from share exports:
+  // redistribution is a licensing violation, so this is not overridable by
+  // the include-private opt-in. Mechanical, keyed on the license field.
+  const restrictedDropped = allMetrics.filter((m) => licenseIsRestricted(m.license));
+
   if (includePrivate) {
-    jsonData.dataType = 'Complete Assessment Database (private pack data INCLUDED)';
+    jsonData.data.metrics = allMetrics.filter((m) => !licenseIsRestricted(m.license));
+    jsonData.dataType = restrictedDropped.length > 0
+      ? 'Complete Assessment Database (private pack data INCLUDED; restricted-license metrics still excluded)'
+      : 'Complete Assessment Database (private pack data INCLUDED)';
+    jsonData.metadata.metricCount = jsonData.data.metrics.length;
+    const restrictedIds = new Set(restrictedDropped.map((m) => m.id));
+    jsonData.data.assessments = stripMetricLinks(jsonData.data.assessments, restrictedIds);
     return jsonData;
   }
 
@@ -112,9 +177,25 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   jsonData.data.findings = jsonData.data.findings.filter(
     (f) => f.source !== 'pack' && !packAssessmentIds.has(f.assessmentId)
   );
+
+  // Imported metric definitions are private data: excluded by default, same
+  // lineage rule as packs. Restricted-license metrics are dropped regardless
+  // of provenance token (defense-in-depth — the guarantee must not hang on a
+  // single source string). IDs of everything dropped are stripped from the
+  // surviving (user-authored) assessments' quarter-level metricId links so no
+  // linkage token rides out.
+  const survivors = allMetrics.filter(
+    (m) => m.source !== 'csv-import' && !licenseIsRestricted(m.license)
+  );
+  jsonData.data.metrics = survivors;
+  const survivorIds = new Set(survivors.map((m) => m.id));
+  const excludedIds = new Set(allMetrics.filter((m) => !survivorIds.has(m.id)).map((m) => m.id));
+  jsonData.data.assessments = stripMetricLinks(jsonData.data.assessments, excludedIds);
+
   jsonData.dataType = 'Shareable Assessment Database (private pack data excluded)';
   jsonData.metadata.assessmentCount = jsonData.data.assessments.length;
   jsonData.metadata.findingCount = jsonData.data.findings.length;
+  jsonData.metadata.metricCount = jsonData.data.metrics.length;
   return jsonData;
 };
 
