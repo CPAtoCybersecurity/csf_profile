@@ -12,6 +12,7 @@ import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
 import DropdownPortal from '../components/DropdownPortal';
 import SortableHeader from '../components/SortableHeader';
+import ScoreSelect from '../components/ScoreSelect';
 
 // Hooks and stores
 import { useCSFData } from '../hooks/useCSFData';
@@ -701,15 +702,15 @@ const Controls = () => {
                       <div className="flex-1">
                         <span className="text-sm font-medium text-gray-500">Actual Score:</span>
                         {editMode ? (
-                          <select
-                            value={getQuarterData(currentItem.ID, selectedQuarter)?.actualScore || 0}
-                            onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { actualScore: Number(e.target.value) })}
-                            className="mt-1 w-full p-2 border rounded text-sm"
-                          >
-                            {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map((score) => (
-                              <option key={score} value={score}>{score}</option>
-                            ))}
-                          </select>
+                          <div className="mt-1">
+                            <ScoreSelect
+                              value={getQuarterData(currentItem.ID, selectedQuarter)?.actualScore || 0}
+                              onChange={(score) => updateQuarterData(currentItem.ID, selectedQuarter, { actualScore: score })}
+                              maxScore={10}
+                              label="Actual Score"
+                              className="p-2 border rounded text-sm"
+                            />
+                          </div>
                         ) : (
                           <div className="mt-1 text-lg font-bold">
                             {getQuarterData(currentItem.ID, selectedQuarter)?.actualScore ?? 0}
@@ -720,15 +721,15 @@ const Controls = () => {
                       <div className="flex-1">
                         <span className="text-sm font-medium text-gray-500">Target Score:</span>
                         {editMode ? (
-                          <select
-                            value={getQuarterData(currentItem.ID, selectedQuarter)?.targetScore || 0}
-                            onChange={(e) => updateQuarterData(currentItem.ID, selectedQuarter, { targetScore: Number(e.target.value) })}
-                            className="mt-1 w-full p-2 border rounded text-sm"
-                          >
-                            {[0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10].map((score) => (
-                              <option key={score} value={score}>{score}</option>
-                            ))}
-                          </select>
+                          <div className="mt-1">
+                            <ScoreSelect
+                              value={getQuarterData(currentItem.ID, selectedQuarter)?.targetScore || 0}
+                              onChange={(score) => updateQuarterData(currentItem.ID, selectedQuarter, { targetScore: score })}
+                              maxScore={10}
+                              label="Target Score"
+                              className="p-2 border rounded text-sm"
+                            />
+                          </div>
                         ) : (
                           <div className="mt-1 text-lg font-bold">
                             {getQuarterData(currentItem.ID, selectedQuarter)?.targetScore ?? 0}

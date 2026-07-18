@@ -131,7 +131,7 @@ const migrateObservationToQuarterly = (oldObs) => {
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 9;
+export const ASSESSMENTS_SCHEMA_VERSION = 10;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -222,6 +222,16 @@ export const migrateAssessmentsState = (persistedState, version) => {
     if (!assessments.some(a => a.id === COMPREHENSIVE_ASSESSMENT_ID)) {
       assessments.push(COMPREHENSIVE_ASSESSMENT);
     }
+    state = { ...state, assessments };
+  }
+
+  // Version 10: Stamp scoringScale (issue #277). Existing assessments were
+  // all scored on the 10-point scale; stored scores are NEVER rescaled.
+  // Idempotent: an assessment already carrying a valid scale keeps it.
+  if (version < 10) {
+    const assessments = (state.assessments || []).map(a =>
+      a.scoringScale === 5 || a.scoringScale === 10 ? a : { ...a, scoringScale: 10 }
+    );
     state = { ...state, assessments };
   }
 
@@ -418,6 +428,7 @@ const useAssessmentsStore = create(
                     name: group.name,
                     description: group.description,
                     scopeType: group.scopeType,
+                    scoringScale: 10,
                     scopeIds: [...new Set(scopeIds)],
                     frameworkFilter: null,
                     jiraKey: group.jiraKey || null,
@@ -479,6 +490,8 @@ const useAssessmentsStore = create(
           name: assessmentData.name || `Assessment ${assessments.length + 1}`,
           description: assessmentData.description || '',
           scopeType: assessmentData.scopeType || 'requirements', // 'requirements' or 'controls'
+          // 10-point (default) or 5-point CMMI-style scale; locked at creation (issue #277)
+          scoringScale: assessmentData.scoringScale === 5 ? 5 : 10,
           scopeIds: assessmentData.scopeIds || [], // Array of requirement IDs or control IDs
           frameworkFilter: assessmentData.frameworkFilter || null, // Optional framework filter
           status: 'Not Started', // Not Started, In Progress, Complete
@@ -820,6 +833,7 @@ const useAssessmentsStore = create(
             'ID': escapeCSVValue(getItemName(itemId)),
             'Assessment': escapeCSVValue(assessment.name),
             'Scope Type': escapeCSVValue(assessment.scopeType),
+            'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
             'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
             'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
           };
@@ -996,6 +1010,8 @@ const useAssessmentsStore = create(
                     description: epicInfo?.description || row['Description'] || row.description || '',
                     scopeType: scopeType,
                     frameworkFilter: row['Framework Filter'] || row.frameworkFilter || null,
+                    // Round-trip the scoring scale; CSVs without the column default to 10 (issue #277)
+                    scoringScale: Number(row['Scoring Scale']) === 5 ? 5 : 10,
                     jiraKey: assessmentJiraKey, // Store Jira Epic key for reference
                     rows: []
                   };
@@ -1208,6 +1224,7 @@ const useAssessmentsStore = create(
                   name: group.name,
                   description: group.description,
                   scopeType: group.scopeType,
+                  scoringScale: group.scoringScale === 5 ? 5 : 10,
                   scopeIds: [...new Set(scopeIds)],
                   frameworkFilter: group.frameworkFilter,
                   jiraKey: group.jiraKey || null, // Store Jira Epic key for sync reference
@@ -1533,6 +1550,7 @@ const useAssessmentsStore = create(
               'Description': escapeCSVValue(assessment.description || ''),
               'Scope Type': escapeCSVValue(assessment.scopeType),
               'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
+              'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
               'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
               'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
             };

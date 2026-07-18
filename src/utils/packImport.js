@@ -325,6 +325,8 @@ export const importPack = (parsed, stores) => {
     name: `${parsed.org.name} (private pack)`,
     description: `Imported from data pack "${slug}" ${packVersion}. Re-importing the pack replaces this assessment.`,
     scopeType: 'requirements',
+    // packFormat 1 scores are defined on the 10-point scale (issue #277)
+    scoringScale: 10,
     scopeIds: resolved.map(({ requirementId }) => requirementId),
     frameworkFilter: defaultFramework?.id || null,
     status: 'In Progress',

@@ -17,6 +17,7 @@ import FindingSelector from '../components/FindingSelector';
 import SortableHeader from '../components/SortableHeader';
 import ExportPasswordDialog from '../components/ExportPasswordDialog';
 import EmptyState from '../components/EmptyState';
+import ScoreSelect from '../components/ScoreSelect';
 
 // Stores
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -28,6 +29,7 @@ import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
 import { tailorMarkdown, canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance } from '../utils/procedureTailor';
+import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -124,7 +126,8 @@ const Assessments = () => {
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
-    scopeType: 'requirements'
+    scopeType: 'requirements',
+    scoringScale: 10
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
   const [scopePreset, setScopePreset] = useState(null); // 'category' | 'subcategory' | 'all' | null (custom)
@@ -553,7 +556,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'requirements' });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10 });
     setSelectedScopeItems(new Set());
     setScopePreset(null);
     setScopeFilterText('');
@@ -1317,11 +1320,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     }
   };
 
-  // Get score badge style
+  // Get score badge style (thresholds proportional to the assessment's scale)
   const getScoreBadgeStyle = (score) => {
     if (!score || score === 0) return 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-300';
-    if (score >= 8) return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
-    if (score >= 5) return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+    const band = scoreBand(score, getScoringScale(currentAssessment));
+    if (band === 'green') return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+    if (band === 'yellow') return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
     return 'bg-red-100 text-red-700 dark:bg-red-600 dark:text-white';
   };
 
@@ -1630,15 +1634,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Target Score</span>
                     {editMode ? (
-                      <select
+                      <ScoreSelect
                         value={currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
-                        onChange={(e) => handleQuarterlyChange('targetScore', Number(e.target.value))}
-                        className="w-16 p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
-                      >
-                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
+                        onChange={(score) => handleQuarterlyChange('targetScore', score)}
+                        maxScore={getScoringScale(currentAssessment)}
+                        label={`${selectedQuarter} Target Score`}
+                      />
                     ) : (
                       <span className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium text-gray-700 dark:text-gray-300">
                         {currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
@@ -1650,15 +1651,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Actual Score</span>
                     {editMode ? (
-                      <select
+                      <ScoreSelect
                         value={currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
-                        onChange={(e) => handleQuarterlyChange('actualScore', Number(e.target.value))}
-                        className="w-16 p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
-                      >
-                        {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(s => (
-                          <option key={s} value={s}>{s}</option>
-                        ))}
-                      </select>
+                        onChange={(score) => handleQuarterlyChange('actualScore', score)}
+                        maxScore={getScoringScale(currentAssessment)}
+                        label={`${selectedQuarter} Actual Score`}
+                      />
                     ) : (
                       <span className={`px-2 py-0.5 rounded text-sm font-bold ${getScoreBadgeStyle(currentObservation.quarters?.[selectedQuarter]?.actualScore)}`}>
                         {currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
@@ -1968,6 +1966,46 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       value={newAssessment.description}
                       onChange={(e) => setNewAssessment(prev => ({ ...prev, description: e.target.value }))}
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Scoring Scale</label>
+                    <div className="space-y-2">
+                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="radio"
+                          name="scoringScale"
+                          value="10"
+                          checked={newAssessment.scoringScale !== 5}
+                          onChange={() => setNewAssessment(prev => ({ ...prev, scoringScale: 10 }))}
+                        />
+                        <div>
+                          <span className="font-medium">10-point scale</span>
+                          <span className="text-green-600 ml-2">(Default)</span>
+                          <p className="text-xs text-gray-500">
+                            The Simply Cyber Academy scale (0&ndash;10). See the Scoring Legend page for band definitions.
+                          </p>
+                        </div>
+                      </label>
+                      <label className="flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50">
+                        <input
+                          type="radio"
+                          name="scoringScale"
+                          value="5"
+                          checked={newAssessment.scoringScale === 5}
+                          onChange={() => setNewAssessment(prev => ({ ...prev, scoringScale: 5 }))}
+                        />
+                        <div>
+                          <span className="font-medium">5-point maturity scale (CMMI-style)</span>
+                          <p className="text-xs text-gray-500">
+                            0&ndash;5 as in the NIST CSF Maturity Toolkit: {CMMI_LEVELS.map(l => `${l.level} ${l.name}`).join(' · ')}
+                          </p>
+                        </div>
+                      </label>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Both scales support quarter-point precision (e.g. 3.25). The scale is locked once the assessment is created.
+                    </p>
                   </div>
 
                   <div>
