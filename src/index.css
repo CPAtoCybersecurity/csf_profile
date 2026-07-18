@@ -265,6 +265,7 @@ code {
 
 .max-w-xs { max-width: 20rem; }
 .max-w-md { max-width: 28rem; }
+.max-w-lg { max-width: 32rem; }
 .max-w-2xl { max-width: 42rem; }
 .max-w-3xl { max-width: 48rem; }
 .max-w-4xl { max-width: 56rem; }
@@ -386,6 +387,15 @@ code {
 .bg-gray-200 { background-color: #e5e7eb; }
 .bg-gray-800 { background-color: #1f2937; }
 .bg-gray-900 { background-color: #111827; }
+/* bg-black reads an alpha var so bg-opacity-* can dim it (Tailwind semantics). */
+.bg-black { --tw-bg-opacity: 1; background-color: rgb(0 0 0 / var(--tw-bg-opacity)); }
+.bg-black\/50 { background-color: rgba(0, 0, 0, 0.5); }
+.bg-black\/10 { background-color: rgba(0, 0, 0, 0.1); }
+/* Color-agnostic alpha modifier: only affects backgrounds that read
+   --tw-bg-opacity (i.e. .bg-black). It never forces black onto other bg colors,
+   so a future `bg-white bg-opacity-50` stays white. Modal backdrops use
+   `bg-black bg-opacity-50`. */
+.bg-opacity-50 { --tw-bg-opacity: 0.5; }
 
 /* Background colors — semantic (reds/oranges/yellows/ambers/greens pass through) */
 .bg-red-50 { background-color: #fef2f2; }
@@ -504,6 +514,7 @@ code {
    10. Positioning
    ========================================================================== */
 
+.fixed { position: fixed; }
 .relative { position: relative; }
 .absolute { position: absolute; }
 .sticky { position: sticky; }
@@ -511,7 +522,9 @@ code {
 .-top-1 { top: -0.25rem; }
 .-right-1 { right: -0.25rem; }
 .left-0 { left: 0; }
+.bottom-0 { bottom: 0; }
 .inset-y-0 { top: 0; bottom: 0; }
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
 .z-20 { z-index: 20; }
 .z-30 { z-index: 30; }
 .z-40 { z-index: 40; }
