@@ -81,7 +81,10 @@ const createDefaultQuarter = () => ({
   testingStatus: 'Not Started',
   examine: false,
   interview: false,
-  test: false
+  test: false,
+  // Optional link to a metrics-catalogue definition (metricsStore). Empty for
+  // hand-entered values; older persisted quarters simply lack the field.
+  metricId: ''
 });
 
 const createDefaultQuarters = () => ({

@@ -28,6 +28,8 @@ import {
 } from '../stores/assessmentsStore';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
+// Format-2 exports carry no metrics section — it is simply skipped (untouched),
+// same as findings in legacy format-1 files.
 const SECTIONS = [
   { key: 'users', store: 'userStore', setter: 'setUsers' },
   { key: 'controls', store: 'controlsStore', setter: 'setControls' },
@@ -35,7 +37,8 @@ const SECTIONS = [
   { key: 'requirements', store: 'requirementsStore', setter: 'setRequirements' },
   { key: 'frameworks', store: 'frameworksStore', setter: 'setFrameworks' },
   { key: 'artifacts', store: 'artifactStore', setter: 'setArtifacts' },
-  { key: 'findings', store: 'findingsStore', setter: 'setFindings' }
+  { key: 'findings', store: 'findingsStore', setter: 'setFindings' },
+  { key: 'metrics', store: 'metricsStore', setter: 'setMetrics' }
 ];
 
 /**

@@ -40,6 +40,7 @@ const Settings = lazy(() => import('./pages/Settings'));
 const AIAssistant = lazy(() => import('./pages/AIAssistant'));
 const Findings = lazy(() => import('./pages/Findings'));
 const AuditLog = lazy(() => import('./pages/AuditLog'));
+const Metrics = lazy(() => import('./pages/Metrics'));
 
 // Lightweight fallback shown while a route chunk loads or its store hydrates.
 const RouteFallback = () => (
@@ -60,6 +61,11 @@ const AppContent = () => {
   useEffect(() => {
     loadConfluenceConfig();
     initializeEntryIdMappings();
+    // Ask the browser to protect this origin's storage from eviction under
+    // disk pressure — all assessment data lives in localStorage, so eviction
+    // is data loss. Best-effort: browsers may ignore it; regular exports
+    // (BackupReminder) remain the real durability story.
+    navigator.storage?.persist?.().catch(() => {});
   }, []);
 
   // Initialize keyboard navigation
@@ -163,6 +169,7 @@ const AppContent = () => {
               <Route path="/requirements" element={<Requirements />} />
               <Route path="/controls" element={<UserControls />} />
               <Route path="/assessments" element={<Assessments />} />
+              <Route path="/metrics" element={<Metrics />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/scoring" element={<ScoringLegend />} />
               <Route path="/artifacts" element={<Artifacts />} />

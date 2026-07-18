@@ -72,22 +72,46 @@ Unknown sections warn-and-skip: a pack written for a future engine still imports
 - **Tags everything** it writes with `source: "pack"`, your `org.slug`, and `packVersion`.
 - **Re-import replaces, never duplicates.** The `org.slug` is the identity key: importing `packVersion: 2026.08` over `2026.07` replaces the pack-owned assessment and pack-sourced findings. The preview warns you before replacing anything you edited locally since the last import.
 
+## Metrics catalogues (`*.csfmetrics.csv`) — private data too
+
+The same bring-your-own model covers **KPIs, KRIs, and metrics**. The app ships no metric
+content: you import your own catalogue as a local CSV (Settings → Metrics Catalogue) and
+browse it under **Metrics** — drill down from CSF functions → categories → subcategories to
+the metrics mapped to each. This keeps licensed material an organization is entitled to use
+internally (for example CIS-derived metrics) out of this MIT repository while your local
+install still gives it a first-class UI.
+
+CSV schema v1 — header row required, one metric per row:
+
+```
+metric_id,name,type,csf_subcategory_ids,description,formula,unit,target,direction,frequency,data_source,license,references,notes
+```
+
+- `type` is `KPI`, `KRI`, or `metric` (case-insensitive).
+- `csf_subcategory_ids` is semicolon-separated (`ID.AM-01;ID.AM-02`).
+- Unknown columns warn-and-skip; the file name (minus `.csfmetrics.csv`) becomes the
+  catalogue's identity — re-importing the same file name replaces it, never duplicates.
+- **`license` is enforcement, not documentation**: a catalogue whose license contains
+  NC, ND, `proprietary`, or `internal` is **hard-blocked** from shareable exports — the
+  include-private opt-in does not override it, because redistributing such content would
+  violate its license. Backup exports (your own machine) always include everything.
+
 ## Sharing safely
 
 The Settings export card offers two intents:
 
-- **Backup** — everything, including pack data. For your own machine only. Files are named `*.backup.json` and gitignored.
-- **Share export** — excludes pack-sourced records **by default**, including the whole pack-owned assessment and everything inside it (the filter follows lineage, not just tags). Including private data requires ticking a box *and* confirming a warning. Default-safe beats remember-to-scrub.
+- **Backup** — everything, including pack data and metrics catalogues. For your own machine only. Files are named `*.backup.json` and gitignored.
+- **Share export** — excludes pack-sourced records **and imported metric definitions** by default, including the whole pack-owned assessment and everything inside it (the filter follows lineage, not just tags). Quarter-level `metricId` links pointing at excluded metrics are stripped so no identifier from a private catalogue rides out on your own records, and all envelope counts are recomputed after filtering. Including private data requires ticking a box *and* confirming a warning — and restricted-license metrics stay excluded even then. Default-safe beats remember-to-scrub.
 
 ## Defense in depth
 
-Even though packs should never be inside a clone, the repo guards against accidents:
+Even though packs and catalogues should never be inside a clone, the repo guards against accidents:
 
-- `.gitignore` ships `*.csfpack.json` and `private-data/`.
-- CI fails any pull request that contains a `*.csfpack.json` file, a `private-data/` directory, or a `*.backup.json` file.
-- CI also fails on pack **content**: any tracked JSON carrying the `packFormat` signature is rejected no matter what it is named. The one exception is the fictional test fixture, allowlisted by exact path.
+- `.gitignore` ships `*.csfpack.json`, `private-data/`, and `*.csfmetrics.csv`.
+- CI fails any pull request that contains a `*.csfpack.json` file, a `private-data/` directory, a `*.backup.json` file, or a `*.csfmetrics.csv` file.
+- CI also fails on **content**: any tracked JSON carrying the `packFormat` signature, and any tracked CSV carrying the metrics-catalogue header signature, is rejected no matter what it is named. The only exceptions are the two fictional test fixtures, allowlisted by exact path.
 
-These are backstops, not the mechanism. The mechanism is separation: the pack lives outside the tree.
+These are backstops, not the mechanism. The mechanism is separation: the pack and your catalogues live outside the tree.
 
 ## Known boundaries (v1)
 

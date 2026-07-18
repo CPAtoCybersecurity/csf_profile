@@ -14,7 +14,8 @@ const SAMPLE = {
   requirements: [{ id: 'GV.SC-04 Ex1', frameworkId: 'nist-csf-2.0' }],
   frameworks: [{ id: 'nist-csf-2.0', name: 'NIST CSF 2.0', isDefault: true }],
   artifacts: [{ id: 'art1', name: 'Policy doc' }],
-  findings: [{ id: 'f1', title: 'Gap found' }]
+  findings: [{ id: 'f1', title: 'Gap found' }],
+  metrics: [{ id: 'm1', name: 'Patch latency', catalogSlug: 'sample', source: 'csv-import' }]
 };
 
 const makeStores = (data = SAMPLE) => {
@@ -25,7 +26,8 @@ const makeStores = (data = SAMPLE) => {
     setRequirements: jest.fn(),
     setFrameworks: jest.fn(),
     setArtifacts: jest.fn(),
-    setFindings: jest.fn()
+    setFindings: jest.fn(),
+    setMetrics: jest.fn()
   };
   const stores = {
     userStore: { getState: () => ({ users: data.users, setUsers: setters.setUsers }) },
@@ -34,7 +36,8 @@ const makeStores = (data = SAMPLE) => {
     requirementsStore: { getState: () => ({ requirements: data.requirements, setRequirements: setters.setRequirements }) },
     frameworksStore: { getState: () => ({ frameworks: data.frameworks, setFrameworks: setters.setFrameworks }) },
     artifactStore: { getState: () => ({ artifacts: data.artifacts, setArtifacts: setters.setArtifacts }) },
-    findingsStore: { getState: () => ({ findings: data.findings, setFindings: setters.setFindings }) }
+    findingsStore: { getState: () => ({ findings: data.findings, setFindings: setters.setFindings }) },
+    metricsStore: { getState: () => ({ metrics: data.metrics, setMetrics: setters.setMetrics }) }
   };
   return { stores, setters };
 };

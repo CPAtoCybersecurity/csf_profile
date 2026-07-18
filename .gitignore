@@ -56,6 +56,11 @@ backups/
 *.csfpack.json
 private-data/
 
+# Metrics catalogues are the user's own (possibly licensed) content — never
+# repo content. (The committed test fixture is named *.metricsfixture.csv on
+# purpose: it is fictional and must not match this pattern.)
+*.csfmetrics.csv
+
 # Server-local persisted state (entry-id mappings) — deployment data, not code
 server/data/
 
