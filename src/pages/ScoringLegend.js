@@ -175,6 +175,8 @@ const ScoringLegend = () => {
         </table>
       </div>
 
+      <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Cyber Resilience courses in Simply Cyber Academy</p>
+
       <h1 className="text-2xl font-bold mb-4 mt-4">NIST SP 800-53A Assessment Methods</h1>
       <div className="bg-white p-4 rounded-lg shadow-sm border">
         <p className="text-sm text-gray-700 mb-4">
