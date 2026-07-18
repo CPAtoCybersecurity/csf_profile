@@ -47,40 +47,6 @@ afterEach(() => {
 });
 
 describe('App Component', () => {
-  describe('Optional Atlassian Credentials', () => {
-    test('renders the app normally when environment variables are missing (credentials are optional)', async () => {
-      // Atlassian env vars are optional — config can come from the Settings UI
-      delete process.env.REACT_APP_JIRA_INSTANCE_URL;
-      delete process.env.REACT_APP_JIRA_API_TOKEN;
-      delete process.env.REACT_APP_CONFLUENCE_INSTANCE_URL;
-      delete process.env.REACT_APP_CONFLUENCE_API_TOKEN;
-
-      await act(async () => {
-        render(<App />);
-      });
-
-      // App renders normally — no blocking configuration page
-      expect(screen.getByText('CSF_PROFILE')).toBeInTheDocument();
-      expect(screen.queryByText('Configuration Required')).not.toBeInTheDocument();
-      expect(screen.queryByText(/How to Fix This/i)).not.toBeInTheDocument();
-    });
-
-    test('renders the app normally when all environment variables are set', async () => {
-      process.env.REACT_APP_JIRA_INSTANCE_URL = 'https://test.atlassian.net';
-      process.env.REACT_APP_JIRA_API_TOKEN = 'test-jira-token-123';
-      process.env.REACT_APP_CONFLUENCE_INSTANCE_URL = 'https://test.atlassian.net/wiki';
-      process.env.REACT_APP_CONFLUENCE_API_TOKEN = 'test-confluence-token-456';
-
-      await act(async () => {
-        render(<App />);
-      });
-
-      expect(screen.getByText('CSF_PROFILE')).toBeInTheDocument();
-      expect(screen.getAllByText(/Dashboard/i).length).toBeGreaterThan(0);
-      expect(screen.queryByText('Configuration Required')).not.toBeInTheDocument();
-    });
-  });
-
   test('renders the app header', async () => {
     await act(async () => {
       render(<App />);

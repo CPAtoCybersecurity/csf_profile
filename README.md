@@ -58,13 +58,12 @@ Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's t
 
 ## 🚪 Choose Your Door
 
-The same NIST CSF 2.0 guidance, flattened into proper tables, ships in five formats. Pick the one that fits how you work — you don't need to install the app to get value from this repo:
+The same NIST CSF 2.0 guidance, flattened into proper tables, ships in four formats. Pick the one that fits how you work — you don't need to install the app to get value from this repo:
 
 | Door | Best for | Start here |
 |------|----------|------------|
 | 📊 **Spreadsheets** | Excel / Power Query users; feeding your AI assistant; zero-tooling quick start | [GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/) |
 | 📝 **Notion template** | Individuals and small teams who want a free, dynamic CSF database — no GRC tool budget needed | [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/) |
-| 🧩 **Jira + Confluence** | Atlassian shops who want assessments, artifacts, and findings as real tickets and pages | [SET_UP_IN_ATLASSIAN/](SET_UP_IN_ATLASSIAN/) |
 | 💻 **React app** | Consultants and analysts who want a guided assessment workflow ([or just try the demo](https://csf-profile-app.pages.dev)) | [INSTALL_THE_APP/](INSTALL_THE_APP/) or [Installation](#installation-and-setup) below |
 | 🎓 **Practice case study** | Career-changers building a GRC portfolio — run a full assessment of fictional "Alma Security" | [ASSESSMENT_CATALOG/](ASSESSMENT_CATALOG/) |
 
@@ -175,22 +174,11 @@ Security note: Passing `--password` on the command line may save it in your shel
 
 ### Environment Variables Configuration (Optional)
 
-The application supports integration with JIRA and Confluence for enhanced tracking capabilities. To enable these integrations, you'll need to configure environment variables with your API credentials.
+The application uses an optional `.env` file for backend configuration. The only credential the app uses is the Claude AI Assistant key (server-side). Copy `.env.example` to `.env` to get started:
 
-#### Setting Up Environment Variables
-
-1. **Copy the example file:**
-   ```bash
-   cp .env.example .env
-   ```
-
-2. **Edit the `.env` file** and add your credentials:
-   - `REACT_APP_JIRA_INSTANCE_URL` - Your JIRA instance URL (e.g., https://your-domain.atlassian.net)
-   - `REACT_APP_JIRA_API_TOKEN` - Your JIRA API token
-   - `REACT_APP_CONFLUENCE_INSTANCE_URL` - Your Confluence URL (e.g., https://your-domain.atlassian.net/wiki)
-   - `REACT_APP_CONFLUENCE_API_TOKEN` - Your Confluence API token
-
-3. **Generate API tokens** at: https://id.atlassian.com/manage-profile/security/api-tokens
+```bash
+cp .env.example .env
+```
 
 #### Claude AI Assistant (server-side key)
 
@@ -200,31 +188,6 @@ The AI Assistant's Claude integration is configured **on the backend only** — 
 - `CLAUDE_MODEL` - Optional model override (defaults to `claude-sonnet-4-20250514`)
 
 Set these in the backend environment (or `.env`) and restart the server. The frontend shows a "Ready" badge when the key is configured (via `GET /api/ai/status`, which returns a boolean only). Without a key, Claude requests return a mock response so local development still works.
-
-#### Windows-Specific Instructions
-
-For local development on Windows, you can set environment variables using PowerShell or Command Prompt:
-
-**Using PowerShell:**
-```powershell
-# Set environment variables for current session
-$env:REACT_APP_JIRA_INSTANCE_URL="https://your-domain.atlassian.net"
-$env:REACT_APP_JIRA_API_TOKEN="your-jira-token"
-$env:REACT_APP_CONFLUENCE_INSTANCE_URL="https://your-domain.atlassian.net/wiki"
-$env:REACT_APP_CONFLUENCE_API_TOKEN="your-confluence-token"
-
-# Then start the app
-npm start
-```
-
-**Using Command Prompt:**
-```cmd
-set REACT_APP_JIRA_INSTANCE_URL=https://your-domain.atlassian.net
-set REACT_APP_JIRA_API_TOKEN=your-jira-token
-set REACT_APP_CONFLUENCE_INSTANCE_URL=https://your-domain.atlassian.net/wiki
-set REACT_APP_CONFLUENCE_API_TOKEN=your-confluence-token
-npm start
-```
 
 **Recommended: Using a `.env` file (All platforms)**
 
@@ -272,39 +235,11 @@ Docker support is planned for a future release. Draft Docker files are available
 
 *Contributed by [@SecBurg](https://github.com/SecBurg)*
 
-## Confluence Cloud Integration
+## Export Options
 
-This application supports fetching control documentation from **Confluence Cloud** using a secure backend integration.
-
-### Required Environment Variables
-
-Set the following environment variables in your backend `.env` file:
-
-```env
-CONFLUENCE_BASE_URL=https://your-company.atlassian.net
-CONFLUENCE_EMAIL=your-email@example.com
-CONFLUENCE_API_TOKEN=your-api-token
-```
-
-## Integration Options
-
-This project supports two paths depending on your infrastructure needs:
-
-### Standard Path (Main Branch)
-File-based exports for users without backend infrastructure:
+File-based exports run entirely in the browser — no backend required:
 - **CSV Export**: Import into Excel, Google Sheets, or any spreadsheet tool
-- **JSON Export**: Import into Jira via Jira Importers plugin, or use with other tools
-- **No backend required** - runs entirely in the browser
-
-### Advanced Path (feature/api-integration Branch) - *Pre-Alpha*
-> **Status**: In active development. Not recommended for production use.
-
-Real-time API integration for teams with infrastructure support:
-- **Jira Cloud API**: Create issues directly from assessment findings
-- **Confluence Cloud API**: Link control documentation and sync content
-- **Requires backend service** for OAuth/token handling
-
-See the [feature/api-integration branch](https://github.com/CPAtoCybersecurity/csf_profile/tree/feature/api-integration) for development progress.
+- **JSON Export**: Import into Jira via the Jira Importers plugin, or use with other tools
 
 ## Features
 
@@ -352,44 +287,6 @@ The tool uses a scoring system from 0-10 to assess the current and desired state
 * **6.1-6.9**: Optimized Security - Organization consistently implements this control with great effectiveness
 * **7.0-7.9**: Fully Optimized Security - Organization implements this control with fully optimized effectiveness
 * **8.1-10.0**: Too Much Security - Organization implements this control at excessive financial cost
-
-## Jira / Confluence Setup and Configuration
-
-### Proof-of-Concept (Free Tier)
-
-1. **Obtain API Tokens**
-
-   * Jira Cloud: [https://id.atlassian.com/manage/api-tokens](https://id.atlassian.com/manage/api-tokens)
-   * Confluence Cloud: same token can be used
-2. **Required Permissions**
-
-   * Jira: Browse Projects, Edit Issues, Create Issues
-   * Confluence: View and Add Content, Edit Pages
-3. **Environment Variables (.env)**
-
-```
-JIRA_BASE_URL=https://your-domain.atlassian.net
-JIRA_EMAIL=your-email@example.com
-JIRA_API_TOKEN=your-jira-api-token
-CONFLUENCE_BASE_URL=https://your-domain.atlassian.net/wiki
-```
-
-### Production Setup (Company Instances)
-
-1. **Service Account** with minimum required permissions
-2. Store API tokens securely (do not commit to repo)
-3. Set environment variables on server
-
-### Optional: EntraID / SSO Integration
-
-* Configure SSO in Jira/Confluence if company uses Microsoft EntraID
-
-### Common API Troubleshooting
-
-* `401 Unauthorized`: Invalid token or email mismatch
-* `403 Forbidden`: Missing permissions
-* `Invalid URL`: Ensure `/wiki` path is included for Confluence
-* `Rate Limits`: Reduce request frequency or batch requests
 
 ## Contributors
 

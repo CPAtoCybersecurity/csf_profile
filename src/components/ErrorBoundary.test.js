@@ -17,8 +17,10 @@ describe('ErrorBoundary', () => {
     console.error.mockRestore();
   });
 
-  test('displays environment error page when error message contains "Missing required environment variables"', () => {
-    const envError = new Error('Missing required environment variables: REACT_APP_JIRA_API_TOKEN');
+  test('shows the generic error page for any error (no Atlassian-specific configuration page)', () => {
+    // The Jira/Confluence integration was removed, so an env-style error must
+    // no longer render the old "Configuration Required" / Atlassian fix page.
+    const envError = new Error('Missing required environment variables: SOME_VAR');
 
     render(
       <ErrorBoundary>
@@ -26,10 +28,10 @@ describe('ErrorBoundary', () => {
       </ErrorBoundary>
     );
 
-    // Should show environment-specific error message
-    expect(screen.getByText('Configuration Required')).toBeInTheDocument();
-    expect(screen.getByText(/The application needs API credentials to connect with JIRA and Confluence/i)).toBeInTheDocument();
-    expect(screen.getByText(/How to Fix This/i)).toBeInTheDocument();
+    expect(screen.getByText('Something Went Wrong')).toBeInTheDocument();
+    expect(screen.queryByText('Configuration Required')).not.toBeInTheDocument();
+    expect(screen.queryByText(/How to Fix This/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/JIRA and Confluence/i)).not.toBeInTheDocument();
   });
 
   test('displays generic error page when error is not environment-related', () => {

@@ -8,7 +8,7 @@ The fastest way to use this project — no install, no code. The complete NIST C
 |------|-----------|------------|
 | `yyyy-mm-dd_CSF_Profile.xlsx` | The main template — all CSF 2.0 guidance as a flat Excel table (Power Query-ready) | Quarterly profile assessments, radar/maturity charts, management reporting |
 | `yyyy-mm-dd_CSF_Profile.csv` | Same data as plain CSV | Importing into any tool — Google Sheets, a database, or your AI assistant for CSF lookup, risk-assessment, and test-procedure prompts |
-| `Confluence-Requirements.csv` | CSF requirements formatted for Confluence import | Building a controls wiki in Confluence (see [SET_UP_IN_ATLASSIAN/](../SET_UP_IN_ATLASSIAN/)) |
+| `Confluence-Requirements.csv` | CSF requirements formatted for Confluence import | Building a controls wiki in Confluence |
 | `JIRA-Assessments.csv` | Assessment records formatted for Jira import | Tracking assessments as Jira issues |
 | `JIRA-Artifacts.csv` | Audit artifact templates for Jira import | "Test once, assure many" artifact tracking |
 | `JIRA-Findings.csv` | Findings formatted for Jira import | Remediation tracking as Jira tickets |
@@ -23,4 +23,4 @@ Tip: the CSV version drops cleanly into an AI assistant project/workspace, which
 
 ## Want more than a spreadsheet?
 
-See [Choose Your Door](../README.md#-choose-your-door) in the main README — the same data is available as a Notion template, Jira/Confluence setup, and a local React app.
+See [Choose Your Door](../README.md#-choose-your-door) in the main README — the same data is available as a Notion template and a local React app.

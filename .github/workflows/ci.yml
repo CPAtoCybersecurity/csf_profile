@@ -118,7 +118,6 @@ jobs:
           src/pages/ScopeSelector.js
           src/pages/UserControls.js
           src/utils/auditReportMarkdown.js
-          src/utils/confluenceSync.js
           src/utils/exportEncryption.js
           EOF
           base="${{ github.event.pull_request.base.sha }}"

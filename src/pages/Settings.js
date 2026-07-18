@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import {
   Upload,
   Download,
@@ -14,9 +14,6 @@ import {
   Gauge,
   Shield,
   Cloud,
-  Key,
-  RefreshCw,
-  Loader2,
   Layers,
   Building2,
   Database,
@@ -61,13 +58,6 @@ import {
   getTimeSinceLastExport,
   getLastExportDate
 } from '../utils/backupTracking';
-import {
-  harvestEntryIds,
-  getAllEntryIdMappings,
-  importEntryIdsFromCSV,
-  exportEntryIdsToCSV,
-  loadConfluenceConfig
-} from '../utils/confluenceSync';
 
 const Settings = () => {
   const frameworks = useFrameworksStore((state) => state.frameworks);
@@ -97,155 +87,6 @@ const Settings = () => {
   const setOrgCloudConsent = useOrgProfileStore((s) => s.setCloudConsent);
   const clearOrgProfile = useOrgProfileStore((s) => s.clearProfile);
 
-  // Atlassian configuration state
-  const [atlassianSiteUrl, setAtlassianSiteUrl] = useState('');
-  const [atlassianEmail, setAtlassianEmail] = useState('');
-  const [atlassianApiToken, setAtlassianApiToken] = useState('');
-  const [showApiToken, setShowApiToken] = useState(false);
-  const [isHarvesting, setIsHarvesting] = useState(false);
-  const [entryIdCount, setEntryIdCount] = useState(0);
-  const [isSavingConfig, setIsSavingConfig] = useState(false);
-  const [isTestingConnection, setIsTestingConnection] = useState(false);
-  const [configStatus, setConfigStatus] = useState({ jira: false, confluence: false });
-
-  // Backend API base URL
-  const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:4000';
-
-  // Load Atlassian config status from backend on mount (credentials stored server-side)
-  useEffect(() => {
-    const loadConfigStatus = async () => {
-      try {
-        const response = await fetch(`${API_BASE}/api/config/status`);
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            // Load non-sensitive data from backend (tokens are masked)
-            if (result.data.jira) {
-              setAtlassianSiteUrl(result.data.jira.baseUrl || '');
-              setAtlassianEmail(result.data.jira.email || '');
-              setConfigStatus(prev => ({ ...prev, jira: result.data.jira.configured }));
-            }
-            if (result.data.confluence) {
-              setConfigStatus(prev => ({ ...prev, confluence: result.data.confluence.configured }));
-            }
-          }
-        }
-      } catch (e) {
-        // Backend may not be running - that's OK for local-only mode
-        console.log('Backend not available, using local-only mode');
-      }
-      // Load entry ID count
-      const mappings = getAllEntryIdMappings();
-      setEntryIdCount(Object.keys(mappings).length);
-    };
-    loadConfigStatus();
-  }, [API_BASE]);
-
-  // Test connection to Atlassian (validates credentials without storing)
-  const testAtlassianConnection = useCallback(async (service = 'jira') => {
-    if (!atlassianSiteUrl || !atlassianEmail || !atlassianApiToken) {
-      toast.error('Please fill in all fields');
-      return false;
-    }
-
-    setIsTestingConnection(true);
-    try {
-      const response = await fetch(`${API_BASE}/api/config/test`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          service,
-          baseUrl: atlassianSiteUrl,
-          email: atlassianEmail,
-          apiToken: atlassianApiToken
-        })
-      });
-      const result = await response.json();
-      if (result.success) {
-        toast.success(result.message);
-        return true;
-      } else {
-        toast.error(result.error || 'Connection failed');
-        return false;
-      }
-    } catch (e) {
-      console.error('Atlassian connection test error:', e);
-      toast.error('Connection test failed. Please verify credentials and try again.');
-    } finally {
-      setIsTestingConnection(false);
-    }
-  }, [API_BASE, atlassianSiteUrl, atlassianEmail, atlassianApiToken]);
-
-  // Save Atlassian config to backend (credentials stored securely server-side, NOT in localStorage)
-  const saveAtlassianConfig = useCallback(async () => {
-    if (!atlassianSiteUrl || !atlassianEmail || !atlassianApiToken) {
-      toast.error('Please fill in all fields');
-      return;
-    }
-
-    setIsSavingConfig(true);
-    try {
-      // Save to both Jira and Confluence config on backend
-      const configData = {
-        baseUrl: atlassianSiteUrl.replace(/\/$/, ''),
-        email: atlassianEmail,
-        apiToken: atlassianApiToken
-      };
-
-      const [jiraRes, confluenceRes] = await Promise.all([
-        fetch(`${API_BASE}/api/config/jira`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(configData)
-        }),
-        fetch(`${API_BASE}/api/config/confluence`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(configData)
-        })
-      ]);
-
-      if (jiraRes.ok && confluenceRes.ok) {
-        // Clear token from state after saving (don't keep sensitive data in memory)
-        setAtlassianApiToken('');
-        setConfigStatus({ jira: true, confluence: true });
-
-        await loadConfluenceConfig();
-        toast.success('Configuration saved securely to server');
-      } else {
-        const error = await jiraRes.json();
-        console.error('Save Atlassian config error:', error);
-        toast.error('Failed to save configuration. Please try again.');
-      }
-    } catch (e) {
-      console.error('Save Atlassian config error:', e);
-      toast.error('Failed to save configuration. Please try again.');
-    } finally {
-      setIsSavingConfig(false);
-    }
-  }, [API_BASE, atlassianSiteUrl, atlassianEmail, atlassianApiToken]);
-
-  // Handle Entry ID harvesting
-  const handleHarvestEntryIds = useCallback(async () => {
-    if (!atlassianEmail || !atlassianApiToken) {
-      toast.error('Please configure Email and API Token first');
-      return;
-    }
-
-    setIsHarvesting(true);
-    try {
-      const mappings = await harvestEntryIds(atlassianApiToken, atlassianEmail);
-      const count = Object.keys(mappings).length;
-      setEntryIdCount(count);
-      toast.success(`Harvested ${count} entry ID mappings from Confluence`);
-    } catch (err) {
-      console.error('Entry ID harvest error:', err);
-      toast.error('Harvesting failed. Please try again.');
-    } finally {
-      setIsHarvesting(false);
-    }
-  }, [atlassianEmail, atlassianApiToken]);
-
   const fileInputRef = useRef(null);
   const newFrameworkFileInputRef = useRef(null);
   const [importFrameworkId, setImportFrameworkId] = useState(null);
@@ -254,7 +95,6 @@ const Settings = () => {
   const findingsImportRef = useRef(null);
   const artifactsImportRef = useRef(null);
   const assessmentsImportRef = useRef(null);
-  const entryIdImportRef = useRef(null);
 
   // Database restore ref
   const restoreImportRef = useRef(null);
@@ -676,45 +516,6 @@ const Settings = () => {
     e.target.value = '';
   }, []);
 
-  // Entry ID import handler
-  const handleEntryIdImport = useCallback(async (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    try {
-      const text = await file.text();
-      const count = await importEntryIdsFromCSV(text);
-      setEntryIdCount(Object.keys(getAllEntryIdMappings()).length);
-      toast.success(`Imported ${count} entry ID mappings`);
-    } catch (err) {
-      console.error('Entry Id import error:', err);
-      toast.error('Import failed. Please try again.');
-    }
-
-    e.target.value = '';
-  }, []);
-
-  // Entry ID export handler
-  const handleEntryIdExport = useCallback(() => {
-    try {
-      const csv = exportEntryIdsToCSV();
-      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      const date = new Date().toISOString().split('T')[0];
-      link.href = url;
-      link.download = `confluence_entry_ids_${date}.csv`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      toast.success('Entry ID mappings exported');
-    } catch (err) {
-      console.error('Entry Id Export error:', err);
-      toast.error('Export failed. Please try again.');
-    }
-  }, []);
-
   const handleDownloadTemplate = useCallback(() => {
     const templateContent = `FRAMEWORK,CSF FUNCTION,CATEGORY,SUBCATEGORY ID,SUBCATEGORY DESCRIPTION,ID,IMPLEMENTATION EXAMPLE
 nist-csf-2.0,GOVERN (GV),Organizational Context (GV.OC),GV.OC-01,The organizational mission is understood and informs cybersecurity risk management,GV.OC-01 Ex1,"Ex1: Share the organization's mission (e.g., through vision and mission statements, marketing, and service strategies) to provide a basis for identifying risks that may impede that mission"
@@ -748,14 +549,14 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
           </p>
         </div>
 
-        {/* Experimental Notice for Jira/Confluence */}
+        {/* Experimental Notice for CSV Import/Export */}
         <div className="callout callout-warning flex items-start gap-3 mb-6">
           <AlertCircle size={18} style={{ color: '#c97b00', flexShrink: 0, marginTop: '1px' }} />
           <div>
             <p className="settings-section-title" style={{ fontSize: '12px' }}>Experimental Features</p>
             <p className="settings-section-desc">
-              The Jira and Confluence import/export features are experimental and still under development.
-              Data formats and functionality may change. Feedback welcome from the community!
+              The CSV import/export features are experimental. Data formats and functionality
+              may change. Feedback welcome from the community!
             </p>
           </div>
         </div>
@@ -1266,13 +1067,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             )}
           </div>
 
-          {/* Jira/Confluence Integration Export */}
+          {/* CSV Import / Export */}
           <div className="card">
             <div className="card-header flex items-center gap-2">
               <Cloud size={16} style={{ color: 'var(--accent)' }} />
               <div>
-                <h3 className="settings-section-title">Jira / Confluence Integration</h3>
-                <p className="settings-section-desc">Export data in formats compatible with Jira and Confluence import</p>
+                <h3 className="settings-section-title">CSV Import / Export</h3>
+                <p className="settings-section-desc">Export and import records as CSV (Jira/Confluence-compatible format)</p>
               </div>
             </div>
 
@@ -1415,205 +1216,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </div>
           </div>
 
-          {/* Atlassian API Configuration */}
-          <div className="card">
-            <div className="card-header flex items-center gap-2">
-              <Key size={16} style={{ color: 'var(--accent)' }} />
-              <div>
-                <h3 className="settings-section-title">Atlassian API Configuration</h3>
-                <p className="settings-section-desc">Configure credentials for Jira Cloud and Confluence API access</p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {/* Site URL */}
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Atlassian Site URL
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://your-site.atlassian.net"
-                  value={atlassianSiteUrl}
-                  onChange={(e) => setAtlassianSiteUrl(e.target.value)}
-                  className="w-full p-2"
-                  style={{ border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-                <p className="settings-section-desc mt-1">Your Atlassian Cloud site URL (e.g., https://company.atlassian.net)</p>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  placeholder="your-email@company.com"
-                  value={atlassianEmail}
-                  onChange={(e) => setAtlassianEmail(e.target.value)}
-                  className="w-full p-2"
-                  style={{ border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-                <p className="settings-section-desc mt-1">Email associated with your Atlassian account</p>
-              </div>
-
-              {/* API Token */}
-              <div>
-                <label className="block text-sm font-medium mb-1">
-                  API Token
-                </label>
-                <div className="relative flex items-center">
-                  <input
-                    type={showApiToken ? 'text' : 'password'}
-                    placeholder="Enter your Atlassian API token"
-                    value={atlassianApiToken}
-                    onChange={(e) => setAtlassianApiToken(e.target.value)}
-                    className="w-full p-2 pr-10"
-                    style={{ border: '1px solid var(--border-color)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowApiToken(!showApiToken)}
-                    className="absolute right-2 p-1"
-                    style={{ color: 'var(--text-muted)', background: 'var(--bg-primary)' }}
-                  >
-                    {showApiToken ? <EyeOff size={18} /> : <Eye size={18} />}
-                  </button>
-                </div>
-                <p className="settings-section-desc mt-2">
-                  Generate at{' '}
-                  <a
-                    href="https://id.atlassian.com/manage-profile/security/api-tokens"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
-                  >
-                    Atlassian API Tokens
-                  </a>
-                </p>
-              </div>
-
-              {/* Save and Test Buttons */}
-              <div className="flex flex-wrap items-center gap-3 pt-2">
-                <button
-                  onClick={saveAtlassianConfig}
-                  disabled={isSavingConfig || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken}
-                  className="btn-terminal"
-                  style={{ padding: '6px 12px' }}
-                >
-                  {isSavingConfig ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Saving...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Key size={16} />
-                      <span>Save Configuration</span>
-                    </>
-                  )}
-                </button>
-                <button
-                  onClick={() => testAtlassianConnection('jira')}
-                  disabled={isTestingConnection || !atlassianSiteUrl || !atlassianEmail || !atlassianApiToken}
-                  className="btn-terminal btn-terminal-success"
-                  style={{ padding: '6px 12px' }}
-                >
-                  {isTestingConnection ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span>Testing...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Check size={16} />
-                      <span>Test Connection</span>
-                    </>
-                  )}
-                </button>
-                {/* Config Status Indicators */}
-                {(configStatus.jira || configStatus.confluence) && (
-                  <div className="flex items-center gap-2 ml-2">
-                    {configStatus.jira && (
-                      <span className="badge badge-success">
-                        <Check size={12} />
-                        Jira
-                      </span>
-                    )}
-                    {configStatus.confluence && (
-                      <span className="badge badge-success">
-                        <Check size={12} />
-                        Confluence
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
-              <p className="settings-section-desc mt-2">
-                <strong>Security Note:</strong> Credentials are stored securely on the server, not in your browser.
-              </p>
-            </div>
-
-            {/* Entry ID Harvesting */}
-            <div className="mt-6 pt-4" style={{ borderTop: '1px solid var(--border-color)' }}>
-              <h4 className="settings-section-title mb-2" style={{ fontSize: '11px' }}>Confluence Entry ID Harvesting</h4>
-              <p className="settings-section-desc mb-3">
-                Harvest entry IDs from your Confluence Requirements database to enable Smart-Embed linking in Jira issues.
-              </p>
-
-              <div className="flex flex-wrap items-center gap-3">
-                <button
-                  onClick={handleHarvestEntryIds}
-                  disabled={isHarvesting || !atlassianEmail || !atlassianApiToken}
-                  className="btn-terminal"
-                  style={{ padding: '6px 12px' }}
-                >
-                  {isHarvesting ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      Harvesting...
-                    </>
-                  ) : (
-                    <>
-                      <RefreshCw size={16} />
-                      Harvest Entry IDs
-                    </>
-                  )}
-                </button>
-
-                <button
-                  onClick={() => entryIdImportRef.current?.click()}
-                  className="btn-terminal btn-terminal-success"
-                  style={{ padding: '6px 12px' }}
-                >
-                  <Upload size={14} />
-                  Import CSV
-                </button>
-
-                <button
-                  onClick={handleEntryIdExport}
-                  disabled={entryIdCount === 0}
-                  className="btn-terminal"
-                  style={{ padding: '6px 12px' }}
-                >
-                  <Download size={14} />
-                  Export CSV
-                </button>
-
-                {entryIdCount > 0 && (
-                  <span className="badge badge-neutral">
-                    {entryIdCount} mapping{entryIdCount !== 1 ? 's' : ''} stored
-                  </span>
-                )}
-              </div>
-
-              <p className="settings-section-desc mt-3">
-                Entry IDs link requirements to their Confluence database entries, enabling Smart-Embed URLs in Jira issue descriptions.
-              </p>
-            </div>
-          </div>
-
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             <div className="card">
@@ -1694,13 +1296,6 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
         style={{ display: 'none' }}
         accept=".csv"
         onChange={handleAssessmentsImport}
-      />
-      <input
-        type="file"
-        ref={entryIdImportRef}
-        style={{ display: 'none' }}
-        accept=".csv"
-        onChange={handleEntryIdImport}
       />
       <input
         type="file"

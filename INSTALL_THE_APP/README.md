@@ -2,14 +2,13 @@
 
 The full-featured way to use the CSF Profile Assessment Database: run the React + Tauri desktop app locally and assess directly inside it. Best when you want the polished UI, live scoring, CSV export, and the built-in assessment workflow.
 
-This is one of four ways to use the CSF Profile Assessment Database:
+This is one of three ways to use the CSF Profile Assessment Database:
 
 | Folder | When to use it |
 |---|---|
 | **`INSTALL_THE_APP/`** *(you are here)* | Run the desktop app locally. Recommended for active assessments. |
 | `GET_THE_SPREADSHEETS/` | You just want CSV/Excel artifacts to work in spreadsheets. |
 | `GET_THE_NOTION_TEMPLATE/` | You prefer to assess inside Notion. Quick-start bundle and import guide. |
-| `SET_UP_IN_ATLASSIAN/` | You want to mirror the assessment into Jira/Confluence. Screenshots + setup. |
 
 ## Quick start
 

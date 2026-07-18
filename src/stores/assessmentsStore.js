@@ -1286,16 +1286,6 @@ const useAssessmentsStore = create(
           return { id: itemId, linkedReqs: '' };
         };
 
-        // Generate smart-embed URL if available
-        const getSmartEmbedUrl = (requirementId) => {
-          try {
-            const { getSmartEmbedUrlForRequirement } = require('../utils/confluenceSync');
-            return getSmartEmbedUrlForRequirement(requirementId) || '';
-          } catch {
-            return '';
-          }
-        };
-
         const csvData = [];
 
         // First row: Epic representing the Assessment
@@ -1351,17 +1341,13 @@ const useAssessmentsStore = create(
             if (qData.interview) methods.push('Interview');
             if (qData.test) methods.push('Test');
 
-            // Build description with smart-embed if available
+            // Build description
             let description = `Control Evaluation for ${controlDetails.id} - ${quarter}\n\n`;
             description += `Test Procedures:\n${obs.testProcedures || 'N/A'}\n\n`;
             description += `Observations:\n${qData.observations || 'N/A'}\n\n`;
             description += `Assessment Methods: ${methods.join(', ') || 'None'}\n\n`;
             if (controlDetails.linkedReqs) {
               description += `Linked Requirements: ${controlDetails.linkedReqs}\n`;
-              const smartEmbedUrl = getSmartEmbedUrl(controlDetails.linkedReqs.split(',')[0]?.trim());
-              if (smartEmbedUrl) {
-                description += `\nView in Confluence: ${smartEmbedUrl}`;
-              }
             }
             if ((obs.linkedArtifacts || []).length > 0) {
               description += `\nLinked Artifacts: ${obs.linkedArtifacts.join(', ')}`;

@@ -24,7 +24,7 @@ This project needs assessment content as much as it needs code: test procedures,
 
 **Full walkthrough for first-timers** (GitHub account setup through merged PR): [Your First Contribution to the CSF Profile Assessment Database](https://www.cpatocybersecurity.com/p/your-first-contribution-to-the-simply-cyber-csf-profile-assessment-database)
 
-Other welcome no-code contributions: fixing documentation gaps, improving onramp guides ([GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/), [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/), [SET_UP_IN_ATLASSIAN/](SET_UP_IN_ATLASSIAN/)), and writing example audit reports against the case study.
+Other welcome no-code contributions: fixing documentation gaps, improving onramp guides ([GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/), [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/)), and writing example audit reports against the case study.
 
 ## 💻 Contribute Code
 

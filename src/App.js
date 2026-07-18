@@ -24,8 +24,6 @@ import useAssessmentsStore from './stores/assessmentsStore';
 
 // Utils
 import { shouldShowBackupReminder, updateLastReminderDate, isFirstVisit } from './utils/backupTracking';
-import { checkEnvironmentVariables } from './utils/envValidation';
-import { initializeEntryIdMappings, loadConfluenceConfig } from './utils/confluenceSync';
 
 // Pages - New Architecture (code-split via React.lazy to shrink the initial
 // bundle; each route now loads its own chunk on demand).
@@ -59,8 +57,6 @@ const AppContent = () => {
   const [lastBackupTrigger, setLastBackupTrigger] = useState(0);
 
   useEffect(() => {
-    loadConfluenceConfig();
-    initializeEntryIdMappings();
     // Ask the browser to protect this origin's storage from eviction under
     // disk pressure — all assessment data lives in localStorage, so eviction
     // is data loss. Best-effort: browsers may ignore it; regular exports
@@ -73,13 +69,11 @@ const AppContent = () => {
 
   // Load data on mount - run once
   useEffect(() => {
-    // Validate environment variables for JIRA/Confluence integration
-    checkEnvironmentVariables();
     // Fix email addresses using store directly
     useUserStore.getState().fixEmailAddresses();
-    // Load requirements data from Confluence-Requirements.csv
+    // Load requirements data from the seed CSV
     loadRequirements();
-    // Load assessments data from JIRA-Assessments.csv
+    // Load assessments data from the seed CSV
     loadAssessments();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Run only once on mount
