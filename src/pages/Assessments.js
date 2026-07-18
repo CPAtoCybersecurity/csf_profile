@@ -30,7 +30,7 @@ import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
-import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
+import { SYSTEM_NAME_MAX_LENGTH, MAX_EXTERNAL_SYSTEMS } from '../utils/externalLinks';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -129,7 +129,7 @@ const Assessments = () => {
     description: '',
     scopeType: 'requirements',
     scoringScale: 10,
-    externalTracking: { enabled: false, systemName: '' }
+    externalTracking: { enabled: false, systems: [] }
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
   const [scopePreset, setScopePreset] = useState(null); // 'category' | 'subcategory' | 'all' | null (custom)
@@ -566,7 +566,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, externalTracking: { enabled: false, systemName: '' } });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, externalTracking: { enabled: false, systems: [] } });
     setSelectedScopeItems(new Set());
     setScopePreset(null);
     setScopeFilterText('');
@@ -2060,34 +2060,93 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         checked={newAssessment.externalTracking.enabled}
                         onChange={(e) => setNewAssessment(prev => ({
                           ...prev,
-                          externalTracking: { ...prev.externalTracking, enabled: e.target.checked }
+                          externalTracking: {
+                            enabled: e.target.checked,
+                            // Seed one empty row on first enable so the name field is ready.
+                            systems: e.target.checked && prev.externalTracking.systems.length === 0
+                              ? [{ id: 'draft-1', name: '' }]
+                              : prev.externalTracking.systems
+                          }
                         }))}
                       />
                       <div>
-                        <span className="font-medium">Track findings, artifacts, and controls in your own ticketing system</span>
+                        <span className="font-medium">Track findings, artifacts, and controls in your own ticketing systems</span>
                         <p className="text-xs text-gray-500">
                           Labels the URL fields on findings (ticket link), artifacts (ticket or Google Drive / SharePoint document link),
-                          and controls (compliance-tool link) with your system&apos;s name. The URL fields themselves are always available,
-                          with or without this option.
+                          and controls (compliance-tool link) with your system&apos;s name. Add more than one system if different
+                          record types live in different tools (e.g. Jira for tickets, SharePoint for documents). The URL fields
+                          themselves are always available, with or without this option.
                         </p>
                       </div>
                     </label>
                     {newAssessment.externalTracking.enabled && (
                       <div className="mt-2">
-                        <label className="block text-sm font-medium text-gray-700">System name</label>
-                        <input
-                          type="text"
-                          className="mt-1 w-full p-2 border rounded"
-                          maxLength={SYSTEM_NAME_MAX_LENGTH}
-                          placeholder="e.g., Jira, ServiceNow, SharePoint"
-                          value={newAssessment.externalTracking.systemName}
-                          onChange={(e) => setNewAssessment(prev => ({
-                            ...prev,
-                            externalTracking: { ...prev.externalTracking, systemName: e.target.value }
-                          }))}
-                        />
+                        <label className="block text-sm font-medium text-gray-700">
+                          {newAssessment.externalTracking.systems.length > 1 ? 'System names' : 'System name'}
+                        </label>
+                        {newAssessment.externalTracking.systems.map((system, index) => (
+                          <div key={system.id} className="mt-1 flex items-center gap-2">
+                            <input
+                              type="text"
+                              className="w-full p-2 border rounded"
+                              maxLength={SYSTEM_NAME_MAX_LENGTH}
+                              placeholder="e.g., Jira, ServiceNow, SharePoint"
+                              value={system.name}
+                              onChange={(e) => setNewAssessment(prev => ({
+                                ...prev,
+                                externalTracking: {
+                                  ...prev.externalTracking,
+                                  systems: prev.externalTracking.systems.map((sys) =>
+                                    sys.id === system.id ? { ...sys, name: e.target.value } : sys
+                                  )
+                                }
+                              }))}
+                            />
+                            {newAssessment.externalTracking.systems.length > 1 && (
+                              <button
+                                type="button"
+                                aria-label={`Remove system ${index + 1}`}
+                                className="p-2 text-red-600 hover:bg-red-50 rounded"
+                                onClick={() => setNewAssessment(prev => ({
+                                  ...prev,
+                                  externalTracking: {
+                                    ...prev.externalTracking,
+                                    systems: prev.externalTracking.systems.filter((sys) => sys.id !== system.id)
+                                  }
+                                }))}
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                        {newAssessment.externalTracking.systems.length < MAX_EXTERNAL_SYSTEMS && (
+                          <button
+                            type="button"
+                            className="mt-2 text-sm text-blue-600 hover:underline"
+                            onClick={() => setNewAssessment(prev => ({
+                              ...prev,
+                              externalTracking: {
+                                ...prev.externalTracking,
+                                systems: [
+                                  ...prev.externalTracking.systems,
+                                  {
+                                    id: `draft-${prev.externalTracking.systems.reduce((max, sys) => {
+                                      const n = /^draft-(\d+)$/.test(sys.id) ? Number(sys.id.slice(6)) : 0;
+                                      return n > max ? n : max;
+                                    }, 0) + 1}`,
+                                    name: ''
+                                  }
+                                ]
+                              }
+                            }))}
+                          >
+                            + Add another system
+                          </button>
+                        )}
                         <p className="text-xs text-gray-500 mt-1">
-                          Shown in link-field labels (e.g. &ldquo;Jira ticket URL&rdquo;). Excluded from share exports by default.
+                          Shown in link-field labels (e.g. &ldquo;Jira ticket URL&rdquo;). With several systems, each finding picks
+                          which one its link belongs to. Blank rows are dropped. Excluded from share exports by default.
                         </p>
                       </div>
                     )}

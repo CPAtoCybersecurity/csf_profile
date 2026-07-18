@@ -31,34 +31,99 @@ export const sanitizeExternalUrl = (url) => {
 /** Max length accepted for a user-entered external system name. */
 export const SYSTEM_NAME_MAX_LENGTH = 60;
 
+/** Max number of external tracking systems per assessment (issue #288). */
+export const MAX_EXTERNAL_SYSTEMS = 10;
+
 /** Default per-assessment external-tracking configuration. */
 export const DEFAULT_EXTERNAL_TRACKING = Object.freeze({
   enabled: false,
-  systemName: ''
+  systems: Object.freeze([])
 });
+
+/** Max length accepted for a system id (defensive cap on imported data). */
+const SYSTEM_ID_MAX_LENGTH = 60;
 
 /**
  * Coerce any persisted/imported value into a well-formed externalTracking
- * object. Foreign shapes (missing, null, wrong types) collapse to the
- * default; systemName is trimmed and length-capped.
+ * object. Since issue #288 the shape is { enabled, systems: [{ id, name }] }
+ * supporting multiple tracking systems (e.g. Jira for tickets, SharePoint
+ * for documents). The pre-#288 single-system shape ({ enabled, systemName })
+ * converts to a one-entry systems list.
+ *
+ * Guarantees: foreign shapes collapse to the default; names are trimmed and
+ * length-capped; empty-name entries are dropped; the list is capped at
+ * MAX_EXTERNAL_SYSTEMS; every entry has a unique non-empty string id
+ * (existing valid ids are preserved so per-record references survive,
+ * missing ones are generated collision-free). Idempotent.
  */
 export const normalizeExternalTracking = (value) => {
-  if (!value || typeof value !== 'object') return { ...DEFAULT_EXTERNAL_TRACKING };
-  const systemName = typeof value.systemName === 'string'
-    ? value.systemName.trim().slice(0, SYSTEM_NAME_MAX_LENGTH)
-    : '';
-  return { enabled: value.enabled === true, systemName };
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return { enabled: false, systems: [] };
+  }
+  const enabled = value.enabled === true;
+
+  let rawSystems = [];
+  if (Array.isArray(value.systems)) {
+    rawSystems = value.systems;
+  } else if (typeof value.systemName === 'string') {
+    // Legacy single-system shape (issue #284, schema v11).
+    rawSystems = [{ name: value.systemName }];
+  }
+
+  const systems = [];
+  const usedIds = new Set();
+  const entries = rawSystems
+    .filter((s) => s && typeof s === 'object' && !Array.isArray(s))
+    .map((s) => ({
+      id: typeof s.id === 'string' ? s.id.trim().slice(0, SYSTEM_ID_MAX_LENGTH) : '',
+      name: typeof s.name === 'string' ? s.name.trim().slice(0, SYSTEM_NAME_MAX_LENGTH) : ''
+    }))
+    .filter((s) => s.name !== '')
+    .slice(0, MAX_EXTERNAL_SYSTEMS);
+  // Preserve valid ids first so generated ids can never collide with them.
+  entries.forEach((s) => {
+    if (s.id && !usedIds.has(s.id)) usedIds.add(s.id);
+    else s.id = '';
+  });
+  let counter = 1;
+  entries.forEach((s) => {
+    if (!s.id) {
+      while (usedIds.has(`sys-${counter}`)) counter += 1;
+      s.id = `sys-${counter}`;
+      usedIds.add(s.id);
+    }
+    systems.push({ id: s.id, name: s.name });
+  });
+
+  return { enabled, systems };
 };
 
 /**
- * Label for an external-URL input/link. Uses the assessment's system name
- * when external tracking is enabled ("Jira ticket URL"), a generic label
- * otherwise. `noun` is e.g. "ticket" (findings) or "control" (controls).
+ * The systems available for linking under an assessment's tracking config:
+ * empty unless tracking is enabled. Accepts any shape (normalizes first).
  */
-export const externalUrlLabel = (externalTracking, noun) => {
+export const externalSystemOptions = (externalTracking) => {
   const tracking = normalizeExternalTracking(externalTracking);
-  if (tracking.enabled && tracking.systemName) {
-    return `${tracking.systemName} ${noun} URL`;
+  return tracking.enabled ? tracking.systems : [];
+};
+
+/**
+ * Label for an external-URL input/link. `noun` is e.g. "ticket" (findings)
+ * or "control" (controls). With one configured system the label uses it
+ * implicitly ("Jira ticket URL" — pre-#288 behavior). With several systems,
+ * `systemId` selects which one; no/unknown selection falls back to the
+ * generic label.
+ */
+export const externalUrlLabel = (externalTracking, noun, systemId) => {
+  const systems = externalSystemOptions(externalTracking);
+  // The single-system implicit rule applies only when the record makes NO
+  // explicit selection. An explicit-but-dangling reference (imported data
+  // pointing at a system this assessment does not have) goes generic — a
+  // confidently wrong system name would be worse than no name.
+  const selected = systems.find((s) => s.id === systemId)
+    || (!systemId && systems.length === 1 ? systems[0] : null);
+  if (selected) {
+    return `${selected.name} ${noun} URL`;
   }
   return `External ${noun} URL`;
 };

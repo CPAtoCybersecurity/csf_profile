@@ -89,6 +89,8 @@ const useFindingsStore = create(
           jiraKey: findingData.jiraKey || null, // Jira issue key if synced
           // Optional URL to the finding's ticket in an external system (issue #284)
           externalUrl: findingData.externalUrl || '',
+          // Which of the assessment's tracking systems the URL belongs to (issue #288)
+          externalSystemId: findingData.externalSystemId || '',
           linkedArtifacts: findingData.linkedArtifacts || []
         };
 

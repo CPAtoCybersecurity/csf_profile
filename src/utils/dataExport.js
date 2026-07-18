@@ -256,14 +256,20 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   // project keys in paths. Scrubbed from share exports by default; the
   // include-private opt-in keeps them, complete backups are unaffected.
   // This deliberately also scrubs the PRE-EXISTING artifacts.link field,
-  // which previously rode share exports wholesale. Map+spread clones every
-  // record — live store objects are never mutated.
+  // which previously rode share exports wholesale. The configured tracking
+  // systems (names reveal internal tooling) and per-finding system
+  // references (issue #288) are scrubbed on the same terms. Map+spread
+  // clones every record — live store objects are never mutated.
+  // Rebuilt (not spread) so a lingering legacy systemName field can never
+  // ride out of a not-yet-migrated record.
   jsonData.data.assessments = jsonData.data.assessments.map((a) => (
     a.externalTracking
-      ? { ...a, externalTracking: { ...a.externalTracking, systemName: '' } }
+      ? { ...a, externalTracking: { enabled: a.externalTracking.enabled === true, systems: [] } }
       : a
   ));
-  jsonData.data.findings = jsonData.data.findings.map((f) => ({ ...f, externalUrl: '' }));
+  jsonData.data.findings = jsonData.data.findings.map((f) => ({
+    ...f, externalUrl: '', externalSystemId: ''
+  }));
   jsonData.data.artifacts = (jsonData.data.artifacts || []).map((ar) => ({ ...ar, link: '' }));
   jsonData.data.controls = (jsonData.data.controls || []).map((c) => ({ ...c, externalUrl: '' }));
 

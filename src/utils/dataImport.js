@@ -26,6 +26,7 @@ import {
   migrateAssessmentsState,
   ASSESSMENTS_SCHEMA_VERSION
 } from '../stores/assessmentsStore';
+import { normalizeExternalTracking } from './externalLinks';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
 // Format-2 exports carry no metrics section — it is simply skipped (untouched),
@@ -166,6 +167,20 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
       fileAssessmentsVersion
     );
     data.assessments = migrated.assessments;
+  }
+
+  // externalTracking is normalized UNCONDITIONALLY (issue #288): a file
+  // claiming the current schema version skips the migration above, but a
+  // hand-edited or tampered payload can still carry duplicate system ids,
+  // an oversize list, or the legacy systemName shape — and no later write
+  // path re-normalizes. normalizeExternalTracking is idempotent, so this
+  // is free for well-formed files.
+  if (Array.isArray(data.assessments)) {
+    data.assessments = data.assessments.map((a) => (
+      a && typeof a === 'object'
+        ? { ...a, externalTracking: normalizeExternalTracking(a.externalTracking) }
+        : a
+    ));
   }
 
   // Resolve every write BEFORE applying any, so a missing setter can never

@@ -62,7 +62,11 @@ describe('export → restore round-trip', () => {
       expect.arrayContaining(['users', 'controls', 'assessments', 'requirements', 'frameworks', 'artifacts', 'findings'])
     );
     expect(setters.setUsers).toHaveBeenCalledWith(SAMPLE.users);
-    expect(setters.setAssessments).toHaveBeenCalledWith(SAMPLE.assessments);
+    // Assessments additionally gain a normalized externalTracking on every
+    // restore (issue #288 unconditional repair); all other data is untouched.
+    expect(setters.setAssessments).toHaveBeenCalledWith(
+      SAMPLE.assessments.map(a => ({ ...a, externalTracking: { enabled: false, systems: [] } }))
+    );
     expect(setters.setFindings).toHaveBeenCalledWith(SAMPLE.findings);
     expect(setters.setFrameworks).toHaveBeenCalledWith(SAMPLE.frameworks);
   });
@@ -222,7 +226,82 @@ describe('importCompleteDatabase safety semantics', () => {
 
     const written = setters.setAssessments.mock.calls[0][0];
     const restored = written.find(a => a.id === 'ASM-v10');
-    expect(restored.externalTracking).toEqual({ enabled: false, systemName: '' });
+    expect(restored.externalTracking).toEqual({ enabled: false, systems: [] });
+  });
+
+  test('a v11 export (single systemName) restores converted to the systems list (issue #288)', () => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: 11 },
+      data: {
+        assessments: [{
+          id: 'ASM-v11',
+          name: 'Pre-288 export',
+          scopeType: 'requirements',
+          scoringScale: 10,
+          scopeIds: [],
+          observations: {},
+          externalTracking: { enabled: true, systemName: 'Jira' }
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-v11');
+    expect(restored.externalTracking).toEqual({ enabled: true, systems: [{ id: 'sys-1', name: 'Jira' }] });
+  });
+
+  test('a file CLAIMING the current version still gets externalTracking normalized (issue #288)', () => {
+    // A tampered/hand-edited payload at the current schema version skips the
+    // migration chain; the unconditional normalize must still repair
+    // duplicate ids, enforce the cap, and convert a smuggled legacy shape.
+    const { stores, setters } = makeStores();
+    const oversize = Array.from({ length: 15 }, (_, i) => ({ name: `Tool ${i}` }));
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: 12 },
+      data: {
+        assessments: [
+          {
+            id: 'ASM-dup',
+            scopeType: 'requirements',
+            scoringScale: 10,
+            scopeIds: [],
+            observations: {},
+            externalTracking: {
+              enabled: true,
+              systems: [{ id: 'sys-1', name: 'A' }, { id: 'sys-1', name: 'B' }]
+            }
+          },
+          {
+            id: 'ASM-oversize',
+            scopeType: 'requirements',
+            scoringScale: 10,
+            scopeIds: [],
+            observations: {},
+            externalTracking: { enabled: true, systems: oversize }
+          },
+          {
+            id: 'ASM-smuggled-legacy',
+            scopeType: 'requirements',
+            scoringScale: 10,
+            scopeIds: [],
+            observations: {},
+            externalTracking: { enabled: true, systemName: 'Smuggled' }
+          }
+        ]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const dupIds = written.find(a => a.id === 'ASM-dup').externalTracking.systems.map(s => s.id);
+    expect(new Set(dupIds).size).toBe(2);
+    expect(written.find(a => a.id === 'ASM-oversize').externalTracking.systems).toHaveLength(10);
+    expect(written.find(a => a.id === 'ASM-smuggled-legacy').externalTracking)
+      .toEqual({ enabled: true, systems: [{ id: 'sys-1', name: 'Smuggled' }] });
   });
 
   test('a mid-apply setter failure rolls back every already-applied section', () => {

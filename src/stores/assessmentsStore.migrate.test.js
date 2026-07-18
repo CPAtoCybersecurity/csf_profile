@@ -65,11 +65,11 @@ describe('migrateAssessmentsState', () => {
         id: 'ASM-x',
         observations: {},
         scoringScale: 10,
-        externalTracking: { enabled: false, systemName: '' }
+        externalTracking: { enabled: false, systems: [] }
       }],
       currentAssessmentId: 'ASM-x'
     };
-    const result = migrateAssessmentsState(state, 11);
+    const result = migrateAssessmentsState(state, 12);
     expect(result).toEqual(state);
   });
 
@@ -123,7 +123,7 @@ describe('migrateAssessmentsState', () => {
     });
   });
 
-  describe('v11: externalTracking stamp (issue #284)', () => {
+  describe('v11/v12: externalTracking stamp + multi-system shape (issues #284/#288)', () => {
     test('a v10 client gets the disabled default stamped on every assessment', () => {
       const state = {
         assessments: [
@@ -134,29 +134,71 @@ describe('migrateAssessmentsState', () => {
       };
       const result = migrateAssessmentsState(state, 10);
       expect(result.assessments.every(a =>
-        a.externalTracking && a.externalTracking.enabled === false && a.externalTracking.systemName === ''
+        a.externalTracking
+          && a.externalTracking.enabled === false
+          && Array.isArray(a.externalTracking.systems)
+          && a.externalTracking.systems.length === 0
       )).toBe(true);
     });
 
-    test('idempotent: an assessment already carrying a config keeps enabled + systemName', () => {
+    test('a v11 single-system config converts to a one-entry systems list', () => {
       const state = {
         assessments: [
           { id: 'ASM-jira', observations: {}, scoringScale: 10, externalTracking: { enabled: true, systemName: 'Jira' } },
+          { id: 'ASM-off', observations: {}, scoringScale: 10, externalTracking: { enabled: false, systemName: '' } },
           { id: 'ASM-junk', observations: {}, scoringScale: 10, externalTracking: 'garbage' }
         ],
         currentAssessmentId: 'ASM-jira'
       };
-      const result = migrateAssessmentsState(state, 10);
+      const result = migrateAssessmentsState(state, 11);
       expect(result.assessments.find(a => a.id === 'ASM-jira').externalTracking)
-        .toEqual({ enabled: true, systemName: 'Jira' });
+        .toEqual({ enabled: true, systems: [{ id: 'sys-1', name: 'Jira' }] });
+      expect(result.assessments.find(a => a.id === 'ASM-off').externalTracking)
+        .toEqual({ enabled: false, systems: [] });
       expect(result.assessments.find(a => a.id === 'ASM-junk').externalTracking)
-        .toEqual({ enabled: false, systemName: '' });
+        .toEqual({ enabled: false, systems: [] });
+    });
+
+    test('idempotent: an already-v12 multi-system config keeps enabled, systems, and ids exactly', () => {
+      const tracking = {
+        enabled: true,
+        systems: [{ id: 'sys-1', name: 'Jira' }, { id: 'sys-2', name: 'SharePoint' }]
+      };
+      const state = {
+        assessments: [
+          { id: 'ASM-multi', observations: {}, scoringScale: 10, externalTracking: tracking }
+        ],
+        currentAssessmentId: 'ASM-multi'
+      };
+      const result = migrateAssessmentsState(state, 11);
+      expect(result.assessments.find(a => a.id === 'ASM-multi').externalTracking).toEqual(tracking);
+    });
+
+    test('the migration touches nothing but externalTracking (scores byte-equal)', () => {
+      const state = {
+        assessments: [{
+          id: 'ASM-a',
+          scoringScale: 10,
+          externalTracking: { enabled: true, systemName: 'Jira' },
+          observations: {
+            'GV.SC-04': { quarters: { Q1: { actualScore: 7.5, targetScore: 9 } } }
+          }
+        }],
+        currentAssessmentId: 'ASM-a'
+      };
+      const result = migrateAssessmentsState(state, 11);
+      const q1 = result.assessments[0].observations['GV.SC-04'].quarters.Q1;
+      expect(q1.actualScore).toBe(7.5);
+      expect(q1.targetScore).toBe(9);
+      expect(result.assessments[0].scoringScale).toBe(10);
     });
 
     test('a v0 client also receives the externalTracking stamp (fall-through)', () => {
       const result = migrateAssessmentsState(legacyV0State(), 0);
       expect(result.assessments.every(a =>
-        a.externalTracking && typeof a.externalTracking.enabled === 'boolean'
+        a.externalTracking
+          && typeof a.externalTracking.enabled === 'boolean'
+          && Array.isArray(a.externalTracking.systems)
       )).toBe(true);
     });
   });

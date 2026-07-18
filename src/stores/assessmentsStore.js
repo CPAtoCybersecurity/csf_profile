@@ -132,7 +132,7 @@ const migrateObservationToQuarterly = (oldObs) => {
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 11;
+export const ASSESSMENTS_SCHEMA_VERSION = 12;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -241,7 +241,13 @@ export const migrateAssessmentsState = (persistedState, version) => {
   // ticketing/document system. Idempotent: a well-formed value is preserved
   // (normalize keeps enabled/systemName), a missing/foreign one becomes the
   // disabled default.
-  if (version < 11) {
+  //
+  // Version 12: Multiple tracking systems (issue #288) — the single
+  // { enabled, systemName } becomes { enabled, systems: [{ id, name }] }.
+  // normalizeExternalTracking converts the legacy shape (systemName becomes
+  // the sole systems entry) and is idempotent on already-migrated values,
+  // so both steps share one normalize pass.
+  if (version < 12) {
     const assessments = (state.assessments || []).map(a => ({
       ...a,
       externalTracking: normalizeExternalTracking(a.externalTracking)
@@ -526,9 +532,15 @@ const useAssessmentsStore = create(
 
       // Update assessment metadata
       updateAssessment: (assessmentId, updates) => {
+        // externalTracking must stay normalized at every producer — no UI
+        // edits it post-create today, but the first surface that does must
+        // not persist an unnormalized config (issue #288).
+        const cleaned = updates && 'externalTracking' in updates
+          ? { ...updates, externalTracking: normalizeExternalTracking(updates.externalTracking) }
+          : updates;
         const updatedAssessments = get().assessments.map(a =>
           a.id === assessmentId
-            ? { ...a, ...updates, lastModified: new Date().toISOString() }
+            ? { ...a, ...cleaned, lastModified: new Date().toISOString() }
             : a
         );
         get().setAssessments(updatedAssessments);
@@ -920,6 +932,8 @@ const useAssessmentsStore = create(
           status: 'Not Started',
           createdDate: new Date().toISOString(),
           lastModified: new Date().toISOString(),
+          // Fresh objects, not a shared reference with the original (#288)
+          externalTracking: normalizeExternalTracking(assessment.externalTracking),
           // Reset all observations
           observations: {}
         };

@@ -140,7 +140,7 @@ The Settings export card offers two intents:
 
 ### External ticketing/document URLs — private data too
 
-Findings, artifacts, and controls can carry links into your own systems (a Jira or ServiceNow ticket, a Google Drive or SharePoint document, a control record in your compliance tool — see the External Tracking option in the new-assessment wizard). Those URLs name your internal hostnames, site paths, and project keys, so share exports **scrub them by default**: `findings.externalUrl`, `artifacts.link`, `controls.externalUrl`, and the assessment's external system name are all blanked unless you explicitly include private data. Note this deliberately changed the artifact `link` field's behavior — before issue #284 it rode share exports untouched. Complete backups always keep every URL.
+Findings, artifacts, and controls can carry links into your own systems (a Jira or ServiceNow ticket, a Google Drive or SharePoint document, a control record in your compliance tool — see the External Tracking option in the new-assessment wizard, which since issue #288 accepts multiple systems). Those URLs name your internal hostnames, site paths, and project keys — and the configured system names reveal your internal tooling — so share exports **scrub them by default**: `findings.externalUrl`, `findings.externalSystemId`, `artifacts.link`, `controls.externalUrl`, and the assessment's configured tracking-system list (`externalTracking.systems`) are all blanked unless you explicitly include private data. Note this deliberately changed the artifact `link` field's behavior — before issue #284 it rode share exports untouched. Complete backups always keep every URL and system name.
 
 ## Defense in depth
 

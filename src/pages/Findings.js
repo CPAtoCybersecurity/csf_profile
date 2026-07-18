@@ -7,7 +7,7 @@ import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
-import { sanitizeExternalUrl, externalUrlLabel } from '../utils/externalLinks';
+import { sanitizeExternalUrl, externalUrlLabel, externalSystemOptions } from '../utils/externalLinks';
 import useSort from '../hooks/useSort';
 import EmptyState from '../components/EmptyState';
 import Markdown from '../components/Markdown';
@@ -42,7 +42,8 @@ const Findings = () => {
     dueDate: '',
     status: 'Not Started',
     priority: 'Medium',
-    externalUrl: ''
+    externalUrl: '',
+    externalSystemId: ''
   });
   const [editMode, setEditMode] = useState(false);
   const [errors, setErrors] = useState({});
@@ -248,7 +249,8 @@ const Findings = () => {
       dueDate: '',
       status: 'Not Started',
       priority: 'Medium',
-      externalUrl: ''
+      externalUrl: '',
+      externalSystemId: ''
     });
     setEditMode(false);
     setErrors({});
@@ -620,17 +622,32 @@ const Findings = () => {
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                   <ChevronRight size={16} className="rotate-90" />
-                  {externalUrlLabel(trackingForAssessment((editMode ? formData : selectedFinding)?.assessmentId), 'ticket')}
+                  {externalUrlLabel(trackingForAssessment((editMode ? formData : selectedFinding)?.assessmentId), 'ticket', (editMode ? formData : selectedFinding)?.externalSystemId)}
                 </h3>
                 {editMode ? (
-                  <input
-                    type="url"
-                    name="externalUrl"
-                    value={formData.externalUrl || ''}
-                    onChange={handleChange}
-                    className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
-                    placeholder="https://... (ticket in Jira, ServiceNow, etc.)"
-                  />
+                  <div className="space-y-2">
+                    {externalSystemOptions(trackingForAssessment(formData?.assessmentId)).length > 1 && (
+                      <select
+                        name="externalSystemId"
+                        value={formData.externalSystemId || ''}
+                        onChange={handleChange}
+                        className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      >
+                        <option value="">Tracking system (optional)...</option>
+                        {externalSystemOptions(trackingForAssessment(formData?.assessmentId)).map((system) => (
+                          <option key={system.id} value={system.id}>{system.name}</option>
+                        ))}
+                      </select>
+                    )}
+                    <input
+                      type="url"
+                      name="externalUrl"
+                      value={formData.externalUrl || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      placeholder="https://... (ticket in Jira, ServiceNow, etc.)"
+                    />
+                  </div>
                 ) : selectedFinding?.externalUrl ? (
                   sanitizeExternalUrl(selectedFinding.externalUrl) ? (
                     <a

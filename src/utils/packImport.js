@@ -327,8 +327,8 @@ export const importPack = (parsed, stores) => {
     scopeType: 'requirements',
     // packFormat 1 scores are defined on the 10-point scale (issue #277)
     scoringScale: 10,
-    // packFormat 1 has no external-tracking concept; disabled default (issue #284)
-    externalTracking: { enabled: false, systemName: '' },
+    // packFormat 1 has no external-tracking concept; disabled default (issue #284/#288)
+    externalTracking: { enabled: false, systems: [] },
     scopeIds: resolved.map(({ requirementId }) => requirementId),
     frameworkFilter: defaultFramework?.id || null,
     status: 'In Progress',
