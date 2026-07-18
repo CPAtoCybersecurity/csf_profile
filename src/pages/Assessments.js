@@ -2,7 +2,8 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
-  FileUp, FileText, Loader2, Bot, Sparkles, User, Settings
+  FileUp, FileText, Loader2, Bot, Sparkles, User, Settings,
+  BookOpen, ExternalLink, RotateCcw
 } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
@@ -25,6 +26,7 @@ import useUserStore from '../stores/userStore';
 import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
+import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
 
 // File upload security configuration
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -124,9 +126,13 @@ const Assessments = () => {
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
   const [scopePreset, setScopePreset] = useState(null); // 'category' | 'subcategory' | 'all' | null (custom)
   const [scopeFilterText, setScopeFilterText] = useState('');
+  const [useBankProcedures, setUseBankProcedures] = useState(true);
+  const [showBankPreview, setShowBankPreview] = useState(false);
   const [generateTestProcedures, setGenerateTestProcedures] = useState(false);
   const [isGeneratingProcedures, setIsGeneratingProcedures] = useState(false);
   const [generatedProcedures, setGeneratedProcedures] = useState({});
+  const [generationProgress, setGenerationProgress] = useState({ done: 0, total: 0 });
+  const cancelGenerationRef = useRef(false);
   const [uploadedEvidence, setUploadedEvidence] = useState([]);
   const [evidenceNotes, setEvidenceNotes] = useState('');
   const [isAnalyzingEvidence, setIsAnalyzingEvidence] = useState(false);
@@ -342,22 +348,50 @@ const Assessments = () => {
     ? ollamaStatus.available && ollamaStatus.hasModel
     : claudeStatus.configured;
 
-  // Generate test procedures for selected scope items
+  // Community-bank coverage over the current selection — computed live from
+  // the generated bank, never assumed. Control-scope items resolve to zero
+  // coverage (the bank is keyed by CSF subcategory).
+  const scopeCoverage = useMemo(
+    () => bankCoverage(Array.from(selectedScopeItems)),
+    [selectedScopeItems]
+  );
+
+  // Items AI generation would target: with the bank attached, AI fills the
+  // gaps; with it off, AI covers the whole selection.
+  const aiTargetIds = useMemo(
+    () => (useBankProcedures ? scopeCoverage.uncovered : Array.from(selectedScopeItems)),
+    [useBankProcedures, scopeCoverage, selectedScopeItems]
+  );
+
+  // Generate test procedures with AI for the target items.
+  // No silent cap: every target is generated, one sequential LLM round-trip
+  // per item, with live progress and a cancel affordance.
   const handleGenerateTestProcedures = useCallback(async () => {
     if (selectedScopeItems.size === 0) {
       toast.error('Please select items in scope first');
       return;
     }
 
-    setIsGeneratingProcedures(true);
-    const procedures = { ...generatedProcedures };
+    const selectedIds = aiTargetIds;
+    if (selectedIds.length === 0) {
+      toast('All selected items already have community procedures — nothing for AI to generate.');
+      return;
+    }
 
-    // Get selected items (limit to first 10 for performance)
-    const selectedIds = Array.from(selectedScopeItems).slice(0, 10);
+    setIsGeneratingProcedures(true);
+    cancelGenerationRef.current = false;
+    setGenerationProgress({ done: 0, total: selectedIds.length });
+    const procedures = { ...generatedProcedures };
+    let done = 0;
 
     for (const itemId of selectedIds) {
-      // Skip if already generated
-      if (procedures[itemId]) continue;
+      if (cancelGenerationRef.current) break;
+      // Already generated (e.g. resuming after a cancel): counts as done.
+      if (procedures[itemId]) {
+        done += 1;
+        setGenerationProgress({ done, total: selectedIds.length });
+        continue;
+      }
 
       let description = '';
       if (newAssessment.scopeType === 'controls') {
@@ -392,12 +426,18 @@ Format as a numbered list. Be specific and actionable.`;
         console.error('Test procedure generation error:', error);
         procedures[itemId] = 'Failed to generate test procedures. Please try again.';
       }
+      done += 1;
+      setGenerationProgress({ done, total: selectedIds.length });
     }
 
     setGeneratedProcedures(procedures);
     setIsGeneratingProcedures(false);
-    toast.success(`Generated procedures for ${Object.keys(procedures).length} items`);
-  }, [selectedScopeItems, generatedProcedures, newAssessment.scopeType, controls, requirements, llmProvider, generateWithOllama, generateWithClaude]);
+    if (cancelGenerationRef.current && done < selectedIds.length) {
+      toast(`Generation canceled after ${done} of ${selectedIds.length} items — run again to continue.`);
+    } else {
+      toast.success(`Generated procedures for ${done} of ${selectedIds.length} items`);
+    }
+  }, [selectedScopeItems, aiTargetIds, generatedProcedures, newAssessment.scopeType, controls, requirements, llmProvider, generateWithOllama, generateWithClaude]);
 
   // Extract text from uploaded file
   const extractTextFromFile = async (file) => {
@@ -506,9 +546,13 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setSelectedScopeItems(new Set());
     setScopePreset(null);
     setScopeFilterText('');
+    setUseBankProcedures(true);
+    setShowBankPreview(false);
     setGenerateTestProcedures(false);
     setIsGeneratingProcedures(false);
     setGeneratedProcedures({});
+    setGenerationProgress({ done: 0, total: 0 });
+    cancelGenerationRef.current = false;
     setUploadedEvidence([]);
     setEvidenceNotes('');
     setIsAnalyzingEvidence(false);
@@ -533,8 +577,15 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     for (const itemId of selectedScopeItems) {
       addToScope(created.id, itemId);
 
-      // Apply generated test procedure if available
-      if (generatedProcedures[itemId]) {
+      // Bank-first: attach the community procedure (full markdown, with
+      // provenance) for every covered item; AI/manual fills the gaps.
+      const bankEntry = useBankProcedures ? getBankProcedure(itemId) : null;
+      if (bankEntry) {
+        updateObservation(created.id, itemId, {
+          testProcedures: bankEntry.markdown,
+          procedureSource: buildProcedureSource(bankEntry.bankId)
+        });
+      } else if (generatedProcedures[itemId]) {
         updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
       }
     }
@@ -557,7 +608,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setCurrentAssessmentId(created.id);
     setView('scope');
     toast.success(`Assessment "${created.name}" created with ${selectedScopeItems.size} items`);
-  }, [newAssessment, createAssessment, selectedScopeItems, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
+  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
 
   const handleSelectAssessment = useCallback((assessment) => {
     setCurrentAssessmentId(assessment.id);
@@ -616,6 +667,24 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   const handleObservationChange = useCallback((field, value) => {
     if (!currentAssessmentId || !selectedItemId) return;
     updateObservation(currentAssessmentId, selectedItemId, { [field]: value });
+  }, [currentAssessmentId, selectedItemId, updateObservation]);
+
+  // Attach (or re-attach) the community procedure for the selected item.
+  // Both write pristine provenance explicitly so the store's modified-flag
+  // heuristic doesn't mark a deliberate attach as a customization.
+  const handleInsertBankProcedure = useCallback((existingText) => {
+    if (!currentAssessmentId || !selectedItemId) return;
+    const entry = getBankProcedure(selectedItemId);
+    if (!entry) return;
+    if (existingText && existingText.trim() &&
+        !window.confirm('Replace the current test procedures with the community version?')) {
+      return;
+    }
+    updateObservation(currentAssessmentId, selectedItemId, {
+      testProcedures: entry.markdown,
+      procedureSource: buildProcedureSource(entry.bankId)
+    });
+    toast.success(`Community procedure for ${entry.bankId} attached`);
   }, [currentAssessmentId, selectedItemId, updateObservation]);
 
   const handleQuarterlyChange = useCallback((field, value) => {
@@ -1316,7 +1385,42 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
                   {/* Test Procedures */}
                   <div className="mb-4">
-                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Test Procedures</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                        Test Procedures
+                        {currentObservation.procedureSource?.bank === 'community' && (
+                          <span className="px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 flex items-center gap-1">
+                            <BookOpen size={11} />
+                            {currentObservation.procedureSource.modified ? 'Community · customized' : 'Community'}
+                          </span>
+                        )}
+                      </label>
+                      <div className="flex items-center gap-3">
+                        {editMode && getBankProcedure(selectedItemId) && (
+                          <button
+                            type="button"
+                            onClick={() => handleInsertBankProcedure(currentObservation.testProcedures)}
+                            className="text-xs text-green-700 dark:text-green-400 flex items-center gap-1 hover:underline"
+                            title={currentObservation.procedureSource ? 'Restore the pristine community version' : 'Insert the community-contributed procedure'}
+                          >
+                            {currentObservation.procedureSource
+                              ? (<><RotateCcw size={12} /> Reset to community version</>)
+                              : (<><BookOpen size={12} /> Insert community procedure</>)}
+                          </button>
+                        )}
+                        {!editMode && currentObservation.procedureSource?.bank === 'community' && bankSourceUrl(currentObservation.procedureSource.bankId) && (
+                          <a
+                            href={bankSourceUrl(currentObservation.procedureSource.bankId)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
+                            title="Suggest an improvement to this community procedure on GitHub"
+                          >
+                            <ExternalLink size={12} /> Improve this procedure
+                          </a>
+                        )}
+                      </div>
+                    </div>
                     {editMode ? (
                       <textarea
                         value={currentObservation.testProcedures || ''}
@@ -1326,7 +1430,13 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       />
                     ) : (
                       <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
-                        <ReactMarkdown>{formatTestProcedures(currentObservation.testProcedures) || 'No test procedures defined'}</ReactMarkdown>
+                        {/* Bank-attached procedures are real markdown — render as-is;
+                            the reformat helper is only for legacy free-text blobs. */}
+                        <ReactMarkdown>
+                          {(currentObservation.procedureSource
+                            ? currentObservation.testProcedures
+                            : formatTestProcedures(currentObservation.testProcedures)) || 'No test procedures defined'}
+                        </ReactMarkdown>
                       </div>
                     )}
                   </div>
@@ -1968,77 +2078,160 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 </div>
               )}
 
-              {/* Step 2: Test Procedure Generation */}
+              {/* Step 2: Test Procedures — community bank first, AI fills the gaps */}
               {wizardStep === 2 && (
                 <div className="space-y-4">
-                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                  {/* Card 1: community-contributed procedures (default ON) */}
+                  <div className={`border rounded-lg p-4 ${useBankProcedures ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-600'}`}>
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={useBankProcedures}
+                        onChange={(e) => setUseBankProcedures(e.target.checked)}
+                        className="w-5 h-5 rounded mt-0.5"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <BookOpen size={18} className="text-green-700" />
+                          <span className="font-medium text-green-900 dark:text-green-200">Use community test procedures (recommended)</span>
+                        </div>
+                        <p className="text-sm text-green-800 dark:text-green-300 mt-1">
+                          Start from expert procedures contributed by the CSF Profile community —
+                          step-by-step tests, pass/fail criteria, interview questions, and evidence
+                          requests. Instant, offline, and fully editable after creation.
+                        </p>
+                        <p className="text-sm font-medium mt-2 text-green-900 dark:text-green-200">
+                          {scopeCoverage.covered.length} of {selectedScopeItems.size} selected items have community procedures
+                        </p>
+                        {scopeCoverage.uncovered.length > 0 && (
+                          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+                            {newAssessment.scopeType === 'controls'
+                              ? 'Community procedures cover CSF subcategories, so control-scope items have no bank match — generate with AI below or write your own after creation.'
+                              : `${scopeCoverage.uncovered.length} selected item(s) have no community procedure yet — generate with AI below or write your own after creation.`}
+                          </p>
+                        )}
+                      </div>
+                    </label>
+                    {useBankProcedures && scopeCoverage.covered.length > 0 && (
+                      <div className="mt-3 ml-8">
+                        <button
+                          type="button"
+                          onClick={() => setShowBankPreview(!showBankPreview)}
+                          className="text-sm text-green-700 dark:text-green-400 underline"
+                        >
+                          {showBankPreview ? 'Hide preview' : `Preview procedures (${scopeCoverage.covered.length})`}
+                        </button>
+                        {showBankPreview && (
+                          <div className="max-h-56 overflow-y-auto space-y-2 mt-2">
+                            {scopeCoverage.covered.map((id) => {
+                              const entry = getBankProcedure(id);
+                              return (
+                                <details key={id} className="p-2 bg-white dark:bg-gray-700 rounded border text-sm">
+                                  <summary className="cursor-pointer font-medium">{id} — {entry.title}</summary>
+                                  <pre className="whitespace-pre-wrap text-xs text-gray-600 dark:text-gray-300 mt-2 max-h-40 overflow-y-auto">
+                                    {entry.markdown.slice(0, 1500)}{entry.markdown.length > 1500 ? '\n…(full procedure attaches on create)' : ''}
+                                  </pre>
+                                </details>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card 2: AI generation — optional, targets the gaps */}
+                  <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-700 rounded-lg p-4">
                     <div className="flex items-start gap-3">
                       <Bot size={24} className="text-purple-600 mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-medium text-purple-900">AI-Generated Test Procedures</h4>
-                        <p className="text-sm text-purple-700 mt-1">
-                          Optionally generate test procedures for your selected scope using AI.
-                          You can refine these after the assessment is created.
+                        <h4 className="font-medium text-purple-900 dark:text-purple-200">Generate with AI (optional)</h4>
+                        <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+                          {useBankProcedures
+                            ? 'AI drafts procedures for items the community bank does not cover.'
+                            : 'AI drafts procedures from scratch for every selected item.'}
+                          {' '}Each item is one model round-trip, so larger batches take time — progress is shown and you can cancel.
                         </p>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded text-xs ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                        {llmProvider === 'ollama' ? 'Ollama' : 'Claude'}
-                      </span>
-                      {isAIReady ? (
-                        <span className="text-green-600 text-sm flex items-center gap-1">
-                          <CheckCircle size={14} /> Ready
+                    <div className="flex items-center justify-between p-3 bg-white/60 dark:bg-gray-800/60 rounded-lg mt-3">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-1 rounded text-xs ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
+                          {llmProvider === 'ollama' ? 'Ollama' : 'Claude'}
                         </span>
-                      ) : (
-                        <span className="text-red-600 text-sm flex items-center gap-1">
-                          <XCircle size={14} /> Not Ready
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-sm text-blue-600 font-medium">
-                      {selectedScopeItems.size} items selected
-                    </p>
-                  </div>
-
-                  <label className="flex items-center gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      checked={generateTestProcedures}
-                      onChange={(e) => setGenerateTestProcedures(e.target.checked)}
-                      className="w-5 h-5 rounded"
-                      disabled={!isAIReady || selectedScopeItems.size === 0}
-                    />
-                    <div>
-                      <span className="font-medium">Generate test procedures</span>
-                      <p className="text-sm text-gray-500">
-                        AI will create test procedures for {Math.min(selectedScopeItems.size, 10)} of {selectedScopeItems.size} selected items
+                        {isAIReady ? (
+                          <span className="text-green-600 text-sm flex items-center gap-1">
+                            <CheckCircle size={14} /> Ready
+                          </span>
+                        ) : (
+                          <span className="text-red-600 text-sm flex items-center gap-1">
+                            <XCircle size={14} /> Not Ready
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                        {aiTargetIds.length} of {selectedScopeItems.size} selected items targeted
                       </p>
                     </div>
-                  </label>
 
-                  {generateTestProcedures && (
-                    <button
-                      onClick={handleGenerateTestProcedures}
-                      disabled={isGeneratingProcedures || !isAIReady}
-                      className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
-                    >
-                      {isGeneratingProcedures ? (
-                        <>
-                          <Loader2 className="animate-spin" size={18} />
-                          Generating Procedures...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={18} />
-                          Generate Now
-                        </>
-                      )}
-                    </button>
-                  )}
+                    <label className="flex items-center gap-3 p-4 border dark:border-gray-600 rounded-lg cursor-pointer hover:bg-white/40 mt-3">
+                      <input
+                        type="checkbox"
+                        checked={generateTestProcedures}
+                        onChange={(e) => setGenerateTestProcedures(e.target.checked)}
+                        className="w-5 h-5 rounded"
+                        disabled={!isAIReady || aiTargetIds.length === 0}
+                      />
+                      <div>
+                        <span className="font-medium dark:text-white">Generate test procedures</span>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {aiTargetIds.length === 0
+                            ? 'Every selected item is covered by community procedures — nothing for AI to generate.'
+                            : `AI will create test procedures for all ${aiTargetIds.length} targeted item(s) — no cap.`}
+                        </p>
+                      </div>
+                    </label>
+
+                    {generateTestProcedures && (
+                      <div className="mt-3 space-y-2">
+                        <button
+                          onClick={handleGenerateTestProcedures}
+                          disabled={isGeneratingProcedures || !isAIReady}
+                          className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+                        >
+                          {isGeneratingProcedures ? (
+                            <>
+                              <Loader2 className="animate-spin" size={18} />
+                              Generating {generationProgress.done} of {generationProgress.total}...
+                            </>
+                          ) : (
+                            <>
+                              <Sparkles size={18} />
+                              Generate Now
+                            </>
+                          )}
+                        </button>
+                        {isGeneratingProcedures && (
+                          <>
+                            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                              <div
+                                className="bg-purple-600 h-2 rounded-full transition-all"
+                                style={{ width: `${generationProgress.total ? Math.round((generationProgress.done / generationProgress.total) * 100) : 0}%` }}
+                              />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => { cancelGenerationRef.current = true; }}
+                              className="w-full border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2 px-4 rounded-lg text-sm"
+                            >
+                              Cancel — keep what's generated so far
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+                  </div>
 
                   {Object.keys(generatedProcedures).length > 0 && (
                     <div className="space-y-2">
