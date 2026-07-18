@@ -12,13 +12,19 @@ import useOrgProfileStore, { EMPTY_PROFILE } from '../stores/orgProfileStore';
 
 const SIZE_BANDS = ['1–49', '50–249', '250–999', '1,000–4,999', '5,000+'];
 
+// Cloud, email, and chat selections drive DETERMINISTIC procedure tailoring
+// (canned substitutions, no AI) — see utils/stackTailorMaps.js.
 const INFRA_PRESETS = [
   'AWS', 'Azure', 'Google Cloud', 'On-premises data center', 'SaaS-heavy',
-  'Kubernetes / containers', 'OT / ICS', 'Remote-first endpoints'
+  'Kubernetes / containers', 'OT / ICS', 'Remote-first endpoints',
+  'Microsoft 365', 'Google Workspace', 'Slack', 'Microsoft Teams'
 ];
 
+// Naming a specific EDR product here enables an exact SentinelOne→product
+// swap in tailored procedures; the generic 'EDR' chip neutralizes instead.
 const TOOL_PRESETS = [
-  'EDR', 'SIEM', 'IdP / SSO', 'MFA', 'Vulnerability scanner', 'DLP', 'Backup / DR', 'Firewall / SASE'
+  'EDR', 'SIEM', 'IdP / SSO', 'MFA', 'Vulnerability scanner', 'DLP', 'Backup / DR', 'Firewall / SASE',
+  'CrowdStrike Falcon', 'Microsoft Defender for Endpoint', 'SentinelOne'
 ];
 
 const ChipPicker = ({ presets, value, onChange, placeholder }) => {

@@ -9,7 +9,7 @@
  */
 import { exportAllDataJSON, buildShareableExport, EXPORT_FORMAT_VERSION } from './dataExport';
 import { validateDatabaseExport, importCompleteDatabase } from './dataImport';
-import { tailorMarkdown, canUseProfileWithProvider, tailoredProvenance } from './procedureTailor';
+import { tailorMarkdown, canUseProfileWithProvider, tailoredProvenance, bankAttachObservation } from './procedureTailor';
 import { getBankProcedure, buildProcedureSource } from './procedureBank';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -127,6 +127,30 @@ describe('org profile in exports', () => {
     const obs = share.data.assessments.find((a) => a.id === assessmentId).observations['CTRL-042'];
     expect(obs.testProcedures).toBe('');
     expect(JSON.stringify(share)).not.toContain(CANARY_JEWEL);
+  });
+
+  test('stack-swap producer: deterministic tool substitutions never leak into default share', () => {
+    // The G8.1 producer path — canned stack swaps reveal profile facts
+    // (their cloud, their EDR vendor) just like AI tailoring does, so the
+    // pristine swap must cover it identically.
+    const stackProfile = {
+      orgName: CANARY_ORG,
+      infrastructure: ['Google Cloud'],
+      securityTools: ['CrowdStrike']
+    };
+    useOrgProfileStore.getState().saveProfile(stackProfile);
+    // Exercise the REAL wizard-attach producer, not a simulation of it —
+    // if it ever stops stamping tailored provenance, this test fails.
+    const produced = bankAttachObservation(getBankProcedure('GV.OC-01'), stackProfile, { substituteName: true, adaptStack: true });
+    expect(produced.procedureSource.tailored).toBe(true);
+    useAssessmentsStore.getState().updateObservation(assessmentId, 'GV.OC-01 Ex1', produced);
+
+    const share = buildShareableExport(stores());
+    const serialized = JSON.stringify(share);
+    const obs = share.data.assessments.find((a) => a.id === assessmentId).observations['GV.OC-01 Ex1'];
+    expect(obs.testProcedures).toBe(pristine);
+    expect(serialized).not.toContain('CrowdStrike');
+    expect(serialized).not.toContain(CANARY_ORG);
   });
 
   test('a tailored observation whose bank entry cannot resolve exports empty text, never the tailored text', () => {

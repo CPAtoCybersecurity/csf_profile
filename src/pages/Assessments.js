@@ -28,7 +28,7 @@ import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
-import { tailorMarkdown, canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance } from '../utils/procedureTailor';
+import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
@@ -135,6 +135,7 @@ const Assessments = () => {
   const [useBankProcedures, setUseBankProcedures] = useState(true);
   const [showBankPreview, setShowBankPreview] = useState(false);
   const [tailorWithProfile, setTailorWithProfile] = useState(false);
+  const [adaptStackRefs, setAdaptStackRefs] = useState(false);
   const [showProfileWizard, setShowProfileWizard] = useState(false);
   const [isTailoringItem, setIsTailoringItem] = useState(false);
 
@@ -142,6 +143,13 @@ const Assessments = () => {
   const orgProfile = useOrgProfileStore((s) => s.profile);
   const hasOrgProfile = useOrgProfileStore((s) => s.hasProfile)();
   const cloudConsent = useOrgProfileStore((s) => s.cloudConsent);
+
+  // Deterministic swap plan derived from the profile (no AI): which canned
+  // tool/platform substitutions would fire, as human-readable lines.
+  const stackPlan = useMemo(
+    () => (orgProfile ? describeStackPlan(deriveStackTargets(orgProfile)) : []),
+    [orgProfile]
+  );
   const [generateTestProcedures, setGenerateTestProcedures] = useState(false);
   const [isGeneratingProcedures, setIsGeneratingProcedures] = useState(false);
   const [generatedProcedures, setGeneratedProcedures] = useState({});
@@ -563,6 +571,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setUseBankProcedures(true);
     setShowBankPreview(false);
     setTailorWithProfile(false);
+    setAdaptStackRefs(false);
     setGenerateTestProcedures(false);
     setIsGeneratingProcedures(false);
     setGeneratedProcedures({});
@@ -597,15 +606,13 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       const bankEntry = useBankProcedures ? getBankProcedure(itemId) : null;
       if (bankEntry) {
         // Optional deterministic tailoring: substitute the org's name for
-        // the case study's "Alma Security". Tailored text carries the
-        // tailored flag so share export can swap back to pristine.
-        const { text, tailored } = tailorWithProfile && orgProfile
-          ? tailorMarkdown(bankEntry.markdown, orgProfile)
-          : { text: bankEntry.markdown, tailored: false };
-        updateObservation(created.id, itemId, {
-          testProcedures: text,
-          procedureSource: { ...buildProcedureSource(bankEntry.bankId), tailored }
-        });
+        // the case study's "Alma Security" and/or re-aim tool/platform
+        // references at the org's stack (canned maps, no AI). The producer
+        // stamps tailored provenance so share export can swap to pristine.
+        updateObservation(created.id, itemId, bankAttachObservation(bankEntry, orgProfile, {
+          substituteName: tailorWithProfile,
+          adaptStack: adaptStackRefs
+        }));
       } else if (generatedProcedures[itemId]) {
         updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
       }
@@ -629,7 +636,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setCurrentAssessmentId(created.id);
     setView('scope');
     toast.success(`Assessment "${created.name}" created with ${selectedScopeItems.size} items`);
-  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, tailorWithProfile, orgProfile, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
+  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, tailorWithProfile, adaptStackRefs, orgProfile, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
 
   const handleSelectAssessment = useCallback((assessment) => {
     setCurrentAssessmentId(assessment.id);
@@ -707,6 +714,31 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     });
     toast.success(`Community procedure for ${entry.bankId} attached`);
   }, [currentAssessmentId, selectedItemId, updateObservation]);
+
+  // Deterministic tailoring of the selected item's procedure: canned
+  // name + tool/platform substitutions from the org profile. No AI, no
+  // key, nothing leaves the machine. Works on already-attached procedures
+  // so existing assessments benefit without re-creation.
+  const handleTailorDeterministic = useCallback((currentText) => {
+    if (!currentAssessmentId || !selectedItemId || !currentText) return;
+    if (!hasOrgProfile) {
+      toast.error('Set up your organization profile first (Settings → Organization profile).');
+      return;
+    }
+    const existing = getObservation(currentAssessmentId, selectedItemId);
+    // The producer stamps tailored provenance — an untagged tailored
+    // procedure would bypass the share-export pristine swap and leak
+    // profile facts.
+    const result = deterministicTailorUpdate(currentText, existing?.procedureSource, selectedItemId, orgProfile);
+    if (!result) {
+      toast('Nothing to adapt — this procedure already matches your profile. Name your cloud, EDR, or email platform in the org profile to enable swaps.', { duration: 6000 });
+      return;
+    }
+    updateObservation(currentAssessmentId, selectedItemId, result.update);
+    toast.success(result.swapCount > 0
+      ? `Procedure adapted to your environment — ${result.swapCount} reference${result.swapCount === 1 ? '' : 's'} swapped (no AI)`
+      : 'Organization name substituted (no AI)');
+  }, [currentAssessmentId, selectedItemId, hasOrgProfile, orgProfile, getObservation, updateObservation]);
 
   // AI-tailor the selected item's procedure with the org profile.
   // Consent gate: the profile never goes to a CLOUD provider without the
@@ -1466,6 +1498,16 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         )}
                       </label>
                       <div className="flex items-center gap-3">
+                        {editMode && hasOrgProfile && currentObservation.testProcedures && (
+                          <button
+                            type="button"
+                            onClick={() => handleTailorDeterministic(currentObservation.testProcedures)}
+                            className="text-xs text-amber-700 dark:text-amber-400 flex items-center gap-1 hover:underline"
+                            title="Swap platform/tool references (AWS, SentinelOne, O365, Slack) for your profile's stack using canned mappings — no AI, nothing leaves this machine"
+                          >
+                            <Settings size={12} /> Adapt to my environment
+                          </button>
+                        )}
                         {editMode && hasOrgProfile && currentObservation.testProcedures && (
                           <button
                             type="button"
@@ -2277,10 +2319,34 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                                 Substitute my organization's name into attached procedures
                               </span>
                             </label>
+                            <label className="flex items-start gap-2 mt-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={adaptStackRefs}
+                                onChange={(e) => setAdaptStackRefs(e.target.checked)}
+                                className="w-4 h-4 rounded mt-0.5"
+                                disabled={!useBankProcedures || stackPlan.length === 0}
+                              />
+                              <span className="text-sm text-amber-900 dark:text-amber-200">
+                                Adapt tool &amp; platform references to my environment (no AI)
+                              </span>
+                            </label>
+                            {stackPlan.length > 0 ? (
+                              <ul className="text-xs text-amber-700 dark:text-amber-400 mt-1 ml-6 list-disc space-y-0.5">
+                                {stackPlan.map((line) => <li key={line}>{line}</li>)}
+                              </ul>
+                            ) : (
+                              <p className="text-xs text-amber-700 dark:text-amber-400 mt-1 ml-6">
+                                No swaps apply yet — the community procedures are written against an
+                                AWS + SentinelOne + O365 + Slack stack. Select a different cloud
+                                (Google Cloud, Azure, on-premises) or name your EDR / email / chat
+                                platform in the profile to enable canned substitutions.
+                              </p>
+                            )}
                             <p className="text-xs text-amber-700 dark:text-amber-400 mt-1">
                               Uses your saved profile{orgProfile?.orgName ? ` (${orgProfile.orgName})` : ''} —{' '}
                               <button type="button" className="underline" onClick={() => setShowProfileWizard(true)}>edit</button>.
-                              Per-item AI tailoring is available on each requirement after creation.
+                              Both options also work per-requirement after creation ("Adapt to my environment").
                               {!useBankProcedures && ' (Enable community procedures above to tailor them.)'}
                             </p>
                           </>
