@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   FIRST_VISIT: 'csf_first_visit_acknowledged',
   BACKUP_REMINDER_FREQUENCY: 'csf_backup_reminder_frequency',
   LAST_REMINDER: 'csf_last_reminder_shown',
+  FIRST_USE: 'csf_first_use_date',
 };
 
 /**
@@ -40,6 +41,22 @@ export const isFirstVisit = () => {
  */
 export const acknowledgeFirstVisit = () => {
   localStorage.setItem(STORAGE_KEYS.FIRST_VISIT, 'true');
+};
+
+/**
+ * Get the first-use date, recording it now if it hasn't been recorded yet.
+ * Used to delay the first backup reminder for brand-new users who have
+ * never exported — they get a full reminder cycle before the first nag.
+ * @returns {Date} The first-use date
+ */
+export const ensureFirstUseDate = () => {
+  const firstUse = localStorage.getItem(STORAGE_KEYS.FIRST_USE);
+  if (firstUse) {
+    return new Date(firstUse);
+  }
+  const now = new Date();
+  localStorage.setItem(STORAGE_KEYS.FIRST_USE, now.toISOString());
+  return now;
 };
 
 /**
@@ -84,11 +101,13 @@ export const shouldShowBackupReminder = () => {
   const lastReminder = getLastReminderDate();
   const lastExport = getLastExportDate();
 
-  // If never reminded, check if enough time has passed since last export or app start
+  // If never reminded, check if enough time has passed since last export or first use
   if (!lastReminder) {
     if (!lastExport) {
-      // Never exported, show reminder after frequency days of first use
-      return true;
+      // Never exported: wait until a full reminder cycle has passed since first use
+      const firstUse = ensureFirstUseDate();
+      const daysSinceFirstUse = (Date.now() - firstUse.getTime()) / (1000 * 60 * 60 * 24);
+      return daysSinceFirstUse >= frequency;
     }
     // Use last export as reference
     const daysSinceExport = (Date.now() - lastExport.getTime()) / (1000 * 60 * 60 * 24);

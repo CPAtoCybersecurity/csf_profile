@@ -20,8 +20,7 @@ import EmptyState from '../components/EmptyState';
 // Stores
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
-import useRequirementsStore from '../stores/requirementsStore';
-import useFrameworksStore from '../stores/frameworksStore';
+import useRequirementsStore, { isCsfRequirement } from '../stores/requirementsStore';
 import useUserStore from '../stores/userStore';
 import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
@@ -93,9 +92,6 @@ const Assessments = () => {
   const requirements = useRequirementsStore((state) => state.requirements);
   const getRequirement = useRequirementsStore((state) => state.getRequirement);
 
-  const frameworks = useFrameworksStore((state) => state.frameworks);
-  const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
-
   // AI Store for test procedure generation
   const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
 
@@ -123,10 +119,10 @@ const Assessments = () => {
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
-    scopeType: 'requirements',
-    frameworkFilter: ''
+    scopeType: 'requirements'
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
+  const [scopePreset, setScopePreset] = useState(null); // 'category' | 'subcategory' | 'all' | null (custom)
   const [scopeFilterText, setScopeFilterText] = useState('');
   const [generateTestProcedures, setGenerateTestProcedures] = useState(false);
   const [isGeneratingProcedures, setIsGeneratingProcedures] = useState(false);
@@ -275,7 +271,36 @@ const Assessments = () => {
     }
   }, []);
 
-  const enabledFrameworks = useMemo(() => getEnabledFrameworks(), [frameworks]);
+  // Assessments are scoped against NIST CSF 2.0 requirements only
+  const csfRequirements = useMemo(() => requirements.filter(isCsfRequirement), [requirements]);
+
+  // Scope presets: one implementation example per category, one per
+  // subcategory, or the full catalog. "First" is catalog order, and the
+  // category key is derived from the subcategory ID (e.g. "GV.SC-04" -> "GV.SC")
+  // so both bundled and imported CSF catalogs group correctly.
+  const scopePresets = useMemo(() => {
+    const perCategory = [];
+    const perSubcategory = [];
+    const seenCategories = new Set();
+    const seenSubcategories = new Set();
+    for (const r of csfRequirements) {
+      const subcategoryId = r.subcategoryId || '';
+      const categoryId = subcategoryId.split('-')[0];
+      if (categoryId && !seenCategories.has(categoryId)) {
+        seenCategories.add(categoryId);
+        perCategory.push(r.id);
+      }
+      if (subcategoryId && !seenSubcategories.has(subcategoryId)) {
+        seenSubcategories.add(subcategoryId);
+        perSubcategory.push(r.id);
+      }
+    }
+    return {
+      category: perCategory,
+      subcategory: perSubcategory,
+      all: csfRequirements.map(r => r.id)
+    };
+  }, [csfRequirements]);
 
   // Get items available for scope selection in wizard
   const wizardScopeItems = useMemo(() => {
@@ -289,11 +314,7 @@ const Assessments = () => {
         type: 'control'
       }));
     } else {
-      let reqs = requirements;
-      if (newAssessment.frameworkFilter) {
-        reqs = reqs.filter(r => r.frameworkId === newAssessment.frameworkFilter);
-      }
-      items = reqs.map(r => ({
+      items = csfRequirements.map(r => ({
         id: r.id,
         label: r.subcategoryId || r.id,
         description: r.implementationExample || r.category || '',
@@ -314,7 +335,7 @@ const Assessments = () => {
     }
 
     return items;
-  }, [newAssessment.scopeType, newAssessment.frameworkFilter, controls, requirements, scopeFilterText]);
+  }, [newAssessment.scopeType, controls, csfRequirements, scopeFilterText]);
 
   // Wizard helper: check if AI is ready
   const isAIReady = llmProvider === 'ollama'
@@ -481,8 +502,9 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'requirements', frameworkFilter: '' });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements' });
     setSelectedScopeItems(new Set());
+    setScopePreset(null);
     setScopeFilterText('');
     setGenerateTestProcedures(false);
     setIsGeneratingProcedures(false);
@@ -1768,7 +1790,11 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           name="scopeType"
                           value="requirements"
                           checked={newAssessment.scopeType === 'requirements'}
-                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                          onChange={(e) => {
+                            setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }));
+                            setSelectedScopeItems(new Set());
+                            setScopePreset(null);
+                          }}
                         />
                         <div>
                           <span className="font-medium">By Requirements</span>
@@ -1782,7 +1808,11 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           name="scopeType"
                           value="controls"
                           checked={newAssessment.scopeType === 'controls'}
-                          onChange={(e) => setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }))}
+                          onChange={(e) => {
+                            setNewAssessment(prev => ({ ...prev, scopeType: e.target.value }));
+                            setSelectedScopeItems(new Set());
+                            setScopePreset(null);
+                          }}
                         />
                         <div>
                           <span className="font-medium">By Controls</span>
@@ -1797,26 +1827,52 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
 
                   {newAssessment.scopeType === 'requirements' && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Framework Filter</label>
-                      <select
-                        className="mt-1 w-full p-2 border rounded"
-                        value={newAssessment.frameworkFilter}
-                        onChange={(e) => {
-                          setNewAssessment(prev => ({ ...prev, frameworkFilter: e.target.value }));
-                          setSelectedScopeItems(new Set()); // Reset selection when framework changes
-                        }}
-                      >
-                        <option value="">All Frameworks</option>
-                        {enabledFrameworks.map(fw => (
-                          <option key={fw.id} value={fw.id}>{fw.name}</option>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Scope Size</label>
+                      <div className="space-y-2">
+                        {[
+                          {
+                            key: 'category',
+                            label: 'One example per category',
+                            description: 'A quick baseline: the first implementation example from each CSF category'
+                          },
+                          {
+                            key: 'subcategory',
+                            label: 'One example per subcategory',
+                            description: 'Standard coverage: the first implementation example from each CSF subcategory'
+                          },
+                          {
+                            key: 'all',
+                            label: 'All implementation examples',
+                            description: 'Comprehensive: every CSF implementation example in the catalog'
+                          }
+                        ].map(preset => (
+                          <label
+                            key={preset.key}
+                            className={`flex items-center gap-2 p-3 border rounded cursor-pointer hover:bg-gray-50 ${scopePreset === preset.key ? 'border-blue-500 bg-blue-50' : ''}`}
+                          >
+                            <input
+                              type="radio"
+                              name="scopePreset"
+                              value={preset.key}
+                              checked={scopePreset === preset.key}
+                              onChange={() => {
+                                setScopePreset(preset.key);
+                                setSelectedScopeItems(new Set(scopePresets[preset.key]));
+                              }}
+                            />
+                            <div>
+                              <span className="font-medium">{preset.label}</span>
+                              <span className="text-gray-500 ml-2">({scopePresets[preset.key].length} items)</span>
+                              <p className="text-xs text-gray-500">{preset.description}</p>
+                            </div>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                     </div>
                   )}
 
                   {/* Scope Item Selection */}
-                  {(newAssessment.scopeType === 'controls' || newAssessment.frameworkFilter) && (
-                    <div className="border rounded-lg overflow-hidden">
+                  <div className="border rounded-lg overflow-hidden">
                       <div className="bg-gray-50 p-3 border-b">
                         <div className="flex items-center justify-between mb-2">
                           <h4 className="font-medium text-gray-700">
@@ -1840,6 +1896,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                             onClick={() => {
                               const allIds = new Set(wizardScopeItems.map(item => item.id));
                               setSelectedScopeItems(allIds);
+                              setScopePreset(null);
                             }}
                           >
                             Select All
@@ -1847,7 +1904,10 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                           <button
                             type="button"
                             className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                            onClick={() => setSelectedScopeItems(new Set())}
+                            onClick={() => {
+                              setSelectedScopeItems(new Set());
+                              setScopePreset(null);
+                            }}
                           >
                             Clear
                           </button>
@@ -1856,7 +1916,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       <div className="max-h-64 overflow-y-auto">
                         {wizardScopeItems.length === 0 ? (
                           <div className="p-4 text-center text-gray-500 text-sm">
-                            No items available. {newAssessment.scopeType === 'controls' ? 'Add controls in the Controls tab.' : 'Select a framework above.'}
+                            No items available. {newAssessment.scopeType === 'controls' ? 'Add controls in the Controls tab.' : 'No CSF requirements loaded.'}
                           </div>
                         ) : (
                           <div className="divide-y">
@@ -1877,6 +1937,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                                       newSet.delete(item.id);
                                     }
                                     setSelectedScopeItems(newSet);
+                                    setScopePreset(null);
                                   }}
                                   className="mt-1 rounded"
                                 />
@@ -1904,7 +1965,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         )}
                       </div>
                     </div>
-                  )}
                 </div>
               )}
 

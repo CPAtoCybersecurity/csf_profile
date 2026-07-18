@@ -3,6 +3,27 @@ import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { escapeCSVValue } from '../utils/sanitize';
 
+export const CSF_FRAMEWORK_ID = 'nist-csf-2.0';
+
+// CSV files carry human-readable framework names (e.g. "NIST CSF 2.0") while
+// stores and filters compare against framework ids (e.g. "nist-csf-2.0").
+// Normalize known display names to canonical ids at ingestion so the two
+// vocabularies never mix in persisted data.
+const FRAMEWORK_NAME_TO_ID = {
+  'nist csf 2.0': CSF_FRAMEWORK_ID,
+  'nist csf': CSF_FRAMEWORK_ID,
+};
+
+export const normalizeFrameworkId = (framework) => {
+  if (!framework) return framework;
+  return FRAMEWORK_NAME_TO_ID[framework.toLowerCase().trim()] || framework;
+};
+
+// True when a requirement belongs to NIST CSF 2.0, accepting both the
+// canonical id and legacy display-name values from older persisted data.
+export const isCsfRequirement = (requirement) =>
+  normalizeFrameworkId(requirement?.frameworkId) === CSF_FRAMEWORK_ID;
+
 const useRequirementsStore = create(
   persist(
     (set, get) => ({
@@ -190,6 +211,7 @@ const useRequirementsStore = create(
 
       // Import requirements from CSV for a specific framework
       importRequirementsCSV: async (csvText, frameworkId) => {
+        frameworkId = normalizeFrameworkId(frameworkId);
         return new Promise((resolve, reject) => {
           Papa.parse(csvText, {
             header: true,
@@ -197,7 +219,7 @@ const useRequirementsStore = create(
             complete: (results) => {
               const newRequirements = results.data.map((row, index) => {
                 // Get framework from row or use provided frameworkId
-                const rowFramework = row.FRAMEWORK || row.Framework || row.framework || frameworkId;
+                const rowFramework = normalizeFrameworkId(row.FRAMEWORK || row.Framework || row.framework || frameworkId);
 
                 return {
                   id: row['Requirement ID'] || row.ID || row.id || `${rowFramework}-${index}`,
@@ -259,7 +281,7 @@ const useRequirementsStore = create(
                   return {
                     // === FRAMEWORK DATA (Read-Only) ===
                     id: row['Requirement ID'] || row.ID || '',
-                    frameworkId: row.Framework || row.FRAMEWORK || 'nist-csf-2.0',
+                    frameworkId: normalizeFrameworkId(row.Framework || row.FRAMEWORK) || CSF_FRAMEWORK_ID,
                     function: row['CSF Function'] || row['CSF FUNCTION'] || row.Function || '',
                     functionDescription: row['CSF Function Description'] || row['Function Description'] || '',
                     category: row['Category Name'] || row.CATEGORY || row.Category || '',
