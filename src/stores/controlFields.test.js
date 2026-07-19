@@ -61,6 +61,49 @@ describe('updateControl sanitizes every free-text field', () => {
   });
 });
 
+describe('the new free-text fields survive angle brackets', () => {
+  beforeEach(resetStore);
+
+  // Regression: these fields used to run through sanitizeInput (DOMPurify with
+  // ALLOWED_TAGS: []), which DELETES angle-bracket content. The panel writes on
+  // every keystroke against a controlled input, so an escalation address
+  // vanished as the user typed it — and `Name <email>` is this app's own owner
+  // convention, so it is exactly what a Tests plan will contain.
+  const WITH_EMAIL = 'Escalate exceptions to <soc@example.com> weekly';
+
+  it('keeps an <email> written through createControl', () => {
+    const created = useControlsStore.getState().createControl({
+      controlId: 'CTL-400',
+      name: 'Review <owner@example.com>',
+      tests: WITH_EMAIL,
+      frameworks: 'CSF 2.0 <internal>'
+    });
+    expect(created.tests).toBe(WITH_EMAIL);
+    expect(created.name).toBe('Review <owner@example.com>');
+    expect(created.frameworks).toBe('CSF 2.0 <internal>');
+  });
+
+  it('keeps an <email> written through updateControl', () => {
+    useControlsStore.getState().createControl({ controlId: 'CTL-401' });
+    useControlsStore.getState().updateControl('CTL-401', { tests: WITH_EMAIL });
+    expect(useControlsStore.getState().getControl('CTL-401').tests).toBe(WITH_EMAIL);
+  });
+
+  it('keeps a less-than sign intact rather than entity-encoding it', () => {
+    useControlsStore.getState().createControl({ controlId: 'CTL-402' });
+    useControlsStore.getState().updateControl('CTL-402', { tests: 'sample size < 25 accounts' });
+    expect(useControlsStore.getState().getControl('CTL-402').tests).toBe('sample size < 25 accounts');
+  });
+
+  it('keeps an <email> through a CSV import', async () => {
+    await useControlsStore.getState().importControlsCSV(
+      `Control ID,Tests\nCTL-403,"${WITH_EMAIL}"`,
+      null
+    );
+    expect(useControlsStore.getState().getControl('CTL-403').tests).toBe(WITH_EMAIL);
+  });
+});
+
 describe('normalizeControlFields', () => {
   it('fills the missing fields on a pre-#306 record', () => {
     const state = normalizeControlFields({
@@ -153,6 +196,52 @@ describe('CSV round-trip carries the issue #306 fields', () => {
     ].join('\n');
     await useControlsStore.getState().importControlsCSV(blank, null);
     expect(useControlsStore.getState().getControl('CTL-101').status).toBe(CONTROL_STATUSES[0]);
+  });
+
+  it('is LOSSLESS for values containing commas, apostrophes and quotes', async () => {
+    // Regression: escapeCSVValue wraps-and-quotes, and Papa.unparse quotes
+    // again, so a re-imported value came back carrying literal " characters
+    // that grew by two on every cycle. An apostrophe alone was enough.
+    const tricky = {
+      controlId: 'CTL-300',
+      name: 'Vendor, Third-Party Reviews',
+      tests: "Sam's quarterly review",
+      frameworks: 'ISO 27001, "Annex A"',
+      status: 'Implemented'
+    };
+
+    const captured = [];
+    const originalBlob = global.Blob;
+    global.Blob = function MockBlob(parts) { captured.push(parts.join('')); return { parts }; };
+    global.URL.createObjectURL = jest.fn(() => 'blob:mock');
+    global.URL.revokeObjectURL = jest.fn();
+    useControlsStore.getState().createControl(tricky);
+    useControlsStore.getState().exportControlsCSV(null);
+    global.Blob = originalBlob;
+
+    // Feed the exported file straight back into the importer.
+    await useControlsStore.getState().importControlsCSV(captured.join(''), null);
+    const back = useControlsStore.getState().getControl('CTL-300');
+
+    expect(back.name).toBe(tricky.name);
+    expect(back.tests).toBe(tricky.tests);
+    expect(back.frameworks).toBe(tricky.frameworks);
+    expect(back.status).toBe('Implemented');
+  });
+
+  it('still neutralizes a formula while staying lossless', async () => {
+    const captured = [];
+    const originalBlob = global.Blob;
+    global.Blob = function MockBlob(parts) { captured.push(parts.join('')); return { parts }; };
+    global.URL.createObjectURL = jest.fn(() => 'blob:mock');
+    global.URL.revokeObjectURL = jest.fn();
+    useControlsStore.getState().createControl({ controlId: 'CTL-301', name: '=cmd|calc' });
+    useControlsStore.getState().exportControlsCSV(null);
+    global.Blob = originalBlob;
+
+    const csv = captured.join('');
+    expect(csv).not.toMatch(/(^|,)=cmd/);
+    expect(csv).toContain("'=cmd|calc");
   });
 
   it('exports the four columns (regression: status used to be dropped on import)', () => {

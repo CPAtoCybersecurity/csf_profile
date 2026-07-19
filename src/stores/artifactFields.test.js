@@ -178,6 +178,39 @@ describe('CSV injection through the round-tripped columns', () => {
   });
 });
 
+describe('artifact CSV round-trip is lossless', () => {
+  beforeEach(resetStore);
+
+  it('preserves commas, apostrophes and quotes through export → import', async () => {
+    useArtifactStore.getState().addArtifact({
+      artifactId: 'AR-60',
+      name: "Vendor, Third-Party Reviews (Sam's copy)",
+      description: 'Quoted "evidence" bundle',
+      health: 'Healthy'
+    });
+
+    const csv = captureCSV(() => useArtifactStore.getState().exportArtifactsCSV());
+    resetStore();
+    await useArtifactStore.getState().importArtifactsCSV(csv);
+
+    const back = useArtifactStore.getState().getArtifactByArtifactId('AR-60');
+    expect(back.name).toBe("Vendor, Third-Party Reviews (Sam's copy)");
+    expect(back.description).toBe('Quoted "evidence" bundle');
+    expect(back.health).toBe('Healthy');
+  });
+
+  it('keeps an apostrophe-bearing Artifact ID stable so re-import dedupes', async () => {
+    // A mangled ID would miss `existingKeys.has(artifactId)` on re-import and
+    // silently duplicate the record instead of skipping it.
+    useArtifactStore.getState().addArtifact({ artifactId: "AR-Q1'26", name: 'Quarterly' });
+    const csv = captureCSV(() => useArtifactStore.getState().exportArtifactsCSV());
+
+    const added = await useArtifactStore.getState().importArtifactsCSV(csv);
+    expect(added).toBe(0); // recognized as already present
+    expect(useArtifactStore.getState().artifacts).toHaveLength(1);
+  });
+});
+
 describe('Jira AR export is a foreign contract', () => {
   beforeEach(resetStore);
 

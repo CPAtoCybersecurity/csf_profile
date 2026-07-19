@@ -214,7 +214,14 @@ const Artifacts = () => {
 
     if (editMode) {
       updateArtifact(formData.id, formData);
-      setSelectedArtifact({ ...formData });
+      // Re-read from the store rather than reusing formData: updateArtifact
+      // stamps lastModified INSIDE the store, so formData still carries the
+      // pre-save value. Before issue #306 nothing rendered lastModified and
+      // the stale copy was invisible; now the panel would show yesterday's
+      // date next to a list row showing today's.
+      const saved = useArtifactStore.getState().getArtifactById(formData.id);
+      setSelectedArtifact(saved || { ...formData });
+      if (saved) setFormData({ ...saved, linkedSubcategoryIds: saved.linkedSubcategoryIds || [] });
       toast.success('Artifact updated');
     } else {
       const newArtifact = {
@@ -423,7 +430,12 @@ const Artifacts = () => {
         {/* Left - Table */}
         <div className={`${selectedArtifact || editMode ? 'w-1/2' : 'w-full'} overflow-auto border-r dark:border-gray-700`}>
           {/* Column headers */}
-          <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
+          {/* min-w-max belongs on the STICKY wrapper, not only on the inner
+              row: a block child of an overflow-auto container is sized to the
+              container's client width, so the grey background and border would
+              stop at the first viewport-width while ~1300px of columns scroll
+              past — rows would slide under a transparent header. */}
+          <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 min-w-max">
             <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-max">
               <div className="w-8 flex-shrink-0"></div>
               <div className="w-56 flex-shrink-0">ID</div>

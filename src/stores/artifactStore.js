@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
-import { escapeCSVValue } from '../utils/sanitize';
+import { escapeCSVValue, csvFormulaGuard } from '../utils/sanitize';
 import { DEFAULT_ARTIFACTS, RELOCATED_ARTIFACT_LINKS } from './defaultArtifactsData';
 import { COMPREHENSIVE_ARTIFACTS, COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -289,28 +289,28 @@ const useArtifactStore = create(
         const artifacts = get().artifacts;
 
         const csvData = artifacts.map(a => ({
-          'Artifact ID': escapeCSVValue(a.artifactId),
+          'Artifact ID': csvFormulaGuard(a.artifactId),
           // 'Name' → 'Artifact Name' (issue #306). Import still accepts the
           // old header, so files exported by earlier versions keep working.
-          'Artifact Name': escapeCSVValue(a.name),
-          'Description': escapeCSVValue(a.description),
-          'Link': escapeCSVValue(a.link || ''),
-          'Type': escapeCSVValue(a.type || 'Document'),
-          'Status': escapeCSVValue(a.status || 'ACTIVE'),
-          'Health': escapeCSVValue(a.health || ''),
-          'Priority': escapeCSVValue(a.priority || 'Medium'),
-          'Control ID': escapeCSVValue(a.controlId || ''),
-          'Assessment ID': escapeCSVValue(a.assessmentId || ''),
+          'Artifact Name': csvFormulaGuard(a.name),
+          'Description': csvFormulaGuard(a.description),
+          'Link': csvFormulaGuard(a.link || ''),
+          'Type': csvFormulaGuard(a.type || 'Document'),
+          'Status': csvFormulaGuard(a.status || 'ACTIVE'),
+          'Health': csvFormulaGuard(a.health || ''),
+          'Priority': csvFormulaGuard(a.priority || 'Medium'),
+          'Control ID': csvFormulaGuard(a.controlId || ''),
+          'Assessment ID': csvFormulaGuard(a.assessmentId || ''),
           'Linked Evaluation IDs': (a.linkedEvaluationIds || []).join('; '),
-          'Compliance Requirement': escapeCSVValue(a.complianceRequirement || ''), // Deprecated
+          'Compliance Requirement': csvFormulaGuard(a.complianceRequirement || ''), // Deprecated
           'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '), // Deprecated
           // Every one of these round-trips through importArtifactsCSV, so
           // every one is user-controlled and must be escaped. 'Last Updated'
           // is new in issue #306; the rest were already importable and
           // already exported raw — same defect class, fixed together.
-          'Created Date': escapeCSVValue(a.createdDate),
-          'Last Updated': escapeCSVValue(a.lastModified || ''),
-          'Jira Key': escapeCSVValue(a.jiraKey || '')
+          'Created Date': csvFormulaGuard(a.createdDate),
+          'Last Updated': csvFormulaGuard(a.lastModified || ''),
+          'Jira Key': csvFormulaGuard(a.jiraKey || '')
         }));
 
         const csv = Papa.unparse(csvData);
