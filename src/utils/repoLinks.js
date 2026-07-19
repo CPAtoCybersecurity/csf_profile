@@ -97,28 +97,42 @@ export function extractRepoLinkPaths(text) {
 /**
  * Find links that look like a misspelled reference to this repository.
  *
- * Linking to another project's main branch is ordinary and is left alone. What this catches is a
- * link to a repo *named* `csf_profile` under an owner we do not recognise — almost always a typo
- * in this repo's own owner, which would otherwise be silently skipped as somebody else's fork.
+ * Linking to another project's main branch is ordinary and is left alone. A link is suspect when
+ * exactly one half of the slug matches ours: the right repo name under an unrecognised owner
+ * (`CPAtoCyberSecurity/csf_profile`), or our owner with a mangled repo name
+ * (`CPAtoCybersecurity/csf-profile`). Both would otherwise pass silently — neither matches the
+ * exact-slug pattern the path check uses, so nothing else in this module would see them.
  *
  * @param {string} text source file contents
  * @returns {string[]} the suspect `owner/repo` slugs found
  */
 export function findUnknownRepos(text) {
-  const repoName = THIS_REPO.split('/')[1];
+  const [ourOwner, ourRepo] = THIS_REPO.split('/');
   const unknown = [];
+
   for (const match of text.matchAll(anyRepoPattern())) {
-    const slug = `${match[1]}/${match[2]}`;
-    if (match[2].toLowerCase() !== repoName.toLowerCase()) continue;
-    if (!KNOWN_REPOS.has(slug)) unknown.push(slug);
+    const [, owner, repo] = match;
+    const slug = `${owner}/${repo}`;
+    if (KNOWN_REPOS.has(slug)) continue;
+
+    const ownerMatches = owner.toLowerCase() === ourOwner.toLowerCase();
+    const repoMatches = repo.toLowerCase() === ourRepo.toLowerCase();
+    // Neither half matches: an unrelated project, which is none of this guard's business.
+    if (!ownerMatches && !repoMatches) continue;
+
+    unknown.push(slug);
   }
+
   return unknown;
 }
 
 /** @returns {boolean} whether this file's contents should be swept. */
 export function isScannable(relPath, contents) {
-  const dot = relPath.lastIndexOf('.');
-  const ext = dot === -1 ? '' : relPath.slice(dot).toLowerCase();
+  // Basename first: a dotted directory such as `.github/CODEOWNERS` would otherwise yield an
+  // "extension" of `.github/codeowners`.
+  const name = relPath.slice(relPath.lastIndexOf('/') + 1);
+  const dot = name.lastIndexOf('.');
+  const ext = dot <= 0 ? '' : name.slice(dot).toLowerCase();
   return TEXT_EXTENSIONS.has(ext) && !contents.includes(IGNORE_MARKER);
 }
 

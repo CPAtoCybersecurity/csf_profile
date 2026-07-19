@@ -168,10 +168,24 @@ describe('findUnknownRepos', () => {
     ).toEqual(['CPAtoCyberSecurity/csf_profile']);
   });
 
+  test('flags a mangled repo name under the correct owner', () => {
+    // Neither check would otherwise see this: the path pattern requires an exact slug, and a
+    // repo-name-only rule would read `csf-profile` as somebody else's project.
+    expect(
+      findUnknownRepos('https://github.com/CPAtoCybersecurity/csf-profile/blob/main/README.md')
+    ).toEqual(['CPAtoCybersecurity/csf-profile']);
+  });
+
   test('leaves links to unrelated projects alone', () => {
     expect(findUnknownRepos('https://github.com/danielmiessler/Telos/blob/main/README.md')).toEqual(
       []
     );
+  });
+
+  test('leaves an unrelated project owned by someone else entirely alone', () => {
+    expect(
+      findUnknownRepos('https://github.com/facebook/create-react-app/blob/main/README.md')
+    ).toEqual([]);
   });
 });
 
@@ -197,6 +211,15 @@ describe('isScannable', () => {
 
   test('rejects a file that opts out via the marker', () => {
     expect(isScannable('src/utils/repoLinks.test.js', 'repo-link-guard:ignore-file')).toBe(false);
+  });
+
+  test('reads the extension from the basename, not a dotted directory', () => {
+    expect(isScannable('.github/CODEOWNERS', '')).toBe(false);
+    expect(isScannable('.github/workflows/ci.yml', '')).toBe(true);
+  });
+
+  test('rejects a dotfile with no extension of its own', () => {
+    expect(isScannable('.gitignore', '')).toBe(false);
   });
 });
 
