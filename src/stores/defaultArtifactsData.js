@@ -8,7 +8,7 @@ export const DEFAULT_ARTIFACTS = [
     artifactId: 'AR-1',
     name: 'Phishing Campaign Results from Jan 2026',
     description: 'Phishing tool (Go Phish) campaign export of results',
-    link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/2025-05-26_Phish-1001-LI-Campaign-Data.xlsx',
+    link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx',
     complianceRequirement: null,
     controlId: 'PR.AT-01 Ex2', // Security awareness training control
     linkedSubcategoryIds: [],
@@ -38,7 +38,7 @@ export const DEFAULT_ARTIFACTS = [
     artifactId: 'AR-3',
     name: 'SOC-Ticket-1004',
     description: 'Sample case',
-    link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/public/Sample_Artifacts/SOC-Ticket-1004.md',
+    link: 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1004.md',
     complianceRequirement: null,
     controlId: 'RS.MI-02 Ex2', // Incident eradication control
     linkedSubcategoryIds: [],
