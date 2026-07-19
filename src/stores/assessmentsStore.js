@@ -6,12 +6,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { normalizeExternalTracking, normalizeExternalLinks } from '../utils/externalLinks';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
-import { UPDATED_OBSERVATIONS, ALMA_AUDIT_OBSERVATIONS } from './defaultAssessmentsData';
 import {
   COMPREHENSIVE_ASSESSMENT_ID,
   COMPREHENSIVE_SCOPE_IDS,
   COMPREHENSIVE_OBSERVATIONS
 } from './comprehensiveAssessmentData';
+import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
+import { cleanCommunityMarkdown } from '../utils/relatedSection.mjs';
 import useAuditLogStore from './auditLogStore';
 
 const COMPREHENSIVE_ASSESSMENT = {
@@ -25,54 +26,13 @@ const COMPREHENSIVE_ASSESSMENT = {
   observations: COMPREHENSIVE_OBSERVATIONS
 };
 
-// Default assessment for new installations
-// References control IDs from DEFAULT_CONTROLS in controlsStore.js
-// User ID 2 = Steve (Auditor) from default users
-// Quarterly observation data imported from defaultAssessmentsData.js (extracted from CSV)
-const DEFAULT_ASSESSMENTS = [
-  {
-    id: 'ASM-default-2025-alma',
-    name: '2026 Alma Security CSF Assessment',
-    description: 'Annual CSF 2.0 assessment for Alma Security covering all implemented controls',
-    scopeType: 'requirements',
-    frameworkFilter: null,
-    createdDate: '2026-01-01T00:00:00.000Z',
-    scopeIds: [
-      'GV.SC-04 Ex1', 'GV.OC-01 Ex1', 'GV.RR-02 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2',
-      'GV.RM-01 Ex2', 'GV.RR-01 Ex4', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7', 'GV.SC-06 Ex3',
-      'GV.SC-10 Ex3', 'GV.SC-09 Ex5', 'ID.RA-07 Ex1', 'PR.AT-01 Ex2', 'PR.IR-02 Ex1',
-      'RS.MI-02 Ex2', 'DE.AE-02 Ex1', 'DE.AE-06 Ex1', 'DE.CM-01 Ex1', 'ID.RA-01 Ex1',
-      'PR.DS-01 Ex4', 'PR.IR-03 Ex3', 'PR.PS-01 Ex1', 'PR.PS-05 Ex1', 'RC.RP-03 Ex1',
-      'RS.MI-01 Ex1', 'DE.AE-03 Ex2', 'DE.CM-03 Ex2', 'DE.CM-09 Ex1', 'ID.AM-02 Ex2',
-      'ID.AM-07 Ex3', 'ID.IM-01 Ex1', 'RS.MA-03 Ex2', 'DE.AE-02 Ex3', 'DE.AE-08 Ex1',
-      'ID.RA-08 Ex1', 'PR.AA-02 Ex2', 'PR.DS-10 Ex1'
-    ],
-    observations: UPDATED_OBSERVATIONS
-  },
-  {
-    id: 'ASM-audit-2025-alma',
-    name: '2026 Alma Security CSF',
-    description: 'Internal Audit Report IA-2026-001.',
-    scopeType: 'requirements',
-    frameworkFilter: null,
-    createdDate: '2026-04-30T00:00:00.000Z',
-    scopeIds: [
-      'GV.OC-01 Ex1', 'GV.OC-02 Ex1', 'GV.OV-01 Ex2', 'GV.RM-01 Ex2',
-      'GV.RR-01 Ex4', 'GV.RR-02 Ex1', 'GV.SC-01 Ex3', 'GV.SC-02 Ex7',
-      'GV.SC-04 Ex1', 'GV.SC-06 Ex3', 'GV.SC-09 Ex5', 'GV.SC-10 Ex3',
-      'ID.AM-02 Ex2', 'ID.AM-07 Ex3', 'ID.IM-01 Ex1', 'ID.RA-01 Ex1',
-      'ID.RA-07 Ex1', 'ID.RA-08 Ex1',
-      'PR.AA-02 Ex2', 'PR.AT-01 Ex2', 'PR.DS-01 Ex4', 'PR.DS-10 Ex1',
-      'PR.IR-02 Ex1', 'PR.IR-03 Ex3', 'PR.PS-01 Ex1', 'PR.PS-05 Ex1',
-      'DE.AE-02 Ex1', 'DE.AE-02 Ex3', 'DE.AE-03 Ex2', 'DE.AE-06 Ex1',
-      'DE.AE-08 Ex1', 'DE.CM-01 Ex1', 'DE.CM-03 Ex2', 'DE.CM-09 Ex1',
-      'RS.AN-03 Ex2', 'RS.MA-03 Ex2', 'RS.MI-01 Ex1', 'RS.MI-02 Ex2',
-      'RC.RP-03 Ex1', 'RC.RP-05 Ex1'
-    ],
-    observations: ALMA_AUDIT_OBSERVATIONS
-  },
-  COMPREHENSIVE_ASSESSMENT
-];
+// Example data shipped with the software (issue #294): ONLY the newest,
+// most comprehensive catalog-driven example installs. The two earlier Alma
+// demo assessments (ASM-default-2025-alma, ASM-audit-2025-alma) are gone —
+// removed from existing installs by the v14 migration below.
+export const LEGACY_EXAMPLE_ASSESSMENT_IDS = ['ASM-default-2025-alma', 'ASM-audit-2025-alma'];
+
+const DEFAULT_ASSESSMENTS = [COMPREHENSIVE_ASSESSMENT];
 
 // Helper to create default quarterly data structure
 const createDefaultQuarter = () => ({
@@ -180,7 +140,7 @@ export const normalizeAssessmentUsers = (value) => {
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 13;
+export const ASSESSMENTS_SCHEMA_VERSION = 14;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -212,15 +172,10 @@ export const migrateAssessmentsState = (persistedState, version) => {
     state = { ...state, assessments: DEFAULT_ASSESSMENTS, currentAssessmentId: null };
   }
 
-  // Version 3: Update default assessment with corrected CSV data (Q1-Q4 scores)
-  if (version < 3) {
-    const assessments = (state.assessments || []).map(assessment =>
-      assessment.id === 'ASM-default-2025-alma'
-        ? { ...assessment, observations: UPDATED_OBSERVATIONS }
-        : assessment
-    );
-    state = { ...state, assessments };
-  }
+  // Version 3 (retired at v14): previously refreshed ASM-default-2025-alma's
+  // observation data. That seeded demo assessment is removed outright at v14
+  // (issue #294), so the step is a no-op — historical copies are dropped
+  // below regardless of the entry version.
 
   // Versions 4 & 5: Fix scopeType from 'controls' to 'requirements' where scopeIds
   // are subcategory/requirement-style IDs (e.g., GV.SC-04, DE.CM-03, GV.SC-04 Ex1)
@@ -237,23 +192,9 @@ export const migrateAssessmentsState = (persistedState, version) => {
     state = { ...state, assessments };
   }
 
-  // Version 6: Add Alma Security Internal Audit as second default assessment
-  if (version < 6) {
-    const assessments = state.assessments || [];
-    if (!assessments.some(a => a.id === 'ASM-audit-2025-alma')) {
-      state = { ...state, assessments: [...assessments, DEFAULT_ASSESSMENTS[1]] };
-    }
-  }
-
-  // Version 7: Rename second assessment
-  if (version < 7) {
-    const assessments = (state.assessments || []).map(a =>
-      a.id === 'ASM-audit-2025-alma'
-        ? { ...a, name: '2026 Alma Security CSF', description: 'Internal Audit Report IA-2026-001.' }
-        : a
-    );
-    state = { ...state, assessments };
-  }
+  // Versions 6 & 7 (retired at v14): previously added and renamed the
+  // ASM-audit-2025-alma demo assessment. Removed outright at v14 (issue
+  // #294), so both steps are no-ops now.
 
   // Version 8: Add comprehensive catalog-driven assessment
   if (version < 8) {
@@ -323,6 +264,60 @@ export const migrateAssessmentsState = (persistedState, version) => {
       users: normalizeAssessmentUsers(a.users)
     }));
     state = { ...state, assessments };
+  }
+
+  // v14 (issue #294): ship a single example assessment.
+  // 1. The two earlier Alma demo assessments are removed — EXACT seeded IDs
+  //    only, so user-created assessments are never touched.
+  // 2. Community-bank attaches that carry pristine provenance
+  //    (bank='community', modified:false, not tailored) are cleaned IN
+  //    PLACE with the same transform the generator applies (Related-section
+  //    strip + relative-link rewrite) rather than wholesale bank
+  //    replacement — so even if a modified flag is stale, at most the
+  //    dead-link Related section is removed, never the user's text. When
+  //    the cleaned copy lands byte-identical to the current bank entry, the
+  //    provenance bankVersion is refreshed too. This deliberately covers
+  //    the comprehensive example itself (its observations are build-time
+  //    bank attaches with pristine provenance): the example heals without a
+  //    destructive constant-replace, so scores/notes a user recorded inside
+  //    it survive — reviewer-flagged data-loss path avoided.
+  if (version < 14) {
+    const kept = (state.assessments || []).filter(
+      a => !LEGACY_EXAMPLE_ASSESSMENT_IDS.includes(a.id)
+    );
+    const assessments = kept.map(a => {
+      if (!a.observations) return a;
+      let changed = false;
+      const observations = {};
+      for (const [itemId, obs] of Object.entries(a.observations)) {
+        const src = obs?.procedureSource;
+        if (src?.bank === 'community' && src.modified === false && !src.tailored &&
+            typeof src.bankId === 'string' && typeof obs.testProcedures === 'string') {
+          const sourceDir = `ASSESSMENT_CATALOG/3_Test_Procedures/${src.bankId.slice(0, 2)}`;
+          const cleaned = cleanCommunityMarkdown(obs.testProcedures, sourceDir);
+          if (cleaned !== obs.testProcedures) {
+            const entry = getBankProcedure(src.bankId);
+            const nowPristine = entry && cleaned === entry.markdown;
+            observations[itemId] = {
+              ...obs,
+              testProcedures: cleaned,
+              procedureSource: nowPristine ? { ...src, bankVersion: BANK_VERSION } : src
+            };
+            changed = true;
+            continue;
+          }
+        }
+        observations[itemId] = obs;
+      }
+      return changed ? { ...a, observations } : a;
+    });
+    let { currentAssessmentId } = state;
+    if (LEGACY_EXAMPLE_ASSESSMENT_IDS.includes(currentAssessmentId)) {
+      currentAssessmentId = assessments.some(x => x.id === COMPREHENSIVE_ASSESSMENT_ID)
+        ? COMPREHENSIVE_ASSESSMENT_ID
+        : (assessments[0]?.id ?? null);
+    }
+    state = { ...state, assessments, currentAssessmentId };
   }
 
   return state;

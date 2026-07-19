@@ -3,10 +3,16 @@ import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
-import { DEFAULT_FINDINGS } from './defaultFindingsData';
 import { COMPREHENSIVE_FINDINGS } from './comprehensiveAssessmentData';
+import { LEGACY_EXAMPLE_ASSESSMENT_IDS } from './assessmentsStore';
 
-const SEEDED_FINDINGS = [...DEFAULT_FINDINGS, ...COMPREHENSIVE_FINDINGS];
+// Only the comprehensive example's findings ship with the software (issue
+// #294). The four FND-1..FND-4 demo findings belonged to the removed legacy
+// example assessments; the v5 migration below drops them from existing
+// installs.
+const SEEDED_FINDINGS = [...COMPREHENSIVE_FINDINGS];
+
+const LEGACY_DEMO_FINDING_IDS = new Set(['FND-1', 'FND-2', 'FND-3', 'FND-4']);
 
 /**
  * Findings Store
@@ -363,25 +369,40 @@ const useFindingsStore = create(
     }),
     {
       name: 'csf-findings-storage',
-      version: 4,
+      version: 5,
+      // Fall-through chain (each step feeds the next) so a client on any old
+      // version receives every later migration.
       migrate: (persistedState, version) => {
+        let state = persistedState || {};
         if (version < 2) {
-          if (persistedState?.findings?.length > 0) {
-            return persistedState;
+          // v0/v1 semantics preserved exactly: real user findings are KEPT
+          // (the old chain early-returned here), empty states get the seed.
+          if (!(state.findings?.length > 0)) {
+            state = { ...state, findings: SEEDED_FINDINGS };
           }
-          return { findings: SEEDED_FINDINGS };
-        }
-        if (version < 3) {
-          return { findings: SEEDED_FINDINGS };
+        } else if (version < 3) {
+          // v2-exactly clients were hard-reset to the seeded set.
+          state = { ...state, findings: SEEDED_FINDINGS };
         }
         // Version 4: Merge in catalog findings for the comprehensive assessment
         if (version < 4) {
-          const existing = persistedState?.findings || [];
+          const existing = state.findings || [];
           const existingIds = new Set(existing.map(f => f.id));
           const additions = COMPREHENSIVE_FINDINGS.filter(f => !existingIds.has(f.id));
-          return { ...persistedState, findings: [...existing, ...additions] };
+          state = { ...state, findings: [...existing, ...additions] };
         }
-        return persistedState;
+        // Version 5 (issue #294): drop the four demo findings that belonged to
+        // the removed legacy example assessments. Guarded by id AND
+        // assessmentId so imported/user records can never match (user-created
+        // findings use FND-<uuid> ids anyway).
+        if (version < 5) {
+          const findings = (state.findings || []).filter(
+            f => !(LEGACY_DEMO_FINDING_IDS.has(f.id) &&
+                   LEGACY_EXAMPLE_ASSESSMENT_IDS.includes(f.assessmentId))
+          );
+          state = { ...state, findings };
+        }
+        return state;
       },
       partialize: (state) => ({
         findings: state.findings

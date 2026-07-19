@@ -158,8 +158,10 @@ describe('importCompleteDatabase safety semantics', () => {
     expect(old.observations['GV.SC-04'].quarters.Q1.actualScore).toBe(2);
     // v4/v5 migration ran: scopeType corrected
     expect(old.scopeType).toBe('requirements');
-    // v6+ migrations ran: default audit assessment appended
-    expect(written.some(a => a.id === 'ASM-audit-2025-alma')).toBe(true);
+    // v14 migration ran: the legacy demo assessments never reach the store
+    // (issue #294 — only the comprehensive example ships)
+    expect(written.some(a => a.id === 'ASM-audit-2025-alma')).toBe(false);
+    expect(written.some(a => a.id === 'ASM-default-2025-alma')).toBe(false);
   });
 
   test('a v9 export (no scoringScale) restores with scale 10 stamped; scores untouched (issue #277)', () => {

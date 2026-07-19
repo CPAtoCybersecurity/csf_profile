@@ -332,6 +332,12 @@ code {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -403,6 +409,7 @@ code {
 /* Purple / cyan / indigo — neutralized */
 .text-purple-700 { color: #5a5a5a; }
 .text-cyan-700 { color: #006a8e; }
+.text-indigo-500 { color: #1e3a8a; }
 .text-indigo-700 { color: #11245a; }
 
 /* Background colors — gray scale */
@@ -455,6 +462,7 @@ code {
 .bg-pink-500 { background-color: #a00000; }
 .bg-indigo-50 { background-color: #eaf0fb; }
 .bg-indigo-500 { background-color: #1e3a8a; }
+.bg-indigo-600 { background-color: #172c6e; }
 .bg-teal-500 { background-color: #006a8e; }
 .bg-cyan-50 { background-color: #e6f2f5; }
 .bg-cyan-500 { background-color: #006a8e; }
@@ -603,6 +611,7 @@ code {
 .hover\:bg-gray-300:hover { background-color: #d1d5db; }
 .hover\:bg-blue-50:hover { background-color: #eaf0fb; }
 .hover\:bg-blue-700:hover { background-color: #11245a; }
+.hover\:bg-indigo-700:hover { background-color: #11245a; }
 .hover\:bg-red-50:hover { background-color: #fef2f2; }
 .hover\:bg-amber-50:hover { background-color: #fffbeb; }
 .hover\:bg-green-700:hover { background-color: #15803d; }

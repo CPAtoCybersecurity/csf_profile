@@ -13,6 +13,7 @@ import FrameworkBadge from '../components/FrameworkBadge';
 import UserSelector from '../components/UserSelector';
 import ArtifactSelector from '../components/ArtifactSelector';
 import FindingSelector from '../components/FindingSelector';
+import ControlSelector from '../components/ControlSelector';
 import SortableHeader from '../components/SortableHeader';
 import ExportPasswordDialog from '../components/ExportPasswordDialog';
 import EmptyState from '../components/EmptyState';
@@ -1495,6 +1496,17 @@ Format as a numbered list. Be specific and actionable.`;
                       label="Findings"
                       selectedFindings={currentObservation.linkedFindings || []}
                       onChange={(findings) => handleObservationChange('linkedFindings', findings)}
+                      disabled={!editMode}
+                    />
+                  </div>
+
+                  {/* Controls (issue #294): in-app control links, same pattern
+                      as Artifacts/Findings — chips jump to the Controls tab. */}
+                  <div className="mb-4">
+                    <ControlSelector
+                      label="Controls"
+                      selectedControls={currentObservation.linkedControls || []}
+                      onChange={(controls) => handleObservationChange('linkedControls', controls)}
                       disabled={!editMode}
                     />
                   </div>

@@ -87,7 +87,7 @@ export const DEFAULT_CONTROLS = [
     linkedRequirementIds: ['DE.CM-01 Ex1'],
     status: 'Partially Implemented',
     artifacts: 'AR-6; AR-7; AR-8; AR-9; AR-10; AR-11',
-    findings: 'FND-1',
+    findings: '', // FND-1 removed with the legacy example assessments (issue #294)
     controlEvaluationBackLink: 'WP-42',
     createdDate: '2025-01-01T00:00:00.000Z',
     lastModified: '2025-01-01T00:00:00.000Z'

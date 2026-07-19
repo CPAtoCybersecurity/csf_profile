@@ -41,6 +41,22 @@ describe('communityProcedures.json (generated bank)', () => {
     expect([...fns].sort()).toEqual(['DE', 'GV', 'ID', 'PR', 'RC', 'RS']);
   });
 
+  test('no entry carries a Related section (issue #294)', () => {
+    // Catalog files end with "## Related" / "## Related Artifacts" sections of
+    // relative links that only resolve on GitHub — dead links in the app. The
+    // generator strips the section; anything after it (e.g. "## Notes") stays.
+    const offenders = ids.filter((id) => /^## Related\b/m.test(bank.procedures[id].markdown));
+    expect(offenders).toEqual([]);
+  });
+
+  test('no entry carries relative markdown links — dead inside the app (issue #294)', () => {
+    // Remaining relative links (e.g. ../../0_Methodology/...) are rewritten
+    // to absolute GitHub blob URLs at generation so they keep working when
+    // rendered in the app.
+    const offenders = ids.filter((id) => /\]\(\.\.?\//.test(bank.procedures[id].markdown));
+    expect(offenders).toEqual([]);
+  });
+
   test('no entry carries tag-like tokens the app sanitizer would DELETE on attach', () => {
     // The DOMPurify-based input sanitizer deletes letter-initial <...> tokens
     // outright (e.g. "<name@example.com>", "<br>"). The generator normalizes
