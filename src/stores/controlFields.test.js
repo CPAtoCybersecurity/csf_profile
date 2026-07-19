@@ -244,6 +244,27 @@ describe('CSV round-trip carries the issue #306 fields', () => {
     expect(csv).toContain("'=cmd|calc");
   });
 
+  it('guards EVERY importable column, including the joined id lists', async () => {
+    // A crafted CSV can seed a formula into any column the importer reads
+    // back, not just the obvious prose ones.
+    await useControlsStore.getState().importControlsCSV(
+      'Control ID,Linked Requirements,Stakeholder IDs\nCTL-302,=cmd|calc,@SUM(1)',
+      null
+    );
+
+    const captured = [];
+    const originalBlob = global.Blob;
+    global.Blob = function MockBlob(parts) { captured.push(parts.join('')); return { parts }; };
+    global.URL.createObjectURL = jest.fn(() => 'blob:mock');
+    global.URL.revokeObjectURL = jest.fn();
+    useControlsStore.getState().exportControlsCSV(null);
+    global.Blob = originalBlob;
+
+    const csv = captured.join('');
+    expect(csv).not.toMatch(/(^|,)=cmd/);
+    expect(csv).not.toMatch(/(^|,)@SUM/);
+  });
+
   it('exports the four columns (regression: status used to be dropped on import)', () => {
     const captured = [];
     const originalBlob = global.Blob;

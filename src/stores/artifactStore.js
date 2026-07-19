@@ -301,9 +301,9 @@ const useArtifactStore = create(
           'Priority': csvFormulaGuard(a.priority || 'Medium'),
           'Control ID': csvFormulaGuard(a.controlId || ''),
           'Assessment ID': csvFormulaGuard(a.assessmentId || ''),
-          'Linked Evaluation IDs': (a.linkedEvaluationIds || []).join('; '),
+          'Linked Evaluation IDs': csvFormulaGuard((a.linkedEvaluationIds || []).join('; ')),
           'Compliance Requirement': csvFormulaGuard(a.complianceRequirement || ''), // Deprecated
-          'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '), // Deprecated
+          'Linked Subcategories': csvFormulaGuard((a.linkedSubcategoryIds || []).join('; ')), // Deprecated
           // Every one of these round-trips through importArtifactsCSV, so
           // every one is user-controlled and must be escaped. 'Last Updated'
           // is new in issue #306; the rest were already importable and

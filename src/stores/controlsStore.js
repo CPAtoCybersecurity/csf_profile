@@ -400,8 +400,10 @@ const useControlsStore = create(
           'Control Owner': csvFormulaGuard(getUserName(c.ownerId)),
           'Control Owner ID': csvFormulaGuard(c.ownerId || ''),
           'Stakeholder(s)': csvFormulaGuard((c.stakeholderIds || []).map(id => getUserName(id)).join('; ')),
-          'Stakeholder IDs': (c.stakeholderIds || []).join('; '),
-          'Linked Requirements': (c.linkedRequirementIds || []).join('; '),
+          // Guarded like every other importable column: these are read back
+          // by importControlsCSV, so a crafted file can seed a formula here.
+          'Stakeholder IDs': csvFormulaGuard((c.stakeholderIds || []).join('; ')),
+          'Linked Requirements': csvFormulaGuard((c.linkedRequirementIds || []).join('; ')),
           // Importable columns are user-controlled; escape them all.
           'Assessment ID': csvFormulaGuard(c.assessmentId || ''),
           'Created Date': csvFormulaGuard(c.createdDate),
