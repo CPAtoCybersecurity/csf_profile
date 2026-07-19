@@ -145,9 +145,7 @@ const ScoringLegend = () => {
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Simply Cyber Academy</p>
-
-      <h1 className="text-2xl font-bold mb-4 mt-4">5-Point Maturity Scale (CMMI-Style)</h1>
+      <h1 className="text-2xl font-bold mb-4 mt-6">5-Point Maturity Scale (CMMI-Style)</h1>
       <div className="bg-white p-4 rounded-lg shadow-sm border overflow-x-auto">
         <p className="text-sm text-gray-700 mb-4">
           Assessments created with the 5-point scale use CMMI-style maturity levels (0&ndash;5), as popularized
@@ -176,9 +174,7 @@ const ScoringLegend = () => {
         </table>
       </div>
 
-      <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Cyber Resilience courses in Simply Cyber Academy</p>
-
-      <h1 className="text-2xl font-bold mb-4 mt-4">NIST SP 800-53A Assessment Methods</h1>
+      <h1 className="text-2xl font-bold mb-4 mt-6">NIST SP 800-53A Assessment Methods</h1>
       <div className="bg-white p-4 rounded-lg shadow-sm border">
         <p className="text-sm text-gray-700 mb-4">
           The following assessment methods are used to determine the extent to which security controls are implemented correctly, operating as intended, and producing the desired outcome.
