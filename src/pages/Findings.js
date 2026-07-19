@@ -149,9 +149,16 @@ const Findings = () => {
       req.subcategoryId?.includes(csfRef)
     );
 
-    // Get controls linked to these requirements
+    // Get controls linked to these requirements, scoped to the FINDING's own
+    // assessment (issue #299): these chips are derived from requirement
+    // matching, and the record — not the page filter — owns the scope. An
+    // unassigned finding fails open (sees every control); demo controls only
+    // decorate demo-assessment findings.
     matchingReqs.forEach(req => {
-      const reqControls = getControlsByRequirement(req.id);
+      const reqControls = filterByScope(
+        getControlsByRequirement(req.id),
+        selectedFinding.assessmentId || SCOPE_ALL
+      );
       reqControls.forEach(ctrl => {
         if (!controlsSet.has(ctrl.controlId)) {
           controlsSet.add(ctrl.controlId);

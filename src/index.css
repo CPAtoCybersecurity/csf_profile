@@ -328,6 +328,7 @@ code {
 .italic { font-style: italic; }
 .tracking-wider { letter-spacing: 0.05em; }
 .whitespace-pre-wrap { white-space: pre-wrap; }
+.whitespace-nowrap { white-space: nowrap; }
 .underline { text-decoration: underline; }
 .hover\:underline:hover { text-decoration: underline; }
 .break-all { word-break: break-all; }

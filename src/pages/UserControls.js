@@ -19,6 +19,18 @@ import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
+import useAssessmentsStore from '../stores/assessmentsStore';
+
+// Assessment scoping (issue #299, same scheme as Findings/Artifacts got in
+// #297): demo controls are stamped to the demo assessment and drop out of
+// every other assessment's view; unassigned controls stay visible everywhere.
+import {
+  SCOPE_ALL,
+  SCOPE_UNASSIGNED,
+  filterByScope,
+  resolveScopeStamp,
+  defaultScope
+} from '../utils/assessmentScope';
 
 const UserControls = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -42,6 +54,9 @@ const UserControls = () => {
   const getEnabledFrameworks = useFrameworksStore((state) => state.getEnabledFrameworks);
 
   const users = useUserStore((state) => state.users);
+
+  const currentAssessmentId = useAssessmentsStore((state) => state.currentAssessmentId);
+  const assessments = useAssessmentsStore((state) => state.assessments);
 
   // Local state
   const [searchTerm, setSearchTerm] = useState('');
@@ -86,6 +101,20 @@ const UserControls = () => {
   const frameworkTriggerRef = useRef(null);
   const fileInputRef = useRef(null);
 
+  // Page-local assessment scope (issue #299): defaults to the assessment the
+  // user is working in; follows the app-wide selection when it changes. Only
+  // this page-local filter ever changes here — never the global selection.
+  const [scopeFilter, setScopeFilter] = useState(() => defaultScope(currentAssessmentId));
+  useEffect(() => {
+    setScopeFilter(defaultScope(currentAssessmentId));
+    setCurrentPage(1);
+  }, [currentAssessmentId]);
+
+  const scopedControls = useMemo(
+    () => filterByScope(controls, scopeFilter, { knownAssessmentIds: assessments.map(a => a.id) }),
+    [controls, scopeFilter, assessments]
+  );
+
   // Handle URL query parameter for deep linking to a specific control
   useEffect(() => {
     const selectedParam = searchParams.get('selected');
@@ -96,6 +125,14 @@ const UserControls = () => {
         setDetailPanelOpen(true);
         setEditMode(false);
         setIsCreating(false);
+        // Widen the PAGE-LOCAL scope if the linked control is outside it
+        // (issue #299) — an unassigned control maps to All, a stamped one to
+        // its own assessment. The global assessment selection is never touched.
+        setScopeFilter(prev => {
+          if (prev === SCOPE_ALL) return prev;
+          const visible = filterByScope([control], prev).length > 0;
+          return visible ? prev : (control.assessmentId || SCOPE_ALL);
+        });
         // Clear the URL parameter after selection
         setSearchParams({}, { replace: true });
       }
@@ -175,7 +212,7 @@ const UserControls = () => {
 
   // Filter and sort data
   const filteredData = useMemo(() => {
-    let result = [...controls];
+    let result = [...scopedControls];
 
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
@@ -207,7 +244,7 @@ const UserControls = () => {
     });
 
     return result;
-  }, [controls, searchTerm, filterOwner, filterFramework, sort, getRequirement]);
+  }, [scopedControls, searchTerm, filterOwner, filterFramework, sort, getRequirement]);
 
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -292,12 +329,18 @@ const UserControls = () => {
       return;
     }
 
-    const created = createControl(newControl);
+    // Stamp the active scope (issue #299): a concrete assessment scope wins,
+    // the Unassigned view stamps null so the new control stays visible where
+    // it was created, otherwise the app-wide current assessment.
+    const created = createControl({
+      ...newControl,
+      assessmentId: resolveScopeStamp(scopeFilter, currentAssessmentId)
+    });
     setSelectedControlId(created.controlId);
     setIsCreating(false);
     setEditMode(false);
     toast.success(`Control ${created.controlId} created`);
-  }, [newControl, createControl]);
+  }, [newControl, createControl, scopeFilter, currentAssessmentId]);
 
   const handleCancelCreate = useCallback(() => {
     setIsCreating(false);
@@ -420,6 +463,26 @@ const UserControls = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
+        </div>
+
+        {/* Assessment scope (issue #299) */}
+        <div className="flex items-center gap-2">
+          <select
+            value={scopeFilter}
+            onChange={(e) => { setScopeFilter(e.target.value); setCurrentPage(1); }}
+            className="text-sm border rounded-lg px-2 py-1.5 bg-white text-gray-700"
+            title="Show controls for one assessment"
+            aria-label="Assessment scope"
+          >
+            <option value={SCOPE_ALL}>All assessments</option>
+            {assessments.map(a => (
+              <option key={a.id} value={a.id}>{a.name}</option>
+            ))}
+            <option value={SCOPE_UNASSIGNED}>Unassigned only</option>
+          </select>
+          <span className="text-sm text-gray-500 whitespace-nowrap">
+            {scopedControls.length} items{scopeFilter !== SCOPE_ALL ? ` · ${controls.length} total` : ''}
+          </span>
         </div>
 
         {/* Owner filter */}

@@ -3,14 +3,17 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import FindingSelector from './FindingSelector';
 import ArtifactSelector from './ArtifactSelector';
+import ControlSelector from './ControlSelector';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
+import useControlsStore from '../stores/controlsStore';
 import { COMPREHENSIVE_ASSESSMENT_ID } from '../stores/comprehensiveAssessmentData';
 
 /**
- * Eval-panel pick lists scope to the assessment being evaluated (issue #297):
- * demo records (stamped to the demo assessment) drop out of every other
- * assessment; unassigned legacy records stay reachable everywhere.
+ * Eval-panel pick lists scope to the assessment being evaluated (issue #297;
+ * ControlSelector joined in #299): demo records (stamped to the demo
+ * assessment) drop out of every other assessment; unassigned legacy records
+ * stay reachable everywhere.
  */
 
 const MINE = 'ASM-user-2026';
@@ -94,5 +97,51 @@ describe('ArtifactSelector scoping (issue #297)', () => {
       <ArtifactSelector label="Artifacts" selectedArtifacts={['Demo artifact']} onChange={() => {}} assessmentId={MINE} />
     );
     expect(screen.getByText('Demo artifact')).toBeInTheDocument();
+  });
+});
+
+const CONTROLS = [
+  { controlId: 'CTL-demo', implementationDescription: 'Demo control', assessmentId: COMPREHENSIVE_ASSESSMENT_ID, seedSource: 'demo-alma' },
+  { controlId: 'CTL-mine', implementationDescription: 'My control', assessmentId: MINE },
+  { controlId: 'CTL-legacy', implementationDescription: 'Legacy control' }
+];
+
+describe('ControlSelector scoping (issue #299)', () => {
+  beforeEach(() => useControlsStore.setState({ controls: CONTROLS }));
+
+  it('scoped to my assessment: my + legacy controls listed, demo hidden', () => {
+    renderWithRouter(
+      <ControlSelector label="Controls" selectedControls={[]} onChange={() => {}} assessmentId={MINE} />
+    );
+    fireEvent.click(screen.getByText('Select controls'));
+    expect(screen.getByText('CTL-mine')).toBeInTheDocument();
+    expect(screen.getByText('CTL-legacy')).toBeInTheDocument();
+    expect(screen.queryByText('CTL-demo')).not.toBeInTheDocument();
+  });
+
+  it('scoped to the demo assessment: demo controls ARE listed', () => {
+    renderWithRouter(
+      <ControlSelector label="Controls" selectedControls={[]} onChange={() => {}} assessmentId={COMPREHENSIVE_ASSESSMENT_ID} />
+    );
+    fireEvent.click(screen.getByText('Select controls'));
+    expect(screen.getByText('CTL-demo')).toBeInTheDocument();
+  });
+
+  it('no assessmentId prop: fails OPEN — everything listed', () => {
+    renderWithRouter(
+      <ControlSelector label="Controls" selectedControls={[]} onChange={() => {}} />
+    );
+    fireEvent.click(screen.getByText('Select controls'));
+    expect(screen.getByText('CTL-demo')).toBeInTheDocument();
+    expect(screen.getByText('CTL-mine')).toBeInTheDocument();
+    expect(screen.getByText('CTL-legacy')).toBeInTheDocument();
+  });
+
+  it('an already-linked out-of-scope control still renders its chip with its real tooltip', () => {
+    renderWithRouter(
+      <ControlSelector label="Controls" selectedControls={['CTL-demo']} onChange={() => {}} disabled assessmentId={MINE} />
+    );
+    // The chip button's title comes from the UNSCOPED register lookup.
+    expect(screen.getByTitle('Demo control')).toHaveTextContent('CTL-demo');
   });
 });

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useControlsStore from '../stores/controlsStore';
+import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
 
 /**
  * In-app control linker for the evaluation panel (issue #294) — the Controls
@@ -9,22 +10,34 @@ import useControlsStore from '../stores/controlsStore';
  * Controls tab (/controls?selected=<controlId>, already honored by
  * UserControls); the dropdown selects from the controls register. Stores
  * plain controlId strings on the observation (linkedControls).
+ *
+ * When assessmentId is given, the pick list scopes to that assessment's
+ * controls plus unassigned ones (issue #299) — demo controls, stamped to the
+ * demo assessment, drop out of every other assessment's picker. Without the
+ * prop the selector fails OPEN and lists everything (existing chips always
+ * render regardless of scope).
  */
 const ControlSelector = ({
   label,
   selectedControls,
   onChange,
-  disabled = false
+  disabled = false,
+  assessmentId
 }) => {
   const navigate = useNavigate();
-  const controls = useControlsStore((state) => state.controls);
+  const allControls = useControlsStore((state) => state.controls);
+  const controls = assessmentId
+    ? allControls.filter(c => belongsToAssessment(c, assessmentId) || isUnassigned(c))
+    : allControls;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Tolerate missing/tampered persisted values — always work on an array.
   const selected = Array.isArray(selectedControls) ? selectedControls : [];
 
-  const getControlById = (controlId) => controls.find(c => c.controlId === controlId);
+  // Chip lookups use the UNSCOPED register: an existing link to an
+  // out-of-scope control must still render with its real tooltip.
+  const getControlById = (controlId) => allControls.find(c => c.controlId === controlId);
 
   const handleSelectControl = (control) => {
     if (selected.includes(control.controlId)) {

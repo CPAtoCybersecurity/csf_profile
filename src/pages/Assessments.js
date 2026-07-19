@@ -31,6 +31,7 @@ import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } f
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
+import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
 import ExternalLinksEditor from '../components/ExternalLinksEditor';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
@@ -231,7 +232,13 @@ const Assessments = () => {
     let items = [];
 
     if (currentAssessment.scopeType === 'controls') {
-      items = controls.filter(c => !scopeIds.includes(c.controlId));
+      // Offer only this assessment's controls plus unassigned ones (issue
+      // #299) — controls stamped to another assessment (the demo set above
+      // all) are not scope candidates here.
+      items = controls.filter(c =>
+        (belongsToAssessment(c, currentAssessment.id) || isUnassigned(c)) &&
+        !scopeIds.includes(c.controlId)
+      );
       if (scopePickerSearch) {
         const search = scopePickerSearch.toLowerCase();
         items = items.filter(c =>
@@ -1526,6 +1533,7 @@ Format as a numbered list. Be specific and actionable.`;
                       selectedControls={currentObservation.linkedControls || []}
                       onChange={(controls) => handleObservationChange('linkedControls', controls)}
                       disabled={!editMode}
+                      assessmentId={currentAssessmentId}
                     />
                   </div>
 
