@@ -1,18 +1,85 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
+import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
 
-// Default users for new installations
-const DEFAULT_USERS = [
-  { id: 1, name: 'Gerry.Callahan', title: 'CISO', email: 'gerry.callahan@almasecurity.com' },
-  { id: 2, name: 'Steve.Mercer', title: 'Director, Internal Audit', email: 'steve.mercer@almasecurity.com' },
-  { id: 3, name: 'Jane.Alvarez', title: 'Product Engineer', email: 'jane.alvarez@almasecurity.com' },
-  { id: 4, name: 'John.Tran', title: 'Financial Systems Analyst', email: 'john.tran@almasecurity.com' },
-  { id: 5, name: 'Chris.Magann', title: 'Vulnerability Management Lead', email: 'chris.magann@almasecurity.com' },
-  { id: 6, name: 'Nadia.Khan', title: 'Detection & Response Lead', email: 'nadia.khan@almasecurity.com' },
-  { id: 7, name: 'Tigan.Wang', title: 'Vulnerability Management Engineer', email: 'tigan.wang@almasecurity.com' },
-  { id: 8, name: 'Omar.Garza', title: 'Senior IT Auditor', email: 'omar.garza@almasecurity.com' },
+// Default users for new installations — the demo (Alma Security) staff.
+// seedSource marks them as shipped example data (issue #297) so the directory
+// can badge them and future migrations can identify them exactly.
+export const DEFAULT_USERS = [
+  { id: 1, name: 'Gerry.Callahan', title: 'CISO', email: 'gerry.callahan@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 2, name: 'Steve.Mercer', title: 'Director, Internal Audit', email: 'steve.mercer@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 3, name: 'Jane.Alvarez', title: 'Product Engineer', email: 'jane.alvarez@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 4, name: 'John.Tran', title: 'Financial Systems Analyst', email: 'john.tran@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 5, name: 'Chris.Magann', title: 'Vulnerability Management Lead', email: 'chris.magann@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 6, name: 'Nadia.Khan', title: 'Detection & Response Lead', email: 'nadia.khan@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 7, name: 'Tigan.Wang', title: 'Vulnerability Management Engineer', email: 'tigan.wang@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
+  { id: 8, name: 'Omar.Garza', title: 'Senior IT Auditor', email: 'omar.garza@almasecurity.com', seedSource: DEMO_SEED_SOURCE },
 ];
+
+/**
+ * Full persisted-state migration for csf-users-storage. Exported so tests
+ * exercise the EXACT production path.
+ */
+export const migrateUsersState = (persistedState, version) => {
+  let state = persistedState;
+  // Version 2: Ensure default users have stable IDs
+  // This fixes issues where users were created with random IDs during CSV import
+  if (version < 2 && state?.users) {
+    const defaultUsersByEmail = new Map(
+      DEFAULT_USERS.map(u => [u.email.toLowerCase(), u])
+    );
+
+    // Update existing users to have correct IDs if they match default users
+    const updatedUsers = state.users.map(user => {
+      const defaultUser = defaultUsersByEmail.get(user.email?.toLowerCase());
+      if (defaultUser && user.id !== defaultUser.id) {
+        // Found a default user with wrong ID - keep the default ID
+        return { ...user, id: defaultUser.id };
+      }
+      return user;
+    });
+
+    // Add any missing default users
+    const existingEmails = new Set(updatedUsers.map(u => u.email?.toLowerCase()));
+    DEFAULT_USERS.forEach(defaultUser => {
+      if (!existingEmails.has(defaultUser.email.toLowerCase())) {
+        updatedUsers.push(defaultUser);
+      }
+    });
+
+    state = { users: updatedUsers };
+  }
+  state = state || { users: DEFAULT_USERS };
+  // Version 3 (issue #297): stamp seed provenance on the shipped demo users
+  // (see stampSeededDemoUsers).
+  if (version < 3) {
+    state = stampSeededDemoUsers(state);
+  }
+  return state;
+};
+
+/**
+ * Issue #297: stamp seed provenance on the shipped demo users. Guard is exact
+ * id + email match against the seeded set, so a user-created record can never
+ * be marked demo. Only seedSource is added; edits (title, name) survive.
+ * Idempotent — also run unconditionally by the restore path (dataImport.js),
+ * whose bulk setters bypass this store's migrate.
+ */
+export function stampSeededDemoUsers(state) {
+  if (!Array.isArray(state?.users)) return state;
+  const demoEmailById = new Map(DEFAULT_USERS.map(u => [u.id, u.email.toLowerCase()]));
+  let changed = false;
+  const users = state.users.map(user => {
+    // The match must be POSITIVE on both sides — a record with an unknown id
+    // and no email must not match via undefined === undefined.
+    const demoEmail = demoEmailById.get(user.id);
+    if (user.seedSource || !demoEmail || demoEmail !== user.email?.toLowerCase()) return user;
+    changed = true;
+    return { ...user, seedSource: DEMO_SEED_SOURCE };
+  });
+  return changed ? { ...state, users } : state;
+}
 
 const useUserStore = create(
   persist(
@@ -151,37 +218,8 @@ const useUserStore = create(
     }),
     {
       name: 'csf-users-storage',
-      version: 2,
-      migrate: (persistedState, version) => {
-        // Version 2: Ensure default users have stable IDs
-        // This fixes issues where users were created with random IDs during CSV import
-        if (version < 2 && persistedState?.users) {
-          const defaultUsersByEmail = new Map(
-            DEFAULT_USERS.map(u => [u.email.toLowerCase(), u])
-          );
-
-          // Update existing users to have correct IDs if they match default users
-          const updatedUsers = persistedState.users.map(user => {
-            const defaultUser = defaultUsersByEmail.get(user.email?.toLowerCase());
-            if (defaultUser && user.id !== defaultUser.id) {
-              // Found a default user with wrong ID - keep the default ID
-              return { ...user, id: defaultUser.id };
-            }
-            return user;
-          });
-
-          // Add any missing default users
-          const existingEmails = new Set(updatedUsers.map(u => u.email?.toLowerCase()));
-          DEFAULT_USERS.forEach(defaultUser => {
-            if (!existingEmails.has(defaultUser.email.toLowerCase())) {
-              updatedUsers.push(defaultUser);
-            }
-          });
-
-          return { users: updatedUsers };
-        }
-        return persistedState || { users: DEFAULT_USERS };
-      },
+      version: 3,
+      migrate: (persistedState, version) => migrateUsersState(persistedState, version),
     }
   )
 );

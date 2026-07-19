@@ -31,6 +31,7 @@ import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
 import KPICard from '../components/KPICard';
 import { generateAuditReportMarkdown } from '../utils/auditReportMarkdown';
+import { filterByScope } from '../utils/assessmentScope';
 import EvidenceTracker from '../components/EvidenceTracker';
 
 // Format number to always show one decimal place
@@ -566,8 +567,9 @@ const Dashboard = () => {
     const inScopeCount = selectedAssessment.scopeIds?.length || 0;
 
     // 3. Evidence Coverage — % of in-scope items with at least one artifact
+    // (only this assessment's artifacts count — issue #297)
     const controlsWithArtifacts = new Set(
-      artifacts
+      filterByScope(artifacts, selectedAssessment.id)
         .filter(a => a.controlId)
         .map(a => a.controlId)
     );
@@ -577,8 +579,9 @@ const Dashboard = () => {
       ? `${Math.round((coveredCount / inScopeCount) * 100)}%`
       : '--';
 
-    // 4. Open Findings — status !== 'Resolved'
-    const openCount = findings.filter(f => f.status !== 'Resolved').length;
+    // 4. Open Findings — status !== 'Resolved', scoped to this assessment (issue #297)
+    const openCount = filterByScope(findings, selectedAssessment.id)
+      .filter(f => f.status !== 'Resolved').length;
 
     return {
       overallScore: { value: overallScore, trend: overallTrend },
@@ -1250,8 +1253,9 @@ const Dashboard = () => {
                   generateAuditReportMarkdown({
                     assessment: selectedAssessment,
                     requirements,
-                    findings,
-                    artifacts,
+                    // Only this assessment's records belong in its report (issue #297)
+                    findings: filterByScope(findings, selectedAssessment?.id),
+                    artifacts: filterByScope(artifacts, selectedAssessment?.id),
                     selectedQuarter,
                     reportMetadata: auditMetadata,
                   });

@@ -3,22 +3,31 @@ import { X, ExternalLink, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useArtifactStore from '../stores/artifactStore';
 import { sanitizeExternalUrl } from '../utils/externalLinks';
+import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
 
 const ArtifactSelector = ({
   label,
   selectedArtifacts,
   onChange,
   multiple = true,
-  disabled = false
+  disabled = false,
+  // Assessment scope (issue #297): when set, the pick list shows only this
+  // assessment's artifacts plus unassigned (legacy) ones — demo artifacts,
+  // being stamped to the demo assessment, drop out everywhere else. Already-
+  // linked chips always resolve against the full store.
+  assessmentId
 }) => {
-  const artifacts = useArtifactStore((state) => state.artifacts);
+  const allArtifacts = useArtifactStore((state) => state.artifacts);
+  const artifacts = assessmentId
+    ? allArtifacts.filter(a => belongsToAssessment(a, assessmentId) || isUnassigned(a))
+    : allArtifacts;
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   // Read-mode chip: link out to the artifact URL, or open its detail in the Artifacts tab
   const renderLinkedChip = (name) => {
-    const artifact = artifacts.find(a => a.name === name);
+    const artifact = allArtifacts.find(a => a.name === name);
     const chipClass = 'px-2 py-1 bg-blue-600 text-white rounded-full text-xs inline-flex items-center gap-1 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 cursor-pointer';
 
     if (sanitizeExternalUrl(artifact?.link)) {
