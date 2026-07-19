@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { escapeCSVValue } from '../utils/sanitize';
-import { DEFAULT_ARTIFACTS } from './defaultArtifactsData';
+import { DEFAULT_ARTIFACTS, RELOCATED_ARTIFACT_LINKS } from './defaultArtifactsData';
 import { COMPREHENSIVE_ARTIFACTS } from './comprehensiveAssessmentData';
 
 // Merge defaults + catalog artifacts. De-dupe by artifactId; catalog wins ties.
@@ -392,8 +392,43 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 6,
+      version: 7,
       migrate: (persistedState, version) => {
+        // Version 7 (#287) runs after the version chain below rather than as another branch in
+        // it. The branches return early, so a user coming from v5 would never reach a v7 branch
+        // placed at the end. Repairing afterwards covers every upgrade path, and it is a no-op
+        // on the branches that reset to DEFAULT_ARTIFACTS, which already carry the new links.
+        return repairRelocatedLinks(applyVersionMigrations(persistedState, version));
+      },
+      partialize: (state) => ({
+        artifacts: state.artifacts
+      })
+    }
+  )
+);
+
+/**
+ * Rewrite artifact links that this app seeded and that a repository restructure later broke.
+ *
+ * Matches on the exact dead URL, so a link the user typed or edited is left alone. Idempotent:
+ * once rewritten, the old string is gone and subsequent runs match nothing.
+ */
+export function repairRelocatedLinks(state) {
+  const artifacts = state?.artifacts;
+  if (!Array.isArray(artifacts)) return state;
+
+  let changed = false;
+  const repaired = artifacts.map(artifact => {
+    const replacement = RELOCATED_ARTIFACT_LINKS[artifact?.link];
+    if (!replacement) return artifact;
+    changed = true;
+    return { ...artifact, link: replacement };
+  });
+
+  return changed ? { ...state, artifacts: repaired } : state;
+}
+
+function applyVersionMigrations(persistedState, version) {
         // Version 2: Added link, complianceRequirement, controlId, type, jiraKey fields
         if (version < 2 && persistedState?.artifacts) {
           const migratedArtifacts = persistedState.artifacts.map(artifact => ({
@@ -442,12 +477,6 @@ const useArtifactStore = create(
           return { ...persistedState, artifacts: [...existing, ...additions] };
         }
         return persistedState;
-      },
-      partialize: (state) => ({
-        artifacts: state.artifacts
-      })
-    }
-  )
-);
+}
 
 export default useArtifactStore;

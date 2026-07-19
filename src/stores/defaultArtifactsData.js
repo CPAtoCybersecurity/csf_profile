@@ -2,6 +2,23 @@
 // Based on JIRA-Artifacts.csv export from AR project
 // These artifacts represent evidence documents collected during the assessment
 
+const REPO = 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main';
+
+/**
+ * Links this app seeded that later 404'd, mapped to their current location.
+ *
+ * Commit 94234c8 restructured the assessment materials into ASSESSMENT_CATALOG/ and deleted
+ * Sample_Artifacts/. Fixing DEFAULT_ARTIFACTS alone only helps new installs — anyone who had
+ * already opened the app has these URLs sitting in localStorage. The artifactStore migration
+ * rewrites them on exactly these strings, so a link a user typed themselves is never touched.
+ */
+export const RELOCATED_ARTIFACT_LINKS = {
+  [`${REPO}/public/Sample_Artifacts/2025-05-26_Phish-1001-LI-Campaign-Data.xlsx`]:
+    `${REPO}/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx`,
+  [`${REPO}/public/Sample_Artifacts/SOC-Ticket-1004.md`]:
+    `${REPO}/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1004.md`
+};
+
 export const DEFAULT_ARTIFACTS = [
   {
     id: 1,

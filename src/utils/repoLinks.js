@@ -13,6 +13,15 @@
 const REPO_MAIN_LINK =
   /https:\/\/github\.com\/CPAtoCybersecurity\/csf_profile\/(?:blob|tree)\/main\/([^\s"'`)\]]+)/g;
 
+// Any repo's main-branch links, so a typo in the owner or repo name fails loudly instead of
+// being silently classified as somebody else's fork and skipped.
+const ANY_MAIN_LINK =
+  /https:\/\/github\.com\/([\w.-]+)\/([\w.-]+)\/(?:blob|tree)\/main\/[^\s"'`)\]]+/g;
+
+// Forks that are legitimately linked from contributed content. Anything outside this set that
+// links to a /main/ path is treated as a mistyped reference to this repository.
+const KNOWN_OWNERS = new Set(['CPAtoCybersecurity/csf_profile', 'greetingsog/csf_profile']);
+
 /**
  * Extract repo-relative paths from every main-branch repo URL in a blob of source text.
  *
@@ -34,4 +43,19 @@ export function extractRepoLinkPaths(text) {
   return paths;
 }
 
-export { REPO_MAIN_LINK };
+/**
+ * Find main-branch links whose owner/repo is neither this repo nor a known fork.
+ *
+ * @param {string} text source file contents
+ * @returns {string[]} the unrecognised `owner/repo` slugs found
+ */
+export function findUnknownRepoOwners(text) {
+  const unknown = [];
+  for (const match of text.matchAll(ANY_MAIN_LINK)) {
+    const slug = `${match[1]}/${match[2]}`;
+    if (!KNOWN_OWNERS.has(slug)) unknown.push(slug);
+  }
+  return unknown;
+}
+
+export { REPO_MAIN_LINK, ANY_MAIN_LINK, KNOWN_OWNERS };
