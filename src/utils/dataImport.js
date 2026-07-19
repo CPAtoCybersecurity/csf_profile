@@ -33,10 +33,10 @@ import {
   normalizeExternalTracking,
   normalizeExternalLinks
 } from './externalLinks';
-import { stampSeededDemoArtifacts } from '../stores/artifactStore';
+import { stampSeededDemoArtifacts, normalizeArtifactFields } from '../stores/artifactStore';
 import { stampSeededDemoFindings } from '../stores/findingsStore';
 import { stampSeededDemoUsers } from '../stores/userStore';
-import { stampSeededDemoControls } from '../stores/controlsStore';
+import { stampSeededDemoControls, normalizeControlFields } from '../stores/controlsStore';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
 // Format-2 exports carry no metrics section — it is simply skipped (untouched),
@@ -230,6 +230,20 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
   }
   if (Array.isArray(data.controls)) {
     data.controls = stampSeededDemoControls({ controls: data.controls }).controls;
+  }
+
+  // Field normalization for the issue #306 additions is UNCONDITIONAL for the
+  // same reason the stamps above are: a file stamped at the current schema
+  // version skips the migration chain, and the bulk setters bypass each
+  // store's load-time migrate. Without this an older backup restores controls
+  // with no name/tests/frameworks/status and artifacts with no health, which
+  // render as permanently blank because nothing ever runs the migration on
+  // them again. Both passes are absent-only and idempotent.
+  if (Array.isArray(data.controls)) {
+    data.controls = normalizeControlFields({ controls: data.controls }).controls;
+  }
+  if (Array.isArray(data.artifacts)) {
+    data.artifacts = normalizeArtifactFields({ artifacts: data.artifacts }).artifacts;
   }
 
   // Resolve every write BEFORE applying any, so a missing setter can never

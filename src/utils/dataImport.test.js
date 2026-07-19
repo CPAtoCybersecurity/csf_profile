@@ -95,7 +95,13 @@ describe('export → restore round-trip', () => {
     const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
     const { stores: targetStores, setters } = makeStores();
     importCompleteDatabase(parsed, targetStores, { backupFirst: false });
-    expect(setters.setArtifacts).toHaveBeenCalledWith(data.artifacts);
+    // The restore path also normalizes the issue #306 fields, so the record
+    // arrives with health/lastModified added. The scope stamp is what this
+    // test guards, and it must survive verbatim.
+    const restored = setters.setArtifacts.mock.calls[0][0];
+    expect(restored).toHaveLength(1);
+    expect(restored[0]).toMatchObject(data.artifacts[0]);
+    expect(restored[0].assessmentId).toBe('ASM-user-2026');
   });
 
   test('a pre-#297 backup gets its demo records stamped on restore (issue #297)', () => {
@@ -120,7 +126,9 @@ describe('export → restore round-trip', () => {
     const restoredArtifacts = setters.setArtifacts.mock.calls[0][0];
     expect(restoredArtifacts[0].assessmentId).toBe(SEEDED_ARTIFACTS[0].assessmentId);
     expect(restoredArtifacts[0].seedSource).toBe('demo-alma');
-    expect(restoredArtifacts[1]).toEqual(mineArtifact); // user record untouched
+    expect(restoredArtifacts[1]).toMatchObject(mineArtifact); // user content untouched
+    expect(restoredArtifacts[1].assessmentId).toBeUndefined();
+    expect(restoredArtifacts[1].seedSource).toBeUndefined();
 
     const restoredUsers = setters.setUsers.mock.calls[0][0];
     expect(restoredUsers[0].seedSource).toBe('demo-alma');
@@ -147,7 +155,9 @@ describe('export → restore round-trip', () => {
     importCompleteDatabase(parsed, targetStores, { backupFirst: false });
 
     const restored = setters.setArtifacts.mock.calls[0][0];
-    expect(restored[0]).toEqual(sameNameMine);          // untouched
+    expect(restored[0]).toMatchObject(sameNameMine);    // content untouched
+    expect(restored[0].assessmentId).toBeUndefined(); // never demo-stamped
+    expect(restored[0].seedSource).toBeUndefined();
     expect(restored[1].seedSource).toBe('user');        // classification kept
     expect(restored[1].assessmentId).toBeUndefined();   // not demo-stamped
   });
@@ -173,8 +183,14 @@ describe('export → restore round-trip', () => {
     const restored = setters.setControls.mock.calls[0][0];
     expect(restored[0].assessmentId).toBe(SEEDED_CONTROLS[0].assessmentId);
     expect(restored[0].seedSource).toBe('demo-alma');
-    expect(restored[1]).toEqual(collidingMine);   // colliding id, different createdDate — untouched
-    expect(restored[2]).toEqual(mineControl);     // user record untouched
+    // colliding id, different createdDate — never demo-stamped
+    expect(restored[1]).toMatchObject(collidingMine);
+    expect(restored[1].assessmentId).toBeUndefined();
+    expect(restored[1].seedSource).toBeUndefined();
+    // plain user control — content kept, classification never added
+    expect(restored[2]).toMatchObject(mineControl);
+    expect(restored[2].assessmentId).toBeUndefined();
+    expect(restored[2].seedSource).toBeUndefined();
   });
 
   test('a current-format backup round-trips control assessmentIds verbatim (issue #299)', () => {
@@ -184,7 +200,10 @@ describe('export → restore round-trip', () => {
     const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
     const { stores: targetStores, setters } = makeStores();
     importCompleteDatabase(parsed, targetStores, { backupFirst: false });
-    expect(setters.setControls.mock.calls[0][0]).toEqual([scoped]);
+    const restoredControls = setters.setControls.mock.calls[0][0];
+    expect(restoredControls).toHaveLength(1);
+    expect(restoredControls[0]).toMatchObject(scoped);
+    expect(restoredControls[0].assessmentId).toBe('ASM-user-2026');
   });
 });
 

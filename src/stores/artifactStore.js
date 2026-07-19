@@ -10,6 +10,8 @@ import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
 // Merge defaults + catalog artifacts. De-dupe by artifactId; catalog wins ties.
 // Every shipped artifact is Alma demo evidence, so all of them are scoped to
 // the demo assessment (issue #297) and carry seed provenance.
+// The issue #306 `health` key is normalized into the seed itself, so a FRESH
+// install and an UPGRADED install hold byte-identical demo records.
 export const SEEDED_ARTIFACTS = (() => {
   const seen = new Set();
   const merged = [];
@@ -18,8 +20,20 @@ export const SEEDED_ARTIFACTS = (() => {
     seen.add(a.artifactId);
     merged.push({ ...a, assessmentId: COMPREHENSIVE_ASSESSMENT_ID, seedSource: DEMO_SEED_SOURCE });
   }
-  return merged;
+  return normalizeArtifactFields({ artifacts: merged }).artifacts;
 })();
+
+/**
+ * Health of the evidence itself (issue #306) — is this artifact current and
+ * sufficient, or does it need work? Deliberately SEPARATE from `status`
+ * (ACTIVE / PENDING / ARCHIVED), which tracks the record's lifecycle: Steve's
+ * 2026-07-19 ratification chose two independent fields over overloading one.
+ *
+ * The default is '' (not set) rather than 'Healthy' — a brand new artifact
+ * nobody has reviewed has not been judged healthy, and asserting otherwise
+ * would put a green claim on evidence in an audit register.
+ */
+export const ARTIFACT_HEALTH_VALUES = ['Healthy', 'Needs Remediation'];
 
 /**
  * Artifact Store
@@ -59,6 +73,10 @@ const useArtifactStore = create(
           linkedSubcategoryIds: artifact.linkedSubcategoryIds || [],
 
           type: artifact.type || 'Document', // Document, Screenshot, Log, Policy, etc.
+
+          // Evidence health (issue #306) — '' means nobody has judged it yet
+          health: artifact.health || '',
+
           createdDate: artifact.createdDate || new Date().toISOString(),
           lastModified: new Date().toISOString(),
           jiraKey: artifact.jiraKey || null // Jira issue key if synced
@@ -272,17 +290,27 @@ const useArtifactStore = create(
 
         const csvData = artifacts.map(a => ({
           'Artifact ID': escapeCSVValue(a.artifactId),
-          'Name': escapeCSVValue(a.name),
+          // 'Name' → 'Artifact Name' (issue #306). Import still accepts the
+          // old header, so files exported by earlier versions keep working.
+          'Artifact Name': escapeCSVValue(a.name),
           'Description': escapeCSVValue(a.description),
           'Link': escapeCSVValue(a.link || ''),
           'Type': escapeCSVValue(a.type || 'Document'),
+          'Status': escapeCSVValue(a.status || 'ACTIVE'),
+          'Health': escapeCSVValue(a.health || ''),
+          'Priority': escapeCSVValue(a.priority || 'Medium'),
           'Control ID': escapeCSVValue(a.controlId || ''),
-          'Assessment ID': a.assessmentId || '',
+          'Assessment ID': escapeCSVValue(a.assessmentId || ''),
           'Linked Evaluation IDs': (a.linkedEvaluationIds || []).join('; '),
           'Compliance Requirement': escapeCSVValue(a.complianceRequirement || ''), // Deprecated
           'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '), // Deprecated
-          'Created Date': a.createdDate,
-          'Jira Key': a.jiraKey || ''
+          // Every one of these round-trips through importArtifactsCSV, so
+          // every one is user-controlled and must be escaped. 'Last Updated'
+          // is new in issue #306; the rest were already importable and
+          // already exported raw — same defect class, fixed together.
+          'Created Date': escapeCSVValue(a.createdDate),
+          'Last Updated': escapeCSVValue(a.lastModified || ''),
+          'Jira Key': escapeCSVValue(a.jiraKey || '')
         }));
 
         const csv = Papa.unparse(csvData);
@@ -354,7 +382,10 @@ const useArtifactStore = create(
                   return {
                     id: uuidv4(),
                     artifactId: artifactId,
-                    name: row['Name'] || row['Summary'] || '',
+                    // 'Artifact Name' is the current header (issue #306);
+                    // 'Name' is what this app used to export and 'Summary' is
+                    // the Jira AR column. All three still land here.
+                    name: row['Artifact Name'] || row['Name'] || row['Summary'] || '',
                     description: row['Description'] || '',
                     link: row['Link'] || row['Custom field (Link)'] || '',
                     type: row['Type'] || row['Custom field (Artifact Type)'] || 'Document',
@@ -380,9 +411,16 @@ const useArtifactStore = create(
                       .split(';').map(s => s.trim()).filter(Boolean),
 
                     createdDate: row['Created Date'] || row['Created'] || new Date().toISOString(),
-                    lastModified: new Date().toISOString(),
+                    // Honor an exported 'Last Updated' so an export → import
+                    // round-trip preserves when the evidence actually changed.
+                    // Without the column this is a brand new local record, so
+                    // "now" is the honest answer.
+                    lastModified: (row['Last Updated'] || '').trim() || new Date().toISOString(),
                     jiraKey: row['Issue key'] || row['Jira Key'] || null,
                     status: row['Status'] || 'ACTIVE',
+                    // issue #306 — blank stays blank ("not set"), never
+                    // defaulted to Healthy
+                    health: (row['Health'] || '').trim(),
                     priority: row['Priority'] || 'Medium'
                   };
                 });
@@ -407,7 +445,7 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 8,
+      version: 9,
       migrate: (persistedState, version) => migrateArtifactsState(persistedState, version),
       partialize: (state) => ({
         artifacts: state.artifacts
@@ -430,14 +468,52 @@ const useArtifactStore = create(
  */
 /**
  * Full persisted-state migration for csf-artifacts-storage. Exported so tests
- * exercise the EXACT production path. Version 7 (#287) and version 8 (#297)
- * run after the version chain rather than as more branches in it — the
- * branches return early, so a user coming from v5 would never reach a branch
- * placed at the end. Repairing afterwards covers every upgrade path, and both
- * passes are no-ops on states that already carry the new data.
+ * exercise the EXACT production path. Version 7 (#287), version 8 (#297) and
+ * version 9 (#306) run after the version chain rather than as more branches in
+ * it — the branches return early, so a user coming from v5 would never reach a
+ * branch placed at the end. Repairing afterwards covers every upgrade path,
+ * and all three passes are no-ops on states that already carry the new data.
  */
 export function migrateArtifactsState(persistedState, version) {
-  return stampSeededDemoArtifacts(repairRelocatedLinks(applyVersionMigrations(persistedState, version)));
+  return normalizeArtifactFields(
+    stampSeededDemoArtifacts(repairRelocatedLinks(applyVersionMigrations(persistedState, version)))
+  );
+}
+
+/**
+ * Version 9 (issue #306): give every artifact the `health` key and a
+ * `lastModified` the panel can render.
+ *
+ * Absent-only: an existing string is never rewritten, so '' (deliberately
+ * "not set") survives untouched. `lastModified` falls back to `createdDate`
+ * rather than to now — stamping now would claim the evidence was updated
+ * today, which is exactly the fact the field exists to report.
+ *
+ * Exported because the restore path (dataImport) uses zustand's bulk setters,
+ * which bypass this store's load-time migrate entirely.
+ */
+export function normalizeArtifactFields(state) {
+  const artifacts = state?.artifacts;
+  if (!Array.isArray(artifacts)) return state;
+
+  let changed = false;
+  const normalized = artifacts.map((artifact) => {
+    if (!artifact || typeof artifact !== 'object') return artifact;
+    const patch = {};
+    if (typeof artifact.health !== 'string') patch.health = '';
+    // Only write lastModified when there is a real value to write. Patching a
+    // blank back to a blank would make this pass non-idempotent, which is the
+    // one property a migration that runs on every load cannot afford.
+    const hasLastModified = typeof artifact.lastModified === 'string' && artifact.lastModified !== '';
+    const createdDate = typeof artifact.createdDate === 'string' ? artifact.createdDate : '';
+    if (!hasLastModified && createdDate) patch.lastModified = createdDate;
+    else if (typeof artifact.lastModified !== 'string') patch.lastModified = '';
+    if (Object.keys(patch).length === 0) return artifact;
+    changed = true;
+    return { ...artifact, ...patch };
+  });
+
+  return changed ? { ...state, artifacts: normalized } : state;
 }
 
 /**

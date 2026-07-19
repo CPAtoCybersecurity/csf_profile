@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
@@ -222,6 +222,147 @@ const Assessments = () => {
       }
     }).filter(Boolean);
   }, [currentAssessment, getControl, getRequirement, requirements]);
+
+  // ---- Scoped-item CSF filters (issue #305) ----------------------------
+  //
+  // A real assessment scopes hundreds of subcategories; working through them
+  // means working one function (or one category) at a time. These two filters
+  // narrow the scoped list in BOTH the scope view and the evaluations table.
+  // They are page-local view state: nothing here ever writes scopeIds.
+
+  // The CSF function/category a scoped item belongs to. A requirement carries
+  // them directly. A control carries neither, so they are derived from the
+  // requirements it links to — a control can legitimately span more than one
+  // function, hence sets rather than single values.
+  const scopedItemFacets = useCallback((item) => {
+    if (item.type === 'requirement') {
+      return {
+        functions: item.function ? [item.function] : [],
+        categories: item.category ? [item.category] : []
+      };
+    }
+    const functions = new Set();
+    const categories = new Set();
+    (item.linkedRequirementIds || []).forEach((reqId) => {
+      const req = getRequirement(reqId);
+      if (req?.function) functions.add(req.function);
+      if (req?.category) categories.add(req.category);
+    });
+    return { functions: [...functions], categories: [...categories] };
+  }, [getRequirement]);
+
+  const [scopedFunctionFilter, setScopedFunctionFilter] = useState('');
+  const [scopedCategoryFilter, setScopedCategoryFilter] = useState('');
+
+  // Switching assessments clears the filters — a function that existed in the
+  // old assessment's scope may not exist in the new one, and a filter matching
+  // nothing reads as an empty assessment.
+  useEffect(() => {
+    setScopedFunctionFilter('');
+    setScopedCategoryFilter('');
+  }, [currentAssessmentId]);
+
+  // Options come from the items actually in scope, not from the whole CSF
+  // catalog, so the dropdowns never offer a choice that yields nothing.
+  const scopedFunctionOptions = useMemo(() => {
+    const found = new Set();
+    scopedItems.forEach((item) => scopedItemFacets(item).functions.forEach((f) => found.add(f)));
+    return [...found].sort();
+  }, [scopedItems, scopedItemFacets]);
+
+  // Categories narrow to the selected function, so the second dropdown only
+  // ever offers categories that can actually be reached from the first.
+  const scopedCategoryOptions = useMemo(() => {
+    const found = new Set();
+    scopedItems.forEach((item) => {
+      const facets = scopedItemFacets(item);
+      if (scopedFunctionFilter && !facets.functions.includes(scopedFunctionFilter)) return;
+      facets.categories.forEach((c) => found.add(c));
+    });
+    return [...found].sort();
+  }, [scopedItems, scopedItemFacets, scopedFunctionFilter]);
+
+  const scopedFiltersActive = Boolean(scopedFunctionFilter || scopedCategoryFilter);
+
+  const filteredScopedItems = useMemo(() => {
+    if (!scopedFiltersActive) return scopedItems;
+    return scopedItems.filter((item) => {
+      const facets = scopedItemFacets(item);
+      if (scopedFunctionFilter && !facets.functions.includes(scopedFunctionFilter)) return false;
+      if (scopedCategoryFilter && !facets.categories.includes(scopedCategoryFilter)) return false;
+      return true;
+    });
+  }, [scopedItems, scopedItemFacets, scopedFunctionFilter, scopedCategoryFilter, scopedFiltersActive]);
+
+  // EVAL-nn is derived from the UNFILTERED position, so an item keeps its
+  // number when a filter is applied. Numbering off the rendered index would
+  // make the table and the detail header disagree the moment you filter.
+  const evalNumberByItemId = useMemo(() => {
+    const numbers = new Map();
+    scopedItems.forEach((item, index) => numbers.set(item.itemId, index + 1));
+    return numbers;
+  }, [scopedItems]);
+
+  const evalNumber = useCallback(
+    (itemId) => String(evalNumberByItemId.get(itemId) || 0).padStart(2, '0'),
+    [evalNumberByItemId]
+  );
+
+  // Prev/next walks the list the user is looking at. When the selected item is
+  // outside the active filter (deep link, or the filter changed underneath it)
+  // fall back to the full list so navigation is never dead.
+  const navigationItems = useMemo(() => (
+    filteredScopedItems.some((i) => i.itemId === selectedItemId) ? filteredScopedItems : scopedItems
+  ), [filteredScopedItems, scopedItems, selectedItemId]);
+
+  // A reusable pair of dropdowns — the scope view and the evaluations table
+  // both drive the same filter state, so a filter set in one holds in the other.
+  const renderScopedCsfFilters = (idPrefix) => (
+    <div className="flex items-center gap-2">
+      <select
+        id={`${idPrefix}-function-filter`}
+        value={scopedFunctionFilter}
+        onChange={(e) => {
+          setScopedFunctionFilter(e.target.value);
+          // The chosen category may not exist under the new function.
+          setScopedCategoryFilter('');
+        }}
+        className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+        aria-label="Filter scoped items by CSF function"
+        disabled={scopedFunctionOptions.length === 0}
+      >
+        <option value="">All functions</option>
+        {scopedFunctionOptions.map((f) => (
+          <option key={f} value={f}>{f}</option>
+        ))}
+      </select>
+      <select
+        id={`${idPrefix}-category-filter`}
+        value={scopedCategoryFilter}
+        onChange={(e) => setScopedCategoryFilter(e.target.value)}
+        className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+        aria-label="Filter scoped items by CSF category"
+        disabled={scopedCategoryOptions.length === 0}
+      >
+        <option value="">All categories</option>
+        {scopedCategoryOptions.map((c) => (
+          <option key={c} value={c}>{c}</option>
+        ))}
+      </select>
+      {scopedFiltersActive && (
+        <button
+          type="button"
+          className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+          onClick={() => {
+            setScopedFunctionFilter('');
+            setScopedCategoryFilter('');
+          }}
+        >
+          Clear
+        </button>
+      )}
+    </div>
+  );
 
   // Get available items for scope selection
   const availableItems = useMemo(() => {
@@ -1128,17 +1269,32 @@ Format as a numbered list. Be specific and actionable.`;
       <div className="grid grid-cols-2 flex-1 min-h-0 overflow-hidden">
         {/* Scoped items */}
         <div className="border-r overflow-auto">
-          <div className="p-3 bg-gray-50 border-b sticky top-0">
-            <h3 className="font-medium">Scoped Items ({scopedItems.length})</h3>
+          <div className="p-3 bg-gray-50 border-b sticky top-0 z-10">
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h3 className="font-medium">
+                Scoped Items ({scopedFiltersActive
+                  ? `${filteredScopedItems.length} of ${scopedItems.length}`
+                  : scopedItems.length})
+              </h3>
+            </div>
+            {/* CSF function/category filters (issue #305) */}
+            {renderScopedCsfFilters('scope')}
           </div>
           {scopedItems.length === 0 ? (
             <div className="p-4 text-center text-gray-500">
               <p>No items in scope</p>
               <p className="text-sm mt-1">Add items from the right panel</p>
             </div>
+          ) : filteredScopedItems.length === 0 ? (
+            <div className="p-4 text-center text-gray-500">
+              <p>No scoped items match this filter</p>
+              <p className="text-sm mt-1">
+                {scopedItems.length} item{scopedItems.length === 1 ? '' : 's'} in scope — clear the filter to see them
+              </p>
+            </div>
           ) : (
             <div className="divide-y">
-              {scopedItems.map(item => {
+              {filteredScopedItems.map(item => {
                 const obs = currentAssessment ? currentAssessment.observations?.[item.itemId] : null;
                 return (
                   <div
@@ -1298,8 +1454,11 @@ Format as a numbered list. Be specific and actionable.`;
 
   // Render assessment view - Jira-style: full table, then two-column detail on click
   const renderAssessView = () => {
+    // Lookup is against the FULL list — a selected item must stay reachable
+    // even when the active filter would hide it (issue #305).
     const currentItem = scopedItems.find(i => i.itemId === selectedItemId);
-    const currentIndex = scopedItems.findIndex(i => i.itemId === selectedItemId);
+    // Prev/next index is against whichever list navigation is walking.
+    const currentIndex = navigationItems.findIndex(i => i.itemId === selectedItemId);
 
     // If an item is selected, show the two-column detail view
     if (selectedItemId && currentObservation && currentItem) {
@@ -1316,14 +1475,14 @@ Format as a numbered list. Be specific and actionable.`;
                 Back
               </button>
               <span>/</span>
-              <span className="text-blue-600 dark:text-blue-400 font-medium">EVAL-{String(currentIndex + 1).padStart(2, '0')}</span>
+              <span className="text-blue-600 dark:text-blue-400 font-medium">EVAL-{evalNumber(selectedItemId)}</span>
               <span className="flex items-center gap-1">
                 <button
                   onClick={() => {
                     const prevIndex = currentIndex - 1;
-                    if (prevIndex >= 0) setSelectedItemId(scopedItems[prevIndex].itemId);
+                    if (prevIndex >= 0) setSelectedItemId(navigationItems[prevIndex].itemId);
                   }}
-                  disabled={currentIndex === 0}
+                  disabled={currentIndex <= 0}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30"
                 >
                   <ChevronRight size={14} className="rotate-180" />
@@ -1331,9 +1490,9 @@ Format as a numbered list. Be specific and actionable.`;
                 <button
                   onClick={() => {
                     const nextIndex = currentIndex + 1;
-                    if (nextIndex < scopedItems.length) setSelectedItemId(scopedItems[nextIndex].itemId);
+                    if (nextIndex < navigationItems.length) setSelectedItemId(navigationItems[nextIndex].itemId);
                   }}
-                  disabled={currentIndex === scopedItems.length - 1}
+                  disabled={currentIndex === -1 || currentIndex === navigationItems.length - 1}
                   className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-30"
                 >
                   <ChevronRight size={14} />
@@ -1764,10 +1923,17 @@ Format as a numbered list. Be specific and actionable.`;
               </button>
               <div>
                 <h1 className="text-lg font-semibold text-gray-900 dark:text-white">{currentAssessment?.name}</h1>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{scopedItems.length} evaluations</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {scopedFiltersActive
+                    ? `${filteredScopedItems.length} of ${scopedItems.length} evaluations`
+                    : `${scopedItems.length} evaluations`}
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
+              {/* CSF function/category filters (issue #305) — same state the
+                  scope view drives, so a filter carries across the two views */}
+              {renderScopedCsfFilters('assess')}
               {/* Quarter selector */}
               <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
                 {['Q1', 'Q2', 'Q3', 'Q4'].map((q) => (
@@ -1814,7 +1980,7 @@ Format as a numbered list. Be specific and actionable.`;
 
           {/* Table rows */}
           <div className="divide-y divide-gray-100 dark:divide-gray-700">
-            {scopedItems.map((item, index) => {
+            {filteredScopedItems.map((item) => {
               const obs = currentAssessment?.observations?.[item.itemId];
               const quarterData = obs?.quarters?.[selectedQuarter] || {};
               const auditor = obs?.auditorId ? useUserStore.getState().getUserById(obs.auditorId) : null;
@@ -1840,7 +2006,7 @@ Format as a numbered list. Be specific and actionable.`;
                     </div>
                     <div className="min-w-0">
                       <span className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline">
-                        EVAL-{String(index + 1).padStart(2, '0')}
+                        EVAL-{evalNumber(item.itemId)}
                       </span>
                       <p className="text-sm text-gray-900 dark:text-white truncate">
                         {item.type === 'control' ? item.controlId : item.subcategoryId || item.id}
@@ -1932,7 +2098,7 @@ Format as a numbered list. Be specific and actionable.`;
           <div className="sticky bottom-0 bg-white dark:bg-gray-800 border-t dark:border-gray-700 px-4 py-2">
             <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
               <span>+ Create</span>
-              <span>{scopedItems.length} of {scopedItems.length}</span>
+              <span>{filteredScopedItems.length} of {scopedItems.length}</span>
             </div>
           </div>
         </div>

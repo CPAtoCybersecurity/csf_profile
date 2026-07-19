@@ -3,7 +3,7 @@ import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, Chevro
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
-import useArtifactStore from '../stores/artifactStore';
+import useArtifactStore, { ARTIFACT_HEALTH_VALUES } from '../stores/artifactStore';
 import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -48,6 +48,8 @@ const Artifacts = () => {
     description: '',
     link: '',
     status: 'ACTIVE',
+    health: '',
+    controlId: '',
     assigneeId: null,
     reporterId: null,
     priority: 'Medium',
@@ -146,10 +148,14 @@ const Artifacts = () => {
     event.target.value = '';
   }, []);
 
-  // Handle CSV export - uses store's exportForJiraCSV (same as Settings Jira export)
+  // Handle CSV export — the STANDARD artifact CSV (issue #306). This page used
+  // to emit the Jira AR import shape, which has no Artifact ID column at all
+  // and so could not carry the fields this issue added. The Jira shape is still
+  // available under Settings → Artifacts (Jira AR Project). The standard CSV is
+  // also what this page's own Import reads, so export → import now round-trips.
   const handleExportCSV = useCallback(() => {
     try {
-      useArtifactStore.getState().exportForJiraCSV();
+      useArtifactStore.getState().exportArtifactsCSV();
       toast.success('Artifacts exported to CSV');
     } catch (err) {
       console.error('Artifact CSV export error:', err);
@@ -261,6 +267,8 @@ const Artifacts = () => {
       description: '',
       link: '',
       status: 'ACTIVE',
+      health: '',
+      controlId: '',
       assigneeId: null,
       reporterId: null,
       priority: 'Medium',
@@ -316,6 +324,29 @@ const Artifacts = () => {
       default:
         return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
     }
+  };
+
+  // Evidence-health badge style (issue #306). Health is a judgement about the
+  // evidence; status above is the record's lifecycle. They are independent.
+  const getHealthStyle = (health) => {
+    switch (health) {
+      case 'Healthy':
+        return 'bg-green-100 text-green-700 dark:bg-green-600 dark:text-white';
+      case 'Needs Remediation':
+        return 'bg-yellow-100 text-yellow-700 dark:bg-yellow-600 dark:text-white';
+      default:
+        return 'bg-gray-100 text-gray-600 dark:bg-gray-600 dark:text-gray-200';
+    }
+  };
+
+  // Render an ISO timestamp as a plain date. Anything unparseable renders as
+  // an em-dash rather than "Invalid Date" — imported CSVs carry whatever the
+  // source tool wrote in the Last Updated column.
+  const formatUpdatedDate = (value) => {
+    if (!value) return '—';
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) return '—';
+    return parsed.toISOString().split('T')[0];
   };
 
   // Get user by ID
@@ -393,13 +424,15 @@ const Artifacts = () => {
         <div className={`${selectedArtifact || editMode ? 'w-1/2' : 'w-full'} overflow-auto border-r dark:border-gray-700`}>
           {/* Column headers */}
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
-            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-max">
               <div className="w-8 flex-shrink-0"></div>
               <div className="w-56 flex-shrink-0">ID</div>
-              <div className="flex-1 min-w-0">Summary</div>
+              <div className="w-64 flex-shrink-0">Artifact Name</div>
               <div className="w-28 flex-shrink-0">Assignee</div>
               <div className="w-28 flex-shrink-0">Reporter</div>
               <div className="w-24 flex-shrink-0">Status</div>
+              <div className="w-36 flex-shrink-0">Health</div>
+              <div className="w-28 flex-shrink-0">Updated</div>
               <div className="w-20 flex-shrink-0">Priority</div>
             </div>
           </div>
@@ -414,7 +447,7 @@ const Artifacts = () => {
                 return (
                   <div
                     key={artifact.id}
-                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${selectedArtifact?.id === artifact.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''
+                    className={`flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors min-w-max ${selectedArtifact?.id === artifact.id ? 'bg-blue-50 dark:bg-blue-900/30' : ''
                       }`}
                     onClick={() => handleViewDetails(artifact)}
                   >
@@ -434,8 +467,8 @@ const Artifacts = () => {
                       </span>
                     </div>
 
-                    {/* Summary/Name */}
-                    <div className="flex-1 min-w-0">
+                    {/* Artifact Name (renamed from Summary — issue #306) */}
+                    <div className="w-64 flex-shrink-0">
                       <p className="text-sm text-gray-900 dark:text-white truncate">{artifact.name}</p>
                     </div>
 
@@ -475,6 +508,24 @@ const Artifacts = () => {
                       <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStatusStyle(artifact.status || 'ACTIVE')}`}>
                         {artifact.status || 'ACTIVE'}
                         <ChevronRight size={12} className="ml-1 rotate-90" />
+                      </span>
+                    </div>
+
+                    {/* Health (issue #306) */}
+                    <div className="w-36 flex-shrink-0">
+                      {artifact.health ? (
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getHealthStyle(artifact.health)}`}>
+                          {artifact.health}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400 dark:text-gray-500">Not set</span>
+                      )}
+                    </div>
+
+                    {/* Last Updated (issue #306) */}
+                    <div className="w-28 flex-shrink-0">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                        {formatUpdatedDate(artifact.lastModified)}
                       </span>
                     </div>
 
@@ -582,6 +633,27 @@ const Artifacts = () => {
                     <ChevronRight size={14} className="ml-1 rotate-90" />
                   </span>
                 )}
+
+                {/* Evidence health (issue #306) — independent of the lifecycle
+                    status to its left */}
+                {editMode ? (
+                  <select
+                    name="health"
+                    value={formData.health || ''}
+                    onChange={handleChange}
+                    className={`px-3 py-1.5 rounded text-sm font-medium ${getHealthStyle(formData.health)} border-none cursor-pointer`}
+                    aria-label="Health"
+                  >
+                    <option value="">Health: not set</option>
+                    {ARTIFACT_HEALTH_VALUES.map((value) => (
+                      <option key={value} value={value}>{value}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className={`inline-flex items-center px-3 py-1.5 rounded text-sm font-medium ${getHealthStyle(selectedArtifact?.health)}`}>
+                    {selectedArtifact?.health || 'Health: not set'}
+                  </span>
+                )}
               </div>
 
               {/* Key details section */}
@@ -590,6 +662,57 @@ const Artifacts = () => {
                   <ChevronRight size={16} className="rotate-90" />
                   Key details
                 </h3>
+
+                {/* Artifact ID (issue #306): editable while creating, shown
+                    read-only afterwards — the ID is the record's identity and
+                    the CSV import key, so it is not something to retype later */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Artifact ID</label>
+                  {editMode && !selectedArtifact ? (
+                    <input
+                      type="text"
+                      name="artifactId"
+                      value={formData.artifactId || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      placeholder={`AR-${artifacts.length + 1}`}
+                    />
+                  ) : (
+                    <span className="text-sm font-mono text-gray-700 dark:text-gray-300">
+                      {selectedArtifact?.artifactId || formData.artifactId || '—'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Control ID (issue #306): the control this evidence supports.
+                    Already a first-class field in the store and the CSV; it had
+                    no panel until now. */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Control ID</label>
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="controlId"
+                      value={formData.controlId || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      placeholder="e.g. CTL-001 or PR.AA-01 Ex1"
+                    />
+                  ) : (
+                    <span className="text-sm font-mono text-gray-700 dark:text-gray-300">
+                      {selectedArtifact?.controlId || 'None'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Last Updated (issue #306): derived from the record, never
+                    hand-edited — the store stamps it on every write */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Last Updated</label>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">
+                    {formatUpdatedDate(selectedArtifact?.lastModified)}
+                  </span>
+                </div>
 
                 {/* Assessment scope (issue #297): visible + reassignable, so an
                     imported or mis-scoped artifact is never stranded */}
@@ -831,20 +954,8 @@ const Artifacts = () => {
                     )}
                   </div>
 
-                  {/* Artifact ID (for new artifacts) */}
-                  {editMode && !selectedArtifact && (
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-500 dark:text-gray-400">Artifact ID</span>
-                      <input
-                        type="text"
-                        name="artifactId"
-                        value={formData.artifactId || ''}
-                        onChange={handleChange}
-                        className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white w-32"
-                        placeholder={`AR-${artifacts.length + 1}`}
-                      />
-                    </div>
-                  )}
+                  {/* Artifact ID moved into Key details above (issue #306) —
+                      it is shown for every artifact now, not just new ones. */}
                 </div>
               </div>
 
