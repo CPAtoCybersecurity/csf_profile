@@ -1240,7 +1240,7 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
                 <h3 className="settings-section-title">Alma Security Case Study Materials</h3>
               </div>
               <a
-                href="https://github.com/CPAtoCybersecurity/csf_profile/tree/main/EXAMPLE%20BUSINESS%20CASE%20STUDY%20FOR%20ASSESSMENT"
+                href="https://github.com/CPAtoCybersecurity/csf_profile/tree/main/ASSESSMENT_CATALOG"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-terminal"
