@@ -65,13 +65,20 @@
   --text-primary: #0e1626;     /* near-black with blue undertone */
   --text-secondary: #1f2a44;
   --text-muted: #4a5570;
-  --text-faint: #8a93a6;
+  --text-faint: #5f6b85;       /* lowest INFORMATIONAL tier — must clear 4.5:1 */
+  --text-decorative: #8a93a6;  /* ornament only (bracket glyphs); never carries meaning */
   --border-color: #0e1626;
   --border-dark: #1f2a44;
   --ring-color: #1e3a8a;
   --accent: #1e3a8a;           /* Simply Cyber royal blue */
   --accent-bright: #2b4fae;    /* hover / CTA tint */
   --accent-soft: #eaf0fb;      /* accent surface */
+
+  /* On-header tokens — for the chrome that stays DARK in both themes
+     (--bg-header). Page-level --accent is a dark navy here and would be
+     invisible, so anything rendered on that surface uses these instead. */
+  --on-header-accent: #3ea6ff;
+  --on-header-muted: #8a8a8a;
 
   /* Terminal status colors (light) */
   --terminal-amber: #1e3a8a;   /* repurposed: status-bar primary */
@@ -97,12 +104,18 @@
   --bg-nav-active: #001100;
   --text-primary: #33ff66;
   --text-secondary: #22cc55;
-  --text-muted: #189944;
-  --text-faint: #0e6633;
+  --text-muted: #1fb551;
+  --text-faint: #12a04a;       /* lowest INFORMATIONAL tier — must clear 4.5:1 */
+  --text-decorative: #0e6633;  /* ornament only (bracket glyphs); never carries meaning */
   --border-color: #1f5533;
   --border-dark: #2a8044;
   --ring-color: #33ff66;
   --accent: #33ff66;
+
+  /* On-header tokens — the dark chrome is already dark here, so the page
+     accent works; kept as tokens so the surface has one vocabulary. */
+  --on-header-accent: #33ff66;
+  --on-header-muted: #12a04a;
 
   /* Terminal status colors (dark) */
   --terminal-amber: #3ea6ff;
@@ -771,12 +784,12 @@ tr:hover .row-hover-actions { opacity: 1; }
 .filter-chip::before {
   content: '[';
   margin-right: 4px;
-  color: var(--text-faint);
+  color: var(--text-decorative);
 }
 .filter-chip::after {
   content: ']';
   margin-left: 4px;
-  color: var(--text-faint);
+  color: var(--text-decorative);
 }
 .filter-chip:hover {
   color: var(--accent);
@@ -1003,7 +1016,7 @@ nav a:active { text-decoration: none !important; }
   background-color: transparent;
 }
 .dark .filter-chip::before,
-.dark .filter-chip::after { color: var(--text-faint); }
+.dark .filter-chip::after { color: var(--text-decorative); }
 .dark .filter-chip:hover {
   color: var(--accent);
   border-color: var(--accent);
@@ -1049,7 +1062,7 @@ nav a:active { text-decoration: none !important; }
   font-variant-numeric: tabular-nums;
 }
 .badge-success { background-color: rgba(42, 106, 42, 0.10); border-color: #2a6a2a; color: #2a6a2a; }
-.badge-warning { background-color: rgba(201, 123, 0, 0.10); border-color: #c97b00; color: #c97b00; }
+.badge-warning { background-color: rgba(163, 95, 0, 0.10); border-color: #a35f00; color: #a35f00; }
 .badge-danger  { background-color: rgba(160, 0, 0, 0.10); border-color: #a00000; color: #a00000; }
 .badge-info    { background-color: rgba(0, 106, 142, 0.10); border-color: #006a8e; color: #006a8e; }
 .badge-neutral { background-color: rgba(90, 90, 90, 0.08); border-color: #5a5a5a; color: #5a5a5a; }
@@ -1249,7 +1262,7 @@ nav a:active { text-decoration: none !important; }
 .terminal-statusbar-segment:first-child::before { content: none; margin-right: 0; }
 .terminal-statusbar-segment.terminal-statusbar-flex { flex: 1; }
 .terminal-statusbar-label {
-  color: #8a8a8a;
+  color: var(--on-header-muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-weight: 600;
@@ -1258,7 +1271,7 @@ nav a:active { text-decoration: none !important; }
 .terminal-statusbar-value { color: #3ea6ff; }
 
 .dark .terminal-statusbar { color: var(--accent); }
-.dark .terminal-statusbar-label { color: var(--text-faint); }
+.dark .terminal-statusbar-label { color: var(--on-header-muted); }
 .dark .terminal-statusbar-value { color: var(--accent); }
 
 /* --- Interactive selector inside status bar (assessment) --- */
@@ -1444,12 +1457,12 @@ nav a:active { text-decoration: none !important; }
 .terminal-bracket-link::before {
   content: '[';
   margin-right: 2px;
-  color: var(--text-faint);
+  color: var(--text-decorative);
 }
 .terminal-bracket-link::after {
   content: ']';
   margin-left: 2px;
-  color: var(--text-faint);
+  color: var(--text-decorative);
 }
 .terminal-bracket-link:hover,
 .terminal-bracket-link.is-active {
@@ -1635,14 +1648,15 @@ nav a:active { text-decoration: none !important; }
 .terminal-statusbar-kbdhints .terminal-kbd {
   height: 14px;
   line-height: 12px;
+  color: var(--on-header-accent);
+  border-color: var(--on-header-accent);
 }
 .terminal-statusbar-kbdhints .terminal-statusbar-kbdlabel {
-  color: #8a8a8a;
+  color: var(--on-header-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.dark .terminal-statusbar-kbdhints .terminal-statusbar-kbdlabel { color: var(--text-faint); }
-.terminal-statusbar-kbdhints:hover .terminal-statusbar-kbdlabel { color: var(--accent); }
+.terminal-statusbar-kbdhints:hover .terminal-statusbar-kbdlabel { color: var(--on-header-accent); }
 
 /* --- Keyboard-shortcuts overlay modal --- */
 .kbd-overlay-backdrop {
@@ -1687,13 +1701,13 @@ nav a:active { text-decoration: none !important; }
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--accent);
+  color: var(--on-header-accent);
 }
 .kbd-overlay-title::before { content: '█ '; }
 .kbd-overlay-close {
   background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--accent);
+  border: 1px solid var(--on-header-accent);
+  color: var(--on-header-accent);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -1704,7 +1718,37 @@ nav a:active { text-decoration: none !important; }
   border-radius: 0;
   line-height: 16px;
 }
-.kbd-overlay-close:hover { background: var(--accent); color: var(--bg-primary); }
+.kbd-overlay-close:hover { background: var(--on-header-accent); color: var(--bg-header); }
+
+/* Windows / Mac modifier-style toggle — lives on the dark header surface. */
+.kbd-overlay-platform {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  margin-left: auto;
+  margin-right: 12px;
+}
+.kbd-overlay-platform-btn {
+  background: transparent;
+  border: 1px solid var(--on-header-muted);
+  color: var(--on-header-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 8px;
+  line-height: 16px;
+  cursor: pointer;
+  border-radius: 0;
+}
+.kbd-overlay-platform-btn + .kbd-overlay-platform-btn { border-left: none; }
+.kbd-overlay-platform-btn:hover { color: var(--on-header-accent); border-color: var(--on-header-accent); }
+.kbd-overlay-platform-btn.is-active {
+  background: var(--on-header-accent);
+  border-color: var(--on-header-accent);
+  color: var(--bg-header);
+}
 
 .kbd-overlay-body { padding: 8px 16px 16px; }
 .kbd-overlay-group { margin-top: 14px; }

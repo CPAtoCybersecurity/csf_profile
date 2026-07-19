@@ -65,8 +65,13 @@ export function useKeyboardNavigation() {
       return;
     }
 
+    // event.key carries the SHIFTED character, so Shift+Z arrives as 'Z' (and
+    // Caps Lock alone flips plain Z the same way). Compare case-insensitively
+    // or the Shift+Z redo chord the shortcuts overlay advertises never fires.
+    const letter = typeof event.key === 'string' ? event.key.toLowerCase() : '';
+
     // Undo: Ctrl/Cmd + Z
-    if ((event.ctrlKey || event.metaKey) && event.key === 'z' && !event.shiftKey) {
+    if ((event.ctrlKey || event.metaKey) && letter === 'z' && !event.shiftKey) {
       event.preventDefault();
       if (canUndo()) {
         undo();
@@ -76,8 +81,8 @@ export function useKeyboardNavigation() {
 
     // Redo: Ctrl/Cmd + Shift + Z or Ctrl/Cmd + Y
     if ((event.ctrlKey || event.metaKey) && (
-      (event.key === 'z' && event.shiftKey) ||
-      event.key === 'y'
+      (letter === 'z' && event.shiftKey) ||
+      letter === 'y'
     )) {
       event.preventDefault();
       if (canRedo()) {

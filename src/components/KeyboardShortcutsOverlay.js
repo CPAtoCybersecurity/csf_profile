@@ -1,4 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  PLATFORM_MAC,
+  PLATFORM_WINDOWS,
+  resolvePlatform,
+  storePlatform,
+} from '../utils/platform';
 
 /**
  * KeyboardShortcutsOverlay
@@ -15,10 +21,18 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // A key token renders as a <kbd> chip.
 const K = (label) => ({ kbd: label });
+// The primary chord modifier, rendered per the selected platform. The hook
+// accepts ctrlKey || metaKey everywhere, so either label is truthful.
+const MOD = { mod: true };
 // A separator between alternative key options ("or").
 const OR = { or: true };
 // A "+" combiner rendered between chord keys.
 const PLUS = { plus: true };
+
+const MODIFIER_LABEL = {
+  [PLATFORM_WINDOWS]: 'Ctrl',
+  [PLATFORM_MAC]: '⌘',
+};
 
 const SHORTCUT_GROUPS = [
   {
@@ -35,7 +49,7 @@ const SHORTCUT_GROUPS = [
     shortcuts: [
       { desc: 'Toggle selection of current item', keys: [K('Space')] },
       { desc: 'Extend selection while moving', keys: [K('Shift'), PLUS, K('↑'), OR, K('Shift'), PLUS, K('↓')] },
-      { desc: 'Select all items', keys: [K('Ctrl'), OR, K('⌘'), PLUS, K('A')] },
+      { desc: 'Select all items', keys: [MOD, PLUS, K('A')] },
       { desc: 'Exit edit / clear selection / deselect', keys: [K('Esc')] },
     ],
   },
@@ -44,8 +58,8 @@ const SHORTCUT_GROUPS = [
     shortcuts: [
       { desc: 'Edit current item', keys: [K('Enter')] },
       { desc: 'Create new item', keys: [K('N')] },
-      { desc: 'Undo', keys: [K('Ctrl'), OR, K('⌘'), PLUS, K('Z')] },
-      { desc: 'Redo', keys: [K('Ctrl'), OR, K('⌘'), PLUS, K('Shift'), PLUS, K('Z'), OR, K('Ctrl'), OR, K('⌘'), PLUS, K('Y')] },
+      { desc: 'Undo', keys: [MOD, PLUS, K('Z')] },
+      { desc: 'Redo', keys: [MOD, PLUS, K('Shift'), PLUS, K('Z'), OR, MOD, PLUS, K('Y')] },
     ],
   },
   {
@@ -57,16 +71,28 @@ const SHORTCUT_GROUPS = [
   },
 ];
 
-const KeyToken = ({ token }) => {
+const KeyToken = ({ token, platform }) => {
   if (token.or) return <span className="kbd-overlay-or">or</span>;
   if (token.plus) return <span className="kbd-overlay-plus">+</span>;
+  if (token.mod) return <kbd className="terminal-kbd">{MODIFIER_LABEL[platform]}</kbd>;
   return <kbd className="terminal-kbd">{token.kbd}</kbd>;
 };
 
+const PLATFORM_OPTIONS = [
+  { id: PLATFORM_WINDOWS, label: 'Windows' },
+  { id: PLATFORM_MAC, label: 'Mac' },
+];
+
 const KeyboardShortcutsOverlay = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [platform, setPlatform] = useState(resolvePlatform);
   const closeButtonRef = useRef(null);
   const previouslyFocused = useRef(null);
+
+  const choosePlatform = useCallback((next) => {
+    setPlatform(next);
+    storePlatform(next);
+  }, []);
 
   const close = useCallback(() => {
     setIsOpen(false);
@@ -124,6 +150,19 @@ const KeyboardShortcutsOverlay = () => {
       >
         <div className="kbd-overlay-header">
           <span className="kbd-overlay-title">Keyboard Shortcuts</span>
+          <div className="kbd-overlay-platform" role="group" aria-label="Modifier key style">
+            {PLATFORM_OPTIONS.map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                className={`kbd-overlay-platform-btn${platform === option.id ? ' is-active' : ''}`}
+                aria-pressed={platform === option.id}
+                onClick={() => choosePlatform(option.id)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
           <button
             type="button"
             ref={closeButtonRef}
@@ -145,7 +184,7 @@ const KeyboardShortcutsOverlay = () => {
                   <span className="kbd-overlay-row-keys">
                     {shortcut.keys.map((token, i) => (
                       // eslint-disable-next-line react/no-array-index-key
-                      <KeyToken key={i} token={token} />
+                      <KeyToken key={i} token={token} platform={platform} />
                     ))}
                   </span>
                 </div>
@@ -155,6 +194,7 @@ const KeyboardShortcutsOverlay = () => {
 
           <div className="kbd-overlay-footer">
             Shortcuts are disabled while typing in an input, textarea, or select.
+            {' '}Ctrl and {'⌘'} both work regardless of the setting above.
           </div>
         </div>
       </div>
