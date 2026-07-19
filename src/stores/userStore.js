@@ -90,8 +90,25 @@ const useUserStore = create(
 
         return get().addUser({
           name: userInfo.name,
-          title: 'Imported User',
+          title: userInfo.title || 'Imported User',
           email: email,
+        });
+      },
+
+      // Email-authoritative resolver (issue #290 wizard). Unlike
+      // findOrCreateUser, there is NO name fallback: distinct emails always
+      // yield distinct users, and a typed email is never silently discarded
+      // by a name match against an existing user. findOrCreateUser keeps its
+      // name fallback for the CSV/import lanes that may lack emails.
+      findOrCreateUserByEmail: ({ name, email, title }) => {
+        const cleanEmail = typeof email === 'string' ? email.trim() : '';
+        if (!cleanEmail) return null;
+        const existing = get().getUserByEmail(cleanEmail);
+        if (existing) return existing.id;
+        return get().addUser({
+          name: name || cleanEmail,
+          title: title || 'Imported User',
+          email: cleanEmail
         });
       },
 

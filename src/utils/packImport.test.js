@@ -239,6 +239,11 @@ describe('importPack', () => {
     expect(Object.keys(assessment.observations)).toEqual(['nist-csf-2.0-GV.SC-04-a']);
     expect(assessment.observations['nist-csf-2.0-GV.SC-04-a'].quarters.Q2.actualScore).toBe(2);
 
+    // Every producer emits the full current shape (issues #291/#290):
+    // year takes the record's vintage, users starts empty.
+    expect(assessment.year).toBe(new Date().getFullYear());
+    expect(assessment.users).toEqual([]);
+
     const findings = setFindings.mock.calls[0][0];
     expect(findings).toHaveLength(1);
     expect(findings[0]).toMatchObject({

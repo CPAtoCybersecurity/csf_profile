@@ -243,7 +243,8 @@ export const generateExecutiveSummary = ({
     : 'N/A';
   const generatedStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   doc.text(`Assessment: ${assessment.name}`, marginL, 21);
-  doc.text(`Created: ${createdStr}  |  Generated: ${generatedStr}  |  Quarter: Q${selectedQuarter}`, pageWidth - marginR, 21, { align: 'right' });
+  const quarterLabel = assessment.year ? `Q${selectedQuarter} ${assessment.year}` : `Q${selectedQuarter}`;
+  doc.text(`Created: ${createdStr}  |  Generated: ${generatedStr}  |  Quarter: ${quarterLabel}`, pageWidth - marginR, 21, { align: 'right' });
 
   curY = 36;
 

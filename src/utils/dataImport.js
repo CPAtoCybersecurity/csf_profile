@@ -24,7 +24,10 @@ import {
 } from './dataExport';
 import {
   migrateAssessmentsState,
-  ASSESSMENTS_SCHEMA_VERSION
+  ASSESSMENTS_SCHEMA_VERSION,
+  normalizeAssessmentYear,
+  normalizeAssessmentUsers,
+  assessmentYearFromCreatedDate
 } from '../stores/assessmentsStore';
 import {
   normalizeExternalTracking,
@@ -178,10 +181,19 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
   // the config (and any observation external links) regardless of the
   // stamped version. Shape-detecting: v11 systemName converts, junk collapses,
   // well-formed values pass through unchanged.
+  // year/users get the same unconditional pass (issues #291/#290): a tampered
+  // or foreign-tool file stamped at the current version could otherwise smuggle
+  // PII fields inside assessment.users straight past every producer guard —
+  // and users has no share-export rebuild backstop the way externalTracking does.
   if (Array.isArray(data.assessments)) {
     data.assessments = data.assessments.map((a) => {
       if (!a || typeof a !== 'object') return a;
-      const next = { ...a, externalTracking: normalizeExternalTracking(a.externalTracking) };
+      const next = {
+        ...a,
+        externalTracking: normalizeExternalTracking(a.externalTracking),
+        year: normalizeAssessmentYear(a.year, assessmentYearFromCreatedDate(a.createdDate)),
+        users: normalizeAssessmentUsers(a.users)
+      };
       if (a.observations && typeof a.observations === 'object') {
         next.observations = Object.fromEntries(
           Object.entries(a.observations).map(([itemId, obs]) => (

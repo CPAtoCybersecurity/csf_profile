@@ -251,6 +251,20 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   const excludedIds = new Set(allMetrics.filter((m) => !survivorIds.has(m.id)).map((m) => m.id));
   jsonData.data.assessments = stripMetricLinks(jsonData.data.assessments, excludedIds);
 
+  // The user directory (names + email addresses) is PII and rides complete
+  // backups only. Excluded from default share exports since issues #290/#291
+  // — the wizard Users step now routes real people into the directory as the
+  // normal new-assessment flow, so a "shareable" file must not carry it.
+  // The KEY is deleted (not emptied): restore applies every section present
+  // in a file, so `users: []` would wipe the receiving install's own
+  // directory, while an absent section is left untouched. Observation
+  // auditorId / assessment { userId, role } references stay (opaque ids) and
+  // resolve against whatever directory the receiving install already has.
+  // The include-private opt-in keeps the directory; this deliberately changes
+  // pre-existing behavior the same way issue #284 did for artifacts.link.
+  delete jsonData.data.users;
+  jsonData.metadata.userCount = 0;
+
   // External ticketing/document URLs (issue #284) point at internal
   // infrastructure — Jira/ServiceNow hostnames, SharePoint sites, Drive docs,
   // project keys in paths. Scrubbed from share exports by default; the

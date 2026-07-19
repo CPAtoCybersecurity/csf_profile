@@ -115,6 +115,14 @@ const TerminalStatusBar = ({ onBackupClick }) => {
         </select>
       </span>
 
+      {/* Assessment year (issue #291) — shown ahead of the quarter selector */}
+      {currentAssessment?.year && (
+        <span className="terminal-statusbar-segment">
+          <span className="terminal-statusbar-label">YEAR</span>
+          <span className="terminal-statusbar-value">{currentAssessment.year}</span>
+        </span>
+      )}
+
       <span className="terminal-statusbar-segment">
         <span className="terminal-statusbar-label">QTR</span>
         <span className="terminal-statusbar-qbtns" role="tablist" aria-label="Quarter selector">

@@ -128,11 +128,59 @@ const migrateObservationToQuarterly = (oldObs) => {
   };
 };
 
+// Assessment-scope user roles (issue #290). Stored lowercase; the wizard
+// renders capitalized labels.
+export const ASSESSMENT_USER_ROLES = ['auditor', 'control owner', 'stakeholder'];
+
+/**
+ * Normalize an assessment year (issue #291): an integer within a sane
+ * calendar window, else the fallback (current year unless the caller
+ * supplies a better vintage, e.g. the migration passes createdDate's year).
+ */
+export const normalizeAssessmentYear = (value, fallback = new Date().getFullYear()) => {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1970 && n <= 2100 ? n : fallback;
+};
+
+/**
+ * Year fallback for an existing record: its createdDate's calendar year when
+ * parseable and sane, else the current year. Shared by the v13 migration and
+ * the restore path's unconditional repair (dataImport.js).
+ */
+export const assessmentYearFromCreatedDate = (createdDate) => {
+  const y = createdDate ? new Date(createdDate).getFullYear() : NaN;
+  return Number.isInteger(y) && y >= 1970 && y <= 2100 ? y : new Date().getFullYear();
+};
+
+/**
+ * Normalize the per-assessment user scope (issue #290). Keeps only
+ * { userId, role } pairs with a known role — names/emails are never embedded
+ * on the assessment (they live in the user directory), so a tampered or
+ * legacy record cannot smuggle PII fields through this surface. Dedupes by
+ * userId (first entry wins).
+ */
+export const normalizeAssessmentUsers = (value) => {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const entry of value) {
+    if (!entry || typeof entry !== 'object') continue;
+    const { userId } = entry;
+    const role = typeof entry.role === 'string' ? entry.role.trim().toLowerCase() : '';
+    if (userId === undefined || userId === null || userId === '') continue;
+    if (!ASSESSMENT_USER_ROLES.includes(role)) continue;
+    if (seen.has(userId)) continue;
+    seen.add(userId);
+    out.push({ userId, role });
+  }
+  return out;
+};
+
 /**
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 12;
+export const ASSESSMENTS_SCHEMA_VERSION = 13;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -259,6 +307,20 @@ export const migrateAssessmentsState = (persistedState, version) => {
     const assessments = (state.assessments || []).map(a => ({
       ...a,
       externalTracking: normalizeExternalTracking(a.externalTracking)
+    }));
+    state = { ...state, assessments };
+  }
+
+  // v13 (issues #291/#290): assessments gain a year and a user scope.
+  // year is stamped from the assessment's own createdDate so historical
+  // assessments keep their vintage (current year when missing/invalid);
+  // users starts empty — { userId, role } pairs added via the wizard.
+  // Idempotent: valid existing values are preserved by the normalizers.
+  if (version < 13) {
+    const assessments = (state.assessments || []).map(a => ({
+      ...a,
+      year: normalizeAssessmentYear(a.year, assessmentYearFromCreatedDate(a.createdDate)),
+      users: normalizeAssessmentUsers(a.users)
     }));
     state = { ...state, assessments };
   }
@@ -522,6 +584,13 @@ const useAssessmentsStore = create(
           scoringScale: assessmentData.scoringScale === 5 ? 5 : 10,
           // Optional external ticketing/document system declaration (issue #284)
           externalTracking: normalizeExternalTracking(assessmentData.externalTracking),
+          // Calendar year the quarterly scores cover (issue #291); defaults
+          // to the year of creation.
+          year: normalizeAssessmentYear(assessmentData.year),
+          // Assessment user scope (issue #290): { userId, role } pairs with
+          // role auditor | control owner | stakeholder. No PII embedded —
+          // names/emails live in the user directory (userStore).
+          users: normalizeAssessmentUsers(assessmentData.users),
           scopeIds: assessmentData.scopeIds || [], // Array of requirement IDs or control IDs
           frameworkFilter: assessmentData.frameworkFilter || null, // Optional framework filter
           status: 'Not Started', // Not Started, In Progress, Complete
@@ -538,13 +607,20 @@ const useAssessmentsStore = create(
         return newAssessment;
       },
 
-      // Update assessment metadata. externalTracking updates are normalized
-      // at the producer so no future edit surface can persist an unnormalized
-      // config (issue #288).
+      // Update assessment metadata. externalTracking/year/users updates are
+      // normalized at the producer so no future edit surface can persist an
+      // unnormalized config (issue #288 doctrine).
       updateAssessment: (assessmentId, updates) => {
-        const safeUpdates = updates && updates.externalTracking !== undefined
-          ? { ...updates, externalTracking: normalizeExternalTracking(updates.externalTracking) }
-          : updates;
+        let safeUpdates = updates;
+        if (updates && updates.externalTracking !== undefined) {
+          safeUpdates = { ...safeUpdates, externalTracking: normalizeExternalTracking(updates.externalTracking) };
+        }
+        if (updates && updates.year !== undefined) {
+          safeUpdates = { ...safeUpdates, year: normalizeAssessmentYear(updates.year) };
+        }
+        if (updates && updates.users !== undefined) {
+          safeUpdates = { ...safeUpdates, users: normalizeAssessmentUsers(updates.users) };
+        }
         const updatedAssessments = get().assessments.map(a =>
           a.id === assessmentId
             ? { ...a, ...safeUpdates, lastModified: new Date().toISOString() }

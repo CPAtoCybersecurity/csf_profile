@@ -63,13 +63,16 @@ describe('export → restore round-trip', () => {
       expect.arrayContaining(['users', 'controls', 'assessments', 'requirements', 'frameworks', 'artifacts', 'findings'])
     );
     expect(setters.setUsers).toHaveBeenCalledWith(SAMPLE.users);
-    // Assessments additionally get the externalTracking shape guaranteed on
-    // restore (issue #288's unconditional normalize) — everything else is
-    // byte-identical to the exported section.
+    // Assessments additionally get the externalTracking shape (issue #288)
+    // and the year/users fields (issues #291/#290) guaranteed on restore by
+    // the unconditional normalize — everything else is byte-identical to the
+    // exported section.
     expect(setters.setAssessments).toHaveBeenCalledWith(
       SAMPLE.assessments.map(a => ({
         ...a,
-        externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
+        externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } },
+        year: new Date().getFullYear(),
+        users: []
       }))
     );
     expect(setters.setFindings).toHaveBeenCalledWith(SAMPLE.findings);
@@ -307,6 +310,42 @@ describe('importCompleteDatabase safety semantics', () => {
       url: 'https://jira.example/browse/SEC-7'
     }));
     expect(links[0].id).toBeTruthy();
+  });
+
+  test('a current-version file cannot smuggle PII inside assessment.users, and junk year is repaired (issues #290/#291)', () => {
+    // users has NO share-export rebuild backstop (the share path spreads the
+    // assessment and trusts the producer invariant) — so the restore-side
+    // unconditional normalize is the only guard against a tampered v13 file.
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: ASSESSMENTS_SCHEMA_VERSION },
+      data: {
+        assessments: [{
+          id: 'ASM-pii-tamper',
+          name: 'Claims current version, smuggles PII in users',
+          scopeType: 'requirements',
+          scoringScale: 10,
+          scopeIds: [],
+          createdDate: '2024-06-01T00:00:00.000Z',
+          observations: {},
+          year: 'not-a-year',
+          users: [
+            { userId: 5, role: 'auditor', name: 'Smuggled Person', email: 'smuggled@corp.example' },
+            { userId: 5, role: 'stakeholder' },
+            { userId: 6, role: 'not-a-role' }
+          ]
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-pii-tamper');
+    expect(restored.users).toEqual([{ userId: 5, role: 'auditor' }]);
+    expect(JSON.stringify(restored)).not.toContain('smuggled@corp.example');
+    expect(JSON.stringify(restored)).not.toContain('Smuggled Person');
+    expect(restored.year).toBe(2024); // junk year repaired to the record's createdDate vintage
   });
 
   test('observation external links round-trip through a complete backup (issue #288)', () => {

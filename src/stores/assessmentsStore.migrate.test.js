@@ -65,11 +65,13 @@ describe('migrateAssessmentsState', () => {
         id: 'ASM-x',
         observations: {},
         scoringScale: 10,
-        externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
+        externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } },
+        year: 2026,
+        users: [{ userId: 1, role: 'auditor' }]
       }],
       currentAssessmentId: 'ASM-x'
     };
-    const result = migrateAssessmentsState(state, 12);
+    const result = migrateAssessmentsState(state, 13);
     expect(result).toEqual(state);
   });
 
@@ -212,6 +214,82 @@ describe('migrateAssessmentsState', () => {
       const migrated = result.assessments[0];
       expect(JSON.stringify(migrated.observations)).toBe(before);
       expect(migrated.scoringScale).toBe(5);
+    });
+  });
+
+  describe('v13: year + user scope stamp (issues #291/#290)', () => {
+    test('a v12 client gets year stamped from its own createdDate and an empty users list', () => {
+      const state = {
+        assessments: [{
+          id: 'ASM-x',
+          createdDate: '2024-03-15T12:00:00.000Z',
+          observations: {},
+          scoringScale: 10,
+          externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
+        }]
+      };
+      const result = migrateAssessmentsState(state, 12);
+      expect(result.assessments[0].year).toBe(2024);
+      expect(result.assessments[0].users).toEqual([]);
+    });
+
+    test('a missing/invalid createdDate falls back to the current year', () => {
+      const state = { assessments: [{ id: 'A' }, { id: 'B', createdDate: 'not-a-date' }] };
+      const result = migrateAssessmentsState(state, 12);
+      const thisYear = new Date().getFullYear();
+      expect(result.assessments[0].year).toBe(thisYear);
+      expect(result.assessments[1].year).toBe(thisYear);
+    });
+
+    test('idempotent: a valid existing year and user scope are preserved', () => {
+      const state = {
+        assessments: [{
+          id: 'ASM-x',
+          createdDate: '2023-01-01T00:00:00.000Z',
+          year: 2025,
+          users: [{ userId: 7, role: 'control owner' }]
+        }]
+      };
+      const result = migrateAssessmentsState(state, 12);
+      expect(result.assessments[0].year).toBe(2025);
+      expect(result.assessments[0].users).toEqual([{ userId: 7, role: 'control owner' }]);
+    });
+
+    test('tampered users entries are dropped, deduped, and stripped of PII fields', () => {
+      const state = {
+        assessments: [{
+          id: 'ASM-x',
+          users: [
+            { userId: 1, role: 'auditor', email: 'smuggled@example.com', name: 'Smuggled' },
+            { userId: 1, role: 'stakeholder' },
+            { userId: 2, role: 'not-a-role' },
+            { role: 'auditor' },
+            'garbage',
+            null
+          ]
+        }]
+      };
+      const result = migrateAssessmentsState(state, 12);
+      expect(result.assessments[0].users).toEqual([{ userId: 1, role: 'auditor' }]);
+    });
+
+    test('a v0 client also receives the year/users stamp (fall-through)', () => {
+      const result = migrateAssessmentsState(legacyV0State(), 0);
+      const legacy = result.assessments.find(a => a.id === 'ASM-legacy');
+      expect(typeof legacy.year).toBe('number');
+      expect(legacy.users).toEqual([]);
+    });
+
+    test('scores and observations are untouched by the stamp', () => {
+      const observations = {
+        'GV.SC-04': { quarters: { Q1: { actualScore: 7.5, targetScore: 9 } } }
+      };
+      const state = {
+        assessments: [{ id: 'ASM-x', observations }]
+      };
+      const before = JSON.stringify(observations);
+      const result = migrateAssessmentsState(state, 12);
+      expect(JSON.stringify(result.assessments[0].observations)).toBe(before);
     });
   });
 
