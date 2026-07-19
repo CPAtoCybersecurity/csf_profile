@@ -4,7 +4,7 @@ import { quotaSafeLocalStorage } from '../utils/safeStorage';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
-import { normalizeExternalTracking } from '../utils/externalLinks';
+import { normalizeExternalTracking, normalizeExternalLinks } from '../utils/externalLinks';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import { UPDATED_OBSERVATIONS, ALMA_AUDIT_OBSERVATIONS } from './defaultAssessmentsData';
 import {
@@ -132,7 +132,7 @@ const migrateObservationToQuarterly = (oldObs) => {
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 11;
+export const ASSESSMENTS_SCHEMA_VERSION = 12;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -242,6 +242,20 @@ export const migrateAssessmentsState = (persistedState, version) => {
   // (normalize keeps enabled/systemName), a missing/foreign one becomes the
   // disabled default.
   if (version < 11) {
+    const assessments = (state.assessments || []).map(a => ({
+      ...a,
+      externalTracking: normalizeExternalTracking(a.externalTracking)
+    }));
+    state = { ...state, assessments };
+  }
+
+  // v12 (issue #288): externalTracking gains a SEPARATE system name per
+  // record type — { enabled, systems: { findings, artifacts, controls } }.
+  // normalizeExternalTracking is shape-detecting (never version-gated): the
+  // v11 single systemName converts to all three slots, foreign shapes
+  // collapse to the default, an already-v12 value is preserved. Scores and
+  // observations are untouched.
+  if (version < 12) {
     const assessments = (state.assessments || []).map(a => ({
       ...a,
       externalTracking: normalizeExternalTracking(a.externalTracking)
@@ -524,11 +538,16 @@ const useAssessmentsStore = create(
         return newAssessment;
       },
 
-      // Update assessment metadata
+      // Update assessment metadata. externalTracking updates are normalized
+      // at the producer so no future edit surface can persist an unnormalized
+      // config (issue #288).
       updateAssessment: (assessmentId, updates) => {
+        const safeUpdates = updates && updates.externalTracking !== undefined
+          ? { ...updates, externalTracking: normalizeExternalTracking(updates.externalTracking) }
+          : updates;
         const updatedAssessments = get().assessments.map(a =>
           a.id === assessmentId
-            ? { ...a, ...updates, lastModified: new Date().toISOString() }
+            ? { ...a, ...safeUpdates, lastModified: new Date().toISOString() }
             : a
         );
         get().setAssessments(updatedAssessments);
@@ -600,6 +619,7 @@ const useAssessmentsStore = create(
           auditorId: null,
           testProcedures: '',
           linkedArtifacts: [],
+          externalLinks: [],
           remediation: {
             ownerId: null,
             actionPlan: '',
@@ -636,6 +656,11 @@ const useAssessmentsStore = create(
         const sanitizedData = {
           ...observationData,
           ...(nextProcedureSource !== undefined ? { procedureSource: nextProcedureSource } : {}),
+          // Producer guard (issue #288): links are normalized where they are
+          // written, so no caller can persist junk types/urls or unbounded lists.
+          ...(observationData.externalLinks !== undefined
+            ? { externalLinks: normalizeExternalLinks(observationData.externalLinks) }
+            : {}),
           testProcedures: observationData.testProcedures !== undefined
             ? sanitizeInput(observationData.testProcedures)
             : currentObservation.testProcedures,

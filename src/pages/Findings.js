@@ -620,7 +620,7 @@ const Findings = () => {
               <div className="mb-6">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                   <ChevronRight size={16} className="rotate-90" />
-                  {externalUrlLabel(trackingForAssessment((editMode ? formData : selectedFinding)?.assessmentId), 'ticket')}
+                  {externalUrlLabel(trackingForAssessment((editMode ? formData : selectedFinding)?.assessmentId), 'findings', 'ticket')}
                 </h3>
                 {editMode ? (
                   <input

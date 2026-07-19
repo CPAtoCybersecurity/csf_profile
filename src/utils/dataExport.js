@@ -258,11 +258,32 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   // This deliberately also scrubs the PRE-EXISTING artifacts.link field,
   // which previously rode share exports wholesale. Map+spread clones every
   // record — live store objects are never mutated.
-  jsonData.data.assessments = jsonData.data.assessments.map((a) => (
-    a.externalTracking
-      ? { ...a, externalTracking: { ...a.externalTracking, systemName: '' } }
-      : a
-  ));
+  jsonData.data.assessments = jsonData.data.assessments.map((a) => {
+    const next = { ...a };
+    if (a.externalTracking) {
+      // REBUILD the config rather than spreading it, so a legacy field
+      // (v11 systemName) riding on an unmigrated record can never survive
+      // into a share export. Only the non-sensitive enabled flag is kept.
+      next.externalTracking = {
+        enabled: a.externalTracking.enabled === true,
+        systems: { findings: '', artifacts: '', controls: '' }
+      };
+    }
+    if (a.observations && typeof a.observations === 'object') {
+      // Observation external links (issue #288) name internal hosts/paths —
+      // scrubbed by default like every other external URL. Shape-agnostic on
+      // purpose (any present value → []), so a tampered non-array value can
+      // no more ride out than the rebuilt externalTracking above. Copy-on-write.
+      next.observations = Object.fromEntries(
+        Object.entries(a.observations).map(([itemId, obs]) => (
+          obs && obs.externalLinks !== undefined
+            ? [itemId, { ...obs, externalLinks: [] }]
+            : [itemId, obs]
+        ))
+      );
+    }
+    return next;
+  });
   jsonData.data.findings = jsonData.data.findings.map((f) => ({ ...f, externalUrl: '' }));
   jsonData.data.artifacts = (jsonData.data.artifacts || []).map((ar) => ({ ...ar, link: '' }));
   jsonData.data.controls = (jsonData.data.controls || []).map((c) => ({ ...c, externalUrl: '' }));

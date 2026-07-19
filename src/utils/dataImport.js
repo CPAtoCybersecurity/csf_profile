@@ -26,6 +26,10 @@ import {
   migrateAssessmentsState,
   ASSESSMENTS_SCHEMA_VERSION
 } from '../stores/assessmentsStore';
+import {
+  normalizeExternalTracking,
+  normalizeExternalLinks
+} from './externalLinks';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
 // Format-2 exports carry no metrics section — it is simply skipped (untouched),
@@ -166,6 +170,29 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
       fileAssessmentsVersion
     );
     data.assessments = migrated.assessments;
+  }
+
+  // External-tracking shape repair is UNCONDITIONAL (issue #288): a file
+  // claiming the current schema version skips the migration chain above, but
+  // the bulk setters below bypass zustand's load-time migrate — so normalize
+  // the config (and any observation external links) regardless of the
+  // stamped version. Shape-detecting: v11 systemName converts, junk collapses,
+  // well-formed values pass through unchanged.
+  if (Array.isArray(data.assessments)) {
+    data.assessments = data.assessments.map((a) => {
+      if (!a || typeof a !== 'object') return a;
+      const next = { ...a, externalTracking: normalizeExternalTracking(a.externalTracking) };
+      if (a.observations && typeof a.observations === 'object') {
+        next.observations = Object.fromEntries(
+          Object.entries(a.observations).map(([itemId, obs]) => (
+            obs && obs.externalLinks !== undefined
+              ? [itemId, { ...obs, externalLinks: normalizeExternalLinks(obs.externalLinks) }]
+              : [itemId, obs]
+          ))
+        );
+      }
+      return next;
+    });
   }
 
   // Resolve every write BEFORE applying any, so a missing setter can never
