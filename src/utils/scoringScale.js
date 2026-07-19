@@ -40,6 +40,47 @@ export const CMMI_LEVELS = [
 ];
 
 /**
+ * Per-level policy/process maturity expectations for the 5-point CMMI-style
+ * scale, from the Cyber Resilience courses in Simply Cyber Academy. Levels
+ * 1-5 only by design — level 0 (Not Performed) means the activity does not
+ * occur at all, so there is no policy/process expectation to state. Rendered
+ * on the Reference page; CMMI_LEVELS above stays the short-label source for
+ * dropdowns, the wizard, and report legends.
+ */
+export const CMMI_EXPECTATIONS = [
+  {
+    level: 1,
+    name: 'Initial',
+    policy: 'Policy or standard does not exist or is not formally approved by management.',
+    process: 'Standard process does not exist.'
+  },
+  {
+    level: 2,
+    name: 'Repeatable',
+    policy: 'Policy or standard exists, but has not been reviewed in more than 2 years.',
+    process: 'Ad-hoc process exists and is done informally.'
+  },
+  {
+    level: 3,
+    name: 'Defined',
+    policy: 'Policy and standard exists with formal management approval. Policy exceptions are documented, approved and occur less than 5% of the time.',
+    process: 'Formal process exists and is documented. Evidence can be provided for most activities. Less than 10% exceptions.'
+  },
+  {
+    level: 4,
+    name: 'Managed',
+    policy: 'Policy and standard exists with formal management approval. Policy exceptions are documented, approved and occur less than 3% of the time.',
+    process: 'Formal process exists and is documented. Evidence can be provided for all activities and detailed metrics of the process are captured and reported. Minimal target for metrics has been established. Less than 5% of process exceptions occur with minimal reoccurring exceptions.'
+  },
+  {
+    level: 5,
+    name: 'Optimizing',
+    policy: 'Policy and standard exists with formal management approval. Policy exceptions are documented, approved and occur less than 0.5% of the time.',
+    process: 'Formal process exists and is documented. Evidence can be provided for all activities and detailed metrics of the process are captured and reported. Minimal target for metrics has been established and continually improving. Less than 1% of process exceptions occur.'
+  }
+];
+
+/**
  * Resolve an assessment's scoring scale. Anything other than an explicit
  * 5 resolves to the default 10 — including legacy assessments created
  * before the field existed.

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Papa from 'papaparse';
-import { CMMI_LEVELS } from '../utils/scoringScale';
+import { CMMI_EXPECTATIONS } from '../utils/scoringScale';
 
 const ScoringLegend = () => {
   const [legendData, setLegendData] = useState([]);
@@ -153,22 +153,23 @@ const ScoringLegend = () => {
           Assessments created with the 5-point scale use CMMI-style maturity levels (0&ndash;5), as popularized
           for CSF assessments by the NIST CSF Maturity Toolkit. Both scales support quarter-point precision
           (e.g. 3.25 indicates partial progress toward the next level). The scale is chosen when an assessment
-          is created and locked afterward.
+          is created and locked afterward. Level 0 (Not Performed) means the activity is not performed at all;
+          levels 1&ndash;5 carry the policy and process expectations below.
         </p>
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-100">
             <tr>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Level</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Maturity Level</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expectation of Policy Maturity Level</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expectation of Process Maturity Level</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {CMMI_LEVELS.map((level) => (
+            {CMMI_EXPECTATIONS.map((level) => (
               <tr key={level.level}>
-                <td className="p-3 text-sm font-medium">{level.level}</td>
-                <td className="p-3 text-sm">{level.name}</td>
-                <td className="p-3 text-sm">{level.description}</td>
+                <td className="p-3 text-sm font-medium whitespace-nowrap align-top">Level {level.level} - {level.name}</td>
+                <td className="p-3 text-sm align-top">{level.policy}</td>
+                <td className="p-3 text-sm align-top">{level.process}</td>
               </tr>
             ))}
           </tbody>
