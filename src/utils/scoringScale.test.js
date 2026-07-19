@@ -3,6 +3,7 @@ import {
   SCALE_OPTIONS,
   QUARTER_FRACTIONS,
   CMMI_LEVELS,
+  CMMI_EXPECTATIONS,
   getScoringScale,
   wholeScoreOptions,
   scaleRatio,
@@ -154,5 +155,34 @@ describe('scoringScale utilities', () => {
       expect(CMMI_LEVELS[0].name).toBe('Not Performed');
       expect(CMMI_LEVELS[5].name).toBe('Optimizing');
     });
+  });
+});
+
+describe('CMMI_EXPECTATIONS (Reference-page policy/process table)', () => {
+  test('covers exactly levels 1-5 with policy and process expectations', () => {
+    expect(CMMI_EXPECTATIONS.map((e) => e.level)).toEqual([1, 2, 3, 4, 5]);
+    CMMI_EXPECTATIONS.forEach((e) => {
+      expect(typeof e.policy).toBe('string');
+      expect(e.policy.length).toBeGreaterThan(0);
+      expect(typeof e.process).toBe('string');
+      expect(e.process.length).toBeGreaterThan(0);
+    });
+  });
+
+  test('level names stay consistent with CMMI_LEVELS (dropdowns/reports source)', () => {
+    CMMI_EXPECTATIONS.forEach((e) => {
+      expect(e.name).toBe(CMMI_LEVELS.find((l) => l.level === e.level).name);
+    });
+  });
+
+  test('exception thresholds match the course table', () => {
+    const policyByLevel = Object.fromEntries(CMMI_EXPECTATIONS.map((e) => [e.level, e.policy]));
+    expect(policyByLevel[3]).toContain('less than 5%');
+    expect(policyByLevel[4]).toContain('less than 3%');
+    expect(policyByLevel[5]).toContain('less than 0.5%');
+    const processByLevel = Object.fromEntries(CMMI_EXPECTATIONS.map((e) => [e.level, e.process]));
+    expect(processByLevel[3]).toContain('Less than 10% exceptions');
+    expect(processByLevel[4]).toContain('Less than 5% of process exceptions');
+    expect(processByLevel[5]).toContain('Less than 1% of process exceptions');
   });
 });
