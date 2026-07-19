@@ -17,6 +17,8 @@
  */
 
 /** Highest pack envelope version this build reads. */
+import { normalizeExternalTracking } from './externalLinks';
+
 export const PACK_FORMAT_VERSION = 1;
 
 /**
@@ -327,8 +329,9 @@ export const importPack = (parsed, stores) => {
     scopeType: 'requirements',
     // packFormat 1 scores are defined on the 10-point scale (issue #277)
     scoringScale: 10,
-    // packFormat 1 has no external-tracking concept; disabled default (issue #284)
-    externalTracking: { enabled: false, systemName: '' },
+    // packFormat 1 has no external-tracking concept; disabled default
+    // (issues #284/#288 — normalize emits the current per-type shape)
+    externalTracking: normalizeExternalTracking(undefined),
     scopeIds: resolved.map(({ requirementId }) => requirementId),
     frameworkFilter: defaultFramework?.id || null,
     status: 'In Progress',

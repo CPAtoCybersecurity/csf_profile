@@ -1,5 +1,6 @@
 import { exportAllDataJSON, EXPORT_FORMAT_VERSION } from './dataExport';
 import { validateDatabaseExport, importCompleteDatabase } from './dataImport';
+import { ASSESSMENTS_SCHEMA_VERSION } from '../stores/assessmentsStore';
 
 /**
  * Round-trip and validation tests for the complete-database restore path.
@@ -62,7 +63,15 @@ describe('export → restore round-trip', () => {
       expect.arrayContaining(['users', 'controls', 'assessments', 'requirements', 'frameworks', 'artifacts', 'findings'])
     );
     expect(setters.setUsers).toHaveBeenCalledWith(SAMPLE.users);
-    expect(setters.setAssessments).toHaveBeenCalledWith(SAMPLE.assessments);
+    // Assessments additionally get the externalTracking shape guaranteed on
+    // restore (issue #288's unconditional normalize) — everything else is
+    // byte-identical to the exported section.
+    expect(setters.setAssessments).toHaveBeenCalledWith(
+      SAMPLE.assessments.map(a => ({
+        ...a,
+        externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
+      }))
+    );
     expect(setters.setFindings).toHaveBeenCalledWith(SAMPLE.findings);
     expect(setters.setFrameworks).toHaveBeenCalledWith(SAMPLE.frameworks);
   });
@@ -222,7 +231,117 @@ describe('importCompleteDatabase safety semantics', () => {
 
     const written = setters.setAssessments.mock.calls[0][0];
     const restored = written.find(a => a.id === 'ASM-v10');
-    expect(restored.externalTracking).toEqual({ enabled: false, systemName: '' });
+    expect(restored.externalTracking).toEqual({
+      enabled: false,
+      systems: { findings: '', artifacts: '', controls: '' }
+    });
+  });
+
+  test('a v11 export converts the single system name to per-type slots on restore (issue #288)', () => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: 11 },
+      data: {
+        assessments: [{
+          id: 'ASM-v11',
+          name: 'Single-system export',
+          scopeType: 'requirements',
+          scoringScale: 10,
+          scopeIds: [],
+          observations: {},
+          externalTracking: { enabled: true, systemName: 'Jira' }
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-v11');
+    expect(restored.externalTracking).toEqual({
+      enabled: true,
+      systems: { findings: 'Jira', artifacts: 'Jira', controls: 'Jira' }
+    });
+  });
+
+  test('a file claiming the current schema version is still shape-repaired (issue #288)', () => {
+    // A tampered/hand-edited file can stamp the current version and skip the
+    // migration chain — the unconditional normalize must repair it anyway.
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: ASSESSMENTS_SCHEMA_VERSION },
+      data: {
+        assessments: [{
+          id: 'ASM-tampered',
+          name: 'Claims current version, carries legacy shape',
+          scopeType: 'requirements',
+          scoringScale: 10,
+          scopeIds: [],
+          observations: {
+            'GV.OC-01 Ex1': {
+              externalLinks: [
+                { type: 'findings', url: '  https://jira.example/browse/SEC-7  ' },
+                { type: 'bogus', url: 'https://x.example' },
+                { type: 'findings' }
+              ],
+              quarters: {}
+            }
+          },
+          externalTracking: { enabled: true, systemName: 'Sneaky' }
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-tampered');
+    expect(restored.externalTracking).toEqual({
+      enabled: true,
+      systems: { findings: 'Sneaky', artifacts: 'Sneaky', controls: 'Sneaky' }
+    });
+    const links = restored.observations['GV.OC-01 Ex1'].externalLinks;
+    expect(links).toHaveLength(1);
+    expect(links[0]).toEqual(expect.objectContaining({
+      type: 'findings',
+      url: 'https://jira.example/browse/SEC-7'
+    }));
+    expect(links[0].id).toBeTruthy();
+  });
+
+  test('observation external links round-trip through a complete backup (issue #288)', () => {
+    const withLinks = {
+      ...SAMPLE,
+      assessments: [{
+        id: 'ASM-links',
+        name: 'Links round-trip',
+        scopeType: 'requirements',
+        scoringScale: 10,
+        scopeIds: [],
+        observations: {
+          'GV.OC-01 Ex1': {
+            externalLinks: [{ id: 'XL-rt-1', type: 'artifacts', url: 'https://sharepoint.example/sites/ev/AR-9' }],
+            quarters: {}
+          }
+        },
+        externalTracking: {
+          enabled: true,
+          systems: { findings: 'Jira', artifacts: 'SharePoint', controls: 'Hyperproof' }
+        }
+      }]
+    };
+    const { stores: sourceStores } = makeStores(withLinks);
+    const backup = exportAllDataJSON(sourceStores);
+
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(backup, targetStores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-links');
+    expect(restored.externalTracking.systems.artifacts).toBe('SharePoint');
+    expect(restored.observations['GV.OC-01 Ex1'].externalLinks).toEqual([
+      { id: 'XL-rt-1', type: 'artifacts', url: 'https://sharepoint.example/sites/ev/AR-9' }
+    ]);
   });
 
   test('a mid-apply setter failure rolls back every already-applied section', () => {

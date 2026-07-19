@@ -65,11 +65,11 @@ describe('migrateAssessmentsState', () => {
         id: 'ASM-x',
         observations: {},
         scoringScale: 10,
-        externalTracking: { enabled: false, systemName: '' }
+        externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
       }],
       currentAssessmentId: 'ASM-x'
     };
-    const result = migrateAssessmentsState(state, 11);
+    const result = migrateAssessmentsState(state, 12);
     expect(result).toEqual(state);
   });
 
@@ -123,7 +123,9 @@ describe('migrateAssessmentsState', () => {
     });
   });
 
-  describe('v11: externalTracking stamp (issue #284)', () => {
+  describe('v11: externalTracking stamp (issue #284; shape now v12 per issue #288)', () => {
+    const DISABLED_V12 = { enabled: false, systems: { findings: '', artifacts: '', controls: '' } };
+
     test('a v10 client gets the disabled default stamped on every assessment', () => {
       const state = {
         assessments: [
@@ -134,11 +136,12 @@ describe('migrateAssessmentsState', () => {
       };
       const result = migrateAssessmentsState(state, 10);
       expect(result.assessments.every(a =>
-        a.externalTracking && a.externalTracking.enabled === false && a.externalTracking.systemName === ''
+        a.externalTracking && a.externalTracking.enabled === false
       )).toBe(true);
+      expect(result.assessments[0].externalTracking).toEqual(DISABLED_V12);
     });
 
-    test('idempotent: an assessment already carrying a config keeps enabled + systemName', () => {
+    test('a v10 record already carrying a single-name config converts it per type', () => {
       const state = {
         assessments: [
           { id: 'ASM-jira', observations: {}, scoringScale: 10, externalTracking: { enabled: true, systemName: 'Jira' } },
@@ -148,16 +151,67 @@ describe('migrateAssessmentsState', () => {
       };
       const result = migrateAssessmentsState(state, 10);
       expect(result.assessments.find(a => a.id === 'ASM-jira').externalTracking)
-        .toEqual({ enabled: true, systemName: 'Jira' });
+        .toEqual({ enabled: true, systems: { findings: 'Jira', artifacts: 'Jira', controls: 'Jira' } });
       expect(result.assessments.find(a => a.id === 'ASM-junk').externalTracking)
-        .toEqual({ enabled: false, systemName: '' });
+        .toEqual(DISABLED_V12);
     });
 
     test('a v0 client also receives the externalTracking stamp (fall-through)', () => {
       const result = migrateAssessmentsState(legacyV0State(), 0);
       expect(result.assessments.every(a =>
-        a.externalTracking && typeof a.externalTracking.enabled === 'boolean'
+        a.externalTracking && typeof a.externalTracking.enabled === 'boolean' &&
+        a.externalTracking.systems && typeof a.externalTracking.systems === 'object'
       )).toBe(true);
+    });
+  });
+
+  describe('v12: per-record-type external systems (issue #288)', () => {
+    test('a v11 client converts the single system name to all three record types', () => {
+      const state = {
+        assessments: [
+          { id: 'ASM-v11', observations: {}, scoringScale: 10, externalTracking: { enabled: true, systemName: 'Jira' } }
+        ],
+        currentAssessmentId: 'ASM-v11'
+      };
+      const result = migrateAssessmentsState(state, 11);
+      expect(result.assessments[0].externalTracking).toEqual({
+        enabled: true,
+        systems: { findings: 'Jira', artifacts: 'Jira', controls: 'Jira' }
+      });
+    });
+
+    test('an already-v12 config is preserved exactly', () => {
+      const config = { enabled: true, systems: { findings: 'Jira', artifacts: 'SharePoint', controls: 'Hyperproof' } };
+      const state = {
+        assessments: [{ id: 'ASM-v12', observations: {}, scoringScale: 10, externalTracking: config }],
+        currentAssessmentId: 'ASM-v12'
+      };
+      const result = migrateAssessmentsState(state, 11);
+      expect(result.assessments[0].externalTracking).toEqual(config);
+    });
+
+    test('scores and observations are untouched by the reshape', () => {
+      const observations = {
+        'GV.OC-01 Ex1': {
+          testProcedures: 'Inspect the charter.',
+          linkedArtifacts: ['art-1'],
+          quarters: { Q1: { actualScore: 3.25, targetScore: 4, observations: 'On track' } }
+        }
+      };
+      const state = {
+        assessments: [{
+          id: 'ASM-frozen',
+          observations,
+          scoringScale: 5,
+          externalTracking: { enabled: true, systemName: 'Jira' }
+        }],
+        currentAssessmentId: 'ASM-frozen'
+      };
+      const before = JSON.stringify(state.assessments[0].observations);
+      const result = migrateAssessmentsState(state, 11);
+      const migrated = result.assessments[0];
+      expect(JSON.stringify(migrated.observations)).toBe(before);
+      expect(migrated.scoringScale).toBe(5);
     });
   });
 

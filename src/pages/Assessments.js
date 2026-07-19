@@ -31,6 +31,7 @@ import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } f
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
+import ExternalLinksEditor from '../components/ExternalLinksEditor';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -129,7 +130,7 @@ const Assessments = () => {
     description: '',
     scopeType: 'requirements',
     scoringScale: 10,
-    externalTracking: { enabled: false, systemName: '' }
+    externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
   const [scopePreset, setScopePreset] = useState(null); // 'category' | 'subcategory' | 'all' | null (custom)
@@ -566,7 +567,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, externalTracking: { enabled: false, systemName: '' } });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } } });
     setSelectedScopeItems(new Set());
     setScopePreset(null);
     setScopeFilterText('');
@@ -1572,7 +1573,6 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                   <div className="mb-4">
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-sm text-gray-500 dark:text-gray-400">Artifacts</label>
-                      {!editMode && <span className="text-sm text-blue-600 dark:text-blue-400 cursor-pointer">Add URL</span>}
                     </div>
                     <ArtifactSelector
                       selectedArtifacts={currentObservation.linkedArtifacts || []}
@@ -1591,10 +1591,17 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     />
                   </div>
 
-                  {/* Linked work items placeholder */}
+                  {/* External links (issue #288): add — not select — links to
+                      findings / artifacts / controls tracked in external
+                      systems (Jira, SharePoint, Hyperproof, ...). */}
                   <div className="mb-4">
-                    <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Linked work items</label>
-                    <p className="text-sm text-gray-400 dark:text-gray-500">Add linked work item</p>
+                    <ExternalLinksEditor
+                      key={selectedItemId}
+                      links={currentObservation.externalLinks || []}
+                      onChange={(links) => handleObservationChange('externalLinks', links)}
+                      externalTracking={currentAssessment?.externalTracking}
+                      disabled={!editMode}
+                    />
                   </div>
                 </div>
 
@@ -2064,30 +2071,42 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                         }))}
                       />
                       <div>
-                        <span className="font-medium">Track findings, artifacts, and controls in your own ticketing system</span>
+                        <span className="font-medium">Track findings, artifacts, and controls in your own systems</span>
                         <p className="text-xs text-gray-500">
-                          Labels the URL fields on findings (ticket link), artifacts (ticket or Google Drive / SharePoint document link),
-                          and controls (compliance-tool link) with your system&apos;s name. The URL fields themselves are always available,
-                          with or without this option.
+                          Name a separate system per record type &mdash; findings (ticket link), artifacts (document link),
+                          and controls (compliance-tool link). Names label the link fields; the link fields themselves are
+                          always available, with or without this option.
                         </p>
                       </div>
                     </label>
                     {newAssessment.externalTracking.enabled && (
-                      <div className="mt-2">
-                        <label className="block text-sm font-medium text-gray-700">System name</label>
-                        <input
-                          type="text"
-                          className="mt-1 w-full p-2 border rounded"
-                          maxLength={SYSTEM_NAME_MAX_LENGTH}
-                          placeholder="e.g., Jira, ServiceNow, SharePoint"
-                          value={newAssessment.externalTracking.systemName}
-                          onChange={(e) => setNewAssessment(prev => ({
-                            ...prev,
-                            externalTracking: { ...prev.externalTracking, systemName: e.target.value }
-                          }))}
-                        />
+                      <div className="mt-2 space-y-2">
+                        {[
+                          { type: 'findings', label: 'Findings system', placeholder: 'e.g., Jira, ServiceNow, Freshservice' },
+                          { type: 'artifacts', label: 'Artifacts system', placeholder: 'e.g., SharePoint, Jira, Google Drive' },
+                          { type: 'controls', label: 'Controls system', placeholder: 'e.g., Hyperproof, Confluence' }
+                        ].map(({ type, label, placeholder }) => (
+                          <div key={type}>
+                            <label className="block text-sm font-medium text-gray-700">{label} <span className="font-normal text-gray-400">(optional)</span></label>
+                            <input
+                              type="text"
+                              className="mt-1 w-full p-2 border rounded"
+                              maxLength={SYSTEM_NAME_MAX_LENGTH}
+                              placeholder={placeholder}
+                              value={newAssessment.externalTracking.systems[type]}
+                              onChange={(e) => setNewAssessment(prev => ({
+                                ...prev,
+                                externalTracking: {
+                                  ...prev.externalTracking,
+                                  systems: { ...prev.externalTracking.systems, [type]: e.target.value }
+                                }
+                              }))}
+                            />
+                          </div>
+                        ))}
                         <p className="text-xs text-gray-500 mt-1">
-                          Shown in link-field labels (e.g. &ldquo;Jira ticket URL&rdquo;). Excluded from share exports by default.
+                          Shown in link-field labels (e.g. &ldquo;Jira ticket URL&rdquo;, &ldquo;Finding links &middot; Jira&rdquo;).
+                          Excluded from share exports by default.
                         </p>
                       </div>
                     )}
