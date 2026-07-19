@@ -20,6 +20,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
+import { cleanCommunityMarkdown } from '../src/utils/relatedSection.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -28,6 +29,12 @@ const OUT = path.join(ROOT, 'src', 'data', 'communityProcedures.json');
 
 const FUNCTIONS = ['GV', 'ID', 'PR', 'DE', 'RS', 'RC'];
 const SUBCATEGORY_ID = /^[A-Z]{2}\.[A-Z]{2,3}-\d{2}$/;
+
+// Issue #294 cleanup — the "## Related" section strip and the relative-link
+// rewrite live in src/utils/relatedSection.mjs, SHARED with the v14
+// assessments migration so pristine attached copies can be cleaned in place
+// to exactly the freshly generated bank text. The catalog files themselves
+// keep their Related sections for GitHub navigation.
 
 function collectProcedures() {
   const procedures = {};
@@ -46,10 +53,13 @@ function collectProcedures() {
       // "<name@example.com>" contact lines, "<br>") outright. Normalize them
       // here so attaching a community procedure is lossless: autolinks and
       // emails lose their brackets, <br> becomes a real newline.
-      const markdown = fs.readFileSync(path.join(dir, file), 'utf8').trim()
-        .replace(/<(https?:\/\/[^<>\s]+)>/g, '$1')
-        .replace(/<([^<>\s]+@[^<>\s]+)>/g, '$1')
-        .replace(/<br\s*\/?>/gi, '\n');
+      const markdown = cleanCommunityMarkdown(
+        fs.readFileSync(path.join(dir, file), 'utf8').trim()
+          .replace(/<(https?:\/\/[^<>\s]+)>/g, '$1')
+          .replace(/<([^<>\s]+@[^<>\s]+)>/g, '$1')
+          .replace(/<br\s*\/?>/gi, '\n'),
+        `ASSESSMENT_CATALOG/3_Test_Procedures/${fn}`
+      );
       const headingLine = markdown.split('\n').find((l) => l.startsWith('# '));
       const title = headingLine ? headingLine.replace(/^#\s+/, '').trim() : id;
       procedures[id] = {

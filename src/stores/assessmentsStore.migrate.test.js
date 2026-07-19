@@ -1,4 +1,5 @@
 import { migrateAssessmentsState } from './assessmentsStore';
+import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
 
 /**
  * Regression tests for the persisted-state migration chain.
@@ -40,11 +41,12 @@ describe('migrateAssessmentsState', () => {
     // v4/v5: scopeType corrected because scopeIds are subcategory-style
     expect(legacy.scopeType).toBe('requirements');
 
-    // v6: audit assessment added — this step was unreachable for v0 clients before the fix
-    expect(result.assessments.some(a => a.id === 'ASM-audit-2025-alma')).toBe(true);
-
-    // v8/v9: comprehensive assessment added — also previously unreachable from v0
-    expect(result.assessments.length).toBeGreaterThanOrEqual(3);
+    // v8/v9: comprehensive assessment added; v14: the two legacy demo
+    // assessments are gone again (issue #294) — only the comprehensive
+    // example plus the user's own assessment remain
+    expect(result.assessments.some(a => a.id === 'ASM-2026-comprehensive-alma')).toBe(true);
+    expect(result.assessments.some(a => a.id === 'ASM-audit-2025-alma')).toBe(false);
+    expect(result.assessments.some(a => a.id === 'ASM-default-2025-alma')).toBe(false);
   });
 
   test('a mid-chain client (v3) still receives all later migrations', () => {
@@ -56,7 +58,7 @@ describe('migrateAssessmentsState', () => {
     const result = migrateAssessmentsState(state, 3);
 
     expect(result.assessments.find(a => a.id === 'ASM-legacy').scopeType).toBe('requirements');
-    expect(result.assessments.some(a => a.id === 'ASM-audit-2025-alma')).toBe(true);
+    expect(result.assessments.some(a => a.id === 'ASM-2026-comprehensive-alma')).toBe(true);
   });
 
   test('current-version state passes through unchanged', () => {
@@ -71,7 +73,7 @@ describe('migrateAssessmentsState', () => {
       }],
       currentAssessmentId: 'ASM-x'
     };
-    const result = migrateAssessmentsState(state, 13);
+    const result = migrateAssessmentsState(state, 14);
     expect(result).toEqual(state);
   });
 
@@ -293,9 +295,212 @@ describe('migrateAssessmentsState', () => {
     });
   });
 
-  test('empty/new state gets defaults and still runs the rest of the chain', () => {
+  test('empty/new state gets ONLY the comprehensive example (issue #294)', () => {
     const result = migrateAssessmentsState({ assessments: [] }, 0);
-    expect(result.assessments.length).toBeGreaterThan(0);
-    expect(result.assessments.some(a => a.id === 'ASM-audit-2025-alma')).toBe(true);
+    expect(result.assessments.map(a => a.id)).toEqual(['ASM-2026-comprehensive-alma']);
+  });
+
+  describe('v14: single example assessment (issue #294)', () => {
+    const comprehensiveStub = (overrides = {}) => ({
+      id: 'ASM-2026-comprehensive-alma',
+      name: 'My renamed example',
+      description: 'stale description',
+      scopeType: 'requirements',
+      scopeIds: ['DE.AE-02 Ex1'],
+      observations: { 'DE.AE-02 Ex1': { testProcedures: 'plain text, no provenance', quarters: {} } },
+      scoringScale: 5,
+      externalTracking: { enabled: true, systems: { findings: 'Jira', artifacts: '', controls: '' } },
+      year: 2030,
+      users: [{ userId: 9, role: 'auditor' }],
+      ...overrides
+    });
+
+    test('removes the two legacy demo assessments; user assessments are never touched', () => {
+      const state = {
+        assessments: [
+          { id: 'ASM-default-2025-alma', observations: {} },
+          { id: 'ASM-audit-2025-alma', observations: {} },
+          { id: 'ASM-mine', name: 'My real assessment', observations: {} }
+        ],
+        currentAssessmentId: 'ASM-mine'
+      };
+      const result = migrateAssessmentsState(state, 13);
+      expect(result.assessments.map(a => a.id)).toEqual(['ASM-mine']);
+      expect(result.currentAssessmentId).toBe('ASM-mine');
+    });
+
+    test('the comprehensive example heals in place — Related stripped, user edits and stamps preserved', () => {
+      // The example's observations are build-time bank attaches with pristine
+      // provenance, so the SAME in-place clean that fixes user assessments
+      // fixes the example. Nothing is constant-replaced: scores, notes, a
+      // user rename, and every stamp survive (reviewer-flagged data-loss
+      // path — a v13 user may have adopted the example as their working
+      // assessment).
+      const entry = getBankProcedure('DE.AE-02 Ex1');
+      const state = {
+        assessments: [comprehensiveStub({
+          observations: {
+            'DE.AE-02 Ex1': {
+              testProcedures: `${entry.markdown}\n\n## Related\n\n- **Controls:** [DE.AE-02_Ex1](../../2_Controls/DE/DE.AE-02_Ex1.md)`,
+              procedureSource: {
+                bank: 'community',
+                bankId: 'DE.AE-02',
+                bankVersion: 'stale0000',
+                attachedAt: '2026-04-30T00:00:00.000Z',
+                modified: false
+              },
+              linkedArtifacts: ['Incident Response Playbook (Excerpt)'],
+              quarters: { Q1: { actualScore: 2, targetScore: 5, observations: 'my own note' } }
+            }
+          }
+        })],
+        currentAssessmentId: 'ASM-2026-comprehensive-alma'
+      };
+      const result = migrateAssessmentsState(state, 13);
+      const comp = result.assessments[0];
+      const obs = comp.observations['DE.AE-02 Ex1'];
+      // Procedure text healed to exactly the current bank entry
+      expect(obs.testProcedures).toBe(entry.markdown);
+      expect(obs.testProcedures).not.toContain('## Related');
+      expect(obs.procedureSource.bankVersion).toBe(BANK_VERSION);
+      // User work inside the example survives
+      expect(obs.quarters.Q1).toEqual({ actualScore: 2, targetScore: 5, observations: 'my own note' });
+      expect(obs.linkedArtifacts).toEqual(['Incident Response Playbook (Excerpt)']);
+      expect(comp.name).toBe('My renamed example');
+      expect(comp.scoringScale).toBe(5);
+      expect(comp.externalTracking.systems.findings).toBe('Jira');
+      expect(comp.year).toBe(2030);
+      expect(comp.users).toEqual([{ userId: 9, role: 'auditor' }]);
+    });
+
+    test('currentAssessmentId pointing at a removed legacy example falls back to the comprehensive', () => {
+      const state = {
+        assessments: [
+          { id: 'ASM-default-2025-alma', observations: {} },
+          comprehensiveStub()
+        ],
+        currentAssessmentId: 'ASM-default-2025-alma'
+      };
+      const result = migrateAssessmentsState(state, 13);
+      expect(result.currentAssessmentId).toBe('ASM-2026-comprehensive-alma');
+    });
+
+    test('currentAssessmentId falls back to the first remaining assessment when the comprehensive was deleted', () => {
+      const state = {
+        assessments: [
+          { id: 'ASM-audit-2025-alma', observations: {} },
+          { id: 'ASM-mine', observations: {} }
+        ],
+        currentAssessmentId: 'ASM-audit-2025-alma'
+      };
+      const result = migrateAssessmentsState(state, 13);
+      expect(result.currentAssessmentId).toBe('ASM-mine');
+    });
+
+    test('a pristine attach from an older bank is cleaned in place to exactly the current bank text', () => {
+      const entry = getBankProcedure('DE.AE-02 Ex1');
+      // Simulate the pre-#294 bank copy: current text plus the Related
+      // section the old bank still carried.
+      const state = {
+        assessments: [{
+          id: 'ASM-mine',
+          observations: {
+            'DE.AE-02 Ex1': {
+              testProcedures: `${entry.markdown}\n\n## Related\n\n- **Artifacts:** [X](../../5_Artifacts/Policies/POL-x.md)`,
+              procedureSource: {
+                bank: 'community',
+                bankId: 'DE.AE-02',
+                bankVersion: 'stale0000',
+                attachedAt: '2026-05-01T00:00:00.000Z',
+                modified: false
+              },
+              quarters: {}
+            }
+          }
+        }],
+        currentAssessmentId: 'ASM-mine'
+      };
+      const result = migrateAssessmentsState(state, 13);
+      const obs = result.assessments[0].observations['DE.AE-02 Ex1'];
+      expect(obs.testProcedures).toBe(entry.markdown);
+      expect(obs.testProcedures).not.toContain('## Related');
+      expect(obs.procedureSource.bankVersion).toBe(BANK_VERSION);
+      expect(obs.procedureSource.attachedAt).toBe('2026-05-01T00:00:00.000Z');
+    });
+
+    test('a stale modified flag can cost at most the Related section — surrounding text survives verbatim', () => {
+      // Flag says pristine but the text has actually diverged from the bank:
+      // the in-place clean only strips the dead-link section, it never
+      // replaces the user text wholesale, and provenance is NOT refreshed.
+      const state = {
+        assessments: [{
+          id: 'ASM-mine',
+          observations: {
+            'DE.AE-02 Ex1': {
+              testProcedures: 'My org checks the DR runbook first.\n\n## Related\n\n- [dead](../../2_Controls/DE/DE.AE-02_Ex1.md)\n\n## Notes\n\nKeep quarterly.',
+              procedureSource: { bank: 'community', bankId: 'DE.AE-02', bankVersion: 'stale0000', modified: false },
+              quarters: {}
+            }
+          }
+        }],
+        currentAssessmentId: 'ASM-mine'
+      };
+      const result = migrateAssessmentsState(state, 13);
+      const obs = result.assessments[0].observations['DE.AE-02 Ex1'];
+      expect(obs.testProcedures).toBe('My org checks the DR runbook first.\n\n## Notes\n\nKeep quarterly.');
+      expect(obs.procedureSource.bankVersion).toBe('stale0000');
+    });
+
+    test('v14 is idempotent — running it twice is a fixed point', () => {
+      const entry = getBankProcedure('DE.AE-02 Ex1');
+      const state = {
+        assessments: [
+          { id: 'ASM-default-2025-alma', observations: {} },
+          comprehensiveStub(),
+          {
+            id: 'ASM-mine',
+            observations: {
+              'DE.AE-02 Ex1': {
+                testProcedures: `${entry.markdown}\n\n## Related\n\n- [x](../../5_Artifacts/y.md)`,
+                procedureSource: { bank: 'community', bankId: 'DE.AE-02', bankVersion: 'stale0000', modified: false },
+                quarters: {}
+              }
+            }
+          }
+        ],
+        currentAssessmentId: 'ASM-default-2025-alma'
+      };
+      const once = migrateAssessmentsState(state, 13);
+      const twice = migrateAssessmentsState(JSON.parse(JSON.stringify(once)), 13);
+      expect(twice).toEqual(once);
+    });
+
+    test('modified or tailored procedure text is NEVER touched by the re-sync', () => {
+      const state = {
+        assessments: [{
+          id: 'ASM-mine',
+          observations: {
+            'DE.AE-02 Ex1': {
+              testProcedures: 'my own edited text ## Related kept because I changed it',
+              procedureSource: { bank: 'community', bankId: 'DE.AE-02', modified: true },
+              quarters: {}
+            },
+            'GV.OC-01 Ex1': {
+              testProcedures: 'AI-tailored text for my org',
+              procedureSource: { bank: 'community', bankId: 'GV.OC-01', modified: false, tailored: true },
+              quarters: {}
+            },
+            'PR.AA-02 Ex2': {
+              testProcedures: 'hand-written, never from the bank',
+              quarters: {}
+            }
+          }
+        }],
+        currentAssessmentId: 'ASM-mine'
+      };
+      const before = JSON.stringify(state.assessments[0].observations);
+      const result = migrateAssessmentsState(state, 13);
+      expect(JSON.stringify(result.assessments[0].observations)).toBe(before);
+    });
   });
 });
