@@ -1,62 +1,108 @@
+// repo-link-guard:ignore-file — this file contains deliberately-broken sample URLs as fixtures.
 import fs from 'fs';
 import path from 'path';
 import { execFileSync } from 'child_process';
-import { extractRepoLinkPaths, findUnknownRepoOwners } from './repoLinks';
+import {
+  extractRepoLinkPaths,
+  findUnknownRepos,
+  isScannable,
+  normalizeLinkPath,
+  sweepLinks
+} from './repoLinks';
 
 const ROOT = path.resolve(__dirname, '..', '..');
-const SRC = path.join(ROOT, 'src');
 
 /**
  * Every path git tracks, as an exact-case set.
  *
  * `fs.existsSync` is the wrong check on two counts: macOS filesystems are case-insensitive, so
- * `ASSESSMENT_Catalog/x.md` resolves locally and 404s on github.com; and a file that exists in
- * the working tree but is untracked or gitignored is not on `main` either. Reading the index
- * answers both. Returns null when git is unavailable, in which case the sweep falls back to
- * checking existence only.
+ * `ASSESSMENT_Catalog/x.md` resolves locally and 404s on github.com; and a file present in the
+ * working tree but untracked or gitignored is not on `main` either. Reading the index answers
+ * both, and it also gives the sweep its file list, which excludes node_modules and build/ for
+ * free. Returns null when git is unavailable.
  */
-function trackedPaths() {
+function readIndex() {
   try {
-    const out = execFileSync('git', ['-C', ROOT, 'ls-files', '-z'], { encoding: 'utf8' });
-    return new Set(out.split('\0').filter(Boolean));
+    const out = execFileSync('git', ['-C', ROOT, 'ls-files', '-z'], {
+      encoding: 'utf8',
+      maxBuffer: 32 * 1024 * 1024
+    });
+    return out.split('\0').filter(Boolean);
   } catch {
     return null;
   }
 }
 
-function isOnMain(rel, tracked) {
-  if (!tracked) return fs.existsSync(path.join(ROOT, rel));
-  // Directories are not themselves index entries; they exist if they contain a tracked file.
-  return tracked.has(rel) || [...tracked].some(p => p.startsWith(`${rel}/`));
+const INDEX = readIndex();
+const TRACKED = INDEX && new Set(INDEX);
+
+function isOnMain(rel) {
+  if (!TRACKED) return fs.existsSync(path.join(ROOT, rel));
+  // Directories are not themselves index entries; one exists if it contains a tracked file.
+  return TRACKED.has(rel) || INDEX.some(p => p.startsWith(`${rel}/`));
 }
 
-// This file necessarily contains malformed sample URLs as test fixtures, so it excludes itself
-// from the on-disk sweep. Its own extraction behavior is covered by the unit tests below.
-const SELF = path.join(SRC, 'utils', 'repoLinks.test.js');
-
-function sourceFiles(dir, out = []) {
-  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) sourceFiles(full, out);
-    else if (full !== SELF) out.push(full);
+function loadTrackedFiles() {
+  const list = INDEX || [];
+  const files = [];
+  for (const rel of list) {
+    const full = path.join(ROOT, rel);
+    if (!fs.existsSync(full)) continue;
+    // Cheap extension gate before reading, so binaries are never slurped.
+    if (!isScannable(rel, '')) continue;
+    files.push({ path: rel, contents: fs.readFileSync(full, 'utf8') });
   }
-  return out;
+  return files;
 }
+
+describe('normalizeLinkPath', () => {
+  test('drops a fragment, which addresses a location inside a file', () => {
+    expect(normalizeLinkPath('README.md#install')).toBe('README.md');
+  });
+
+  test('drops a query string', () => {
+    expect(normalizeLinkPath('README.md?raw=1')).toBe('README.md');
+  });
+
+  test('drops a markdown autolink terminator', () => {
+    expect(normalizeLinkPath('README.md>')).toBe('README.md');
+  });
+
+  test('drops a trailing escape sequence from an embedded string literal', () => {
+    expect(normalizeLinkPath('README.md\\n more prose')).toBe('README.md');
+  });
+
+  test('drops a trailing slash on a directory link', () => {
+    expect(normalizeLinkPath('ASSESSMENT_CATALOG/')).toBe('ASSESSMENT_CATALOG');
+  });
+
+  test('percent-decodes so %20 matches a real space', () => {
+    expect(normalizeLinkPath('A%20B/c.md')).toBe('A B/c.md');
+  });
+
+  test('returns a malformed percent-encoding as written instead of throwing', () => {
+    expect(() => normalizeLinkPath('50%off.md')).not.toThrow();
+    expect(normalizeLinkPath('50%off.md')).toBe('50%off.md');
+  });
+
+  test('returns null when nothing usable remains', () => {
+    expect(normalizeLinkPath('#anchor-only')).toBeNull();
+  });
+});
 
 describe('extractRepoLinkPaths', () => {
   test('extracts the path from a blob URL', () => {
-    const text = 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/README.md';
-    expect(extractRepoLinkPaths(text)).toEqual(['README.md']);
+    expect(
+      extractRepoLinkPaths('https://github.com/CPAtoCybersecurity/csf_profile/blob/main/README.md')
+    ).toEqual(['README.md']);
   });
 
   test('extracts the path from a tree URL', () => {
-    const text = 'https://github.com/CPAtoCybersecurity/csf_profile/tree/main/ASSESSMENT_CATALOG';
-    expect(extractRepoLinkPaths(text)).toEqual(['ASSESSMENT_CATALOG']);
-  });
-
-  test('percent-decodes paths so %20 matches a real space', () => {
-    const text = 'https://github.com/CPAtoCybersecurity/csf_profile/tree/main/A%20B/c.md';
-    expect(extractRepoLinkPaths(text)).toEqual(['A B/c.md']);
+    expect(
+      extractRepoLinkPaths(
+        'https://github.com/CPAtoCybersecurity/csf_profile/tree/main/ASSESSMENT_CATALOG'
+      )
+    ).toEqual(['ASSESSMENT_CATALOG']);
   });
 
   test('ignores commit-pinned URLs, which never rot', () => {
@@ -65,7 +111,7 @@ describe('extractRepoLinkPaths', () => {
     expect(extractRepoLinkPaths(text)).toEqual([]);
   });
 
-  test('ignores links to other forks of this repo', () => {
+  test('ignores branches on other forks of this repo', () => {
     const text =
       'https://github.com/greetingsog/csf_profile/blob/greetingsog-patch-1/Sample_Artifacts/x.md';
     expect(extractRepoLinkPaths(text)).toEqual([]);
@@ -78,68 +124,126 @@ describe('extractRepoLinkPaths', () => {
     expect(extractRepoLinkPaths(text)).toEqual([]);
   });
 
-  test('trims trailing punctuation from URLs written inside prose', () => {
-    const text =
-      'see https://github.com/CPAtoCybersecurity/csf_profile/blob/main/README.md, and elsewhere';
-    expect(extractRepoLinkPaths(text)).toEqual(['README.md']);
+  test('finds several links in one blob of prose', () => {
+    const text = [
+      'see https://github.com/CPAtoCybersecurity/csf_profile/blob/main/README.md, and',
+      '[here](https://github.com/CPAtoCybersecurity/csf_profile/tree/main/ASSESSMENT_CATALOG)'
+    ].join('\n');
+    expect(extractRepoLinkPaths(text)).toEqual(['README.md', 'ASSESSMENT_CATALOG']);
+  });
+});
+
+describe('findUnknownRepos', () => {
+  test('accepts this repo', () => {
+    expect(
+      findUnknownRepos('https://github.com/CPAtoCybersecurity/csf_profile/blob/main/README.md')
+    ).toEqual([]);
+  });
+
+  test('flags a mistyped owner rather than treating it as another fork', () => {
+    expect(
+      findUnknownRepos('https://github.com/CPAtoCyberSecurity/csf_profile/blob/main/README.md')
+    ).toEqual(['CPAtoCyberSecurity/csf_profile']);
+  });
+
+  test('leaves links to unrelated projects alone', () => {
+    expect(findUnknownRepos('https://github.com/danielmiessler/Telos/blob/main/README.md')).toEqual(
+      []
+    );
+  });
+});
+
+describe('CSV embedding', () => {
+  test('a link in a CSV cell stops at the column separator', () => {
+    const row =
+      'AR-3,https://github.com/CPAtoCybersecurity/csf_profile/blob/main/README.md,Sample case';
+    expect(extractRepoLinkPaths(row)).toEqual(['README.md']);
+  });
+});
+
+describe('isScannable', () => {
+  test('accepts source and documentation files', () => {
+    expect(isScannable('src/pages/Settings.js', '')).toBe(true);
+    expect(isScannable('README.md', '')).toBe(true);
+    expect(isScannable('GET_THE_SPREADSHEETS/JIRA-Artifacts.csv', '')).toBe(true);
+  });
+
+  test('rejects binaries, which cannot hold a source-level reference', () => {
+    expect(isScannable('public/logo192.png', '')).toBe(false);
+    expect(isScannable('ASSESSMENT_CATALOG/1_Case_Study/alma-backgrounder.docx', '')).toBe(false);
+  });
+
+  test('rejects a file that opts out via the marker', () => {
+    expect(isScannable('src/utils/repoLinks.test.js', 'repo-link-guard:ignore-file')).toBe(false);
+  });
+});
+
+describe('sweepLinks', () => {
+  const linkTo = p => `https://github.com/CPAtoCybersecurity/csf_profile/blob/main/${p}`;
+
+  // Polarity proof: the sweep is only meaningful if a dead path actually reaches `broken`.
+  test('reports a link whose path does not resolve', () => {
+    const files = [{ path: 'fixture.js', contents: linkTo('NO_SUCH_DIR/nope.md') }];
+    const { broken, checked } = sweepLinks(files, () => false);
+    expect(checked).toBe(1);
+    expect(broken).toHaveLength(1);
+    expect(broken[0]).toContain('fixture.js');
+    expect(broken[0]).toContain('NO_SUCH_DIR/nope.md');
+  });
+
+  test('says nothing about a link whose path resolves', () => {
+    const files = [{ path: 'fixture.js', contents: linkTo('README.md') }];
+    expect(sweepLinks(files, () => true)).toEqual({ broken: [], checked: 1 });
+  });
+
+  test('skips files that opt out, including their broken links', () => {
+    const files = [
+      { path: 'fixture.js', contents: `repo-link-guard:ignore-file ${linkTo('NO_SUCH.md')}` }
+    ];
+    expect(sweepLinks(files, () => false)).toEqual({ broken: [], checked: 0 });
+  });
+
+  test('skips binaries without reading them for links', () => {
+    const files = [{ path: 'thing.png', contents: linkTo('NO_SUCH.md') }];
+    expect(sweepLinks(files, () => false)).toEqual({ broken: [], checked: 0 });
   });
 });
 
 describe('repo link integrity', () => {
-  const files = sourceFiles(SRC);
+  const files = loadTrackedFiles();
 
-  test('the sweep actually finds source files to scan', () => {
-    expect(files.length).toBeGreaterThan(50);
+  test('the sweep has files to scan', () => {
+    if (!INDEX) return; // git unavailable
+    expect(files.length).toBeGreaterThan(100);
   });
 
-  test('every main-branch repo link under src/ points at a path that is on main', () => {
-    const tracked = trackedPaths();
-    const broken = [];
-    let checked = 0;
-
-    for (const file of files) {
-      for (const rel of extractRepoLinkPaths(fs.readFileSync(file, 'utf8'))) {
-        checked += 1;
-        if (!isOnMain(rel, tracked)) {
-          broken.push(
-            `${path.relative(ROOT, file)} links to "${rel}", which is not a tracked path. ` +
-              'Update the URL to the file\'s current location, or pin it to a commit ' +
-              '(/commit/<sha>) if it is meant to reference a historical version.'
-          );
-        }
-      }
-    }
-
-    // Guards against the check silently passing because the regex stopped matching anything.
+  test('every main-branch link in the repo points at a path that is on main', () => {
+    const { broken, checked } = sweepLinks(files, isOnMain);
+    // Guards against a silent pass caused by the regex or the file walk going dark.
     expect(checked).toBeGreaterThan(0);
     expect(broken).toEqual([]);
   });
 
-  test('every main-branch link belongs to this repo or a known fork', () => {
+  test('no link misspells this repo as an unrecognised owner', () => {
     const unknown = [];
     for (const file of files) {
-      for (const slug of findUnknownRepoOwners(fs.readFileSync(file, 'utf8'))) {
-        unknown.push(`${path.relative(ROOT, file)} -> ${slug}`);
+      if (!isScannable(file.path, file.contents)) continue;
+      for (const slug of findUnknownRepos(file.contents)) {
+        unknown.push(`${file.path} -> ${slug}`);
       }
     }
     expect(unknown).toEqual([]);
   });
 
-  // Polarity proof: the sweep above is only meaningful if a bad path would actually fail it.
-  test('a link to a nonexistent path is detected as broken', () => {
-    const bogus =
-      'https://github.com/CPAtoCybersecurity/csf_profile/tree/main/THIS_DIRECTORY_DOES_NOT_EXIST';
-    const [rel] = extractRepoLinkPaths(bogus);
-    expect(rel).toBe('THIS_DIRECTORY_DOES_NOT_EXIST');
-    expect(isOnMain(rel, trackedPaths())).toBe(false);
+  test('the index comparison is case-exact, which fs.existsSync is not on macOS', () => {
+    if (!TRACKED) return; // git unavailable; the sweep degraded to existence-only
+    expect(isOnMain('ASSESSMENT_CATALOG')).toBe(true);
+    expect(isOnMain('assessment_catalog')).toBe(false);
   });
 
-  // Polarity proof for the case check specifically: this path exists on a case-insensitive
-  // filesystem, so only an index-backed comparison can reject it.
-  test('a link whose casing differs from the tracked path is detected as broken', () => {
-    const tracked = trackedPaths();
-    if (!tracked) return; // git unavailable; the sweep already degraded to existence-only
-    expect(isOnMain('ASSESSMENT_CATALOG', tracked)).toBe(true);
-    expect(isOnMain('assessment_catalog', tracked)).toBe(false);
+  test('an untracked file present in the working tree does not count as on main', () => {
+    if (!TRACKED) return;
+    expect(fs.existsSync(path.join(ROOT, 'node_modules'))).toBe(true);
+    expect(isOnMain('node_modules')).toBe(false);
   });
 });
