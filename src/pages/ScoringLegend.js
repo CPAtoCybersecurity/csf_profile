@@ -145,7 +145,7 @@ const ScoringLegend = () => {
         </div>
       </div>
 
-      <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Mastering Cyber Resilience by AKYLADE</p>
+      <p className="text-sm text-gray-600 mt-6 mb-2 italic">Scoring Legend from Simply Cyber Academy</p>
 
       <h1 className="text-2xl font-bold mb-4 mt-4">5-Point Maturity Scale (CMMI-Style)</h1>
       <div className="bg-white p-4 rounded-lg shadow-sm border overflow-x-auto">
