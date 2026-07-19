@@ -153,4 +153,4 @@ export function sweepLinks(files, resolves) {
   return { broken, checked };
 }
 
-export { THIS_REPO, KNOWN_REPOS, TEXT_EXTENSIONS };
+export { THIS_REPO };

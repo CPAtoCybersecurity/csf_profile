@@ -67,6 +67,42 @@ describe('repairRelocatedLinks (artifacts store migration v7, issue #287)', () =
     expect(() => repairRelocatedLinks(before)).not.toThrow();
   });
 
+  // A link is user-supplied — CSV import takes the column raw. If the lookup read through the
+  // prototype chain, these would each replace the link with a function or an object, and
+  // JSON.stringify would then drop the field entirely on the way into localStorage.
+  test.each([
+    'toString',
+    'valueOf',
+    'constructor',
+    'hasOwnProperty',
+    'isPrototypeOf',
+    'propertyIsEnumerable',
+    '__proto__'
+  ])('leaves the inherited-property name %p untouched', name => {
+    const artifacts = [{ artifactId: 'AR-1', link: name }];
+    const after = repairRelocatedLinks({ artifacts });
+    expect(typeof after.artifacts[0].link).toBe('string');
+    expect(after.artifacts[0].link).toBe(name);
+    // Unchanged input must return the identical object, not a needless whole-state rewrite.
+    expect(after.artifacts[0]).toBe(artifacts[0]);
+  });
+
+  test('survives the round trip into and out of localStorage', () => {
+    const artifacts = [
+      { artifactId: 'AR-1', link: DEAD_LINK },
+      { artifactId: 'AR-2', link: 'toString' }
+    ];
+    const repaired = repairRelocatedLinks({ artifacts });
+    const persisted = JSON.parse(JSON.stringify(repaired));
+    expect(persisted.artifacts[0].link).toBe(LIVE_LINK);
+    expect(persisted.artifacts[1].link).toBe('toString');
+  });
+
+  test('ignores a non-string link rather than throwing on it', () => {
+    const artifacts = [{ artifactId: 'AR-1', link: { nested: true } }];
+    expect(repairRelocatedLinks({ artifacts }).artifacts[0]).toBe(artifacts[0]);
+  });
+
   test('every relocation target is a link this repo actually ships', () => {
     for (const target of Object.values(RELOCATED_ARTIFACT_LINKS)) {
       expect(target).toContain('/ASSESSMENT_CATALOG/');

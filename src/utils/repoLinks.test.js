@@ -36,11 +36,33 @@ function readIndex() {
 const INDEX = readIndex();
 const TRACKED = INDEX && new Set(INDEX);
 
+// Directories are not index entries of their own; one is on main if it contains a tracked file.
+const TRACKED_DIRS =
+  INDEX &&
+  new Set(
+    INDEX.flatMap(p => {
+      const dirs = [];
+      for (let i = p.indexOf('/'); i !== -1; i = p.indexOf('/', i + 1)) dirs.push(p.slice(0, i));
+      return dirs;
+    })
+  );
+
 function isOnMain(rel) {
   if (!TRACKED) return fs.existsSync(path.join(ROOT, rel));
-  // Directories are not themselves index entries; one exists if it contains a tracked file.
-  return TRACKED.has(rel) || INDEX.some(p => p.startsWith(`${rel}/`));
+  return TRACKED.has(rel) || TRACKED_DIRS.has(rel);
 }
+
+// A test that returns before asserting still reports green, so a missing git would silently
+// downgrade this whole file to the weaker existence check with nothing in the output to say so.
+// On CI that is a failure, not a degradation; locally it is announced.
+const gitAvailable = INDEX !== null;
+if (!gitAvailable && !process.env.CI) {
+  console.warn(
+    'repoLinks.test.js: git unavailable — link sweep degraded to existence-only, ' +
+      'which cannot detect case drift or untracked paths.'
+  );
+}
+const describeWithGit = gitAvailable || process.env.CI ? describe : describe.skip;
 
 function loadTrackedFiles() {
   const list = INDEX || [];
@@ -209,11 +231,16 @@ describe('sweepLinks', () => {
   });
 });
 
-describe('repo link integrity', () => {
+describeWithGit('repo link integrity', () => {
   const files = loadTrackedFiles();
 
+  // On CI this must hold outright: a checkout without a git index would otherwise turn every
+  // assertion below into a vacuous pass.
+  test('git is available, so the index-backed checks are real', () => {
+    expect(gitAvailable).toBe(true);
+  });
+
   test('the sweep has files to scan', () => {
-    if (!INDEX) return; // git unavailable
     expect(files.length).toBeGreaterThan(100);
   });
 
@@ -236,13 +263,16 @@ describe('repo link integrity', () => {
   });
 
   test('the index comparison is case-exact, which fs.existsSync is not on macOS', () => {
-    if (!TRACKED) return; // git unavailable; the sweep degraded to existence-only
     expect(isOnMain('ASSESSMENT_CATALOG')).toBe(true);
     expect(isOnMain('assessment_catalog')).toBe(false);
   });
 
+  test('a nested directory counts as on main when it holds a tracked file', () => {
+    expect(isOnMain('ASSESSMENT_CATALOG/5_Artifacts/Tickets')).toBe(true);
+    expect(isOnMain('ASSESSMENT_CATALOG/no_such_subdir')).toBe(false);
+  });
+
   test('an untracked file present in the working tree does not count as on main', () => {
-    if (!TRACKED) return;
     expect(fs.existsSync(path.join(ROOT, 'node_modules'))).toBe(true);
     expect(isOnMain('node_modules')).toBe(false);
   });

@@ -411,7 +411,13 @@ const useArtifactStore = create(
  * Rewrite artifact links that this app seeded and that a repository restructure later broke.
  *
  * Matches on the exact dead URL, so a link the user typed or edited is left alone. Idempotent:
- * once rewritten, the old string is gone and subsequent runs match nothing.
+ * once rewritten, the old string is gone and subsequent runs match nothing. Only the `link`
+ * field is repaired — a URL a user pasted into a description is their prose, not our data.
+ *
+ * The lookup is own-property-only. A link reading `toString` or `__proto__` — reachable through
+ * CSV import, which takes the column raw — would otherwise resolve to an inherited member and
+ * replace the link with a function or an object, which JSON.stringify then drops on the way
+ * into localStorage. Silent field loss is not an acceptable failure mode for a migration.
  */
 export function repairRelocatedLinks(state) {
   const artifacts = state?.artifacts;
@@ -419,8 +425,13 @@ export function repairRelocatedLinks(state) {
 
   let changed = false;
   const repaired = artifacts.map(artifact => {
-    const replacement = RELOCATED_ARTIFACT_LINKS[artifact?.link];
-    if (!replacement) return artifact;
+    const link = artifact?.link;
+    if (typeof link !== 'string') return artifact;
+    if (!Object.prototype.hasOwnProperty.call(RELOCATED_ARTIFACT_LINKS, link)) return artifact;
+
+    const replacement = RELOCATED_ARTIFACT_LINKS[link];
+    if (typeof replacement !== 'string') return artifact;
+
     changed = true;
     return { ...artifact, link: replacement };
   });
