@@ -2,10 +2,9 @@ import React, { useState, useCallback, useMemo, useRef } from 'react';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
-  FileUp, FileText, Loader2, Bot, Sparkles, User, Settings,
+  Loader2, Bot, Sparkles, User, Settings,
   BookOpen, ExternalLink, RotateCcw
 } from 'lucide-react';
-import { v4 as uuidv4 } from 'uuid';
 import toast from 'react-hot-toast';
 import Markdown from '../components/Markdown';
 
@@ -34,22 +33,6 @@ import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
 import ExternalLinksEditor from '../components/ExternalLinksEditor';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
-
-// File upload security configuration
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_EXTENSIONS = ['.txt', '.md', '.csv', '.pdf', '.docx'];
-const ALLOWED_MIME_TYPES = [
-  'text/plain',
-  'text/markdown',
-  'text/csv',
-  'application/pdf',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-];
-
-// Sanitize filename to prevent path traversal and injection
-const sanitizeFilename = (filename) => {
-  return filename.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 255);
-};
 
 // Helper function to format test procedures for display
 const formatTestProcedures = (text) => {
@@ -124,12 +107,13 @@ const Assessments = () => {
 
   // New assessment wizard state
   const [showNewModal, setShowNewModal] = useState(false);
-  const [wizardStep, setWizardStep] = useState(1); // 1: Basic + Scope, 2: Test Procedures, 3: Evidence Upload
+  const [wizardStep, setWizardStep] = useState(1); // 1: Basic + Scope, 2: Test Procedures, 3: Users
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
     scopeType: 'requirements',
     scoringScale: 10,
+    year: new Date().getFullYear(),
     externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } }
   });
   const [selectedScopeItems, setSelectedScopeItems] = useState(new Set()); // Selected controls/requirements
@@ -158,10 +142,12 @@ const Assessments = () => {
   const [generatedProcedures, setGeneratedProcedures] = useState({});
   const [generationProgress, setGenerationProgress] = useState({ done: 0, total: 0 });
   const cancelGenerationRef = useRef(false);
-  const [uploadedEvidence, setUploadedEvidence] = useState([]);
-  const [evidenceNotes, setEvidenceNotes] = useState('');
-  const [isAnalyzingEvidence, setIsAnalyzingEvidence] = useState(false);
-  const [evidenceAnalysis, setEvidenceAnalysis] = useState(null);
+
+  // Wizard Users step (issue #290): people in scope for the assessment.
+  // Rows are { name, email, role } while editing; on create they become
+  // user-directory entries plus { userId, role } pairs on the assessment.
+  const [wizardUsers, setWizardUsers] = useState([]);
+  const [newUserRow, setNewUserRow] = useState({ name: '', email: '', role: 'auditor' });
 
   // Check provider status on mount
   React.useEffect(() => {
@@ -464,110 +450,34 @@ Format as a numbered list. Be specific and actionable.`;
     }
   }, [selectedScopeItems, aiTargetIds, generatedProcedures, newAssessment.scopeType, controls, requirements, llmProvider, generateWithOllama, generateWithClaude]);
 
-  // Extract text from uploaded file
-  const extractTextFromFile = async (file) => {
-    if (file.type === 'text/plain' || file.name.endsWith('.md') || file.name.endsWith('.txt')) {
-      return await file.text();
-    }
-    return `[Content from ${file.name} - PDF/DOCX extraction requires additional setup. Please use TXT or MD files.]`;
-  };
-
-  // Handle evidence file upload with validation
-  const handleEvidenceUpload = useCallback(async (files) => {
-    const newDocs = [];
-    for (const file of files) {
-      // Validate file size
-      if (file.size > MAX_FILE_SIZE) {
-        toast.error(`File "${file.name}" exceeds 10MB limit`);
-        continue;
-      }
-
-      // Validate file extension
-      const ext = file.name.toLowerCase().match(/\.[^.]+$/)?.[0];
-      if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
-        toast.error(`File "${file.name}" has unsupported type. Allowed: ${ALLOWED_EXTENSIONS.join(', ')}`);
-        continue;
-      }
-
-      // Validate MIME type (additional check)
-      if (file.type && !ALLOWED_MIME_TYPES.includes(file.type) && file.type !== '') {
-        console.warn(`File "${file.name}" has unexpected MIME type: ${file.type}`);
-      }
-
-      // Sanitize filename
-      const safeName = sanitizeFilename(file.name);
-
-      const text = await extractTextFromFile(file);
-      newDocs.push({
-        id: uuidv4(),
-        name: safeName,
-        originalName: file.name,
-        type: file.type,
-        size: file.size,
-        text: text,
-        status: 'ready'
-      });
-    }
-    setUploadedEvidence(prev => [...prev, ...newDocs]);
-  }, []);
-
-  // Analyze evidence documents
-  const handleAnalyzeEvidence = useCallback(async () => {
-    if (uploadedEvidence.length === 0 && !evidenceNotes.trim()) {
-      toast.error('Please upload documents or add notes first.');
+  // Wizard Users step handlers (issue #290)
+  const handleAddWizardUser = useCallback(() => {
+    const name = newUserRow.name.trim();
+    const email = newUserRow.email.trim();
+    if (!name) {
+      toast.error('Name is required');
       return;
     }
-
-    setIsAnalyzingEvidence(true);
-    setEvidenceAnalysis(null);
-
-    const allText = uploadedEvidence.map(d =>
-      `=== ${d.name} ===\n${d.text}`
-    ).join('\n\n') + (evidenceNotes ? `\n\n=== User Notes ===\n${evidenceNotes}` : '');
-
-    const prompt = `Analyze these organizational documents to pre-populate a NIST CSF 2.0 assessment.
-
-DOCUMENTS PROVIDED:
-${allText.substring(0, 8000)}
-
-Identify evidence for CSF 2.0 controls. Respond in JSON format:
-{
-  "findings": [
-    {"controlId": "GV.PO-01", "score": "yes", "confidence": 0.85, "evidence": "Brief description", "quote": "Relevant quote"}
-  ],
-  "coverage": {"GOVERN": 45, "IDENTIFY": 30, "PROTECT": 60, "DETECT": 20, "RESPOND": 55, "RECOVER": 15},
-  "gaps": ["Major gaps identified"],
-  "recommendations": ["Key recommendations"]
-}
-
-Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intentions), "no" (none found).`;
-
-    try {
-      let response;
-      if (llmProvider === 'ollama') {
-        response = await generateWithOllama(prompt, 3000);
-      } else {
-        response = await generateWithClaude(prompt, 3000);
-      }
-
-      const jsonMatch = response.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        setEvidenceAnalysis(JSON.parse(jsonMatch[0]));
-      } else {
-        setEvidenceAnalysis({ raw: response, error: 'Could not parse JSON' });
-      }
-    } catch (error) {
-      console.error('Evidence analysis error:', error);
-      setEvidenceAnalysis({ error: 'Failed to analyze evidence. Please try again.' });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error('A valid email address is required');
+      return;
     }
+    if (wizardUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+      toast.error('That email address is already in the list');
+      return;
+    }
+    setWizardUsers(prev => [...prev, { name, email, role: newUserRow.role }]);
+    setNewUserRow({ name: '', email: '', role: newUserRow.role });
+  }, [newUserRow, wizardUsers]);
 
-    setIsAnalyzingEvidence(false);
-  }, [uploadedEvidence, evidenceNotes, llmProvider, generateWithOllama, generateWithClaude]);
+  const handleRemoveWizardUser = useCallback((email) => {
+    setWizardUsers(prev => prev.filter(u => u.email !== email));
+  }, []);
 
   // Reset wizard state
   const resetWizard = useCallback(() => {
     setWizardStep(1);
-    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } } });
+    setNewAssessment({ name: '', description: '', scopeType: 'requirements', scoringScale: 10, year: new Date().getFullYear(), externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } } });
     setSelectedScopeItems(new Set());
     setScopePreset(null);
     setScopeFilterText('');
@@ -580,10 +490,8 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
     setGeneratedProcedures({});
     setGenerationProgress({ done: 0, total: 0 });
     cancelGenerationRef.current = false;
-    setUploadedEvidence([]);
-    setEvidenceNotes('');
-    setIsAnalyzingEvidence(false);
-    setEvidenceAnalysis(null);
+    setWizardUsers([]);
+    setNewUserRow({ name: '', email: '', role: 'auditor' });
   }, []);
 
   // Handlers
@@ -598,7 +506,20 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       return;
     }
 
-    const created = createAssessment(newAssessment);
+    // Users step (issue #290): rows become user-directory entries plus
+    // { userId, role } pairs on the assessment. Email-authoritative on
+    // purpose — two people who share a name but not an email stay two users.
+    const ROLE_TITLES = { auditor: 'Auditor', 'control owner': 'Control Owner', stakeholder: 'Stakeholder' };
+    const { findOrCreateUserByEmail } = useUserStore.getState();
+    const scopedUsers = [];
+    for (const row of wizardUsers) {
+      const userId = findOrCreateUserByEmail({ name: row.name, email: row.email, title: ROLE_TITLES[row.role] });
+      if (userId !== null && userId !== undefined) {
+        scopedUsers.push({ userId, role: row.role });
+      }
+    }
+
+    const created = createAssessment({ ...newAssessment, users: scopedUsers });
 
     // Add selected items to scope
     for (const itemId of selectedScopeItems) {
@@ -621,25 +542,12 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
       }
     }
 
-    // Apply evidence analysis findings (for items already in scope)
-    if (evidenceAnalysis?.findings) {
-      for (const finding of evidenceAnalysis.findings) {
-        if (selectedScopeItems.has(finding.controlId)) {
-          const existingObs = getObservation(created.id, finding.controlId);
-          const existingProcedures = existingObs?.testProcedures || '';
-          updateObservation(created.id, finding.controlId, {
-            testProcedures: existingProcedures + `\n\nEvidence: ${finding.evidence}\nQuote: "${finding.quote}"`,
-          });
-        }
-      }
-    }
-
     setShowNewModal(false);
     resetWizard();
     setCurrentAssessmentId(created.id);
     setView('scope');
     toast.success(`Assessment "${created.name}" created with ${selectedScopeItems.size} items`);
-  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, tailorWithProfile, adaptStackRefs, orgProfile, generatedProcedures, evidenceAnalysis, addToScope, updateObservation, getObservation, setCurrentAssessmentId, resetWizard]);
+  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, tailorWithProfile, adaptStackRefs, orgProfile, generatedProcedures, wizardUsers, addToScope, updateObservation, setCurrentAssessmentId, resetWizard]);
 
   const handleSelectAssessment = useCallback((assessment) => {
     setCurrentAssessmentId(assessment.id);
@@ -1622,9 +1530,9 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 </div>
 
                 <div className="space-y-4">
-                  {/* Assignee */}
+                  {/* Auditor (issue #290: the person performing this evaluation) */}
                   <div className="flex items-start justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">Assignee</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Auditor</span>
                     <div className="text-right">
                       <UserSelector
                         selectedUsers={currentObservation.auditorId}
@@ -1655,6 +1563,14 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       ))}
                     </div>
                   </div>
+
+                  {/* Year (issue #291): the calendar year the quarters cover */}
+                  {currentAssessment?.year && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-500 dark:text-gray-400">Year</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentAssessment.year}</span>
+                    </div>
+                  )}
 
                   {/* Quarter selector */}
                   <div className="flex items-center justify-between">
@@ -1792,7 +1708,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
             <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-max">
               <div className="w-8 flex-shrink-0"></div>
               <div className="w-32 flex-shrink-0">Work</div>
-              <div className="w-28 flex-shrink-0">Assignee</div>
+              <div className="w-28 flex-shrink-0">Auditor</div>
               <div className="w-64 flex-shrink-0">Test Procedures</div>
               <div className="w-48 flex-shrink-0">Description</div>
               <div className="w-16 flex-shrink-0">Artifacts</div>
@@ -1839,7 +1755,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     </div>
                   </div>
 
-                  {/* Assignee column */}
+                  {/* Auditor column */}
                   <div className="w-28 flex-shrink-0 flex items-center">
                     {auditor ? (
                       <div className="flex items-center gap-1.5" title={auditor.name}>
@@ -1975,7 +1891,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 {[
                   { num: 1, label: 'Scope' },
                   { num: 2, label: 'Test Procedures' },
-                  { num: 3, label: 'Evidence' }
+                  { num: 3, label: 'Users' }
                 ].map((step, idx) => (
                   <React.Fragment key={step.num}>
                     <div className={`flex items-center gap-2 ${wizardStep === step.num ? 'text-blue-600' : wizardStep > step.num ? 'text-green-600' : 'text-gray-400'}`}>
@@ -2007,6 +1923,22 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                       onChange={(e) => setNewAssessment(prev => ({ ...prev, name: e.target.value }))}
                       autoFocus
                     />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Year</label>
+                    <input
+                      type="number"
+                      min="1970"
+                      max="2100"
+                      step="1"
+                      className="mt-1 w-32 p-2 border rounded"
+                      value={newAssessment.year}
+                      onChange={(e) => setNewAssessment(prev => ({ ...prev, year: e.target.value === '' ? '' : Number(e.target.value) }))}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      The calendar year the Q1&ndash;Q4 scores cover.
+                    </p>
                   </div>
 
                   <div>
@@ -2437,7 +2369,7 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                     <div className="flex items-start gap-3">
                       <Bot size={24} className="text-purple-600 mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-medium text-purple-900 dark:text-purple-200">Generate with AI (optional)</h4>
+                        <h4 className="font-medium text-purple-900 dark:text-purple-200">Generate with AI (Experimental, optional)</h4>
                         <p className="text-sm text-purple-700 dark:text-purple-300 mt-1">
                           {useBankProcedures
                             ? 'AI drafts procedures for items the community bank does not cover.'
@@ -2541,143 +2473,96 @@ Use scores: "yes" (complete evidence), "partial" (incomplete), "planned" (intent
                 </div>
               )}
 
-              {/* Step 3: Evidence Upload */}
+              {/* Step 3: Users in scope (issue #290) */}
               {wizardStep === 3 && (
                 <div className="space-y-4">
-                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
-                      <FileUp size={24} className="text-orange-600 mt-0.5" />
+                      <User size={24} className="text-blue-600 mt-0.5" />
                       <div className="flex-1">
-                        <h4 className="font-medium text-orange-900">Evidence Upload (Optional)</h4>
-                        <p className="text-sm text-orange-700 mt-1">
-                          Upload documents to give your assessment a head start. AI will analyze them to identify existing controls and evidence.
+                        <h4 className="font-medium text-blue-900">Users (Optional)</h4>
+                        <p className="text-sm text-blue-700 mt-1">
+                          Add the people in scope for this assessment. Each person gets a role:
+                          auditor (performs the evaluations), control owner (owns the controls
+                          being assessed), or stakeholder (reviews the results). They are added
+                          to the user directory and can be assigned as auditors on evaluations.
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded text-xs ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
-                        {llmProvider === 'ollama' ? 'Ollama' : 'Claude'}
-                      </span>
-                      {isAIReady ? (
-                        <span className="text-green-600 text-sm flex items-center gap-1">
-                          <CheckCircle size={14} /> Ready
-                        </span>
-                      ) : (
-                        <span className="text-red-600 text-sm flex items-center gap-1">
-                          <XCircle size={14} /> Not Ready
-                        </span>
-                      )}
+                  {/* Add user row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto_auto] gap-2 items-end">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Name</label>
+                      <input
+                        type="text"
+                        className="mt-1 w-full p-2 border rounded"
+                        placeholder="e.g., Jane Alvarez"
+                        value={newUserRow.name}
+                        onChange={(e) => setNewUserRow(prev => ({ ...prev, name: e.target.value }))}
+                      />
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Email address</label>
+                      <input
+                        type="email"
+                        className="mt-1 w-full p-2 border rounded"
+                        placeholder="e.g., jane@example.com"
+                        value={newUserRow.email}
+                        onChange={(e) => setNewUserRow(prev => ({ ...prev, email: e.target.value }))}
+                        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleAddWizardUser(); } }}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700">Role</label>
+                      <select
+                        className="mt-1 p-2 border rounded"
+                        value={newUserRow.role}
+                        onChange={(e) => setNewUserRow(prev => ({ ...prev, role: e.target.value }))}
+                      >
+                        <option value="auditor">Auditor</option>
+                        <option value="control owner">Control Owner</option>
+                        <option value="stakeholder">Stakeholder</option>
+                      </select>
+                    </div>
+                    <button
+                      type="button"
+                      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded flex items-center gap-1"
+                      onClick={handleAddWizardUser}
+                    >
+                      <Plus size={16} />
+                      Add
+                    </button>
                   </div>
 
-                  {/* File drop zone */}
-                  <div
-                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-orange-400 transition-colors"
-                    onClick={() => document.getElementById('wizardFileInput')?.click()}
-                    onDragOver={(e) => e.preventDefault()}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      handleEvidenceUpload(Array.from(e.dataTransfer.files));
-                    }}
-                  >
-                    <input
-                      id="wizardFileInput"
-                      type="file"
-                      multiple
-                      hidden
-                      accept=".txt,.md,.pdf,.docx"
-                      onChange={(e) => handleEvidenceUpload(Array.from(e.target.files))}
-                    />
-                    <Upload size={32} className="mx-auto mb-2 text-gray-400" />
-                    <p className="text-gray-600">Drop files here or click to upload</p>
-                    <p className="text-xs text-gray-400 mt-1">TXT, MD supported (PDF/DOCX coming soon)</p>
-                  </div>
-
-                  {/* Uploaded files list */}
-                  {uploadedEvidence.length > 0 && (
+                  {/* Added users list */}
+                  {wizardUsers.length > 0 ? (
                     <div className="space-y-2">
-                      {uploadedEvidence.map(doc => (
-                        <div key={doc.id} className="flex items-center justify-between p-2 bg-gray-50 rounded">
-                          <div className="flex items-center gap-2">
-                            <FileText size={16} className="text-gray-400" />
-                            <span className="text-sm">{doc.name}</span>
-                            <span className="text-xs text-gray-400">({(doc.size / 1024).toFixed(1)} KB)</span>
+                      {wizardUsers.map(u => (
+                        <div key={u.email} className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <User size={16} className="text-gray-400 flex-shrink-0" />
+                            <span className="text-sm font-medium truncate">{u.name}</span>
+                            <span className="text-xs text-gray-500 truncate">{u.email}</span>
+                            <span className="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 capitalize flex-shrink-0">
+                              {u.role}
+                            </span>
                           </div>
                           <button
-                            onClick={() => setUploadedEvidence(prev => prev.filter(d => d.id !== doc.id))}
-                            className="text-red-500 hover:text-red-700 p-1"
+                            onClick={() => handleRemoveWizardUser(u.email)}
+                            className="text-red-500 hover:text-red-700 p-1 flex-shrink-0"
+                            aria-label={`Remove ${u.name}`}
                           >
                             <Trash2 size={14} />
                           </button>
                         </div>
                       ))}
                     </div>
-                  )}
-
-                  {/* Notes */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Additional Notes</label>
-                    <textarea
-                      value={evidenceNotes}
-                      onChange={e => setEvidenceNotes(e.target.value)}
-                      placeholder="Add context about your security program..."
-                      className="w-full h-24 px-3 py-2 border rounded-lg text-sm resize-none"
-                    />
-                  </div>
-
-                  {/* Analyze button */}
-                  {(uploadedEvidence.length > 0 || evidenceNotes.trim()) && (
-                    <button
-                      onClick={handleAnalyzeEvidence}
-                      disabled={isAnalyzingEvidence || !isAIReady}
-                      className="w-full bg-orange-600 hover:bg-orange-700 disabled:bg-gray-300 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center gap-2"
-                    >
-                      {isAnalyzingEvidence ? (
-                        <>
-                          <Loader2 className="animate-spin" size={18} />
-                          Analyzing Evidence...
-                        </>
-                      ) : (
-                        <>
-                          <Sparkles size={18} />
-                          Analyze Evidence
-                        </>
-                      )}
-                    </button>
-                  )}
-
-                  {/* Analysis results */}
-                  {evidenceAnalysis && !evidenceAnalysis.error && (
-                    <div className="space-y-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h4 className="font-medium text-green-900 flex items-center gap-2">
-                        <CheckCircle size={16} />
-                        Analysis Complete
-                      </h4>
-                      {evidenceAnalysis.findings && (
-                        <p className="text-sm text-green-700">
-                          Found evidence for {evidenceAnalysis.findings.length} controls
-                        </p>
-                      )}
-                      {evidenceAnalysis.gaps && evidenceAnalysis.gaps.length > 0 && (
-                        <div>
-                          <p className="text-xs font-medium text-gray-700">Gaps identified:</p>
-                          <ul className="text-xs text-gray-600 list-disc list-inside">
-                            {evidenceAnalysis.gaps.slice(0, 3).map((gap, i) => (
-                              <li key={i}>{gap}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {evidenceAnalysis?.error && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                      <p className="text-red-700 text-sm">{evidenceAnalysis.error}</p>
-                    </div>
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      No users added yet. You can skip this step and manage users later from the Users page.
+                    </p>
                   )}
                 </div>
               )}

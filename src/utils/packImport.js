@@ -18,6 +18,7 @@
 
 /** Highest pack envelope version this build reads. */
 import { normalizeExternalTracking } from './externalLinks';
+import { normalizeAssessmentYear, assessmentYearFromCreatedDate } from '../stores/assessmentsStore';
 
 export const PACK_FORMAT_VERSION = 1;
 
@@ -332,6 +333,11 @@ export const importPack = (parsed, stores) => {
     // packFormat 1 has no external-tracking concept; disabled default
     // (issues #284/#288 — normalize emits the current per-type shape)
     externalTracking: normalizeExternalTracking(undefined),
+    // packFormat 1 has no year/users concept either (issues #291/#290):
+    // year takes the record's vintage (preserved createdDate on re-import),
+    // users starts empty — every producer emits the full current shape.
+    year: normalizeAssessmentYear(undefined, assessmentYearFromCreatedDate(existing?.createdDate || now)),
+    users: [],
     scopeIds: resolved.map(({ requirementId }) => requirementId),
     frameworkFilter: defaultFramework?.id || null,
     status: 'In Progress',

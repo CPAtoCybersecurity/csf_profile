@@ -141,6 +141,7 @@ Be specific to ${controlId}. Keep each section concise (2-4 bullets or sentences
         <div className="flex items-center gap-2">
           <span className="text-lg">{llmProvider === 'ollama' ? '🦙' : '🤖'}</span>
           <h3 className="font-semibold text-gray-800 dark:text-white">Score Explainer</h3>
+          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Experimental</span>
           {ollamaStatus?.hasModel && llmProvider === 'ollama' && (
             <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">NIST-trained</span>
           )}

@@ -90,6 +90,7 @@ const AIAssistant = () => {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
           {llmProvider === 'ollama' ? '🦙' : '🤖'} AI Assistant
+          <span className="text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Experimental</span>
         </h1>
         <p className="text-gray-600 dark:text-gray-400">
           AI-powered gap analysis and implementation guidance using the NIST cybersecurity training dataset

@@ -246,6 +246,7 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
                 <span className={`px-2 py-1 rounded ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
                   {llmProvider === 'ollama' ? '🦙 Ollama' : '🤖 Claude'}
                 </span>
+                <span className="px-2 py-1 rounded bg-amber-100 text-amber-700">Experimental</span>
                 {!isReady && (
                   <span className="px-2 py-1 rounded bg-red-100 text-red-700">Not Ready</span>
                 )}
@@ -263,6 +264,7 @@ Be conservative with scores. Only mark "yes" if clear, complete evidence exists.
             <span className={`px-2 py-1 rounded ${llmProvider === 'ollama' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
               {llmProvider === 'ollama' ? '🦙 Ollama' : '🤖 Claude'}
             </span>
+            <span className="px-2 py-1 rounded bg-amber-100 text-amber-700">Experimental</span>
             {!isReady && (
               <span className="px-2 py-1 rounded bg-red-100 text-red-700">Not Ready</span>
             )}
