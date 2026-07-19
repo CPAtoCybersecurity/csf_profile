@@ -250,7 +250,7 @@ const OrgProfileWizard = ({ onClose }) => {
               <button
                 type="button"
                 onClick={finish}
-                className="px-4 py-2 text-sm bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium"
+                className="px-4 py-2 text-sm bg-amber-700 hover:bg-amber-800 text-white rounded-lg font-medium"
               >
                 Save profile
               </button>
@@ -258,7 +258,7 @@ const OrgProfileWizard = ({ onClose }) => {
               <button
                 type="button"
                 onClick={() => setStep(step + 1)}
-                className="px-4 py-2 text-sm bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium flex items-center gap-1"
+                className="px-4 py-2 text-sm bg-amber-700 hover:bg-amber-800 text-white rounded-lg font-medium flex items-center gap-1"
               >
                 Next <ChevronRight size={14} />
               </button>
