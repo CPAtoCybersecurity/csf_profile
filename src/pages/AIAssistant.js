@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import useAIStore from '../stores/aiStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
+import { filterByScope } from '../utils/assessmentScope';
 
 /**
  * AI Assistant Page
@@ -56,7 +57,11 @@ const AIAssistant = () => {
   const handleAnalyze = async () => {
     if (!selectedAssessment) return;
     try {
-      await analyzeAssessmentGaps(selectedAssessment, controls);
+      // Only the analyzed assessment's controls (plus unassigned ones) cross
+      // the AI boundary (issue #299) — other assessments' demo/stamped
+      // controls stay out of the analysis context.
+      const scopedControls = filterByScope(controls, selectedAssessment.id);
+      await analyzeAssessmentGaps(selectedAssessment, scopedControls);
     } catch (error) {
       console.error('Analysis failed:', error);
     }

@@ -151,6 +151,41 @@ describe('export → restore round-trip', () => {
     expect(restored[1].seedSource).toBe('user');        // classification kept
     expect(restored[1].assessmentId).toBeUndefined();   // not demo-stamped
   });
+
+  test('a pre-#299 backup gets its demo controls stamped on restore, user controls untouched (issue #299)', () => {
+    const { SEEDED_CONTROLS } = require('../stores/controlsStore');
+    // What an old backup holds: a seeded demo control without the new fields,
+    // a user control that reuses a seeded controlId (different createdDate),
+    // and a plain user control.
+    const { assessmentId, seedSource, ...legacyDemoControl } = SEEDED_CONTROLS[0];
+    const collidingMine = {
+      ...legacyDemoControl,
+      createdDate: '2026-05-05T10:00:00.000Z'
+    };
+    const mineControl = { controlId: 'CTL-mine', implementationDescription: 'Mine', createdDate: '2026-01-01T00:00:00.000Z' };
+
+    const data = { ...SAMPLE, controls: [legacyDemoControl, collidingMine, mineControl] };
+    const { stores } = makeStores(data);
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+
+    const restored = setters.setControls.mock.calls[0][0];
+    expect(restored[0].assessmentId).toBe(SEEDED_CONTROLS[0].assessmentId);
+    expect(restored[0].seedSource).toBe('demo-alma');
+    expect(restored[1]).toEqual(collidingMine);   // colliding id, different createdDate — untouched
+    expect(restored[2]).toEqual(mineControl);     // user record untouched
+  });
+
+  test('a current-format backup round-trips control assessmentIds verbatim (issue #299)', () => {
+    const scoped = { controlId: 'CTL-9', implementationDescription: 'Scoped', assessmentId: 'ASM-user-2026', createdDate: '2026-01-01T00:00:00.000Z' };
+    const data = { ...SAMPLE, controls: [scoped] };
+    const { stores } = makeStores(data);
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+    expect(setters.setControls.mock.calls[0][0]).toEqual([scoped]);
+  });
 });
 
 describe('validateDatabaseExport', () => {

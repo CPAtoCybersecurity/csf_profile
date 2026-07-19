@@ -62,13 +62,19 @@ const Artifacts = () => {
   // Sorting (over the scoped list — issue #297)
   const { sort, sortedData, handleSort } = useSort(scopedArtifacts);
 
-  // Get linked controls for the selected artifact
+  // Get linked controls for the selected artifact, scoped to the ARTIFACT's
+  // own assessment (issue #299): derived chips follow the record's scope, not
+  // the page filter. An unassigned artifact fails open; demo controls only
+  // decorate demo-assessment artifacts.
   const linkedControls = useMemo(() => {
     if (!selectedArtifact?.linkedSubcategoryIds?.length) return [];
     const controlsSet = new Set();
     const controls = [];
     selectedArtifact.linkedSubcategoryIds.forEach(reqId => {
-      const reqControls = getControlsByRequirement(reqId);
+      const reqControls = filterByScope(
+        getControlsByRequirement(reqId),
+        selectedArtifact.assessmentId || SCOPE_ALL
+      );
       reqControls.forEach(ctrl => {
         if (!controlsSet.has(ctrl.controlId)) {
           controlsSet.add(ctrl.controlId);

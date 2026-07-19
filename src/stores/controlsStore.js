@@ -3,11 +3,24 @@ import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_CONTROLS } from './defaultControlsData';
+import { COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
+import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
+
+// The shipped Alma controls are demo evidence for the demo assessment
+// (issue #299, same segregation scheme as #297 gave users/findings/artifacts):
+// stamped with the demo assessment's id + seed provenance so they appear only
+// in the demo assessment's scope, while anything a user creates (which never
+// carries an assessmentId unless a scope stamps one) stays visible everywhere.
+export const SEEDED_CONTROLS = DEFAULT_CONTROLS.map((c) => ({
+  ...c,
+  assessmentId: COMPREHENSIVE_ASSESSMENT_ID,
+  seedSource: DEMO_SEED_SOURCE
+}));
 
 const useControlsStore = create(
   persist(
     (set, get) => ({
-      controls: DEFAULT_CONTROLS,
+      controls: SEEDED_CONTROLS,
       loading: false,
       error: null,
 
@@ -81,6 +94,11 @@ const useControlsStore = create(
           controlEvaluationBackLink: controlData.controlEvaluationBackLink || '',
           // Optional URL to this control in an external compliance/ticketing tool (issue #284)
           externalUrl: controlData.externalUrl || '',
+          // Assessment scoping (issue #299): null = visible in every
+          // assessment's view; a concrete id scopes the control to that
+          // assessment. seedSource is never set here — only shipped demo
+          // records carry it.
+          assessmentId: controlData.assessmentId || null,
           createdDate: new Date().toISOString(),
           lastModified: new Date().toISOString()
         };
@@ -282,6 +300,11 @@ const useControlsStore = create(
                   linkedRequirementIds: row['Linked Requirements']
                     ? row['Linked Requirements'].split(';').map(s => s.trim()).filter(Boolean)
                     : [],
+                  // Assessment scoping round-trip (issue #299): blank → null
+                  // (visible everywhere). Unknown ids are preserved, not
+                  // nulled — reachable under All, and they survive a later
+                  // restore of that assessment (same call as #297 artifacts).
+                  assessmentId: (row['Assessment ID'] || '').trim() || null,
                   createdDate: row.createdDate || new Date().toISOString(),
                   lastModified: new Date().toISOString()
                 };
@@ -313,6 +336,7 @@ const useControlsStore = create(
           'Stakeholder(s)': escapeCSVValue((c.stakeholderIds || []).map(id => getUserName(id)).join('; ')),
           'Stakeholder IDs': (c.stakeholderIds || []).join('; '),
           'Linked Requirements': (c.linkedRequirementIds || []).join('; '),
+          'Assessment ID': c.assessmentId || '',
           'Created Date': c.createdDate,
           'Last Modified': c.lastModified
         }));
@@ -350,6 +374,7 @@ const useControlsStore = create(
             stakeholderIds: c.stakeholderIds || [],
             stakeholderNames: (c.stakeholderIds || []).map(id => getUserName(id)),
             linkedRequirementIds: c.linkedRequirementIds || [],
+            assessmentId: c.assessmentId || null,
             createdDate: c.createdDate,
             lastModified: c.lastModified
           }))
@@ -474,25 +499,65 @@ const useControlsStore = create(
     }),
     {
       name: 'csf-controls-storage',
-      version: 5,
-      migrate: (persistedState, version) => {
-        // Version 5: Default controls from Alma Security example data
-        // Existing users with data keep their controls, new users get Alma Security examples
-        if (version < 5) {
-          if (persistedState?.controls?.length > 0) {
-            // Existing user with data - keep their controls
-            return persistedState;
-          }
-          // New user or empty state - use Alma Security example controls
-          return { controls: DEFAULT_CONTROLS };
-        }
-        return persistedState;
-      },
+      version: 6,
+      migrate: (persistedState, version) => migrateControlsState(persistedState, version),
       partialize: (state) => ({
         controls: state.controls
       })
     }
   )
 );
+
+/**
+ * Persist migration pipeline. Version history:
+ * - v5: empty/new installs get the Alma example controls; installs with their
+ *   own data keep it untouched.
+ * - v6 (issue #299): seeded demo controls gain assessmentId + seedSource so
+ *   they appear only in the demo assessment's scope.
+ */
+export function migrateControlsState(persistedState, version) {
+  let state = persistedState;
+  if (version < 5) {
+    state = state?.controls?.length > 0 ? state : { controls: SEEDED_CONTROLS };
+  }
+  return stampSeededDemoControls(state);
+}
+
+/**
+ * Stamp the persisted copies of the shipped Alma demo controls with the demo
+ * assessment's id + seed provenance (issue #299 — the same heal-in-place as
+ * #297's stampSeededDemoArtifacts / Users / Findings).
+ *
+ * Guard doctrine:
+ * - Absent-only: any existing assessmentId OR seedSource means this record
+ *   has already been classified (locally or by the install that exported it)
+ *   — never re-derive over an existing classification.
+ * - The match must be POSITIVE on both sides: the controlId must be a seeded
+ *   id AND the record's createdDate must equal that seed's createdDate.
+ *   createdDate is the stable identity field — updateControl never touches it
+ *   and createControl always stamps the current time — so a demo control
+ *   whose description the user edited is still recognized, while a
+ *   user-created control that reuses a seeded controlId can never match, and
+ *   a record with an unknown controlId and no createdDate cannot match via
+ *   undefined === undefined.
+ * - Idempotent: once stamped, the absent-only guard matches nothing.
+ */
+export function stampSeededDemoControls(state) {
+  const controls = state?.controls;
+  if (!Array.isArray(controls)) return state;
+
+  const seededCreatedById = new Map(DEFAULT_CONTROLS.map((c) => [c.controlId, c.createdDate]));
+
+  let changed = false;
+  const stamped = controls.map((control) => {
+    if (!control || control.assessmentId || control.seedSource) return control;
+    const seededCreated = seededCreatedById.get(control.controlId);
+    if (!seededCreated || seededCreated !== control.createdDate) return control;
+    changed = true;
+    return { ...control, assessmentId: COMPREHENSIVE_ASSESSMENT_ID, seedSource: DEMO_SEED_SOURCE };
+  });
+
+  return changed ? { ...state, controls: stamped } : state;
+}
 
 export default useControlsStore;

@@ -41,7 +41,6 @@ const Requirements = () => {
 
   // Controls, artifacts, and findings for the detail panel and table display
   const controls = useControlsStore((state) => state.controls);
-  const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
   const allArtifactRecords = useArtifactStore((state) => state.artifacts);
   const allFindingRecords = useFindingsStore((state) => state.findings);
   const users = useUserStore((state) => state.users);
@@ -57,6 +56,13 @@ const Requirements = () => {
   const findings = useMemo(
     () => filterByScope(allFindingRecords, defaultScope(currentAssessmentId)),
     [allFindingRecords, currentAssessmentId]
+  );
+  // Controls join the same scoping in issue #299: the demo (Alma) controls
+  // belong to the demo assessment, so their implementation text / owners stop
+  // decorating requirements under every other assessment.
+  const scopedControls = useMemo(
+    () => filterByScope(controls, defaultScope(currentAssessmentId)),
+    [controls, currentAssessmentId]
   );
   const getArtifactsByControl = useCallback(
     (controlId) => artifacts.filter(a => a.controlId === controlId),
@@ -81,11 +87,14 @@ const Requirements = () => {
     return user?.name || '';
   }, [users]);
 
-  // Helper: Get control data for a requirement (pulls from linked Controls)
+  // Helper: Get control data for a requirement (pulls from linked Controls,
+  // scoped to the assessment being worked — issue #299)
   const getControlDataForRequirement = useCallback((requirementId) => {
-    const linkedControls = getControlsByRequirement(requirementId);
+    const linkedControls = scopedControls.filter(c =>
+      c.linkedRequirementIds && c.linkedRequirementIds.includes(requirementId)
+    );
     if (linkedControls.length === 0) {
-      const matchingControl = controls.find(c => c.controlId === requirementId);
+      const matchingControl = scopedControls.find(c => c.controlId === requirementId);
       if (matchingControl) {
         return {
           controlId: matchingControl.controlId,
@@ -119,7 +128,7 @@ const Requirements = () => {
       findings: allFindings,
       controlEvaluationBackLink: links[0] || ''
     };
-  }, [controls, getControlsByRequirement, getArtifactsByControl, getFindingsByControl, getUserName]);
+  }, [scopedControls, getArtifactsByControl, getFindingsByControl, getUserName]);
 
   // Local state
   const [selectedRequirement, setSelectedRequirement] = useState(null);
@@ -757,7 +766,7 @@ const Requirements = () => {
           requirement={selectedRequirement}
           onClose={() => setSelectedRequirement(null)}
           onSave={handleSaveRequirement}
-          controls={controls}
+          controls={scopedControls}
           artifacts={artifacts}
           findings={findings}
         />

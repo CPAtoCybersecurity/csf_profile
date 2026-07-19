@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 import toast from 'react-hot-toast';
 import useUserStore from '../stores/userStore';
 import { escapeCSVValue } from '../utils/sanitize';
+import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
 
 const UserManagement = () => {
   const users = useUserStore((state) => state.users);
@@ -151,11 +152,17 @@ const UserManagement = () => {
     setEditMode(true);
   };
 
-  // Handle delete user
+  // Handle delete user. Shipped demo (Alma) users delete WITHOUT the
+  // confirmation prompt (issue #299) — they are fictional example data and
+  // clearing them is routine; a fresh install re-seeds them. The guard is a
+  // strict positive match on the seed brand so a real user can never lose
+  // the confirm.
   const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
+    const user = users.find(u => u.id === id);
+    const isDemoUser = user?.seedSource === DEMO_SEED_SOURCE;
+    if (isDemoUser || window.confirm('Are you sure you want to delete this user?')) {
       deleteUser(id);
-      toast.success('User deleted');
+      toast.success(isDemoUser ? 'Demo user removed' : 'User deleted');
     }
   };
 
@@ -303,7 +310,7 @@ const UserManagement = () => {
                 <tr key={user.id} className="hover:bg-gray-50:bg-gray-700">
                   <td className="p-3 text-sm">
                     {user.name}
-                    {user.seedSource === 'demo-alma' && (
+                    {user.seedSource === DEMO_SEED_SOURCE && (
                       <span
                         className="badge badge-neutral ml-1"
                         title="Shipped example user — part of the Alma Security demo assessment"
