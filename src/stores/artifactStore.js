@@ -4,16 +4,19 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { escapeCSVValue } from '../utils/sanitize';
 import { DEFAULT_ARTIFACTS, RELOCATED_ARTIFACT_LINKS } from './defaultArtifactsData';
-import { COMPREHENSIVE_ARTIFACTS } from './comprehensiveAssessmentData';
+import { COMPREHENSIVE_ARTIFACTS, COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
+import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
 
 // Merge defaults + catalog artifacts. De-dupe by artifactId; catalog wins ties.
-const SEEDED_ARTIFACTS = (() => {
+// Every shipped artifact is Alma demo evidence, so all of them are scoped to
+// the demo assessment (issue #297) and carry seed provenance.
+export const SEEDED_ARTIFACTS = (() => {
   const seen = new Set();
   const merged = [];
   for (const a of [...DEFAULT_ARTIFACTS, ...COMPREHENSIVE_ARTIFACTS]) {
     if (seen.has(a.artifactId)) continue;
     seen.add(a.artifactId);
-    merged.push(a);
+    merged.push({ ...a, assessmentId: COMPREHENSIVE_ASSESSMENT_ID, seedSource: DEMO_SEED_SOURCE });
   }
   return merged;
 })();
@@ -44,6 +47,9 @@ const useArtifactStore = create(
 
           // Primary link: Control (general evidence for a control)
           controlId: artifact.controlId || null,
+
+          // Assessment scope (issue #297): null = visible in every scope
+          assessmentId: artifact.assessmentId || null,
 
           // Secondary link: Evaluations (point-in-time evidence for specific assessments)
           linkedEvaluationIds: artifact.linkedEvaluationIds || [],
@@ -271,6 +277,7 @@ const useArtifactStore = create(
           'Link': escapeCSVValue(a.link || ''),
           'Type': escapeCSVValue(a.type || 'Document'),
           'Control ID': escapeCSVValue(a.controlId || ''),
+          'Assessment ID': a.assessmentId || '',
           'Linked Evaluation IDs': (a.linkedEvaluationIds || []).join('; '),
           'Compliance Requirement': escapeCSVValue(a.complianceRequirement || ''), // Deprecated
           'Linked Subcategories': (a.linkedSubcategoryIds || []).join('; '), // Deprecated
@@ -355,6 +362,14 @@ const useArtifactStore = create(
                     // Primary link
                     controlId: row['Control ID'] || row['Custom field (Control ID)'] || null,
 
+                    // Assessment scope (issue #297). Header-name based, so older
+                    // CSVs without the column simply land unassigned (null =
+                    // visible in every per-assessment view). An id that names no
+                    // current assessment is preserved as-is — it stays reachable
+                    // under the All scope and survives a later restore of that
+                    // assessment; imports never silently rewrite it.
+                    assessmentId: (row['Assessment ID'] || '').trim() || null,
+
                     // Secondary link: Evaluations
                     linkedEvaluationIds: (row['Linked Evaluation IDs'] || row['Custom field (Linked Evaluation IDs)'] || '')
                       .split(';').map(s => s.trim()).filter(Boolean),
@@ -392,14 +407,8 @@ const useArtifactStore = create(
     }),
     {
       name: 'csf-artifacts-storage',
-      version: 7,
-      migrate: (persistedState, version) => {
-        // Version 7 (#287) runs after the version chain below rather than as another branch in
-        // it. The branches return early, so a user coming from v5 would never reach a v7 branch
-        // placed at the end. Repairing afterwards covers every upgrade path, and it is a no-op
-        // on the branches that reset to DEFAULT_ARTIFACTS, which already carry the new links.
-        return repairRelocatedLinks(applyVersionMigrations(persistedState, version));
-      },
+      version: 8,
+      migrate: (persistedState, version) => migrateArtifactsState(persistedState, version),
       partialize: (state) => ({
         artifacts: state.artifacts
       })
@@ -419,6 +428,56 @@ const useArtifactStore = create(
  * replace the link with a function or an object, which JSON.stringify then drops on the way
  * into localStorage. Silent field loss is not an acceptable failure mode for a migration.
  */
+/**
+ * Full persisted-state migration for csf-artifacts-storage. Exported so tests
+ * exercise the EXACT production path. Version 7 (#287) and version 8 (#297)
+ * run after the version chain rather than as more branches in it — the
+ * branches return early, so a user coming from v5 would never reach a branch
+ * placed at the end. Repairing afterwards covers every upgrade path, and both
+ * passes are no-ops on states that already carry the new data.
+ */
+export function migrateArtifactsState(persistedState, version) {
+  return stampSeededDemoArtifacts(repairRelocatedLinks(applyVersionMigrations(persistedState, version)));
+}
+
+/**
+ * Version 8 (issue #297): scope the shipped demo artifacts to the demo assessment.
+ *
+ * Existing installs hold copies of the seeded Alma artifacts with no assessmentId, so they
+ * bleed into every assessment's Artifacts view. Stamp exactly those copies with the demo
+ * assessment id and seed provenance. Heal-in-place with a conservative guard:
+ *
+ * - Match requires BOTH the seeded artifactId AND the exact seeded name — the Artifacts page
+ *   suggests `AR-<n>` ids for new records, so an id alone can collide with a user's own
+ *   artifact. A seeded record the user renamed stays unstamped (null = visible everywhere,
+ *   so nothing the user can see is ever lost).
+ * - An artifact that already has ANY assessmentId is never touched.
+ *
+ * Idempotent: once stamped, the no-assessmentId guard matches nothing.
+ */
+export function stampSeededDemoArtifacts(state) {
+  const artifacts = state?.artifacts;
+  if (!Array.isArray(artifacts)) return state;
+
+  const seededNamesById = new Map(SEEDED_ARTIFACTS.map(a => [a.artifactId, a.name]));
+
+  let changed = false;
+  const stamped = artifacts.map(artifact => {
+    // Absent-only: any existing assessmentId OR seedSource means this record
+    // has already been classified (locally or by the install that exported
+    // it) — never re-derive over an existing classification.
+    if (!artifact || artifact.assessmentId || artifact.seedSource) return artifact;
+    // The match must be POSITIVE on both sides — a record with an unknown
+    // artifactId and no name must not match via undefined === undefined.
+    const seededName = seededNamesById.get(artifact.artifactId);
+    if (!seededName || seededName !== artifact.name) return artifact;
+    changed = true;
+    return { ...artifact, assessmentId: COMPREHENSIVE_ASSESSMENT_ID, seedSource: DEMO_SEED_SOURCE };
+  });
+
+  return changed ? { ...state, artifacts: stamped } : state;
+}
+
 export function repairRelocatedLinks(state) {
   const artifacts = state?.artifacts;
   if (!Array.isArray(artifacts)) return state;

@@ -1,4 +1,4 @@
-import { migrateAssessmentsState } from './assessmentsStore';
+import { migrateAssessmentsState, DEMO_ASSESSMENT_USERS } from './assessmentsStore';
 import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
 
 /**
@@ -501,6 +501,55 @@ describe('migrateAssessmentsState', () => {
       const before = JSON.stringify(state.assessments[0].observations);
       const result = migrateAssessmentsState(state, 13);
       expect(JSON.stringify(result.assessments[0].observations)).toBe(before);
+    });
+  });
+
+  describe('v15: demo assessment user roster seed (issue #297)', () => {
+    const DEMO_ID = 'ASM-2026-comprehensive-alma';
+
+    test('seeds the demo roster when the demo assessment has no users', () => {
+      const state = {
+        assessments: [{ id: DEMO_ID, observations: {}, users: [] }],
+        currentAssessmentId: DEMO_ID
+      };
+      const result = migrateAssessmentsState(state, 14);
+      expect(result.assessments[0].users).toEqual(DEMO_ASSESSMENT_USERS);
+    });
+
+    test('seeds when the users field is missing entirely (pre-#290 payload shape)', () => {
+      const state = { assessments: [{ id: DEMO_ID, observations: {} }] };
+      const result = migrateAssessmentsState(state, 14);
+      expect(result.assessments[0].users).toEqual(DEMO_ASSESSMENT_USERS);
+    });
+
+    test('a roster the user populated is NEVER replaced (heal-in-place)', () => {
+      const mine = [{ userId: 42, role: 'auditor' }];
+      const state = { assessments: [{ id: DEMO_ID, observations: {}, users: mine }] };
+      const result = migrateAssessmentsState(state, 14);
+      expect(result.assessments[0].users).toEqual(mine);
+    });
+
+    test('other assessments are never touched', () => {
+      const state = { assessments: [{ id: 'ASM-mine', observations: {}, users: [] }] };
+      const result = migrateAssessmentsState(state, 14);
+      expect(result.assessments[0].users).toEqual([]);
+    });
+
+    test('a v0 client falls through all the way to the v15 seed', () => {
+      const state = {
+        assessments: [{ id: DEMO_ID, observations: {} }],
+        currentAssessmentId: DEMO_ID
+      };
+      const result = migrateAssessmentsState(state, 0);
+      expect(result.assessments[0].users).toEqual(DEMO_ASSESSMENT_USERS);
+    });
+
+    test('is idempotent — running the chain again changes nothing', () => {
+      const once = migrateAssessmentsState(
+        { assessments: [{ id: DEMO_ID, observations: {}, users: [] }] }, 14
+      );
+      const twice = migrateAssessmentsState(JSON.parse(JSON.stringify(once)), 15);
+      expect(twice.assessments[0].users).toEqual(once.assessments[0].users);
     });
   });
 });

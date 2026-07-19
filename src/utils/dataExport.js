@@ -27,7 +27,11 @@ export const PERSIST_KEYS = {
   findings: 'csf-findings-storage',
   requirements: 'csf-requirements-storage',
   metrics: 'csf-metrics-storage',
-  orgProfile: 'csf-org-profile-storage'
+  orgProfile: 'csf-org-profile-storage',
+  // issue #297: artifact/user schema versions travel too, so future restores
+  // can version-gate instead of relying on the unconditional stamp passes
+  artifacts: 'csf-artifacts-storage',
+  users: 'csf-users-storage'
 };
 
 /**

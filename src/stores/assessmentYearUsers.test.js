@@ -243,3 +243,53 @@ describe('findOrCreateUserByEmail — email-authoritative wizard resolver (issue
     expect(useUserStore.getState().findOrCreateUserByEmail({ name: 'No Email' })).toBeNull();
   });
 });
+
+describe('assessment user roster actions (issue #297)', () => {
+  const rosterOf = (id) =>
+    useAssessmentsStore.getState().assessments.find(a => a.id === id).users;
+
+  const makeAssessment = (users = []) =>
+    useAssessmentsStore.getState().createAssessment({ name: 'Roster test', users }).id;
+
+  test('addAssessmentUser appends a normalized pair with the given role', () => {
+    const id = makeAssessment();
+    useAssessmentsStore.getState().addAssessmentUser(id, 42, 'auditor');
+    expect(rosterOf(id)).toEqual([{ userId: 42, role: 'auditor' }]);
+  });
+
+  test('adding the same user twice dedupes (first role wins)', () => {
+    const id = makeAssessment();
+    useAssessmentsStore.getState().addAssessmentUser(id, 42, 'auditor');
+    useAssessmentsStore.getState().addAssessmentUser(id, 42, 'stakeholder');
+    expect(rosterOf(id)).toEqual([{ userId: 42, role: 'auditor' }]);
+  });
+
+  test('an unknown role is coerced to stakeholder, not dropped', () => {
+    const id = makeAssessment();
+    useAssessmentsStore.getState().addAssessmentUser(id, 42, 'Supreme Leader');
+    expect(rosterOf(id)).toEqual([{ userId: 42, role: 'stakeholder' }]);
+  });
+
+  test('removeAssessmentUser removes exactly that user', () => {
+    const id = makeAssessment([{ userId: 1, role: 'auditor' }, { userId: 2, role: 'stakeholder' }]);
+    useAssessmentsStore.getState().removeAssessmentUser(id, 1);
+    expect(rosterOf(id)).toEqual([{ userId: 2, role: 'stakeholder' }]);
+  });
+
+  test('setAssessmentUserRole changes the role; an invalid role is refused (pair kept)', () => {
+    const id = makeAssessment([{ userId: 1, role: 'auditor' }]);
+    useAssessmentsStore.getState().setAssessmentUserRole(id, 1, 'control owner');
+    expect(rosterOf(id)).toEqual([{ userId: 1, role: 'control owner' }]);
+    useAssessmentsStore.getState().setAssessmentUserRole(id, 1, 'nonsense');
+    expect(rosterOf(id)).toEqual([{ userId: 1, role: 'control owner' }]);
+  });
+
+  test('the shipped demo roster is a valid, already-normalized user scope', () => {
+    // The seed must survive normalizeAssessmentUsers unchanged — otherwise
+    // the demo assessment would install with a roster the producer gate
+    // silently prunes.
+    const { DEMO_ASSESSMENT_USERS } = require('./assessmentsStore');
+    expect(normalizeAssessmentUsers(DEMO_ASSESSMENT_USERS)).toEqual(DEMO_ASSESSMENT_USERS);
+    expect(DEMO_ASSESSMENT_USERS).toHaveLength(8);
+  });
+});

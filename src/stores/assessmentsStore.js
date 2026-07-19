@@ -15,6 +15,21 @@ import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
 import { cleanCommunityMarkdown } from '../utils/relatedSection.mjs';
 import useAuditLogStore from './auditLogStore';
 
+// The demo assessment's user roster (issue #297): the 8 shipped Alma
+// directory users, so the example demonstrates the per-assessment user scope
+// and the demo staff stop appearing in every other assessment's pickers.
+// Roles derive from their directory titles (userStore DEFAULT_USERS).
+export const DEMO_ASSESSMENT_USERS = [
+  { userId: 1, role: 'stakeholder' },    // Gerry.Callahan — CISO
+  { userId: 2, role: 'auditor' },        // Steve.Mercer — Director, Internal Audit
+  { userId: 3, role: 'control owner' },  // Jane.Alvarez — Product Engineer
+  { userId: 4, role: 'control owner' },  // John.Tran — Financial Systems Analyst
+  { userId: 5, role: 'control owner' },  // Chris.Magann — Vulnerability Management Lead
+  { userId: 6, role: 'control owner' },  // Nadia.Khan — Detection & Response Lead
+  { userId: 7, role: 'control owner' },  // Tigan.Wang — Vulnerability Management Engineer
+  { userId: 8, role: 'auditor' }         // Omar.Garza — Senior IT Auditor
+];
+
 const COMPREHENSIVE_ASSESSMENT = {
   id: COMPREHENSIVE_ASSESSMENT_ID,
   name: '2026 Alma Security Comprehensive CSF Assessment',
@@ -23,7 +38,8 @@ const COMPREHENSIVE_ASSESSMENT = {
   frameworkFilter: null,
   createdDate: '2026-04-30T00:00:00.000Z',
   scopeIds: COMPREHENSIVE_SCOPE_IDS,
-  observations: COMPREHENSIVE_OBSERVATIONS
+  observations: COMPREHENSIVE_OBSERVATIONS,
+  users: DEMO_ASSESSMENT_USERS
 };
 
 // Example data shipped with the software (issue #294): ONLY the newest,
@@ -140,7 +156,7 @@ export const normalizeAssessmentUsers = (value) => {
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 14;
+export const ASSESSMENTS_SCHEMA_VERSION = 15;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -318,6 +334,21 @@ export const migrateAssessmentsState = (persistedState, version) => {
         : (assessments[0]?.id ?? null);
     }
     state = { ...state, assessments, currentAssessmentId };
+  }
+
+  // v15 (issue #297): seed the demo assessment's user roster. Existing
+  // installs predate the roster, so their copy of the demo assessment has
+  // users: [] and the eval-panel user picker (now roster-scoped) would go
+  // empty. Heal-in-place: ONLY the demo assessment, ONLY when its roster is
+  // empty — a roster the user populated (or deliberately pruned to a
+  // non-empty set) is never replaced.
+  if (version < 15) {
+    const assessments = (state.assessments || []).map(a =>
+      a.id === COMPREHENSIVE_ASSESSMENT_ID && normalizeAssessmentUsers(a.users).length === 0
+        ? { ...a, users: DEMO_ASSESSMENT_USERS }
+        : a
+    );
+    state = { ...state, assessments };
   }
 
   return state;
@@ -622,6 +653,41 @@ const useAssessmentsStore = create(
             : a
         );
         get().setAssessments(updatedAssessments);
+      },
+
+      // ── Assessment user roster (issues #290/#297) ─────────────────────────
+      // The roster is the per-assessment user scope. All three actions route
+      // through updateAssessment so normalizeAssessmentUsers stays the single
+      // producer-side gate (dedupe, role allowlist, no PII on the record).
+
+      addAssessmentUser: (assessmentId, userId, role = 'stakeholder') => {
+        const assessment = get().assessments.find(a => a.id === assessmentId);
+        if (!assessment || userId === undefined || userId === null || userId === '') return;
+        // Coerce an unknown role rather than letting normalize drop the pair.
+        const cleanRole = typeof role === 'string' ? role.trim().toLowerCase() : '';
+        const safeRole = ASSESSMENT_USER_ROLES.includes(cleanRole) ? cleanRole : 'stakeholder';
+        const current = normalizeAssessmentUsers(assessment.users);
+        if (current.some(u => u.userId === userId)) return; // already on the roster
+        get().updateAssessment(assessmentId, { users: [...current, { userId, role: safeRole }] });
+      },
+
+      removeAssessmentUser: (assessmentId, userId) => {
+        const assessment = get().assessments.find(a => a.id === assessmentId);
+        if (!assessment) return;
+        const current = normalizeAssessmentUsers(assessment.users);
+        get().updateAssessment(assessmentId, { users: current.filter(u => u.userId !== userId) });
+      },
+
+      setAssessmentUserRole: (assessmentId, userId, role) => {
+        const assessment = get().assessments.find(a => a.id === assessmentId);
+        if (!assessment) return;
+        // An unknown role would make normalize DROP the pair — refuse instead.
+        const cleanRole = typeof role === 'string' ? role.trim().toLowerCase() : '';
+        if (!ASSESSMENT_USER_ROLES.includes(cleanRole)) return;
+        const current = normalizeAssessmentUsers(assessment.users);
+        get().updateAssessment(assessmentId, {
+          users: current.map(u => (u.userId === userId ? { ...u, role: cleanRole } : u))
+        });
       },
 
       // Delete assessment

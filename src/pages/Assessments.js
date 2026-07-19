@@ -20,7 +20,7 @@ import EmptyState from '../components/EmptyState';
 import ScoreSelect from '../components/ScoreSelect';
 
 // Stores
-import useAssessmentsStore from '../stores/assessmentsStore';
+import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES } from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore, { isCsfRequirement } from '../stores/requirementsStore';
 import useUserStore from '../stores/userStore';
@@ -78,6 +78,11 @@ const Assessments = () => {
   const importAssessmentsCSV = useAssessmentsStore((state) => state.importAssessmentsCSV);
   const exportAllAssessmentsCSV = useAssessmentsStore((state) => state.exportAllAssessmentsCSV);
   const cloneAssessment = useAssessmentsStore((state) => state.cloneAssessment);
+  const addAssessmentUser = useAssessmentsStore((state) => state.addAssessmentUser);
+  const removeAssessmentUser = useAssessmentsStore((state) => state.removeAssessmentUser);
+  const setAssessmentUserRole = useAssessmentsStore((state) => state.setAssessmentUserRole);
+  // Subscribed (not getState) so the roster editor re-renders on directory edits
+  const directoryUsers = useUserStore((state) => state.users);
 
   const controls = useControlsStore((state) => state.controls);
   const getControl = useControlsStore((state) => state.getControl);
@@ -179,6 +184,17 @@ const Assessments = () => {
   const currentAssessment = useMemo(() => {
     return assessments.find(a => a.id === currentAssessmentId);
   }, [assessments, currentAssessmentId]);
+
+  // The current assessment's user roster (issues #290/#297) — the scope for
+  // the eval-panel user picker
+  const rosterUserIds = useMemo(
+    () => normalizeAssessmentUsers(currentAssessment?.users).map(u => u.userId),
+    [currentAssessment]
+  );
+  const rosterUsers = useMemo(
+    () => normalizeAssessmentUsers(currentAssessment?.users),
+    [currentAssessment]
+  );
 
   // Get progress for current assessment
   const progress = useMemo(() => {
@@ -1487,6 +1503,7 @@ Format as a numbered list. Be specific and actionable.`;
                       selectedArtifacts={currentObservation.linkedArtifacts || []}
                       onChange={(artifacts) => handleObservationChange('linkedArtifacts', artifacts)}
                       disabled={!editMode}
+                      assessmentId={currentAssessmentId}
                     />
                   </div>
 
@@ -1497,6 +1514,7 @@ Format as a numbered list. Be specific and actionable.`;
                       selectedFindings={currentObservation.linkedFindings || []}
                       onChange={(findings) => handleObservationChange('linkedFindings', findings)}
                       disabled={!editMode}
+                      assessmentId={currentAssessmentId}
                     />
                   </div>
 
@@ -1550,6 +1568,8 @@ Format as a numbered list. Be specific and actionable.`;
                         selectedUsers={currentObservation.auditorId}
                         onChange={(userId) => handleObservationChange('auditorId', userId)}
                         disabled={!editMode}
+                        scopeUserIds={rosterUserIds}
+                        onAddToScope={(userId) => addAssessmentUser(currentAssessmentId, userId, 'auditor')}
                       />
                       {!currentObservation.auditorId && (
                         <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">Assign to me</p>
@@ -1583,6 +1603,59 @@ Format as a numbered list. Be specific and actionable.`;
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{currentAssessment.year}</span>
                     </div>
                   )}
+
+                  {/* Assessment users (issues #290/#297): the roster that scopes
+                      the user pickers on this assessment. Editable here because
+                      the wizard is the only other place the roster exists. */}
+                  <div className="flex items-start justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Users</span>
+                    <div className="text-right space-y-1">
+                      {rosterUsers.length === 0 && (
+                        <span className="text-sm text-gray-400">None</span>
+                      )}
+                      {rosterUsers.map(({ userId, role }) => {
+                        const user = directoryUsers.find(u => u.id === userId);
+                        if (!user) return null;
+                        return (
+                          <div key={userId} className="flex items-center gap-1.5 justify-end">
+                            <span className="text-sm text-gray-700 dark:text-gray-300 truncate" title={user.email || user.name}>
+                              {user.name}
+                            </span>
+                            {editMode ? (
+                              <select
+                                value={role}
+                                onChange={(e) => setAssessmentUserRole(currentAssessmentId, userId, e.target.value)}
+                                className="text-xs border border-gray-300 dark:border-gray-600 rounded px-1 py-0.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+                                aria-label={`Role for ${user.name}`}
+                              >
+                                {ASSESSMENT_USER_ROLES.map(r => (
+                                  <option key={r} value={r}>{r}</option>
+                                ))}
+                              </select>
+                            ) : (
+                              <span className="text-xs text-gray-500 dark:text-gray-400 capitalize">{role}</span>
+                            )}
+                            {editMode && (
+                              <button
+                                onClick={() => removeAssessmentUser(currentAssessmentId, userId)}
+                                className="text-gray-400 hover:text-red-500"
+                                title={`Remove ${user.name} from this assessment`}
+                                aria-label={`Remove ${user.name} from this assessment`}
+                              >
+                                <X size={12} />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {editMode && (
+                        <UserSelector
+                          selectedUsers={null}
+                          onChange={(userId) => addAssessmentUser(currentAssessmentId, userId)}
+                        />
+                      )}
+                    </div>
+                  </div>
 
                   {/* Quarter selector */}
                   <div className="flex items-center justify-between">

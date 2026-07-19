@@ -301,7 +301,17 @@ const UserManagement = () => {
             {users.length > 0 ? (
               users.map((user) => (
                 <tr key={user.id} className="hover:bg-gray-50:bg-gray-700">
-                  <td className="p-3 text-sm">{user.name}</td>
+                  <td className="p-3 text-sm">
+                    {user.name}
+                    {user.seedSource === 'demo-alma' && (
+                      <span
+                        className="badge badge-neutral ml-1"
+                        title="Shipped example user — part of the Alma Security demo assessment"
+                      >
+                        Demo
+                      </span>
+                    )}
+                  </td>
                   <td className="p-3 text-sm">{user.title}</td>
                   <td className="p-3 text-sm">{user.email}</td>
                   <td className="p-3 text-sm">

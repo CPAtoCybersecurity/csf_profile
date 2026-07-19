@@ -7,6 +7,7 @@ import useRequirementsStore from '../stores/requirementsStore';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
 import { generateExecutiveSummary } from '../utils/executiveSummaryPDF';
+import { filterByScope } from '../utils/assessmentScope';
 import {
   getTimeSinceLastExport,
   getLastExportDate,
@@ -66,8 +67,9 @@ const TerminalStatusBar = ({ onBackupClick }) => {
       generateExecutiveSummary({
         assessment: currentAssessment,
         requirements,
-        findings,
-        artifacts,
+        // Only this assessment's records belong in its summary (issue #297)
+        findings: filterByScope(findings, currentAssessment.id),
+        artifacts: filterByScope(artifacts, currentAssessment.id),
         selectedQuarter,
       });
     } catch (err) {

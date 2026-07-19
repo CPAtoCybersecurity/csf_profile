@@ -2,16 +2,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useFindingsStore from '../stores/findingsStore';
+import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
 
 const FindingSelector = ({
   label,
   selectedFindings,
   onChange,
   multiple = true,
-  disabled = false
+  disabled = false,
+  // Assessment scope (issue #297): when set, the pick list shows only this
+  // assessment's findings plus unassigned (legacy) ones — demo findings,
+  // being stamped to the demo assessment, drop out everywhere else. Already-
+  // linked chips always render regardless of scope.
+  assessmentId
 }) => {
   const navigate = useNavigate();
-  const findings = useFindingsStore((state) => state.findings);
+  const allFindings = useFindingsStore((state) => state.findings);
+  const findings = assessmentId
+    ? allFindings.filter(f => belongsToAssessment(f, assessmentId) || isUnassigned(f))
+    : allFindings;
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -32,9 +41,10 @@ const FindingSelector = ({
     }
   };
 
-  // Get finding by ID
+  // Get finding by ID — resolves against the FULL store so an already-linked
+  // finding renders its chip even when the scope filter hides it from the list
   const getFindingById = (findingId) => {
-    return findings.find(f => f.id === findingId);
+    return allFindings.find(f => f.id === findingId);
   };
 
   // Close dropdown when clicking outside

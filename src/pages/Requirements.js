@@ -25,6 +25,8 @@ import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
 import useUserStore from '../stores/userStore';
 import useUIStore from '../stores/uiStore';
+import useAssessmentsStore from '../stores/assessmentsStore';
+import { filterByScope, defaultScope } from '../utils/assessmentScope';
 
 const Requirements = () => {
   // Store state
@@ -40,11 +42,30 @@ const Requirements = () => {
   // Controls, artifacts, and findings for the detail panel and table display
   const controls = useControlsStore((state) => state.controls);
   const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
-  const artifacts = useArtifactStore((state) => state.artifacts);
-  const getArtifactsByControl = useArtifactStore((state) => state.getArtifactsByControl);
-  const findings = useFindingsStore((state) => state.findings);
-  const getFindingsByControl = useFindingsStore((state) => state.getFindingsByControl);
+  const allArtifactRecords = useArtifactStore((state) => state.artifacts);
+  const allFindingRecords = useFindingsStore((state) => state.findings);
   const users = useUserStore((state) => state.users);
+  const currentAssessmentId = useAssessmentsStore((state) => state.currentAssessmentId);
+
+  // Evidence shown per control follows the assessment being worked (issue
+  // #297): demo records, stamped to the demo assessment, drop out of every
+  // other context; unassigned (legacy/user) records stay visible everywhere.
+  const artifacts = useMemo(
+    () => filterByScope(allArtifactRecords, defaultScope(currentAssessmentId)),
+    [allArtifactRecords, currentAssessmentId]
+  );
+  const findings = useMemo(
+    () => filterByScope(allFindingRecords, defaultScope(currentAssessmentId)),
+    [allFindingRecords, currentAssessmentId]
+  );
+  const getArtifactsByControl = useCallback(
+    (controlId) => artifacts.filter(a => a.controlId === controlId),
+    [artifacts]
+  );
+  const getFindingsByControl = useCallback(
+    (controlId) => findings.filter(f => f.controlId === controlId),
+    [findings]
+  );
 
   // UI state
   const darkMode = useUIStore((state) => state.darkMode);

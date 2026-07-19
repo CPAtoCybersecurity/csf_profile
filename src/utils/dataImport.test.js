@@ -85,6 +85,72 @@ describe('export → restore round-trip', () => {
     expect(exported.formatVersion).toBe(EXPORT_FORMAT_VERSION);
     expect(exported.data.findings).toEqual(SAMPLE.findings);
   });
+
+  test('an artifact assessmentId survives the round-trip (issue #297)', () => {
+    const data = {
+      ...SAMPLE,
+      artifacts: [{ id: 'art1', artifactId: 'AR-mine', name: 'Policy doc', assessmentId: 'ASM-user-2026' }]
+    };
+    const { stores } = makeStores(data);
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+    expect(setters.setArtifacts).toHaveBeenCalledWith(data.artifacts);
+  });
+
+  test('a pre-#297 backup gets its demo records stamped on restore (issue #297)', () => {
+    // What an old backup actually holds: seeded demo copies without the new
+    // fields, alongside the user's own records.
+    const { SEEDED_ARTIFACTS } = require('../stores/artifactStore');
+    const { DEFAULT_USERS } = require('../stores/userStore');
+    const { assessmentId, seedSource, ...legacyDemoArtifact } = SEEDED_ARTIFACTS[0];
+    const { seedSource: _s, ...legacyDemoUser } = DEFAULT_USERS[0];
+    const mineArtifact = { id: 'art-mine', artifactId: 'AR-mine', name: 'My evidence' };
+
+    const data = {
+      ...SAMPLE,
+      artifacts: [legacyDemoArtifact, mineArtifact],
+      users: [legacyDemoUser]
+    };
+    const { stores } = makeStores(data);
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+
+    const restoredArtifacts = setters.setArtifacts.mock.calls[0][0];
+    expect(restoredArtifacts[0].assessmentId).toBe(SEEDED_ARTIFACTS[0].assessmentId);
+    expect(restoredArtifacts[0].seedSource).toBe('demo-alma');
+    expect(restoredArtifacts[1]).toEqual(mineArtifact); // user record untouched
+
+    const restoredUsers = setters.setUsers.mock.calls[0][0];
+    expect(restoredUsers[0].seedSource).toBe('demo-alma');
+  });
+
+  test('a foreign backup cannot get real data mis-branded as demo on restore (issue #297)', () => {
+    const { SEEDED_ARTIFACTS } = require('../stores/artifactStore');
+    // Same NAME as a shipped demo artifact but the user's own artifactId:
+    // the positive id+name guard must leave it untouched.
+    const sameNameMine = { id: 'a-1', artifactId: 'AR-my-own', name: SEEDED_ARTIFACTS[0].name };
+    // Same id+name but already classified by the exporting install: the
+    // absent-only rule must never overwrite an existing classification.
+    const alreadyClassified = {
+      ...SEEDED_ARTIFACTS[0],
+      assessmentId: undefined,
+      seedSource: 'user'
+    };
+    delete alreadyClassified.assessmentId;
+
+    const data = { ...SAMPLE, artifacts: [sameNameMine, alreadyClassified] };
+    const { stores } = makeStores(data);
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+
+    const restored = setters.setArtifacts.mock.calls[0][0];
+    expect(restored[0]).toEqual(sameNameMine);          // untouched
+    expect(restored[1].seedSource).toBe('user');        // classification kept
+    expect(restored[1].assessmentId).toBeUndefined();   // not demo-stamped
+  });
 });
 
 describe('validateDatabaseExport', () => {

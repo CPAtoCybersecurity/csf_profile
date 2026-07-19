@@ -33,6 +33,9 @@ import {
   normalizeExternalTracking,
   normalizeExternalLinks
 } from './externalLinks';
+import { stampSeededDemoArtifacts } from '../stores/artifactStore';
+import { stampSeededDemoFindings } from '../stores/findingsStore';
+import { stampSeededDemoUsers } from '../stores/userStore';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
 // Format-2 exports carry no metrics section — it is simply skipped (untouched),
@@ -205,6 +208,23 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
       }
       return next;
     });
+  }
+
+  // Demo-data segregation stamps are UNCONDITIONAL for the same reason
+  // (issue #297): a pre-#297 backup carries the seeded demo artifacts /
+  // findings / users without assessment scoping or provenance, and the bulk
+  // setters bypass each store's load-time migrate. All three passes are
+  // provenance-guarded (exact seeded id + name/email match, never overwrite
+  // an existing assessmentId/seedSource) and idempotent, so a current-format
+  // file passes through untouched.
+  if (Array.isArray(data.artifacts)) {
+    data.artifacts = stampSeededDemoArtifacts({ artifacts: data.artifacts }).artifacts;
+  }
+  if (Array.isArray(data.findings)) {
+    data.findings = stampSeededDemoFindings({ findings: data.findings }).findings;
+  }
+  if (Array.isArray(data.users)) {
+    data.users = stampSeededDemoUsers({ users: data.users }).users;
   }
 
   // Resolve every write BEFORE applying any, so a missing setter can never

@@ -8,6 +8,7 @@ import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import { sanitizeExternalUrl, externalUrlLabel } from '../utils/externalLinks';
+import { SCOPE_ALL, SCOPE_UNASSIGNED, filterByScope, resolveScopeStamp, defaultScope } from '../utils/assessmentScope';
 import useSort from '../hooks/useSort';
 import EmptyState from '../components/EmptyState';
 import Markdown from '../components/Markdown';
@@ -26,10 +27,25 @@ const Findings = () => {
   const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
   const requirements = useRequirementsStore((state) => state.requirements);
   const assessments = useAssessmentsStore((state) => state.assessments);
+  const currentAssessmentId = useAssessmentsStore((state) => state.currentAssessmentId);
 
   // External-tracking config of the assessment a finding belongs to (issue #284)
   const trackingForAssessment = (assessmentId) =>
     assessments.find((a) => a.id === assessmentId)?.externalTracking;
+
+  // Assessment scope (issue #297): page-local — never mutates the app-wide
+  // current assessment. Defaults to the assessment being worked; follows when
+  // the user switches assessments in the status bar.
+  const [scopeFilter, setScopeFilter] = useState(() => defaultScope(currentAssessmentId));
+  useEffect(() => {
+    setScopeFilter(defaultScope(currentAssessmentId));
+  }, [currentAssessmentId]);
+  const scopedFindings = useMemo(
+    () => filterByScope(findings, scopeFilter, {
+      knownAssessmentIds: assessments.map(a => a.id)
+    }),
+    [findings, scopeFilter, assessments]
+  );
 
   const [formData, setFormData] = useState({
     id: null,
@@ -61,11 +77,16 @@ const Findings = () => {
         setSelectedFinding(finding);
         setFormData({ ...finding });
         setEditMode(false);
+        // If the active scope hides the deep-linked finding, widen the
+        // page-local scope so it is visible (issue #297)
+        if (filterByScope([finding], scopeFilter).length === 0) {
+          setScopeFilter(finding.assessmentId || SCOPE_ALL);
+        }
         // Clear the URL parameter after selection
         setSearchParams({}, { replace: true });
       }
     }
-  }, [searchParams, findings, setSearchParams]);
+  }, [searchParams, findings, setSearchParams, scopeFilter]);
 
   // Resize handlers
   const handleMouseDown = useCallback((e) => {
@@ -110,8 +131,8 @@ const Findings = () => {
     return () => window.removeEventListener('keyboard-new-item', handleNewItem);
   }, []);
 
-  // Sorting
-  const { sortedData } = useSort(findings);
+  // Sorting (over the scoped list — issue #297)
+  const { sortedData } = useSort(scopedFindings);
 
   // Get linked controls for the selected finding based on complianceRequirement
   const linkedControls = useMemo(() => {
@@ -205,7 +226,12 @@ const Findings = () => {
       setSelectedFinding({ ...selectedFinding, ...formData });
       toast.success('Finding updated');
     } else {
-      const newFinding = createFinding(formData);
+      // Stamp the new finding into the active scope (issue #297): a concrete
+      // scope selection wins, else the app-wide current assessment, else null
+      const newFinding = createFinding({
+        ...formData,
+        assessmentId: resolveScopeStamp(scopeFilter, currentAssessmentId)
+      });
       toast.success('Finding created');
       setSelectedFinding(newFinding);
     }
@@ -318,9 +344,25 @@ const Findings = () => {
               <AlertTriangle size={24} className="text-amber-500" />
               Findings
             </h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{findings.length} items</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {scopedFindings.length} items{scopeFilter !== SCOPE_ALL ? ` · ${findings.length} total` : ''}
+            </p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Assessment scope (issue #297) */}
+            <select
+              value={scopeFilter}
+              onChange={(e) => setScopeFilter(e.target.value)}
+              className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              title="Show findings for one assessment"
+              aria-label="Assessment scope"
+            >
+              <option value={SCOPE_ALL}>All assessments</option>
+              {assessments.map(a => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+              <option value={SCOPE_UNASSIGNED}>Unassigned only</option>
+            </select>
             <input
               type="file"
               accept=".csv"
@@ -476,8 +518,10 @@ const Findings = () => {
             ) : (
               <EmptyState
                 icon={AlertTriangle}
-                title="No findings recorded"
-                description="Record findings as you discover gaps in your assessment."
+                title={findings.length > 0 ? 'No findings in this scope' : 'No findings recorded'}
+                description={findings.length > 0
+                  ? 'This assessment has no findings yet. Switch the scope selector to All assessments to see everything.'
+                  : 'Record findings as you discover gaps in your assessment.'}
                 actionLabel="Record a Finding"
                 onAction={() => {
                   resetForm();
@@ -727,6 +771,34 @@ const Findings = () => {
                 </h3>
 
                 <div className="space-y-4">
+                  {/* Assessment scope (issue #297): visible + reassignable, so an
+                      imported or mis-scoped finding is never stranded */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Assessment</span>
+                    {editMode ? (
+                      <select
+                        name="assessmentId"
+                        value={formData.assessmentId || ''}
+                        onChange={(e) => setFormData({ ...formData, assessmentId: e.target.value || null })}
+                        className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white max-w-[200px]"
+                        aria-label="Assessment"
+                      >
+                        <option value="">Unassigned (all scopes)</option>
+                        {assessments.map(a => (
+                          <option key={a.id} value={a.id}>{a.name}</option>
+                        ))}
+                        {formData.assessmentId && !assessments.some(a => a.id === formData.assessmentId) && (
+                          <option value={formData.assessmentId}>{formData.assessmentId} (not found)</option>
+                        )}
+                      </select>
+                    ) : (
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {assessments.find(a => a.id === selectedFinding?.assessmentId)?.name
+                          || (selectedFinding?.assessmentId ? `${selectedFinding.assessmentId} (not found)` : 'Unassigned')}
+                      </span>
+                    )}
+                  </div>
+
                   {/* CSF Compliance Requirement */}
                   <div className="flex items-center justify-between">
                     <span className="text-sm text-gray-500 dark:text-gray-400">CSF Reference</span>

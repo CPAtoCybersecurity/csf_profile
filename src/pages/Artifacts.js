@@ -6,7 +6,9 @@ import useCSFStore from '../stores/csfStore';
 import useArtifactStore from '../stores/artifactStore';
 import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
+import useAssessmentsStore from '../stores/assessmentsStore';
 import useSort from '../hooks/useSort';
+import { SCOPE_ALL, SCOPE_UNASSIGNED, filterByScope, resolveScopeStamp, defaultScope } from '../utils/assessmentScope';
 import { extractArtifactsFromProfile } from '../updateArtifactLinks';
 import EmptyState from '../components/EmptyState';
 import { sanitizeExternalUrl } from '../utils/externalLinks';
@@ -22,6 +24,22 @@ const Artifacts = () => {
   const deleteArtifact = useArtifactStore((state) => state.deleteArtifact);
   const users = useUserStore((state) => state.users);
   const getControlsByRequirement = useControlsStore((state) => state.getControlsByRequirement);
+  const assessments = useAssessmentsStore((state) => state.assessments);
+  const currentAssessmentId = useAssessmentsStore((state) => state.currentAssessmentId);
+
+  // Assessment scope (issue #297): page-local — never mutates the app-wide
+  // current assessment. Defaults to the assessment being worked; follows when
+  // the user switches assessments in the status bar.
+  const [scopeFilter, setScopeFilter] = useState(() => defaultScope(currentAssessmentId));
+  useEffect(() => {
+    setScopeFilter(defaultScope(currentAssessmentId));
+  }, [currentAssessmentId]);
+  const scopedArtifacts = useMemo(
+    () => filterByScope(artifacts, scopeFilter, {
+      knownAssessmentIds: assessments.map(a => a.id)
+    }),
+    [artifacts, scopeFilter, assessments]
+  );
 
   const [formData, setFormData] = useState({
     id: null,
@@ -41,8 +59,8 @@ const Artifacts = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Sorting
-  const { sort, sortedData, handleSort } = useSort(artifacts);
+  // Sorting (over the scoped list — issue #297)
+  const { sort, sortedData, handleSort } = useSort(scopedArtifacts);
 
   // Get linked controls for the selected artifact
   const linkedControls = useMemo(() => {
@@ -192,6 +210,9 @@ const Artifacts = () => {
         artifactId: formData.artifactId || `AR-${artifacts.length + 1}`,
         status: formData.status || 'ACTIVE',
         priority: formData.priority || 'Medium',
+        // Stamp into the active scope (issue #297): a concrete scope selection
+        // wins, else the app-wide current assessment, else null (unassigned)
+        assessmentId: resolveScopeStamp(scopeFilter, currentAssessmentId),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
@@ -267,10 +288,15 @@ const Artifacts = () => {
         ...target,
         linkedSubcategoryIds: target.linkedSubcategoryIds || []
       });
+      // If the active scope hides the deep-linked artifact, widen the
+      // page-local scope so it is visible (issue #297)
+      if (filterByScope([target], scopeFilter).length === 0) {
+        setScopeFilter(target.assessmentId || SCOPE_ALL);
+      }
     }
     // Clear the state so refresh/back doesn't re-trigger the selection
     navigate(location.pathname, { replace: true, state: null });
-  }, [location.state, location.pathname, artifacts, navigate]);
+  }, [location.state, location.pathname, artifacts, navigate, scopeFilter]);
 
   // Get status badge style
   const getStatusStyle = (status) => {
@@ -298,9 +324,25 @@ const Artifacts = () => {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900 dark:text-white">Artifacts</h1>
-            <p className="text-sm text-gray-500 dark:text-gray-400">{artifacts.length} items</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {scopedArtifacts.length} items{scopeFilter !== SCOPE_ALL ? ` · ${artifacts.length} total` : ''}
+            </p>
           </div>
           <div className="flex items-center gap-3">
+            {/* Assessment scope (issue #297) */}
+            <select
+              value={scopeFilter}
+              onChange={(e) => setScopeFilter(e.target.value)}
+              className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              title="Show artifacts for one assessment"
+              aria-label="Assessment scope"
+            >
+              <option value={SCOPE_ALL}>All assessments</option>
+              {assessments.map(a => (
+                <option key={a.id} value={a.id}>{a.name}</option>
+              ))}
+              <option value={SCOPE_UNASSIGNED}>Unassigned only</option>
+            </select>
             <input
               type="file"
               accept=".csv"
@@ -440,8 +482,10 @@ const Artifacts = () => {
             ) : (
               <EmptyState
                 icon={FileArchive}
-                title="No artifacts linked"
-                description="Add artifacts to document evidence for your controls."
+                title={artifacts.length > 0 ? 'No artifacts in this scope' : 'No artifacts linked'}
+                description={artifacts.length > 0
+                  ? 'This assessment has no artifacts yet. Switch the scope selector to All assessments to see everything.'
+                  : 'Add artifacts to document evidence for your controls.'}
                 actionLabel="Add an Artifact"
                 onAction={() => {
                   resetForm();
@@ -540,6 +584,34 @@ const Artifacts = () => {
                   <ChevronRight size={16} className="rotate-90" />
                   Key details
                 </h3>
+
+                {/* Assessment scope (issue #297): visible + reassignable, so an
+                    imported or mis-scoped artifact is never stranded */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Assessment</label>
+                  {editMode ? (
+                    <select
+                      name="assessmentId"
+                      value={formData.assessmentId || ''}
+                      onChange={(e) => setFormData({ ...formData, assessmentId: e.target.value || null })}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      aria-label="Assessment"
+                    >
+                      <option value="">Unassigned (all scopes)</option>
+                      {assessments.map(a => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                      ))}
+                      {formData.assessmentId && !assessments.some(a => a.id === formData.assessmentId) && (
+                        <option value={formData.assessmentId}>{formData.assessmentId} (not found)</option>
+                      )}
+                    </select>
+                  ) : (
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {assessments.find(a => a.id === selectedArtifact?.assessmentId)?.name
+                        || (selectedArtifact?.assessmentId ? `${selectedArtifact.assessmentId} (not found)` : 'Unassigned')}
+                    </span>
+                  )}
+                </div>
 
                 {/* Link */}
                 <div className="mb-4">

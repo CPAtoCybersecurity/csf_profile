@@ -58,13 +58,25 @@ const UserSelector = ({
   selectedUsers,
   onChange,
   multiple = false,
-  disabled = false
+  disabled = false,
+  // Assessment scoping (issue #297). When scopeUserIds is an array, the
+  // dropdown lists ONLY those users (the assessment's roster) by default —
+  // the rest of the directory stays behind an explicit "Browse directory"
+  // expansion (or a typed search). Picking a directory user calls
+  // onAddToScope(userId) so the caller can link them onto the roster —
+  // without that, a rosterless assessment would be a dead end.
+  scopeUserIds,
+  onAddToScope
 }) => {
   const users = useUserStore((state) => state.users);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [browseDirectory, setBrowseDirectory] = useState(false);
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
+
+  const scoped = Array.isArray(scopeUserIds);
+  const scopeSet = scoped ? new Set(scopeUserIds) : null;
 
   // Get selected user objects
   const getSelectedUserObjects = () => {
@@ -83,17 +95,23 @@ const UserSelector = ({
   const selectedUserObjects = getSelectedUserObjects();
 
   // Filter users based on search
-  const filteredUsers = users.filter(user => {
+  const matchesSearch = (user) => {
     const searchLower = searchTerm.toLowerCase();
     return (
       user.name?.toLowerCase().includes(searchLower) ||
       user.email?.toLowerCase().includes(searchLower) ||
       user.title?.toLowerCase().includes(searchLower)
     );
-  });
+  };
+  const filteredUsers = (scoped ? users.filter(u => scopeSet.has(u.id)) : users).filter(matchesSearch);
+  const directoryUsers = scoped ? users.filter(u => !scopeSet.has(u.id)).filter(matchesSearch) : [];
+  const showDirectory = scoped && (browseDirectory || searchTerm.trim() !== '');
 
   // Handle selecting a user
   const handleSelectUser = (user) => {
+    if (scoped && !scopeSet.has(user.id) && onAddToScope) {
+      onAddToScope(user.id);
+    }
     if (multiple) {
       if (selectedUsers && selectedUsers.includes(user.id)) {
         onChange(selectedUsers.filter(id => id !== user.id));
@@ -103,6 +121,7 @@ const UserSelector = ({
     } else {
       onChange(user.id);
       setDropdownOpen(false);
+      setBrowseDirectory(false);
     }
     setSearchTerm('');
   };
@@ -128,6 +147,7 @@ const UserSelector = ({
       ) {
         setDropdownOpen(false);
         setSearchTerm('');
+        setBrowseDirectory(false);
       }
     };
 
@@ -141,6 +161,37 @@ const UserSelector = ({
       return selectedUsers && selectedUsers.includes(userId);
     }
     return selectedUsers === userId;
+  };
+
+  // One dropdown row — shared by the main (roster) list and the directory section
+  const renderUserRow = (user) => {
+    const selected = isUserSelected(user.id);
+    return (
+      <button
+        key={user.id}
+        className={`w-full p-2 text-left hover:bg-gray-50 flex items-center gap-3 ${
+          selected ? 'bg-blue-50' : ''
+        }`}
+        onClick={() => handleSelectUser(user)}
+      >
+        <UserAvatar user={user} size="sm" />
+        <div className="flex-1 min-w-0">
+          <div className="font-medium text-sm truncate">{user.name}</div>
+          <div className="text-xs text-gray-500 truncate">
+            {user.email && <span className="text-blue-600">{user.email}</span>}
+            {user.email && user.title && <span className="mx-1">•</span>}
+            {user.title && <span>{user.title}</span>}
+          </div>
+        </div>
+        {selected && (
+          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+            <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+        )}
+      </button>
+    );
   };
 
   return (
@@ -191,38 +242,40 @@ const UserSelector = ({
                 {/* User list */}
                 <div className="max-h-60 overflow-auto">
                   {filteredUsers.length > 0 ? (
-                    filteredUsers.map(user => {
-                      const selected = isUserSelected(user.id);
-                      return (
-                        <button
-                          key={user.id}
-                          className={`w-full p-2 text-left hover:bg-gray-50 flex items-center gap-3 ${
-                            selected ? 'bg-blue-50' : ''
-                          }`}
-                          onClick={() => handleSelectUser(user)}
-                        >
-                          <UserAvatar user={user} size="sm" />
-                          <div className="flex-1 min-w-0">
-                            <div className="font-medium text-sm truncate">{user.name}</div>
-                            <div className="text-xs text-gray-500 truncate">
-                              {user.email && <span className="text-blue-600">{user.email}</span>}
-                              {user.email && user.title && <span className="mx-1">•</span>}
-                              {user.title && <span>{user.title}</span>}
-                            </div>
-                          </div>
-                          {selected && (
-                            <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                              <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                              </svg>
-                            </div>
-                          )}
-                        </button>
-                      );
-                    })
+                    filteredUsers.map(user => renderUserRow(user))
                   ) : (
                     <div className="p-4 text-sm text-gray-500 text-center">
-                      {searchTerm ? 'No matching users' : 'No users available'}
+                      {searchTerm
+                        ? 'No matching users'
+                        : (scoped ? 'No users on this assessment yet' : 'No users available')}
+                    </div>
+                  )}
+
+                  {/* Directory expansion (scoped mode): the rest of the user
+                      directory, behind an explicit browse/search step so demo
+                      or unrelated users never crowd the assessment's own list */}
+                  {scoped && !showDirectory && (
+                    <div className="p-2 border-t">
+                      <button
+                        className="w-full px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                        onClick={() => setBrowseDirectory(true)}
+                      >
+                        Browse directory…
+                      </button>
+                    </div>
+                  )}
+                  {scoped && showDirectory && (
+                    <div className="border-t">
+                      <div className="p-2 text-xs text-gray-500">
+                        Directory — selecting adds the user to this assessment
+                      </div>
+                      {directoryUsers.length > 0 ? (
+                        directoryUsers.map(user => renderUserRow(user))
+                      ) : (
+                        <div className="p-4 text-sm text-gray-500 text-center">
+                          {searchTerm ? 'No matching directory users' : 'No other users in the directory'}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
