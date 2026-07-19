@@ -89,12 +89,16 @@ describe('KeyboardShortcutsOverlay — platform toggle', () => {
     render(<KeyboardShortcutsOverlay />);
     openOverlay();
 
-    const redoKeys = screen.getByRole('group', { name: 'Redo' });
-    const labels = within(redoKeys)
+    // Scoping to the row needs one DOM step up from its description. The
+    // alternative — giving every keys span a role and a name purely so a query
+    // can reach it — makes screen readers announce each shortcut twice.
+    // eslint-disable-next-line testing-library/no-node-access
+    const redoRow = screen.getByText('Redo').closest('.kbd-overlay-row');
+    const labels = within(redoRow)
       .getAllByText((_content, node) => node.tagName === 'KBD')
       .map((node) => node.textContent);
     expect(labels).toEqual(['⌘', 'Shift', 'Z', '⌘', 'Y']);
-    expect(within(redoKeys).getByText('or')).toBeInTheDocument();
+    expect(within(redoRow).getByText('or')).toBeInTheDocument();
   });
 
   it('persists the choice and prefers it over detection on remount', () => {

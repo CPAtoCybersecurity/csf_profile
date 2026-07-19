@@ -75,13 +75,30 @@ const contrast = (a, b) => {
   return (hi + 0.05) / (lo + 0.05);
 };
 
-/** Composite a translucent overlay (hover tints) onto an opaque background. */
-const over = (fg, bg, alpha) => {
-  const parse = (h) => [0, 2, 4].map((i) => parseInt(h.replace('#', '').slice(i, i + 2), 16));
-  const [f, b] = [parse(fg), parse(bg)];
-  return `#${f
-    .map((v, i) => Math.round(v * alpha + b[i] * (1 - alpha)).toString(16).padStart(2, '0'))
+const parseHex = (h) => [0, 2, 4].map((i) => parseInt(h.replace('#', '').slice(i, i + 2), 16));
+
+/** Composite a translucent overlay onto an opaque background. */
+const over = ([r, g, b], bg, alpha) => {
+  const base = parseHex(bg);
+  return `#${[r, g, b]
+    .map((v, i) => Math.round(v * alpha + base[i] * (1 - alpha)).toString(16).padStart(2, '0'))
     .join('')}`;
+};
+
+/**
+ * Read an `rgba(r, g, b, a)` declaration out of the stylesheet. Taking the
+ * channels as well as the alpha matters: an earlier version asserted only that
+ * the alpha was still 0.06 and composited a hardcoded accent, so restyling the
+ * hover tint to a different color left the test grading the old surface.
+ */
+const rgbaDecl = (selector, prop) => {
+  const raw = declValue(selector, prop);
+  const m = /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+)\s*)?\)/.exec(raw);
+  if (!m) throw new Error(`not an rgb(a) value on ${selector}: ${raw}`);
+  return {
+    rgb: [Number(m[1]), Number(m[2]), Number(m[3])],
+    alpha: m[4] === undefined ? 1 : Number(m[4]),
+  };
 };
 
 // --- the pair matrix ---------------------------------------------------------
@@ -101,10 +118,12 @@ const surfaces = (vars) => ({
 const lightSurfaces = surfaces(LIGHT_VARS);
 const darkSurfaces = surfaces(DARK_VARS);
 
-// Row hover tints are declared as rgba() literals; keep them in sync by hand
-// with index.css `tr:hover td` — asserted below so a change is caught.
-const LIGHT_HOVER = over(resolve('var(--accent)', LIGHT_VARS), lightSurfaces.base, 0.06);
-const DARK_HOVER = over(resolve('var(--accent)', DARK_VARS), darkSurfaces.base, 0.08);
+// Row hover tints: both the color and the alpha come from the stylesheet, so
+// restyling `tr:hover td` re-grades every hovered-row pair automatically.
+const lightHoverTint = rgbaDecl('tr:hover td', 'background-color');
+const darkHoverTint = rgbaDecl('.dark tr:hover td', 'background-color');
+const LIGHT_HOVER = over(lightHoverTint.rgb, lightSurfaces.base, lightHoverTint.alpha);
+const DARK_HOVER = over(darkHoverTint.rgb, darkSurfaces.base, darkHoverTint.alpha);
 
 const pairs = [
   // Informational text tiers on the page surface.
@@ -160,9 +179,13 @@ describe('palette parsing', () => {
     expect(resolve('var(--accent)', LIGHT_VARS)).not.toEqual(resolve('var(--accent)', DARK_VARS));
   });
 
-  it('still composites the row-hover tints index.css declares', () => {
-    expect(declValue('tr:hover td', 'background-color')).toContain('0.06');
-    expect(declValue('.dark tr:hover td', 'background-color')).toContain('0.08');
+  it('composites the row-hover tints from their declared color and alpha', () => {
+    expect(lightHoverTint.alpha).toBeLessThan(1);
+    expect(darkHoverTint.alpha).toBeLessThan(1);
+    // The composited surfaces must actually differ from the untinted base,
+    // otherwise the hovered-row pairs are silently duplicating the base pairs.
+    expect(LIGHT_HOVER).not.toEqual(lightSurfaces.base);
+    expect(DARK_HOVER).not.toEqual(darkSurfaces.base);
   });
 });
 
@@ -178,11 +201,15 @@ describe('token coverage', () => {
   it('every informational text token is exercised by at least one pair', () => {
     const covered = new Set(pairs.map(([, , fg]) => fg));
     const merged = { ...LIGHT_VARS, ...DARK_VARS };
+    // Exclude by what a value IS, not by what it looks like: --text-xs..3xl are
+    // font sizes sharing the prefix. Anything that is not a length is treated
+    // as a color and must be classified, so a token declared as rgb()/hsl()/
+    // an 8-digit hex cannot slip past this the way a hex-only filter allowed.
+    const isLength = (value) => /^[\d.]+(rem|em|px|%)$/.test(value.trim());
     const tokens = Object.keys(merged).filter(
       (name) =>
         /^--(text|on)-/.test(name) &&
-        // --text-xs .. --text-3xl are font sizes sharing the prefix.
-        /^#[0-9a-f]{6}$/i.test(merged[name]) &&
+        !isLength(merged[name]) &&
         name !== '--text-decorative',
     );
     const missing = tokens.filter((name) => !covered.has(`var(${name})`));

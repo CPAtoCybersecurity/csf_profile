@@ -181,7 +181,7 @@ const KeyboardShortcutsOverlay = () => {
               {group.shortcuts.map((shortcut) => (
                 <div key={shortcut.desc} className="kbd-overlay-row">
                   <span className="kbd-overlay-row-desc">{shortcut.desc}</span>
-                  <span className="kbd-overlay-row-keys" role="group" aria-label={shortcut.desc}>
+                  <span className="kbd-overlay-row-keys">
                     {shortcut.keys.map((token, i) => (
                       // eslint-disable-next-line react/no-array-index-key
                       <KeyToken key={i} token={token} platform={platform} />
