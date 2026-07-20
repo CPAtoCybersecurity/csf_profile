@@ -1,0 +1,5529 @@
+{
+  "queueFormat": "mapping-review-queue-v1",
+  "queueVersion": "59188b896eca6f08",
+  "generatorVersion": 1,
+  "justification": "Mappings decide only which optional addendum is offered — never scope, never score. Precision beats recall.",
+  "role": "Ratification workpaper, not a shipping gate: a signature with no override ships its derived pairs as-is (unranked; the fan-out cap is retired). The override file (data/mapping-overrides.json) is the ratification instrument. Nothing under src/ imports this file. Member assertion texts are excerpts from the platform bank (src/data/platformProcedures.json), whose per-record license metadata and THIRD-PARTY-NOTICES.md govern them.",
+  "derivedFromBankVersion": "9f530721501fd1f0",
+  "olir": {
+    "release": "The NIST Cybersecurity Framework (CSF) 2.0 — Final (CPRT bulk download, generated 2026-07-20)",
+    "retrievedAt": "2026-07-20",
+    "sourceUrl": "https://csrc.nist.gov/extensions/nudp/services/json/csf/download?olirids=all",
+    "lane": "SP 800-53 Rev 5.2.0"
+  },
+  "signatureCount": 85,
+  "stats": {
+    "policyCount": 265,
+    "signatureCount": 85,
+    "pairCount": 945,
+    "derivedPairCount": 855,
+    "grainPairs": {
+      "exact": 369,
+      "subpart-truncated": 84,
+      "enh-fallback": 402
+    },
+    "authoredPairs": 90,
+    "overriddenPolicies": 0,
+    "emptyPolicies": [],
+    "fanout": {
+      "median": 3,
+      "mean": 3.57,
+      "p90": 7,
+      "max": 13
+    },
+    "fanoutBeforeGapTable": {
+      "median": 3,
+      "mean": 3.23,
+      "p90": 6,
+      "max": 13
+    },
+    "zeroBeforeGapTable": [
+      "GWS.GMAIL.18.1v1",
+      "GWS.GMAIL.18.2v1",
+      "GWS.GMAIL.18.3v1",
+      "GWS.GMAIL.4.1v1",
+      "GWS.GMAIL.4.2v1",
+      "GWS.GMAIL.7.1v1",
+      "GWS.GMAIL.7.2v1",
+      "GWS.GMAIL.7.3v1",
+      "GWS.GMAIL.7.4v1",
+      "GWS.GMAIL.7.5v1",
+      "GWS.GMAIL.7.6v1",
+      "GWS.GMAIL.7.7v1",
+      "GWS.MEET.4.1v1",
+      "MS.AAD.4.1v1",
+      "MS.DEFENDER.2.1v1",
+      "MS.DEFENDER.2.2v1",
+      "MS.DEFENDER.2.3v1",
+      "MS.EXO.4.1v1",
+      "MS.EXO.4.2v1",
+      "MS.EXO.7.1v1",
+      "MS.SECURITYSUITE.2.1v1",
+      "MS.SECURITYSUITE.2.2v1",
+      "MS.SECURITYSUITE.2.3v1",
+      "MS.SECURITYSUITE.6.1v1",
+      "MS.SECURITYSUITE.6.2v1",
+      "MS.TEAMS.1.2v2",
+      "MS.TEAMS.1.3v1",
+      "MS.TEAMS.1.5v1",
+      "MS.TEAMS.1.7v2"
+    ],
+    "zeroBeforeGapTableCount": 29,
+    "recoveredByGapTable": 29,
+    "emptyAfterGapTable": 0
+  },
+  "signatures": {
+    "AC-17a": {
+      "controls": [
+        "AC-17a"
+      ],
+      "members": [
+        {
+          "policyId": "MS.TEAMS.1.1v1",
+          "assertion": "External meeting participants SHOULD NOT be enabled to request control of shared desktops or windows."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-17a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-19a": {
+      "controls": [
+        "AC-19a"
+      ],
+      "members": [
+        {
+          "policyId": "MS.DEFENDER.4.6v1",
+          "assertion": "The custom policy SHOULD include an action to block access to sensitive information by restricted apps and unwanted Bluetooth applications."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.3.5v1",
+          "assertion": "The DLP policy SHOULD include an action to block access to sensitive information by restricted apps and unwanted Bluetooth applications."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-19a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-2": {
+      "controls": [
+        "AC-2"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.7.4v1",
+          "assertion": "Permanent active role assignments SHALL NOT be allowed for highly privileged roles."
+        },
+        {
+          "policyId": "MS.AAD.7.5v1",
+          "assertion": "Provisioning users to highly privileged roles SHALL NOT occur outside of a PAM system."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-2(1)": {
+      "controls": [
+        "AC-2(1)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.7.7v1",
+          "assertion": "Eligible and active highly privileged role assignments SHALL trigger an alert."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-2(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-2(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-2(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-2(12)": {
+      "controls": [
+        "AC-2(12)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.2.2v1",
+          "assertion": "A notification SHOULD be sent to the administrator when high-risk users are detected."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-2(12)|AC-2(13)": {
+      "controls": [
+        "AC-2(12)",
+        "AC-2(13)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.2.1v1",
+          "assertion": "Users detected as high risk SHALL be blocked."
+        },
+        {
+          "policyId": "MS.AAD.2.3v1",
+          "assertion": "Sign-ins detected as high risk SHALL be blocked."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)",
+            "AC-2(13)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)",
+            "AC-2(13)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)",
+            "AC-2(13)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)",
+            "AC-2(13)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-2(12)",
+            "AC-2(13)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-20b|IA-3": {
+      "controls": [
+        "AC-20b",
+        "IA-3"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.3.7v1",
+          "assertion": "Managed devices SHOULD be required for authentication."
+        },
+        {
+          "policyId": "MS.AAD.3.8v1",
+          "assertion": "Managed Devices SHOULD be required to register MFA."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "ID.AM-02",
+          "provenance": "derived",
+          "via": [
+            "AC-20b"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.AM-04",
+          "provenance": "derived",
+          "via": [
+            "AC-20b"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-21a": {
+      "controls": [
+        "AC-21a"
+      ],
+      "members": [
+        {
+          "policyId": "MS.TEAMS.1.7v2",
+          "assertion": "Record an event SHOULD NOT be set to Always record."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "authored",
+          "via": [
+            "AC-21a"
+          ]
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-21b|AC-3": {
+      "controls": [
+        "AC-21b",
+        "AC-3"
+      ],
+      "members": [
+        {
+          "policyId": "MS.SHAREPOINT.3.1v1",
+          "assertion": "Expiration days for Anyone links SHALL be set to 30 days or less."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "authored",
+          "via": [
+            "AC-21b"
+          ]
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-21b|SC-7(10)(a)": {
+      "controls": [
+        "AC-21b",
+        "SC-7(10)(a)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERBI.7.1v1",
+          "assertion": "Sensitivity labels SHOULD be enabled for Power BI and employed for sensitive data per enterprise data protection policies."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "AC-21b",
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-2d": {
+      "controls": [
+        "AC-2d"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.3.1v1",
+          "assertion": "An SPF policy SHALL be published for each domain that fails all non-approved senders."
+        },
+        {
+          "policyId": "MS.EXO.2.2v3",
+          "assertion": "An SPF policy SHALL be published for each domain that fails all non-approved senders."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2d"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-2d"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2d"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-2d"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-2d"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-2|AC-3|IA-8": {
+      "controls": [
+        "AC-2",
+        "AC-3",
+        "IA-8"
+      ],
+      "members": [
+        {
+          "policyId": "MS.SHAREPOINT.1.1v1",
+          "assertion": "External sharing for SharePoint SHALL be limited to \"Existing guests\" or \"Only people in your organization\"."
+        },
+        {
+          "policyId": "MS.SHAREPOINT.1.2v1",
+          "assertion": "External sharing for OneDrive SHALL be limited to \"Existing guests\" or \"Only people in your organization\"."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "AC-2",
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-2",
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-2",
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3": {
+      "controls": [
+        "AC-3"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CHAT.4.1v1",
+          "assertion": "External chat messaging SHALL be restricted to allowlisted domains only."
+        },
+        {
+          "policyId": "GWS.CLASSROOM.1.1v1",
+          "assertion": "\"Who can join classes in your domain\" SHOULD be set to \"Users in your domain only.\""
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.2.2v1",
+          "assertion": "Agencies SHALL allow users who are not members of a shared Google Drive to be added to files."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.3.1v1",
+          "assertion": "Agencies SHALL enable the security update for Google Drive files."
+        },
+        {
+          "policyId": "GWS.GROUPS.1.1v1",
+          "assertion": "Group access from outside the organization SHALL be disabled unless explicitly granted by the group owner."
+        },
+        {
+          "policyId": "MS.AAD.8.3v1",
+          "assertion": "Guest invites SHOULD only be allowed to specific external domains that have been authorized by the agency for legitimate business purposes."
+        },
+        {
+          "policyId": "MS.TEAMS.1.4v1",
+          "assertion": "Internal users SHOULD be admitted automatically."
+        },
+        {
+          "policyId": "MS.TEAMS.2.1v2",
+          "assertion": "External access for users SHALL only be enabled on a per-domain basis."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3|AC-6(10)": {
+      "controls": [
+        "AC-3",
+        "AC-6(10)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.SHAREPOINT.1.3v1",
+          "assertion": "External sharing SHALL be restricted to approved external domains and/or users in approved security groups per interagency collaboration needs."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "AC-6(10)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3|AC-6|CM-7(4)": {
+      "controls": [
+        "AC-3",
+        "AC-6",
+        "CM-7(4)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.9.1v1",
+          "assertion": "Risky AI agents SHALL be blocked."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "AC-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-05",
+          "provenance": "derived",
+          "via": [
+            "CM-7(4)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3|IA-8|SC-7(10)": {
+      "controls": [
+        "AC-3",
+        "IA-8",
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.DRIVEDOCS.1.6v1",
+          "assertion": "Agencies SHALL set access checking to \"recipients only.\""
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(10)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(10)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3|SC-7(10)": {
+      "controls": [
+        "AC-3",
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CHAT.2.1v1",
+          "assertion": "External file sharing SHALL be disabled to protect sensitive information from unauthorized or accidental sharing."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.16.3v1",
+          "assertion": "Looker Studio Sharing outside org SHOULD be set to OFF."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.18.2v1",
+          "assertion": "The action for DLP policies SHOULD be set to block."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.1v1",
+          "assertion": "External sharing SHALL be restricted to allowlisted domains."
+        },
+        {
+          "policyId": "GWS.MEET.6.1v1",
+          "assertion": "Administrators SHOULD NOT be allowed to override the default sharing level for meeting notes set by the organization."
+        },
+        {
+          "policyId": "MS.DEFENDER.4.3v1",
+          "assertion": "The action for the custom policy SHOULD be set to block sharing sensitive information with everyone."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.3.3v1",
+          "assertion": "The action for the DLP policy SHOULD be set to block sharing sensitive information with everyone."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(10)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(10)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3|SC-7(10)(a)": {
+      "controls": [
+        "AC-3",
+        "SC-7(10)(a)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CALENDAR.1.1v1",
+          "assertion": "External sharing options for primary calendars SHALL be configured to \"Only free/busy information (hide event details).\""
+        },
+        {
+          "policyId": "GWS.CALENDAR.1.2v1",
+          "assertion": "External sharing options for secondary calendars SHALL be configured to \"Only free/busy information (hide event details).\""
+        },
+        {
+          "policyId": "MS.EXO.6.1v1",
+          "assertion": "Contact folders SHALL NOT be shared with all domains."
+        },
+        {
+          "policyId": "MS.EXO.6.2v1",
+          "assertion": "Calendar details SHALL NOT be shared with all domains."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(10)(a)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(10)(a)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-3|SC-7(5)": {
+      "controls": [
+        "AC-3",
+        "SC-7(5)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERPLATFORM.3.1v1",
+          "assertion": "Power Platform tenant isolation SHALL be enabled."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.3.2v1",
+          "assertion": "An inbound/outbound connection allowlist SHOULD be configured."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(5)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-3",
+            "SC-7(5)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-4": {
+      "controls": [
+        "AC-4"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.11.1v1",
+          "assertion": "Automatic forwarding SHOULD be disabled, especially to external domains."
+        },
+        {
+          "policyId": "GWS.GMAIL.12.1v1",
+          "assertion": "The option to use a per-user outbound gateway that is a mail server other than the Google Workspace (GWS) mail servers SHALL be disabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.14.1v1",
+          "assertion": "An email allowlist SHOULD NOT be implemented."
+        },
+        {
+          "policyId": "MS.EXO.1.1v2",
+          "assertion": "Automatic forwarding to external domains SHALL be disabled."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.8.1v1",
+          "assertion": "IP allow lists SHOULD NOT be created."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.8.2v1",
+          "assertion": "Safe lists SHOULD NOT be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.AM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-4|AC-6(5)": {
+      "controls": [
+        "AC-4",
+        "AC-6(5)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERBI.4.1v1",
+          "assertion": "Service principals with access to APIs SHOULD be restricted to specific security groups."
+        },
+        {
+          "policyId": "MS.POWERBI.4.2v1",
+          "assertion": "Service principals creating and using profiles SHOULD be restricted to specific security groups."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.AM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-4|SC-7(10)(a)|SI-8": {
+      "controls": [
+        "AC-4",
+        "SC-7(10)(a)",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "MS.TEAMS.4.1v1",
+          "assertion": "Teams email integration SHALL be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)",
+            "SI-8"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "AC-4",
+            "SI-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.AM-03",
+          "provenance": "derived",
+          "via": [
+            "AC-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AC-4",
+            "SC-7(10)(a)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "AC-4",
+            "SC-7(10)(a)"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "enh-fallback": 1,
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-5": {
+      "controls": [
+        "AC-5"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.17.1v1",
+          "assertion": "Require multi-party approval for sensitive admin actions SHOULD be enabled."
+        },
+        {
+          "policyId": "MS.AAD.7.2v1",
+          "assertion": "Privileged users SHALL be provisioned with finer-grained roles instead of Global Administrator."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-5"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6": {
+      "controls": [
+        "AC-6"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.10.2v1",
+          "assertion": "Agencies SHALL NOT allow users to grant consent for access to low-risk scopes."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.8v1",
+          "assertion": "\"Private to owner\" SHALL be the default access level for newly created items."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.2.1v1",
+          "assertion": "Agencies SHOULD NOT allow members with manager access to override shared Google Drive creation settings."
+        },
+        {
+          "policyId": "GWS.GROUPS.3.1v1",
+          "assertion": "The default permission to view conversations SHOULD be set to \"All group members.\""
+        },
+        {
+          "policyId": "MS.AAD.8.1v1",
+          "assertion": "Guest users SHOULD have limited or restricted access to Microsoft Entra ID directory objects."
+        },
+        {
+          "policyId": "MS.SHAREPOINT.2.1v1",
+          "assertion": "File and folder default sharing scope SHALL be set to \"Specific people (only the people the user specifies)\"."
+        },
+        {
+          "policyId": "MS.SHAREPOINT.2.2v1",
+          "assertion": "File and folder default sharing permissions SHALL be set to view only."
+        },
+        {
+          "policyId": "MS.SHAREPOINT.3.2v1",
+          "assertion": "The allowable file and folder permissions for links SHALL be set to view only."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(1)": {
+      "controls": [
+        "AC-6(1)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.7.6v1",
+          "assertion": "Activation of the Global Administrator role SHALL require approval."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(10)": {
+      "controls": [
+        "AC-6(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CLASSROOM.2.1v1",
+          "assertion": "Users SHOULD NOT be able to authorize apps to access their Google Classroom data."
+        },
+        {
+          "policyId": "GWS.CLASSROOM.4.1v1",
+          "assertion": "Only teachers SHOULD be allowed to unenroll students from classes."
+        },
+        {
+          "policyId": "GWS.GROUPS.2.1v1",
+          "assertion": "Group creation SHOULD be restricted to administrators within the organization unless alternative creators are necessary for agency mission fulfillment."
+        },
+        {
+          "policyId": "MS.AAD.8.2v1",
+          "assertion": "Only users with the Guest Inviter role SHOULD be able to invite guest users."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.1.1v1",
+          "assertion": "The ability to create production and sandbox environments SHALL be restricted to admins."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.1.2v1",
+          "assertion": "The ability to create trial environments SHALL be restricted to admins."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.5.1v1",
+          "assertion": "The ability to create Power Pages sites SHOULD be restricted to admins."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(10)|AC-6(5)": {
+      "controls": [
+        "AC-6(10)",
+        "AC-6(5)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CLASSROOM.5.1v1",
+          "assertion": "Class creation SHOULD be restricted to verified teachers only."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.6.1v1",
+          "assertion": "The Share with Everyone feature SHOULD be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(10)",
+            "AC-6(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(10)|CM-5": {
+      "controls": [
+        "AC-6(10)",
+        "CM-5"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.5.1v1",
+          "assertion": "Only administrators SHALL be allowed to register applications."
+        },
+        {
+          "policyId": "MS.AAD.5.2v1",
+          "assertion": "User consent to applications SHALL be restricted."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-5"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(10)|CM-7": {
+      "controls": [
+        "AC-6(10)",
+        "CM-7"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GROUPS.1.2v1",
+          "assertion": "Group owners' ability to add external members to groups SHOULD be disabled unless necessary for agency mission fulfillment."
+        },
+        {
+          "policyId": "GWS.GROUPS.1.3v1",
+          "assertion": "Group owners' ability to allow external, non-group members to post in the group SHOULD be disabled unless necessary for agency mission fulfillment."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(5)": {
+      "controls": [
+        "AC-6(5)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.6.1v1",
+          "assertion": "All administrative accounts SHALL be provisioned as cloud-only accounts separate from an agency's authoritative on-premises or other federated identity providers."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.6.2v1",
+          "assertion": "A minimum of **two** and a maximum of **eight** separate and distinct super admin users SHALL be configured."
+        },
+        {
+          "policyId": "MS.AAD.7.1v1",
+          "assertion": "A minimum of two users and a maximum of eight users SHALL be provisioned with the Global Administrator role."
+        },
+        {
+          "policyId": "MS.AAD.7.3v1",
+          "assertion": "Privileged users SHALL be provisioned cloud-only accounts separate from an on-premises directory or other federated identity providers."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6(9)": {
+      "controls": [
+        "AC-6(9)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.7.8v1",
+          "assertion": "User activation of the Global Administrator role SHALL trigger an alert."
+        },
+        {
+          "policyId": "MS.AAD.7.9v1",
+          "assertion": "User activation of other highly privileged roles SHOULD trigger an alert."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6(9)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AC-6|CM-7": {
+      "controls": [
+        "AC-6",
+        "CM-7"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERBI.2.1v1",
+          "assertion": "Guest user access to the Power BI tenant SHOULD be disabled unless the agency mission requires the capability."
+        },
+        {
+          "policyId": "MS.POWERBI.3.1v1",
+          "assertion": "The Invite external users to your organization feature SHOULD be disabled unless agency mission requires the capability."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-05",
+          "provenance": "derived",
+          "via": [
+            "AC-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AT-2b": {
+      "controls": [
+        "AT-2b"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CALENDAR.2.1v1",
+          "assertion": "External invitations warnings SHALL be enabled to prompt users before sending invitations."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.3v1",
+          "assertion": "Warnings SHALL be enabled when a user is attempting to share with someone in a non-allowlisted domain."
+        },
+        {
+          "policyId": "GWS.GMAIL.13.1v1",
+          "assertion": "Unintended external reply warnings SHALL be enabled."
+        },
+        {
+          "policyId": "MS.DEFENDER.4.4v1",
+          "assertion": "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the custom policy."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.3.4v1",
+          "assertion": "Notifications to inform users and help educate them on the proper use of sensitive information SHOULD be enabled in the DLP policy."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AT-01",
+          "provenance": "derived",
+          "via": [
+            "AT-2b"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AT-2b|SI-4|SI-8": {
+      "controls": [
+        "AT-2b",
+        "SI-4",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.6.3v1",
+          "assertion": "\"Show warning prompt for any click on links to untrusted domains\" SHALL be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.AE-02",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.AE-03",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4",
+            "SI-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-06",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "SI-4",
+            "SI-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.IM-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.IM-02",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.IM-03",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.RA-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AT-01",
+          "provenance": "derived",
+          "via": [
+            "AT-2b"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AT-2b|SI-8": {
+      "controls": [
+        "AT-2b",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "MS.SECURITYSUITE.2.4v1",
+          "assertion": "User warnings, comparable to the user safety tips included with EOP, SHOULD be displayed."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "PR.AT-01",
+          "provenance": "derived",
+          "via": [
+            "AT-2b"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-11": {
+      "controls": [
+        "AU-11"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.14.2v1",
+          "assertion": "Audit logs SHALL be retained and searchable for a minimum of 3 months and retrievable for a minimum of 12 months."
+        },
+        {
+          "policyId": "MS.DEFENDER.6.3v1",
+          "assertion": "Audit logs SHALL be maintained for at least the minimum duration dictated by OMB M-21-31."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.5.2v1",
+          "assertion": "Audit logs SHALL be retained and searchable for a minimum of 3 months and retrievable for a minimum of 12 months."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "derived",
+          "via": [
+            "AU-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-11|AU-2": {
+      "controls": [
+        "AU-11",
+        "AU-2"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GEMINI.3.1v1",
+          "assertion": "Gemini conversation history SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GEMINI.3.2v1",
+          "assertion": "Gemini conversation retention SHALL be set to minimum of 18 months."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "derived",
+          "via": [
+            "AU-11",
+            "AU-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-12": {
+      "controls": [
+        "AU-12"
+      ],
+      "members": [
+        {
+          "policyId": "MS.DEFENDER.6.1v1",
+          "assertion": "Unified Audit logging SHALL be enabled."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.5.1v1",
+          "assertion": "Unified Audit logging SHALL be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AU-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AU-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "AU-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "derived",
+          "via": [
+            "AU-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-12c": {
+      "controls": [
+        "AU-12c"
+      ],
+      "members": [
+        {
+          "policyId": "MS.EXO.13.1v1",
+          "assertion": "Mailbox auditing SHALL be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-12c|SI-3": {
+      "controls": [
+        "AU-12c",
+        "SI-3"
+      ],
+      "members": [
+        {
+          "policyId": "MS.SECURITYSUITE.7.3v1",
+          "assertion": "User click tracking SHOULD be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "derived",
+          "via": [
+            "AU-12c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-2|SC-7(10)": {
+      "controls": [
+        "AU-2",
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CHAT.1.1v1",
+          "assertion": "Chat history SHALL be enabled for information traceability."
+        },
+        {
+          "policyId": "GWS.CHAT.3.1v1",
+          "assertion": "Space history SHOULD be enabled for information traceability."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "derived",
+          "via": [
+            "AU-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-4": {
+      "controls": [
+        "AU-4"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.4.1v1",
+          "assertion": "Security logs SHALL be sent to the agency's security operations center for monitoring."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.PS-04",
+          "provenance": "authored",
+          "via": [
+            "AU-4"
+          ]
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "AU-9": {
+      "controls": [
+        "AU-9"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CHAT.1.2v1",
+          "assertion": "Users SHALL NOT be allowed to change their history setting."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "AU-9"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-11": {
+      "controls": [
+        "CM-11"
+      ],
+      "members": [
+        {
+          "policyId": "MS.TEAMS.5.1v2",
+          "assertion": "Agencies SHOULD only allow installation of Microsoft apps approved by the agency."
+        },
+        {
+          "policyId": "MS.TEAMS.5.2v2",
+          "assertion": "Agencies SHOULD only allow installation of third-party apps approved by the agency."
+        },
+        {
+          "policyId": "MS.TEAMS.5.3v2",
+          "assertion": "Agencies SHOULD only allow installation of custom apps approved by the agency."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-03",
+          "provenance": "derived",
+          "via": [
+            "CM-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "CM-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-02",
+          "provenance": "derived",
+          "via": [
+            "CM-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-4": {
+      "controls": [
+        "CM-4"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.5.3v1",
+          "assertion": "An admin consent workflow SHALL be configured for applications."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "ID.RA-07",
+          "provenance": "derived",
+          "via": [
+            "CM-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-4"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-6a|SI-3a|SI-8": {
+      "controls": [
+        "CM-6a",
+        "SI-3a",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "MS.DEFENDER.1.1v1",
+          "assertion": "The standard and strict preset security policies SHALL be enabled."
+        },
+        {
+          "policyId": "MS.DEFENDER.1.2v1",
+          "assertion": "All users SHALL be added to Exchange Online Protection (EOP) in either the standard or strict preset security policy."
+        },
+        {
+          "policyId": "MS.DEFENDER.1.3v1",
+          "assertion": "All users SHALL be added to Defender for Office 365 protection in either the standard or strict preset security policy."
+        },
+        {
+          "policyId": "MS.DEFENDER.1.4v1",
+          "assertion": "Sensitive accounts SHALL be added to Exchange Online Protection in the strict preset security policy."
+        },
+        {
+          "policyId": "MS.DEFENDER.1.5v1",
+          "assertion": "Sensitive accounts SHALL be added to Defender for Office 365 protection in the strict preset security policy."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "CM-6a",
+            "SI-8"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-6a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7": {
+      "controls": [
+        "CM-7"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CALENDAR.3.1v1",
+          "assertion": "Calendar Interop SHOULD be disabled."
+        },
+        {
+          "policyId": "GWS.CALENDAR.4.1v1",
+          "assertion": "\"Appointment Schedule with Payments\" SHOULD be disabled."
+        },
+        {
+          "policyId": "GWS.CLASSROOM.3.1v1",
+          "assertion": "\"Roster Import\" with Clever SHOULD be turned off."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.11.1v1",
+          "assertion": "Only approved Google Workspace (GWS) Marketplace applications SHALL be allowed for installation."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.16.1v1",
+          "assertion": "Service status for Google services that do not have an individual control SHOULD be set to OFF for everyone."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.16.2v1",
+          "assertion": "User access to Early Access applications SHOULD be disabled."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.16.4v1",
+          "assertion": "Pinpoint access to drive SHOULD be set to OFF."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.4.1v1",
+          "assertion": "Agencies SHOULD disable Google Drive SDK access."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.5.1v1",
+          "assertion": "Google Drive for Desktop SHALL be enabled for authorized devices only."
+        },
+        {
+          "policyId": "GWS.GMAIL.10.1v1",
+          "assertion": "Google Workspace Sync SHOULD be disabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.9.1v1",
+          "assertion": "POP and IMAP access SHALL be disabled to protect sensitive agency or organization emails from being accessed through legacy applications or other third-party mail clients."
+        },
+        {
+          "policyId": "GWS.GROUPS.4.1v1",
+          "assertion": "The ability for groups to be hidden from the directory SHALL be disabled."
+        },
+        {
+          "policyId": "GWS.MEET.3.1v1",
+          "assertion": "Host management meeting features SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.MEET.5.1v1",
+          "assertion": "Automatic recordings for Google Meet SHALL be disabled."
+        },
+        {
+          "policyId": "GWS.MEET.5.2v1",
+          "assertion": "Automatic transcripts for Google Meet SHALL be disabled."
+        },
+        {
+          "policyId": "GWS.SITES.1.1v1",
+          "assertion": "Sites Service SHOULD be disabled for all users."
+        },
+        {
+          "policyId": "MS.AAD.1.1v1",
+          "assertion": "Legacy authentication SHALL be blocked."
+        },
+        {
+          "policyId": "MS.AAD.3.4v1",
+          "assertion": "The Authentication Methods Manage Migration feature SHALL be set to Migration Complete."
+        },
+        {
+          "policyId": "MS.AAD.3.9v1",
+          "assertion": "Device code authentication SHOULD be blocked."
+        },
+        {
+          "policyId": "MS.EXO.5.1v1",
+          "assertion": "SMTP AUTH SHALL be disabled."
+        },
+        {
+          "policyId": "MS.TEAMS.1.6v1",
+          "assertion": "Meeting recording SHOULD be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7b|IA-5c": {
+      "controls": [
+        "CM-7b",
+        "IA-5c"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.1.3v1",
+          "assertion": "SMS or Voice SHALL NOT be used as the MFA method."
+        },
+        {
+          "policyId": "MS.AAD.3.5v2",
+          "assertion": "The authentication methods SMS, Voice Call, and Email One-Time Passcode (OTP) SHALL be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-5c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-5c"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7b"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7|IA-5g": {
+      "controls": [
+        "CM-7",
+        "IA-5g"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERBI.5.1v1",
+          "assertion": "ResourceKey-based authentication SHOULD be blocked unless a specific use case (e.g., streaming and/or PUSH datasets) merits its use."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7|SC-7(10)": {
+      "controls": [
+        "CM-7",
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.12.1v1",
+          "assertion": "Google Takeout services SHALL be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7|SC-7(10)(a)": {
+      "controls": [
+        "CM-7",
+        "SC-7(10)(a)"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERBI.1.1v1",
+          "assertion": "The Publish to Web feature SHOULD be disabled unless the agency mission requires the capability."
+        },
+        {
+          "policyId": "MS.TEAMS.2.3v2",
+          "assertion": "Internal users SHOULD NOT be enabled to initiate contact with unmanaged users."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7|SI-3": {
+      "controls": [
+        "CM-7",
+        "SI-3"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERBI.6.1v1",
+          "assertion": "Python and R interactions SHOULD be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7|SI-3|SI-8": {
+      "controls": [
+        "CM-7",
+        "SI-3",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.8.1v1",
+          "assertion": "User email uploads SHALL be disabled to protect against unauthorized files being introduced into the secured environment."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CM-7|SI-8": {
+      "controls": [
+        "CM-7",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "MS.TEAMS.2.2v2",
+          "assertion": "Unmanaged users SHALL NOT be enabled to initiate contact with internal users."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "PR.PS-01",
+          "provenance": "derived",
+          "via": [
+            "CM-7"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "CP-10|CP-9": {
+      "controls": [
+        "CP-10",
+        "CP-9"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.DRIVEDOCS.5.2v1",
+          "assertion": "Monitoring for potential ransomware corruption SHALL be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "CP-9"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "CP-9"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-11",
+          "provenance": "derived",
+          "via": [
+            "CP-9"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RC.RP-01",
+          "provenance": "derived",
+          "via": [
+            "CP-10"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RC.RP-02",
+          "provenance": "derived",
+          "via": [
+            "CP-10"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RC.RP-03",
+          "provenance": "derived",
+          "via": [
+            "CP-9"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RC.RP-05",
+          "provenance": "derived",
+          "via": [
+            "CP-10"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-11": {
+      "controls": [
+        "IA-11"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.4.1v1",
+          "assertion": "Users SHALL be forced to re-authenticate after an established 12-hour GWS login session has expired."
+        },
+        {
+          "policyId": "MS.SHAREPOINT.3.3v2",
+          "assertion": "Reauthentication days for people who use a verification code SHALL be set to 30 days or less."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-11"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2": {
+      "controls": [
+        "IA-2"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.7.1v1",
+          "assertion": "Account conflict management SHOULD be configured to replace conflicting unmanaged accounts with managed accounts."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2(1)|IA-2(13)|IA-2(2)|IA-2(8)|IA-5c|IA-5g": {
+      "controls": [
+        "IA-2(1)",
+        "IA-2(13)",
+        "IA-2(2)",
+        "IA-2(8)",
+        "IA-5c",
+        "IA-5g"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.3.3v2",
+          "assertion": "If Microsoft Authenticator is enabled, it SHALL be configured to show login context information."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(13)",
+            "IA-2(2)",
+            "IA-2(8)",
+            "IA-5c",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 4,
+            "subpart-truncated": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(13)",
+            "IA-2(2)",
+            "IA-2(8)",
+            "IA-5c",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 4,
+            "subpart-truncated": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2(1)|IA-2(2)": {
+      "controls": [
+        "IA-2(1)",
+        "IA-2(2)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CALENDAR.3.2v1",
+          "assertion": "Microsoft 365 (Graph API) SHALL be used instead of basic authentication to establish connectivity between tenants or organizations in cases where Calendar Interop is deemed necessary for agency mission fulfillment."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.1.2v1",
+          "assertion": "If phishing-resistant MFA has not been enforced, an alternative MFA method SHALL be enforced for all users."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.1.4v1",
+          "assertion": "The Google 2-Step Verification (2SV) new user enrollment period SHALL be set to at least one day and at most one week."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.1.5v1",
+          "assertion": "Allow users to trust the device SHALL be disabled."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.10.5v1",
+          "assertion": "Access to GWS applications by less secure applications that do not meet security authentication standards SHALL be prevented."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.3.1v1",
+          "assertion": "Post-single sign-on (SSO) verification SHOULD be enabled for users signing in using the organization's SSO profile."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.3.2v1",
+          "assertion": "Post-SSO verification SHOULD be enabled for users signing in using other SSO profiles."
+        },
+        {
+          "policyId": "MS.AAD.3.2v2",
+          "assertion": "MFA SHALL be enforced for all users."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(2)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(2)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2(1)|IA-2(2)|IA-2(8)|IA-5c|IA-5g": {
+      "controls": [
+        "IA-2(1)",
+        "IA-2(2)",
+        "IA-2(8)",
+        "IA-5c",
+        "IA-5g"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.1.1v1",
+          "assertion": "Phishing-Resistant MFA SHALL be required for all users."
+        },
+        {
+          "policyId": "MS.AAD.3.1v1",
+          "assertion": "Phishing-resistant MFA SHALL be enforced for all users."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(2)",
+            "IA-2(8)",
+            "IA-5c",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 3,
+            "subpart-truncated": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(2)",
+            "IA-2(8)",
+            "IA-5c",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 3,
+            "subpart-truncated": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2(1)|IA-2(2)|IA-5c|IA-5d|IA-5g|SI-3|SI-8": {
+      "controls": [
+        "IA-2(1)",
+        "IA-2(2)",
+        "IA-5c",
+        "IA-5d",
+        "IA-5g",
+        "SI-3",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.9.1v1",
+          "assertion": "Highly privileged accounts SHALL be enrolled in the Google Workspace (GWS) Advanced Protection Program."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.9.2v1",
+          "assertion": "All sensitive user accounts SHOULD be enrolled into the GWS Advanced Protection Program."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(2)",
+            "IA-5c",
+            "IA-5d",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 2,
+            "subpart-truncated": 3
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(2)",
+            "IA-5c",
+            "IA-5d",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 2,
+            "subpart-truncated": 3
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2(1)|IA-2(8)|IA-5c|IA-5g": {
+      "controls": [
+        "IA-2(1)",
+        "IA-2(8)",
+        "IA-5c",
+        "IA-5g"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.3.6v1",
+          "assertion": "Phishing-resistant MFA SHALL be required for highly privileged roles."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(8)",
+            "IA-5c",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 2,
+            "subpart-truncated": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2(1)",
+            "IA-2(8)",
+            "IA-5c",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "enh-fallback": 2,
+            "subpart-truncated": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2|IA-8": {
+      "controls": [
+        "IA-2",
+        "IA-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.MEET.1.1v1",
+          "assertion": "External users who were not explicitly invited to a Google Meet meeting SHALL be required to ask to join."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2",
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2",
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-2|SC-7(10)": {
+      "controls": [
+        "IA-2",
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.1.1v1",
+          "assertion": "Mail delegation SHOULD be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-2"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-3": {
+      "controls": [
+        "IA-3"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.2.1v1",
+          "assertion": "Policies restricting access to Google Workspace (GWS) based on enterprise device signals SHOULD be implemented."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-5": {
+      "controls": [
+        "IA-5"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.5.5v1",
+          "assertion": "Application Password Addition SHOULD be blocked."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-5"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-5"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-5(1)": {
+      "controls": [
+        "IA-5(1)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.5.1v1",
+          "assertion": "User password strength SHALL be enforced."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.5.2v1",
+          "assertion": "User password length SHALL be at least 12 characters."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.5.3v1",
+          "assertion": "User password length SHOULD be at least 16 characters."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.5.4v1",
+          "assertion": "Password policy SHALL be enforced at next sign-in."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.5.5v1",
+          "assertion": "User passwords SHALL NOT be reused."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.5.6v1",
+          "assertion": "User passwords SHALL NOT expire."
+        },
+        {
+          "policyId": "MS.AAD.6.1v1",
+          "assertion": "User passwords SHALL NOT expire."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-5(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-5(1)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-5d|IA-5g": {
+      "controls": [
+        "IA-5d",
+        "IA-5g"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.8.1v1",
+          "assertion": "Account self-recovery for super admins SHALL be disabled."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.8.2v1",
+          "assertion": "Account self-recovery for users and non-super admins SHALL be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-5d",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 2
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-5d",
+            "IA-5g"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 2
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-5|SC-12": {
+      "controls": [
+        "IA-5",
+        "SC-12"
+      ],
+      "members": [
+        {
+          "policyId": "MS.AAD.5.6v1",
+          "assertion": "Application password lifetime SHOULD be restricted to 180 days or less."
+        },
+        {
+          "policyId": "MS.AAD.5.7v1",
+          "assertion": "Application certificate lifetime SHOULD be restricted to 365 days or less."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-5"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-5"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-8": {
+      "controls": [
+        "IA-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.DRIVEDOCS.1.5v1",
+          "assertion": "Any Organizational Units that allow external sharing SHOULD disable content availability to \"anyone with the link.\""
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IA-8|SC-7(10)": {
+      "controls": [
+        "IA-8",
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.DRIVEDOCS.1.10v1",
+          "assertion": "If external sharing is not allowed, then forms owned by users within the organization SHOULD NOT be able to accept responses from anyone accessing the link from outside the organization."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.11v1",
+          "assertion": "If receiving external files is not allowed, then users in the organization SHOULD NOT be able to submit responses to forms from users or shared drives outside of the organization."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.4v1",
+          "assertion": "If sharing outside of the organization, agencies SHOULD disable sharing of files with individuals who are not using a Google account."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.9v1",
+          "assertion": "Out-of-Domain file-level warnings SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.MEET.2.1v1",
+          "assertion": "Meeting access SHALL be disabled for meetings created by users who are not members of any Google Workspace (GWS) tenant or organization."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-01",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.AA-03",
+          "provenance": "derived",
+          "via": [
+            "IA-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "IR-6": {
+      "controls": [
+        "IR-6"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CHAT.5.1v1",
+          "assertion": "Chat content reporting SHALL be enabled for all conversation types."
+        },
+        {
+          "policyId": "GWS.CHAT.5.2v1",
+          "assertion": "All reporting message categories SHOULD be selected."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "RC.CO-03",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.AN-06",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.AN-07",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.CO-02",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.CO-03",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.MA-01",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.MA-02",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.MA-03",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "RS.MA-04",
+          "provenance": "derived",
+          "via": [
+            "IR-6"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-15": {
+      "controls": [
+        "SC-15"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.MEET.4.1v1",
+          "assertion": "\"Warn for external participants\" SHALL be enabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "authored",
+          "via": [
+            "SC-15"
+          ]
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-15a": {
+      "controls": [
+        "SC-15a"
+      ],
+      "members": [
+        {
+          "policyId": "MS.TEAMS.1.2v2",
+          "assertion": "Anonymous users SHALL NOT be enabled to start meetings."
+        },
+        {
+          "policyId": "MS.TEAMS.1.3v1",
+          "assertion": "Anonymous users and dial-in callers SHOULD NOT be admitted automatically."
+        },
+        {
+          "policyId": "MS.TEAMS.1.5v1",
+          "assertion": "Dial-in users SHOULD NOT be enabled to bypass the lobby."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "authored",
+          "via": [
+            "SC-15a"
+          ]
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-7(10)": {
+      "controls": [
+        "SC-7(10)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.CLASSROOM.1.2v1",
+          "assertion": "\"Which classes users in your domain can join\" SHOULD be set to \"Classes in your domain only.\""
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.15.1v1",
+          "assertion": "The data storage region SHALL be set to be the United States for all users in the agency's GWS environment."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.15.2v1",
+          "assertion": "Data SHALL be processed in the region selected for data at rest."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.18.1v1",
+          "assertion": "A custom policy SHALL be configured for Google Drive, Google Calendar, Google Chat, and Gmail to protect PII and sensitive information as defined by the agency, covering at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN)."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.8.3v1",
+          "assertion": "Ability to add recovery information SHOULD be disabled."
+        },
+        {
+          "policyId": "GWS.DRIVEDOCS.1.7v1",
+          "assertion": "Users SHOULD NOT be allowed to upload or move content to shared drives owned by another organization."
+        },
+        {
+          "policyId": "GWS.MEET.6.2v1",
+          "assertion": "Default sharing setting for Google AI notes SHALL be restricted to \"Guests in your organization.\""
+        },
+        {
+          "policyId": "MS.DEFENDER.4.1v2",
+          "assertion": "A custom policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN)."
+        },
+        {
+          "policyId": "MS.DEFENDER.4.2v1",
+          "assertion": "The custom policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices."
+        },
+        {
+          "policyId": "MS.DEFENDER.4.5v1",
+          "assertion": "A list of apps that are restricted from accessing files protected by DLP policy SHOULD be defined."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.2.1v1",
+          "assertion": "A DLP policy SHALL be created to restrict connector access in the default Power Platform environment."
+        },
+        {
+          "policyId": "MS.POWERPLATFORM.2.2v1",
+          "assertion": "Non-default environments SHOULD have at least one DLP policy affecting them."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.3.1v1",
+          "assertion": "A DLP policy SHALL be configured to protect PII and sensitive information, as defined by the agency, blocking at a minimum: credit card numbers, U.S. Individual Taxpayer Identification Numbers (ITIN), and U.S. Social Security numbers (SSN)."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.3.2v1",
+          "assertion": "The DLP policy SHOULD be applied to Exchange, OneDrive, SharePoint, Teams chat, and Devices."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-7(10)(a)": {
+      "controls": [
+        "SC-7(10)(a)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.ASSUREDCONTROLS.1.1v1",
+          "assertion": "Access Approvals SHOULD be enabled."
+        },
+        {
+          "policyId": "GWS.ASSUREDCONTROLS.1.2v1",
+          "assertion": "Agencies SHOULD restrict support access to U.S.-based Google staff only."
+        },
+        {
+          "policyId": "GWS.ASSUREDCONTROLS.2.1v1",
+          "assertion": "Data processing across multiple regions SHOULD be disabled for all Google Workspace products."
+        },
+        {
+          "policyId": "GWS.GEMINI.1.1v1",
+          "assertion": "Gemini app user access SHALL be set to OFF for everyone without a license."
+        },
+        {
+          "policyId": "GWS.GEMINI.2.1v1",
+          "assertion": "Gemini Alpha features SHALL be disabled."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)(a)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-7(10)a": {
+      "controls": [
+        "SC-7(10)a"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GEMINI.4.1v1",
+          "assertion": "Conversation sharing SHALL be set to OFF."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)a"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)a"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)a"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)a"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)a"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-7(10)|SI-12": {
+      "controls": [
+        "SC-7(10)",
+        "SI-12"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.17.1v1",
+          "assertion": "Comprehensive mail storage SHOULD be enabled to allow information traceability across applications."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.AM-07",
+          "provenance": "derived",
+          "via": [
+            "SI-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.AM-08",
+          "provenance": "derived",
+          "via": [
+            "SI-12"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.IR-01",
+          "provenance": "derived",
+          "via": [
+            "SC-7(10)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SC-8": {
+      "controls": [
+        "SC-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.2.1v1",
+          "assertion": "DKIM SHOULD be enabled for all domains."
+        },
+        {
+          "policyId": "MS.EXO.3.1v1",
+          "assertion": "DKIM SHOULD be enabled for all domains."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SC-8"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SI-10": {
+      "controls": [
+        "SI-10"
+      ],
+      "members": [
+        {
+          "policyId": "MS.POWERPLATFORM.4.1v1",
+          "assertion": "Content Security Policy (CSP) SHALL be enforced for model-driven and canvas Power Apps."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-10"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SI-3": {
+      "controls": [
+        "SI-3"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.10.1v1",
+          "assertion": "Agencies SHALL use GWS application access control policies to restrict access to all GWS services by third-party applications."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.10.3v1",
+          "assertion": "Agencies SHALL NOT trust unconfigured internal applications."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.10.4v1",
+          "assertion": "Agencies SHALL NOT allow users to access unconfigured third-party applications."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.1.1v1",
+          "assertion": "Emails with click-to-run file attachments SHALL be blocked, including at a minimum .exe, .cmd, and .vbe files."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.1.2v1",
+          "assertion": "Email scanning SHALL be capable of reviewing emails after delivery."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.1.3v1",
+          "assertion": "Emails identified as containing malware SHALL be quarantined or dropped."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.1.4v1",
+          "assertion": "SharePoint, OneDrive, and Teams message attachments SHOULD be scanned for malware."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.7.1v1",
+          "assertion": "URL comparison with a block-list SHOULD be enabled for URLs in emails, Teams messages, and Office documents."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.7.2v1",
+          "assertion": "Direct download links SHOULD be scanned for malware."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SI-3a": {
+      "controls": [
+        "SI-3a"
+      ],
+      "members": [
+        {
+          "policyId": "MS.DEFENDER.3.1v1",
+          "assertion": "Safe attachments SHOULD be enabled for SharePoint, OneDrive, and Microsoft Teams."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3a"
+          ],
+          "grain": "subpart-truncated",
+          "grainVias": {
+            "subpart-truncated": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SI-3|SI-8": {
+      "controls": [
+        "SI-3",
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.DRIVEDOCS.1.2v1",
+          "assertion": "Receiving files from non-allowlisted domains SHOULD be disabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.15.1v1",
+          "assertion": "Enhanced pre-delivery message scanning SHALL be enabled to prevent phishing."
+        },
+        {
+          "policyId": "GWS.GMAIL.16.1v1",
+          "assertion": "Security sandbox SHOULD be enabled to provide additional email protections."
+        },
+        {
+          "policyId": "GWS.GMAIL.5.1v1",
+          "assertion": "\"Protect against encrypted attachments from untrusted senders\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.5.2v1",
+          "assertion": "\"Protect against attachments with scripts from untrusted senders\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.5.3v1",
+          "assertion": "\"Protect against anomalous attachment types in emails\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.5.4v1",
+          "assertion": "Google SHOULD be allowed to automatically apply future recommended settings for attachments."
+        },
+        {
+          "policyId": "GWS.GMAIL.5.5v1",
+          "assertion": "Emails flagged by SCuBA policies GWS.GMAIL.5.1 through GWS.GMAIL.5.3 SHALL NOT be kept in inbox."
+        },
+        {
+          "policyId": "GWS.GMAIL.6.1v1",
+          "assertion": "\"Identify links behind shortened URLs\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.6.2v1",
+          "assertion": "\"Scan linked images\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.6.4v1",
+          "assertion": "Google SHALL be allowed to automatically apply future recommended settings for links and external images."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-3"
+          ],
+          "grain": "exact",
+          "grainVias": {
+            "exact": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SI-4(5)": {
+      "controls": [
+        "SI-4(5)"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.COMMONCONTROLS.13.1v1",
+          "assertion": "Required system-defined alerting rules, as listed in the policy group description, SHALL be enabled with alerts."
+        },
+        {
+          "policyId": "GWS.COMMONCONTROLS.14.1v1",
+          "assertion": "The following critical logs SHALL be sent to the agency's centralized SIEM."
+        },
+        {
+          "policyId": "GWS.GMAIL.4.3v1",
+          "assertion": "The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`."
+        },
+        {
+          "policyId": "GWS.GMAIL.4.4v1",
+          "assertion": "An agency point of contact SHOULD be included for aggregate and failure reports."
+        },
+        {
+          "policyId": "MS.DEFENDER.5.1v1",
+          "assertion": "At a minimum, the alerts required by the CISA M365 Secure Configuration Baseline for Exchange Online SHALL be enabled."
+        },
+        {
+          "policyId": "MS.DEFENDER.5.2v1",
+          "assertion": "The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM)."
+        },
+        {
+          "policyId": "MS.EXO.4.3v1",
+          "assertion": "The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`."
+        },
+        {
+          "policyId": "MS.EXO.4.4v1",
+          "assertion": "An agency point of contact SHOULD be included for aggregate and failure reports."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.4.1v1",
+          "assertion": "At a minimum, the following alerts SHALL be enabled:"
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.4.2v1",
+          "assertion": "The alerts SHOULD be sent to a monitored address or incorporated into a Security Information and Event Management (SIEM)."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.AE-02",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.AE-03",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-06",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.IM-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.IM-02",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.IM-03",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "ID.RA-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-01",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-02",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        },
+        {
+          "subcategoryId": "PR.DS-10",
+          "provenance": "derived",
+          "via": [
+            "SI-4(5)"
+          ],
+          "grain": "enh-fallback",
+          "grainVias": {
+            "enh-fallback": 1
+          }
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    },
+    "SI-8": {
+      "controls": [
+        "SI-8"
+      ],
+      "members": [
+        {
+          "policyId": "GWS.GMAIL.18.1v1",
+          "assertion": "Domains SHALL NOT be added to lists that bypass spam filters."
+        },
+        {
+          "policyId": "GWS.GMAIL.18.2v1",
+          "assertion": "Domains SHALL NOT be added to lists that bypass spam filters and hide warnings."
+        },
+        {
+          "policyId": "GWS.GMAIL.18.3v1",
+          "assertion": "\"Bypass spam filters\" and \"hide warnings for all messages from internal and external senders\" SHALL NOT be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.4.1v1",
+          "assertion": "A DMARC policy SHALL be published at the full domain or the second-level domain for all Google Workspace domains, including user alias domains."
+        },
+        {
+          "policyId": "GWS.GMAIL.4.2v1",
+          "assertion": "The DMARC message rejection option SHALL be p=reject."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.1v1",
+          "assertion": "\"Protect against domain spoofing based on similar domain names\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.2v1",
+          "assertion": "\"Protect against spoofing of employee names\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.3v1",
+          "assertion": "\"Protect against inbound emails spoofing your domain\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.4v1",
+          "assertion": "\"Protect against any unauthenticated emails\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.5v1",
+          "assertion": "\"Protect your Groups from inbound emails spoofing your domain\" SHALL be enabled."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.6v1",
+          "assertion": "Emails flagged by SCuBA policies GWS.GMAIL.7.1 through GWS.GMAIL.7.5 SHALL NOT be kept in inbox."
+        },
+        {
+          "policyId": "GWS.GMAIL.7.7v1",
+          "assertion": "Google SHALL be allowed to automatically apply future recommended settings for spoofing and authentication."
+        },
+        {
+          "policyId": "MS.DEFENDER.2.1v1",
+          "assertion": "User impersonation protection SHOULD be enabled for sensitive accounts in both the standard and strict preset policies."
+        },
+        {
+          "policyId": "MS.DEFENDER.2.2v1",
+          "assertion": "Domain impersonation protection SHOULD be enabled for domains owned by the agency in both the standard and strict preset policies."
+        },
+        {
+          "policyId": "MS.DEFENDER.2.3v1",
+          "assertion": "Domain impersonation protection SHOULD be added for key suppliers and partners in both the standard and strict preset policies."
+        },
+        {
+          "policyId": "MS.EXO.4.1v1",
+          "assertion": "A DMARC policy SHALL be published for every second-level domain."
+        },
+        {
+          "policyId": "MS.EXO.4.2v1",
+          "assertion": "The DMARC message rejection option SHALL be p=reject."
+        },
+        {
+          "policyId": "MS.EXO.7.1v1",
+          "assertion": "External sender warnings SHALL be implemented."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.2.1v1",
+          "assertion": "User impersonation protection SHOULD be enabled for sensitive accounts."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.2.2v1",
+          "assertion": "Domain impersonation protection SHOULD be enabled for domains owned by the agency."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.2.3v1",
+          "assertion": "Domain impersonation protection SHOULD be added for key suppliers and partners."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.6.1v1",
+          "assertion": "Emails detected as spam and phishing SHALL NOT be delivered to the user's inbox."
+        },
+        {
+          "policyId": "MS.SECURITYSUITE.6.2v1",
+          "assertion": "Allowed domains SHALL NOT be added to inbound anti-spam protection policies."
+        }
+      ],
+      "pairs": [
+        {
+          "subcategoryId": "DE.CM-01",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        },
+        {
+          "subcategoryId": "DE.CM-09",
+          "provenance": "authored",
+          "via": [
+            "SI-8"
+          ]
+        }
+      ],
+      "overrideStatus": "ships-as-is"
+    }
+  }
+}

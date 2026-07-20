@@ -1,0 +1,24 @@
+{
+  "overridesFormat": "mapping-overrides-v1",
+  "role": "Hand-authored ratification instrument for the 800-53 -> CSF 2.0 subcategory mapping (plan §7 R-2). The gap table declares control->subcategory edges the OLIR crosswalk lacks; overrides replace a policy's or signature's derived pairs outright. A signature with no override ships its derived pairs as-is (unranked; the fan-out cap is retired). An entry referencing an unknown policy, signature, control, or subcategory is a GENERATOR ERROR, not a warning — overrides must rot loudly when upstream revs.",
+  "gapTable": {
+    "AC-21": {
+      "subcategories": ["PR.DS-01"],
+      "rationale": "Information-sharing controls (Power BI sensitivity labels, SharePoint Anyone-link expiry, Teams recording limits) govern disclosure of stored organizational data through sharing mechanisms — protecting data-at-rest confidentiality. AC-21 has no CSF 2.0 informative reference in the pinned OLIR lanes."
+    },
+    "AU-4": {
+      "subcategories": ["PR.PS-04"],
+      "rationale": "Audit log storage capacity underpins log availability for continuous monitoring. NIST's own lineage: CSF v1.1 PR.PT-01 (audit/log records) was incorporated into PR.PS-04 per the workbook's withdrawal notes. AU-4 has no CSF 2.0 informative reference in the pinned OLIR lanes."
+    },
+    "SC-15": {
+      "subcategories": ["PR.IR-01"],
+      "rationale": "Collaborative computing controls (meeting lobby, anonymous-start restrictions, external-participant warnings) protect collaboration environments from unauthorized logical access and usage. SC-15 has no CSF 2.0 informative reference in the pinned OLIR lanes."
+    },
+    "SI-8": {
+      "subcategories": ["DE.CM-01", "DE.CM-09"],
+      "rationale": "Spam/phishing protection (the entire Gmail/Defender/EXO surface — pre-delivery scanning, spam-filter integrity, sandboxing) monitors mail services and platforms for potentially adverse events. NIST's own lineage: CSF v1.1 DE.CM-4 (malicious code detected) was incorporated into DE.CM-01 and DE.CM-09 per the workbook's withdrawal notes. SI-8 has no CSF 2.0 informative reference in the pinned OLIR lanes."
+    }
+  },
+  "byPolicy": {},
+  "bySignature": {}
+}
