@@ -138,6 +138,31 @@ The Settings export card offers two intents:
 - **Backup** — everything, including pack data and metrics catalogues. For your own machine only. Files are named `*.backup.json` and gitignored.
 - **Share export** — excludes pack-sourced records **and imported metric definitions** by default, including the whole pack-owned assessment and everything inside it (the filter follows lineage, not just tags). Quarter-level `metricId` links pointing at excluded metrics are stripped so no identifier from a private catalogue rides out on your own records, and all envelope counts are recomputed after filtering. Including private data requires ticking a box *and* confirming a warning — and restricted-license metrics stay excluded even then. Default-safe beats remember-to-scrub.
 
+### The disposition registry — how the share filter is enforced
+
+The share filter is not a hand-maintained scrub list. Every field that can appear in a share
+export is **declared** in `src/utils/shareRegistry.js` with a disposition — share / omit /
+empty / rebuild / strip — and `buildShareableExport` is a mechanical fold over those
+declarations. A field nobody declared does not serialize, in either share mode (fail-closed,
+the inversion of the historical default that produced four separate field leaks). Two tests
+enforce the registry from both ends:
+
+- the **appearance test** (`src/utils/shareRegistry.test.js`) builds state through the real
+  producers and fails on any field path the registry does not name — a new feature's new
+  field is a red test at commit time, forcing a disposition decision instead of a silent
+  leak found later;
+- the **golden snapshots** (`src/utils/dataExportGolden.test.js`) freeze all three envelopes
+  (default share, include-private share, complete backup), so a disappearance is a visible
+  diff rather than a silent loss.
+
+A third guard works at surface grain: the **egress census** (`src/utils/egressCensus.test.js`)
+fails when any file gains a browser-download path (`URL.createObjectURL` / jsPDF `doc.save`)
+without an inventoried posture — a brand-new exporter cannot be born fail-open either.
+
+Complete backups are wholesale by design and bypass the registry. The own-data exports (the
+CSV exports, Jira CSVs, "Assessments Only" JSON) remain the documented exception described
+above: they are working artifacts for your own use, not the sharing surface.
+
 ### The user directory — private data too
 
 The Users page (and, since issue #290, the new-assessment wizard's Users step) holds real people: names and email addresses, with roles of auditor, control owner, or stakeholder scoped per assessment. Share exports **exclude the user directory by default** — the `data.users` section is omitted entirely unless you explicitly include private data (omitted, not emptied: restoring a share file therefore leaves the receiving install's own directory untouched). The per-assessment `{ userId, role }` pairs and each observation's `auditorId` stay (they are opaque identifiers) and resolve against whatever directory the receiving install already has. Complete backups always keep the full directory. Note this deliberately changed pre-existing behavior — before issues #290/#291 the directory rode share exports wholesale, which mattered less when it only ever held the fictional demo users.
