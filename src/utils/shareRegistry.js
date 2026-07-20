@@ -42,7 +42,7 @@
  */
 
 import { licenseIsRestricted } from './metricsImport';
-import { getBankProcedure } from './procedureBank';
+import { resolvePristine } from './procedureBank';
 
 export const SHARE = 'share';
 export const OMIT = 'omit';
@@ -63,16 +63,19 @@ const map = (of) => ({ kind: 'map', of });
  * (org name, systems, crown-jewel references) into observation text — a
  * derived leak path. Provenance (procedureSource.bankId) makes the fix
  * deterministic: shared copies get the untailored community markdown. If the
- * bank entry cannot be resolved, the text is dropped entirely — never leaked.
- * Registry-owned so the pristine rule has exactly one home; applied as the
- * observation record transform in default share mode.
+ * source cannot be resolved, the text is dropped entirely — never leaked.
+ * Resolution is a POSITIVE bank match (resolvePristine): a tailored source
+ * carrying a bank label this build does not recognize drops to '' rather
+ * than shipping community markdown under a foreign label. Registry-owned so
+ * the pristine rule has exactly one home; applied as the observation record
+ * transform in default share mode.
  */
 export const pristineObservation = (obs) => {
   if (!obs?.procedureSource?.tailored) return obs;
-  const bankEntry = getBankProcedure(obs.procedureSource.bankId);
+  const pristine = resolvePristine(obs.procedureSource);
   return {
     ...obs,
-    testProcedures: bankEntry ? bankEntry.markdown : '',
+    testProcedures: pristine ? pristine.markdown : '',
     procedureSource: { ...obs.procedureSource, tailored: false, modified: false }
   };
 };

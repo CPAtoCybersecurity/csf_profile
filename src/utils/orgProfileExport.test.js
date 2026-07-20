@@ -273,3 +273,93 @@ describe('deterministic tailoring', () => {
     expect(text).toBe('Review Alma Security policy.');
   });
 });
+
+// ---------------------------------------------------------------------------
+// R-6 provenance-inversion pin (PR-1, plan §7): the pristine swap is a
+// POSITIVE bank match. A tailored observation carrying a bank label this
+// build does not recognize — e.g. restored from a share made by a newer
+// build with a platform bank — must export with its text DROPPED, never
+// with community markdown shipped under the foreign bank's label. The
+// bankId here deliberately LOOKS like a community subcategory: a bank-blind
+// resolver would happily (and wrongly) resolve it.
+// ---------------------------------------------------------------------------
+describe('foreign-bank tailored sources in share exports', () => {
+  let assessmentId;
+
+  beforeEach(() => {
+    const created = useAssessmentsStore.getState().createAssessment({
+      name: 'Foreign bank export test',
+      description: '',
+      scopeType: 'requirements'
+    });
+    assessmentId = created.id;
+    useAssessmentsStore.getState().addToScope(assessmentId, 'GV.OC-01 Ex1');
+    useAssessmentsStore.getState().updateObservation(assessmentId, 'GV.OC-01 Ex1', {
+      testProcedures: 'Platform-bank addendum text with tenant facts baked in.',
+      procedureSource: {
+        bank: 'scuba-gws',
+        bankId: 'GV.OC-01',
+        bankVersion: 'future-1',
+        attachedAt: '2026-07-20T00:00:00.000Z',
+        tailored: true,
+        modified: true
+      }
+    });
+  });
+
+  afterEach(() => {
+    useAssessmentsStore.getState().deleteAssessment(assessmentId);
+  });
+
+  test('default share drops foreign-bank tailored text — never community markdown under a foreign label', () => {
+    const share = buildShareableExport(stores());
+    const shared = share.data.assessments.find((a) => a.id === assessmentId);
+    const obs = shared.observations['GV.OC-01 Ex1'];
+    expect(obs.testProcedures).toBe('');
+    expect(obs.testProcedures).not.toBe(getBankProcedure('GV.OC-01').markdown);
+    expect(obs.procedureSource.bank).toBe('scuba-gws');
+    expect(obs.procedureSource.tailored).toBe(false);
+  });
+
+  test('include-private opt-in deliberately keeps foreign-bank tailored text verbatim', () => {
+    const share = buildShareableExport(stores(), { includePrivate: true });
+    const shared = share.data.assessments.find((a) => a.id === assessmentId);
+    const obs = shared.observations['GV.OC-01 Ex1'];
+    expect(obs.testProcedures).toBe('Platform-bank addendum text with tenant facts baked in.');
+    expect(obs.procedureSource.tailored).toBe(true);
+  });
+});
+
+// The bankless variant of the same attack: no bank field at all, but a
+// bankId that resolves in the community bank. Never produced by any shipped
+// build (buildProcedureSource has stamped bank:'community' since birth,
+// tailoredProvenance's no-bank branch stamps bankId:null) — importable only
+// from tampered files, and it must fail closed the same way.
+describe('bankless tailored sources in share exports', () => {
+  let assessmentId;
+
+  beforeEach(() => {
+    const created = useAssessmentsStore.getState().createAssessment({
+      name: 'Bankless export test',
+      description: '',
+      scopeType: 'requirements'
+    });
+    assessmentId = created.id;
+    useAssessmentsStore.getState().addToScope(assessmentId, 'GV.OC-01 Ex1');
+    useAssessmentsStore.getState().updateObservation(assessmentId, 'GV.OC-01 Ex1', {
+      testProcedures: 'Tampered tailored text.',
+      procedureSource: { bankId: 'GV.OC-01', tailored: true, modified: true }
+    });
+  });
+
+  afterEach(() => {
+    useAssessmentsStore.getState().deleteAssessment(assessmentId);
+  });
+
+  test('default share drops bankless tailored text to empty — no bank match, no substitution', () => {
+    const share = buildShareableExport(stores());
+    const obs = share.data.assessments.find((a) => a.id === assessmentId).observations['GV.OC-01 Ex1'];
+    expect(obs.testProcedures).toBe('');
+    expect(obs.procedureSource.tailored).toBe(false);
+  });
+});
