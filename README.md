@@ -306,9 +306,13 @@ This tool is based on the NIST Cybersecurity Framework (CSF), developed by the N
 
 As a demonstration of how to conduct CSF profile assessment, fictional company "Alma Security" is used, inspired by Daniel Miessler's open source Telos project here: [https://github.com/danielmiessler/Telos/blob/main/corporate_telos.md](https://github.com/danielmiessler/Telos/blob/main/corporate_telos.md)
 
-## Disclaimer
+## License
 
-This software is provided under the MIT License. [https://github.com/CPAtoCybersecurity/csf_profile/blob/main/LICENSE](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/LICENSE)
+The source code of this project is provided under the MIT License. [https://github.com/CPAtoCybersecurity/csf_profile/blob/main/LICENSE](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/LICENSE)
+
+**Scope:** the MIT grant covers the code. Files under `src/data/` and `vendor/` carry their own licenses — generated data banks and vendored third-party content are governed by per-record license metadata, documented in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). A fork inherits those obligations along with the content.
+
+## Disclaimer
 
 By using this tool, you agree to the following:
 

@@ -101,7 +101,33 @@ const OBSERVATION = struct({
     bankVersion: SHARE,
     attachedAt: SHARE,
     modified: SHARE,
-    tailored: SHARE
+    tailored: SHARE,
+    // License metadata stamped at attach for licensed bank content
+    // (licenseClass.js licenseProvenance). MANDATORY-if-parent-present:
+    // a share export is redistribution, so when licensed text ships, its
+    // attribution block must ship with it — SHARE here, and the
+    // licenseAttribution suite pins that the production fold carries the
+    // block byte-equal in BOTH modes. Nothing in this struct is private:
+    // it names public upstream sources, never org data.
+    license: SHARE,
+    licenseClass: SHARE,
+    licenseObligations: struct({
+      attribution: SHARE,
+      changeIndication: SHARE,
+      noDerivatives: SHARE,
+      noticeText: SHARE
+    }),
+    attribution: struct({
+      attributionText: SHARE,
+      sourceUrl: SHARE,
+      licenseUrl: SHARE,
+      retrievedAt: SHARE,
+      upstream: struct({
+        repo: SHARE,
+        sha: SHARE,
+        path: SHARE
+      })
+    })
   }),
   linkedArtifacts: SHARE,
   linkedFindings: SHARE,
