@@ -29,6 +29,15 @@
  * and must never wire into any share-export or render block.
  */
 
+/**
+ * Version of this classification schema. Stamped (with the parser version)
+ * into the vendor MANIFEST and generated bank files so a future tightening
+ * (e.g. unknown ⇒ restricted) is a re-derivation over retained raw inputs,
+ * not undetectable data loss (PR-3 entry condition 3). Bump on any change to
+ * the token vocabulary, class set, or merge rules.
+ */
+export const LICENSE_SCHEMA_VERSION = 1;
+
 /* The gate axis. Order matters: merging takes the MOST restrictive. */
 export const UNDECLARED = 'undeclared'; // blank/unrecognized — asserts nothing, restricts nothing
 export const PUBLIC_DOMAIN = 'public-domain'; // CC0, US Government work

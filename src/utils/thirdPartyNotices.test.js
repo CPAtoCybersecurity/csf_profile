@@ -127,14 +127,18 @@ describe('notices markdown — deterministic, scope + standing notices', () => {
   });
 
   test('the committed THIRD-PARTY-NOTICES.md matches a fresh render of the shipped banks (drift = red here AND in CI)', () => {
-    const real = JSON.parse(
+    const community = JSON.parse(
       fs.readFileSync(path.join(__dirname, '..', 'data', 'communityProcedures.json'), 'utf8')
+    );
+    const platform = JSON.parse(
+      fs.readFileSync(path.join(__dirname, '..', 'data', 'platformProcedures.json'), 'utf8')
     );
     const committed = fs.readFileSync(
       path.join(__dirname, '..', '..', 'THIRD-PARTY-NOTICES.md'), 'utf8'
     );
     expect(committed).toBe(noticesMarkdown([
-      { name: 'Community test-procedure bank (src/data/communityProcedures.json)', records: real.procedures }
+      { name: 'Community test-procedure bank (src/data/communityProcedures.json)', records: community.procedures },
+      { name: 'Platform procedure bank (src/data/platformProcedures.json)', records: platform.procedures }
     ]));
   });
 });

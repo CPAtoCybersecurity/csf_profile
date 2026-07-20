@@ -1,0 +1,1208 @@
+# CISA Google Workspace Secure Configuration Baseline for Gmail
+
+Gmail is the Google Workspace offering for sending and receiving email. Users can upload attachments to emails and send them to a given email address. Additional Gmail features include integrating with other Google applications, such as Meet and Chat. This Secure Configuration Baseline (SCB) provides specific policies to strengthen Gmail security.
+
+The Cybersecurity and Infrastructure Security Agency's (CISA) Secure Cloud Business Applications (SCuBA) project provides guidance and capabilities to secure federal civilian executive branch (FCEB) agencies' cloud business application environments and protect federal information that is created, accessed, shared, and stored in those environments.
+
+The CISA SCuBA SCBs for GWS help secure federal information assets stored within GWS cloud business application environments through consistent, effective, and manageable security configurations. CISA created baselines tailored to the federal government's threats and risk tolerance. Organizations outside of the federal government may also find these baselines to be useful references to help reduce risks even if such organizations have different risk tolerances or face different threats.
+
+For non-federal users, the information in this document is being provided "as is" for INFORMATIONAL PURPOSES ONLY. CISA does not endorse any commercial product or service, including any subjects of analysis. Any reference to specific commercial entities or commercial products, processes, or services by service mark, trademark, manufacturer, or otherwise, does not constitute or imply endorsement, recommendation, or favoritism by CISA. Without limiting the generality of the foregoing, some controls and settings are not available in all products. CISA has no control over vendor changes to products offerings or features. Accordingly, these SCuBA SCBs for GWS may not be applicable to the products available to you. This document does not address, ensure compliance with, or supersede any law, regulation, or other authority. Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology. This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+
+This baseline is based on Google documentation available in the [Gmail Google Workspace Admin Help Center](https://support.google.com/a/topic/9202?hl=en&ref_topic=9197) and addresses the following:
+
+- [Mail Delegation](#1-mail-delegation)
+- [Domain Keys Identified Mail](#2-domainkeys-identified-mail)
+- [Sender Policy Framework](#3-sender-policy-framework)
+- [Domain Based Message Authentication, Reporting, and Conformance](#4-domain-based-message-authentication-reporting-and-conformance)
+- [Attachment Protections](#5-attachment-protections)
+- [Links and External Images Protections](#6-links-and-external-images-protection)
+- [Spoofing and Authentication Protection](#7-spoofing-and-authentication-protection)
+- [User Email Uploads](#8-user-email-uploads)
+- [POP and IMAP Access](#9-pop-and-imap-access-for-users)
+- [Workspace Sync](#10-google-workspace-sync)
+- [Automatic Forwarding](#11-automatic-forwarding)
+- [Per User Outbound Gateways](#12-per-user-outbound-gateways)
+- [Unintended External Reply Warning](#13-unintended-external-reply-warning)
+- [Email Allowlist](#14-email-allowlist)
+- [Enhanced Pre-Delivery Message Scanning](#15-enhanced-pre-delivery-message-scanning)
+- [Security Sandbox](#16-security-sandbox)
+- [Comprehensive Mail Storage](#17-comprehensive-mail-storage)
+- [Spam Filtering](#18-spam-filtering)
+
+
+Within Google Workspace, settings can be assigned to users through organizational units, configuration groups, or individually. Before changing a setting, the user can select the organizational unit, configuration group, or individual users to which they want to apply changes.
+
+## Assumptions
+
+This document assumes the organization is using GWS Enterprise Plus.
+
+This document does not address, ensure compliance with, or supersede any law, regulation, or other authority.  Entities are responsible for complying with any recordkeeping, privacy, and other laws that may apply to the use of technology.  This document is not intended to, and does not, create any right or benefit for anyone against the United States, its departments, agencies, or entities, its officers, employees, or agents, or any other person.
+
+## Key Terminology
+
+The key words "MUST," "MUST NOT," "REQUIRED," "SHALL," "SHALL NOT," "SHOULD," "SHOULD NOT," "RECOMMENDED," "MAY," and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services) (**BOD 25-01 Requirement**): This indicator means that the policy is required under CISA BOD 25-01.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology) (**Automated Check**): This indicator means that the policy can be automatically checked via ScubaGoggles. See [our documentation](../../README.md) for help getting started.
+
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#break-glass-accounts)(**Configurable**): This indicator means that the policy can be customized via a configuration file.
+
+[![Log-Based Check](https://img.shields.io/badge/Log--Based_Check-F6E8E5)](../../docs/usage/Limitations.md#log-based-policy-checks)(**Log-Based Check**): This indicator means that ScubaGoggles will check the policy by reviewing admin audit logs. See [Limitations](../../docs/usage/Limitations.md#log-based-policy-checks).
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#gwscommoncontrols83v06-instructions)(**Manual**): This indicator means that the policy requires manual verification of configuration settings.
+
+# Baseline Policies
+
+## 1. Mail Delegation
+
+This section determines whether users can delegate access to their mailbox to others within the same domain. This delegation includes access to read, send, and delete messages on the account owner's behalf. This delegation can be done via a command line tool (GAM) if enabled in the admin console.
+
+### Policies
+
+#### GWS.GMAIL.1.1v1
+Mail delegation SHOULD be disabled.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Granting mail delegation can inadvertently lead to disclosure of sensitive information, impersonation of delegated accounts, or malicious alteration or deletion of emails. By controlling mail delegation, these risks can be significantly reduced, improving the security and integrity of email communications.
+- _Last modified:_ October 2023
+- _Note:_ Exceptions should be limited to individuals authorized by existing agency policy, such as Senior Executive Service (SES) or politically appointed staff. Other considerations include ensuring that delegated accounts require phishing-resistant multifactor authentication (MFA), limiting delegated account permissions (e.g. allowing view/reply, prohibiting delete), monitoring delegated accounts regularly, and disabling them if no longer required.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ IA-2, SC-7(10)
+- MITRE ATT&CK TTP Mapping
+  - [T098: Account Manipulation](https://attack.mitre.org/techniques/T1098/)
+    - [T098:002: Account Manipulation: Additional Email Delegate Permissions](https://attack.mitre.org/techniques/T1098/002/)
+
+### Resources
+
+-   [Google Workspace Admin Help: Turn Gmail delegation on or off](https://support.google.com/a/answer/7223765?hl=en)
+-   [GAM: Example Email Settings - Creating a Gmail delegate](https://github.com/GAM-team/GAM/wiki/ExamplesEmailSettings#creating-a-gmail-delegate)
+-   [CIS Google Workspace Foundations Benchmark](https://www.cisecurity.org/benchmark/google_workspace)
+
+### Prerequisites
+
+-   None
+
+### Implementation
+
+#### GWS.GMAIL.1.1v1 Instructions
+To configure the settings for Mail Delegation:
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **User Settings -\> Mail delegation**.
+4.  Ensure that the **Let users delegate access to their mailbox to other users in the domain** checkbox is unchecked.
+5.  Select **Save**.
+
+
+## 2. DomainKeys Identified Mail
+
+This section enables DomainKeys Identified Mail (DKIM) to help prevent spoofing of outgoing messages sent from a specific domain. DKIM allows digital signatures to be added to email messages in the message header, providing a layer of both authenticity and integrity to emails. Without DKIM, messages that are sent from a specific domain are more likely to be marked as spam by receiving mail servers. DKIM relies on Domain Name System (DNS) records and its deployment depends on how an agency manages its DNS.
+
+### Policies
+
+#### GWS.GMAIL.2.1v1
+DKIM SHOULD be enabled for all domains.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#dns-configuration)
+
+- _Rationale:_ Enabling DKIM for all domains can help prevent email spoofing and phishing attacks. Without DKIM, threat actors could manipulate email headers to appear as if they are from a legitimate source, potentially leading to the disclosure of sensitive information. By enabling DKIM, the authenticity of emails can be verified, reducing this risk.
+- _Last modified:_ November 2023
+- _Note:_ This policy is not applicable to user alias domains. Emails sent from user alias domains will be signed by a Google-managed DKIM signing domain (gappssmtp.com) even if DKIM is disabled.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SC-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1434: Internal Spear Phishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1672: Email Spoofing](https://attack.mitre.org/techniques/T1672/)
+
+### Resources
+
+-   [Binding Operational Directive 18-01 - Enhance Email and Web Security \| DHS](https://cyber.dhs.gov/bod/18-01/)
+-   [Trustworthy Email \| NIST 800-177 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-177/rev-1/final)
+-   [Google Workspace Admin Help: Help prevent spoofing and spam with DKIM](https://support.google.com/a/answer/174124)
+-   [CIS Google Workspace Foundations Benchmark](https://www.cisecurity.org/benchmark/google_workspace)
+
+### Prerequisites
+
+-   None
+
+### Implementation
+
+#### GWS.GMAIL.2.1v1 Instructions
+To configure the settings for DKIM:
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Authenticate email -\> DKIM authentication**.
+4.  Select a domain listed in the **Selected** domain drop-down menu.
+5.  Select **START AUTHENTICATION**.
+6.  Select **Save**.
+7.  Add the DNS TXT record listed in Admin Console to the domain, via the domain provider's DNS settings page. Note that it can take up to 48 hours for DNS changes to fully propagate.
+
+Note that step 7 requires action taken outside of the Google Admin Console, dependent on the agency's domain provider. Thus, the exact final step needed to set up DKIM varies from agency to agency. See [Turn on DKIM for your domain](https://support.google.com/a/answer/180504) for more details.
+
+To test your DKIM configuration, consider using a web-based tool, such as the [Google Admin Toolbox](https://toolbox.googleapps.com/apps/checkmx/).
+
+## 3. Sender Policy Framework
+
+The Sender Policy Framework (SPF) is a mechanism that allows administrators to specify which IP addresses are explicitly approved to send emails on behalf of the domain, facilitating detection of spoofed emails. SPF isn't configured through the Google admin console but rather via DNS records hosted by the agency's domain. The exact steps needed to set up SPF vary from agency to agency. Google's documentation provides helpful starting points.
+
+### Policies
+
+#### GWS.GMAIL.3.1v1
+An SPF policy SHALL be published for each domain that fails all non-approved senders.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#dns-configuration)
+
+- _Rationale:_ Threat actors could potentially manipulate an email "from" field to appear as a legitimate sender, increasing the risk of phishing attacks. By publishing an SPF policy that fails all non-approved senders for each domain, this risk can be reduced as it helps to detect and block deceptive emails. Additionally, an SPF policy is required for FCEB agencies by BOD 18-01.
+- _Last modified:_ February 2024
+- _Note:_
+  - SPF defines two different "fail" mechanisms: fail (indicated by `-`, sometimes referred to as hardfail) and softfail (indicated by `~`). Either hard or soft fail may be used to comply with this baseline policy.
+  - This policy is not applicable to user alias domains. Gmail uses the primary domain as the `envelope-from` domain and the alias domain as the `header-from` domain. SPF only verifies the `envelope-from` domain.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-2d
+- MITRE ATT&CK TTP Mapping
+  - [T1078: Valid Accounts](https://attack.mitre.org/techniques/T1078/)
+    - [T1078:004: Valid Accounts: Cloud Accounts](https://attack.mitre.org/techniques/T1078/004/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1672: Email Spoofing](https://attack.mitre.org/techniques/T1672/)
+  - [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)
+    - [T1598.003: Phishing for Information: Spearphishing Link](https://attack.mitre.org/techniques/T1598/003/)
+
+### Resources
+
+-   [Binding Operational Directive 18-01 - Enhance Email and Web Security \| DHS](https://cyber.dhs.gov/bod/18-01/)
+-   [Trustworthy Email \| NIST 800-177 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-177/rev-1/final)
+-   [Google Workspace Admin Help: Help prevent spoofing and spam with SPF](https://support.google.com/a/answer/33786#to-do)
+
+### Prerequisites
+-   A list of approved IP addresses for sending mail must be maintained. Failing to maintain an accurate list of authorized IP addresses may result in spoofed email messages or failure to deliver legitimate messages when SPF is enabled. Maintaining a list helps to enable unauthorized servers sending spoofed messages to be detected and permits message delivery from legitimate senders.
+
+### Implementation
+
+#### GWS.GMAIL.3.1v1 Instructions
+First, identify any approved senders specific to your agency (see [Identify all email senders for your organization](https://support.google.com/a/answer/10686639#senders) for tips). SPF allows you to indicate approved senders by IP address or CIDR range. However, note that SPF allows you to [include](https://www.rfc-editor.org/rfc/rfc7208#section-5.2) the IP addresses indicated by a separate SPF policy, refered to by domain name. See [Define your SPF record—Basic setup](https://support.google.com/a/answer/10685031) for inclusions required for Google to send email on behalf of your domain.
+
+SPF is not configured through the Google Workspace admin center, but rather via DNS records hosted by the agency's domain. Thus, the exact steps needed to set up SPF varies from agency to agency. See [Add your SPF record at your domain provider](https://support.google.com/a/answer/10684623) for more details.
+
+To test your SPF configuration, consider using a web-based tool, such as the [Google Admin Toolbox](https://toolbox.googleapps.com/apps/checkmx/).  Additionally, SPF records can be requested using the command line tool `dig`. For example:
+```
+dig example.com txt
+```
+If SPF is configured, a response resembling `v=spf1 include:_spf.google.com -all` will be returned; though by necessity, the contents of the SPF policy may vary by agency. In this example, the SPF policy indicates the IP addresses listed by the policy for "_spf.google.com" are the only approved senders for "example.com." These IPs can be determined via additional SPF lookups, starting with "_spf.google.com."
+
+Ensure the IP addresses listed as approved senders for your domains are correct. Additionally, ensure that each policy either ends in `-all` or [redirects](https://www.rfc-editor.org/rfc/rfc7208#section-6.1) to one that does; this directive indicates that all IPs that don't match the policy should fail. See [Define your SPF record—Advanced setup](https://support.google.com/a/answer/10683907) for a more in-depth discussion of SPF record syntax.
+
+## 4. Domain-based Message Authentication, Reporting, and Conformance
+
+
+Domain-based Message Authentication, Reporting, and Conformance (DMARC) works with SPF and DKIM to authenticate mail senders and ensure that destination email systems can validate messages sent from your domain. DMARC helps receiving mail systems determine what to do with messages sent from your domain that fail SPF or DKIM checks.
+
+### Policies
+
+#### GWS.GMAIL.4.1v1
+A DMARC policy SHALL be published at the full domain or the second-level domain for all Google Workspace domains, including user alias domains.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#dns-configuration)
+
+- _Rationale:_ Without proper authentication and a DMARC policy available for each domain, recipients may improperly handle SPF and DKIM failures, possibly enabling threat actors to send deceptive emails that appear to be from your domain. Publishing a DMARC policy for every domain further reduces the risk posed by authentication failures.
+- _Last modified:_ September 2025
+- _Note:_
+  - A DMARC record published at the second-level domain applies to all subdomains by default. In other words, a DMARC record published for `example.com` will protect both `a.example.com` and `b.example.com`, but a separate record would need to be published for `c.example.gov`. In this example `a.example.com` is the full domain, or fully qualified domain name (FQDN), whereas `example.com` is the second-level domain.
+  - User alias domains provide an alternative email address to send or receive email and therefore must have a DMARC policy in place.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1672: Email Spoofing](https://attack.mitre.org/techniques/T1672/)
+  - [T1598: Phishing for Information](https://attack.mitre.org/techniques/T1598/)
+    - [T1598.003: Phishing for Information: Spearphishing Link](https://attack.mitre.org/techniques/T1598/003/)
+
+#### GWS.GMAIL.4.2v1
+The DMARC message rejection option SHALL be p=reject.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#dns-configuration)
+
+- _Rationale:_ Without stringent email authentication, threat actors could potentially send deceptive emails that appear to be from the organization's domain, increasing the risk of phishing attacks. This policy reduces risk as it automatically rejects emails that fail SPF or DKIM checks, preventing potentially harmful emails from reaching recipients. Additionally, "reject" is the level of protection required by BOD 18-01 for federal civilian executive branch (FCEB) agencies.
+- _Last modified:_ November 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1586: Compromise Accounts](https://attack.mitre.org/techniques/T1586/)
+    - [T1586:002: Compromise Accounts: Email Accounts](https://attack.mitre.org/techniques/T1586/002/)
+  - [T1672: Email Spoofing](https://attack.mitre.org/techniques/T1672/)
+
+#### GWS.GMAIL.4.3v1
+The DMARC point of contact for aggregate reports SHALL include `reports@dmarc.cyber.dhs.gov`.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#dns-configuration)
+
+- _Rationale:_ Without a centralized point of contact for DMARC aggregate reports, potential email security issues may go unnoticed, increasing the risk of phishing attacks. As required by BOD 18-01, FCEB users should set reports@dmarc.cyber.dhs.gov as the DMARC aggregate report recipient. This allows CISA to monitor and address email authentication issues.
+- _Last modified:_ November 2023
+- _Note:_ Only FCEB agencies should include this email address in their DMARC record.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
+- MITRE ATT&CK TTP Mapping
+  - None
+
+#### GWS.GMAIL.4.4v1
+An agency point of contact SHOULD be included for aggregate and failure reports.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#dns-configuration)
+
+- _Rationale:_ Without a designated agency point of contact for DMARC aggregate and failure reports, potential email security issues may not be promptly addressed, increasing the risk of phishing attacks. This risk can be reduced by including an agency point of contact, facilitating timely response to email authentication issues and enhancing overall email security.
+- _Last modified:_ November 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4(5)
+- MITRE ATT&CK TTP Mapping
+  - None
+
+### Resources
+
+-   [Binding Operational Directive 18-01 - Enhance Email and Web Security \| DHS](https://cyber.dhs.gov/bod/18-01/)
+-   [Trustworthy Email \| NIST 800-177 Rev. 1](https://csrc.nist.gov/publications/detail/sp/800-177/rev-1/final)
+-   [Domain-based Message Authentication, Reporting, and Conformance (DMARC) \| RFC 7489](https://datatracker.ietf.org/doc/html/rfc7489)
+-   [Google Workspace Admin Help: Help prevent spoofing and spam with DMARC](https://support.google.com/a/answer/2466580)
+
+### Prerequisites
+
+-   DKIM or SPF must be enabled
+
+### Implementation
+
+[//]: # (Keep the version suffix out of the anchor.)
+[//]: # (https://stackoverflow.com/questions/5319754/cross-reference-named-anchor-in-markdown)
+<a name="gmail41-instructions"></a>
+#### GWS.GMAIL.4.1v1 Instructions
+DMARC is not configured through the Google Admin Console, but rather via DNS records hosted by the agency's domain(s). As such, implementation varies depending on how an agency manages its DNS records. See [Add your DMARC record](https://support.google.com/a/answer/2466563) for Google guidance.
+
+To test your DMARC configuration, consider using one of many publicly available web-based tools, such as the [Google Admin Toolbox](https://toolbox.googleapps.com/apps/checkmx/). Additionally, DMARC records can be requested using the command line tool `dig`. For example:
+
+```
+dig _dmarc.example.com txt
+```
+
+If DMARC is configured, a response resembling `v=DMARC1; p=reject; pct=100; rua=mailto:reports@dmarc.cyber.dhs.gov, mailto:reports@example.com; ruf=mailto:reports@example.com` will be returned, though by necessity, the contents of the record will vary by agency. In this example, the policy indicates all emails failing the SPF/DKIM checks are to be rejected and aggregate reports sent to reports@dmarc.cyber.dhs.gov and reports@example.com. Failure reports will be sent to reports@example.com.
+
+#### GWS.GMAIL.4.2v1 Instructions
+See [GWS.GMAIL.4.1 instructions](#gmail41-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes `p=reject`.
+
+#### GWS.GMAIL.4.3v1 Instructions
+See [GWS.GMAIL.4.1 instructions](#gmail41-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes reports@dmarc.cyber.dhs.gov as one of the emails for the `rua` field.
+
+#### GWS.GMAIL.4.4v1 Instructions
+See [GWS.GMAIL.4.1 instructions](#gmail41-instructions) for an overview of how to publish and check a DMARC record. Ensure the record published includes a point of contact specific to your agency, in addition to reports@dmarc.cyber.dhs.gov, as one of the emails for the `rua` field and one or more agency-defined points of contact for the `ruf` field.
+
+## 5. Attachment Protections
+
+This section enables protections against suspicious attachments and scripts from untrusted senders, including encrypted attachments, documents with malicious scripts, and attachment file types that are uncommon and/or archaic. Malware can be spread through these attachments. These messages can be kept in the inbox with a warning label (default), moved to spam, or quarantined.
+
+A Google Workspace solution is not strictly required to satisfy this baseline control, but the solution selected by an agency should offer services comparable to those offered by Google.
+
+### Policies
+
+#### GWS.GMAIL.5.1v1
+"Protect against encrypted attachments from untrusted senders" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Attachments from untrusted senders, especially encrypted ones, may contain malicious content that poses a security risk. By enabling protection against encrypted attachments from untrusted senders, this risk can be reduced, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+    - [T1204:003: User Execution: Malicious Image](https://attack.mitre.org/techniques/T1204/003/)
+
+#### GWS.GMAIL.5.2v1
+"Protect against attachments with scripts from untrusted senders" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Attachments with scripts from untrusted senders may contain malicious content that poses a security risk. By enabling protection against such attachments, this risk can be reduced, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+    - [T1204:003: User Execution: Malicious Image](https://attack.mitre.org/techniques/T1204/003/)
+
+#### GWS.GMAIL.5.3v1
+"Protect against anomalous attachment types in emails" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Anomalous attachment types in emails may contain malicious content that poses a security risk. By enabling protection against such attachments, this risk can be reduced, enhancing the safety and integrity of the user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+    - [T1204:003: User Execution: Malicious Image](https://attack.mitre.org/techniques/T1204/003/)
+
+#### GWS.GMAIL.5.4v1
+Google SHOULD be allowed to automatically apply future recommended settings for attachments.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ By enabling this feature, the system can automatically stay updated with the latest security measures recommended by Google, reducing the risk of security breaches.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - None
+
+#### GWS.GMAIL.5.5v1
+Emails flagged by SCuBA policies GWS.GMAIL.5.1 through GWS.GMAIL.5.3 SHALL NOT be kept in inbox.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Keeping emails flagged by attachment protection controls in the inbox could potentially expose users to malicious content. Removing these emails from the inbox enhances the safety and integrity of user data and systems.
+- _Last modified:_ September 2023
+- _Note:_ Agencies/organizations can choose whether to send these emails to spam or quarantine.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+    - [T1204:003: User Execution: Malicious Image](https://attack.mitre.org/techniques/T1204/003/)
+
+
+### Resources
+
+-   [Google Workspace Admin Help: Advanced phishing and malware protection](https://support.google.com/a/answer/9157861?product_name=UnuFlow&hl=en&visit_id=637831282628458101-2078141803&rd=1&src=supportwidget0&hl=en#zippy=%2Cturn-on-attachment-protection)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Attachment Protections:
+
+#### Policies Group 5 common Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Safety -\> Attachments**.
+4.  Follow implementation for each individual policy
+5.  Select **Save**.
+
+#### GWS.GMAIL.5.1v1 Instructions
+1.  Check the **Protect against encrypted attachments from untrusted senders** checkbox.
+
+#### GWS.GMAIL.5.2v1 Instructions
+1.  Check the **Protect against attachments with scripts from untrusted senders** checkbox.
+
+#### GWS.GMAIL.5.3v1 Instructions
+1.  Check the **Protect against anomalous attachment types in emails** checkbox.
+
+#### GWS.GMAIL.5.4v1 Instructions
+1.  Check the **Apply future recommended settings automatically** checkbox.
+
+#### GWS.GMAIL.5.5v1 Instructions
+1.  Under the setting for Policy 5.1 through Policy 5.3, ensure either "Move email to spam" or "Quarantine" is selected.
+
+
+## 6. Links and External Images Protection
+
+This section enables extra protections to prevent email phishing due to links and external images. Specific settings for this control include identifying hidden malicious links behind shortened URLs, scanning linked images to find hidden malicious content, showing a warning prompt when clicking links to untrusted domains, and applying future recommended settings automatically.
+
+A Google Workspace solution is not strictly required to satisfy this baseline control, but the solution selected by an agency should offer services comparable to those offered by Google.
+
+### Policies
+
+#### GWS.GMAIL.6.1v1
+"Identify links behind shortened URLs" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Shortened URLs can hide malicious links, posing a security risk. This risk can be reduced by identifying links behind shortened URLs, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+
+#### GWS.GMAIL.6.2v1
+"Scan linked images" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Linked images in emails can contain malicious content, posing a security risk. By enabling the scanning of linked images, this risk can be reduced, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+
+#### GWS.GMAIL.6.3v1
+"Show warning prompt for any click on links to untrusted domains" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Clicking on links to unfamiliar domains can expose users to malicious content, posing a security risk. This risk can be reduced by enabling a warning prompt for any click on such links, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-4, SI-8, AT-2b
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+
+#### GWS.GMAIL.6.4v1
+Google SHALL be allowed to automatically apply future recommended settings for links and external images.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ By enabling this feature, the system can automatically stay updated with the latest recommended security measures from Google, reducing the risk of security breaches and enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - None
+
+
+### Resources
+
+-   [Google Workspace Admin Help: Advanced phishing and malware protection](https://support.google.com/a/answer/9157861?product_name=UnuFlow&hl=en&visit_id=637831282628458101-2078141803&rd=1&src=supportwidget0&hl=en#zippy=%2Cturn-on-attachment-protection)
+-   [Google Workspace Admin Help: Set up rules to detect harmful attachments](https://support.google.com/a/answer/7676854?product_name=UnuFlow&hl=en&visit_id=637831464632988595-2408633144&rd=1&src=supportwidget0&hl=en)
+-   [Google Workspace Admin Help: Monitor the health of your Gmail settings](https://support.google.com/a/answer/7490901?product_name=UnuFlow&hl=en&visit_id=637831464698491311-452219641&rd=1&src=supportwidget0&hl=en)
+-   [CIS Google Workspace Foundations Benchmark](https://www.cisecurity.org/benchmark/google_workspace)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Links and External Images Protection:
+
+#### Policies Group 6 common Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Safety -\> Links and external images**.
+4.  Follow implementation for each individual policy.
+5.  Select **Save**
+
+#### GWS.GMAIL.6.1v1 Instructions
+1.  Check the **Identify links behind shortened URLs** checkbox.
+
+#### GWS.GMAIL.6.2v1 Instructions
+1.  Check the **Scan linked images** checkbox.
+
+#### GWS.GMAIL.6.3v1 Instructions
+1.  Check the **Show warning prompt for any click on links to untrusted domains** checkbox.
+
+#### GWS.GMAIL.6.4v1 Instructions
+1.  Check the **Apply future recommended settings automatically** checkbox.
+
+
+## 7. Spoofing and Authentication Protection
+
+This control enables extra protections to prevent spoofing of a domain name, employee names, email pretending to be from a specific domain, and unauthenticated email from any domain. These messages can be kept in the inbox with a warning label (default), moved to spam, or quarantined.
+
+A Google Workspace solution is not strictly required to satisfy this baseline control, but the solution selected by an agency should offer services comparable to those offered by Google.
+
+### Policies
+
+#### GWS.GMAIL.7.1v1
+"Protect against domain spoofing based on similar domain names" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Emails sent from domains that look similar to the user's domain can deceive users into interacting with malicious content, posing a security risk. Enabling protection against such spoofing can reduce this risk, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+#### GWS.GMAIL.7.2v1
+"Protect against spoofing of employee names" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Spoofing of employee identities (e.g., CEO and IT staff) can deceive users into interacting with malicious content, posing a security risk. Enabling protection against such spoofing can reduce this risk, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+#### GWS.GMAIL.7.3v1
+"Protect against inbound emails spoofing your domain" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Inbound emails appearing to come from the user's domain can deceive users into interacting with malicious content, posing a security risk. This risk can be reduced by enabling protection against such spoofing, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+#### GWS.GMAIL.7.4v1
+"Protect against any unauthenticated emails" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Unauthenticated emails can contain malicious content, posing a security risk. This risk can be reduced by enabling protection against such emails, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+#### GWS.GMAIL.7.5v1
+"Protect your Groups from inbound emails spoofing your domain" SHALL be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Inbound emails spoofing the user's domain can deceive users into interacting with malicious content, posing a security risk. This risk can be reduced by enabling protection against such spoofing, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+#### GWS.GMAIL.7.6v1
+Emails flagged by SCuBA policies GWS.GMAIL.7.1 through GWS.GMAIL.7.5 SHALL NOT be kept in inbox.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Retaining emails flagged by spoofing and authentication controls in the inbox could potentially expose users to malicious content. Moving emails out of the main inbox, to either spam or quarantine, can reduce this risk, enhancing the safety and integrity of the user's data and systems.
+- _Last modified:_ September 2023
+- _Note:_ Agencies/organizations can choose whether to send the emails to spam or quarantine.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+
+#### GWS.GMAIL.7.7v1
+Google SHALL be allowed to automatically apply future recommended settings for spoofing and authentication.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ By enabling this feature, the system can automatically stay updated with the latest Google recommended security measures, reducing the risk of security breaches and enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1434: Internal Spearphishing](https://attack.mitre.org/techniques/T1434/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+
+### Resources
+
+-   [Google Workspace Admin Help: Advanced phishing and malware protection](https://support.google.com/a/answer/9157861?product_name=UnuFlow&hl=en&visit_id=637831282628458101-2078141803&rd=1&src=supportwidget0&hl=en#zippy=%2Cturn-on-attachment-protection)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Spoofing and Authentication Protection:
+
+#### Policies Group 7 common Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Safety -\> Spoofing and authentication**.
+4.  Follow steps for individual policies below.
+5.  Select **Save**
+
+#### GWS.GMAIL.7.1v1 Instructions
+1.  Check the **Protect against domain spoofing based on similar domain names** checkbox.
+
+#### GWS.GMAIL.7.2v1 Instructions
+1.  Check the **Protect against spoofing of employee names** checkbox.
+
+#### GWS.GMAIL.7.3v1 Instructions
+1.  Check the **Protect against inbound emails spoofing your domain** checkbox.
+
+#### GWS.GMAIL.7.4v1 Instructions
+1.  Check the **Protect against any unauthenticated emails** checkbox.
+
+#### GWS.GMAIL.7.5v1 Instructions
+1.  Check the **Protect your groups from inbound emails spoofing your domain** checkbox.
+
+#### GWS.GMAIL.7.6v1 Instructions
+1.  Under each setting from Policy 7.1 through Policy 7.5, make sure either "Move email to spam" or "Quarantine" is selected.
+
+#### GWS.GMAIL.7.7v1 Instructions
+1.  Check the **Apply future recommended settings automatically** checkbox.
+
+
+## 8. User Email Uploads
+
+This section addresses a feature that enables users to import their email and contacts from non-Google webmail accounts such as Yahoo!, Hotmail, or AOL.
+
+### Policies
+
+#### GWS.GMAIL.8.1v1
+User email uploads SHALL be disabled to protect against unauthorized files being introduced into the secured environment.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Allowing user email uploads could potentially introduce unauthorized or malicious files into the secured environment, posing a security risk. By disabling user email uploads, this risk can be reduced, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7, SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
+  - [T1204: User Execution](https://attack.mitre.org/techniques/T1204/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002/)
+    - [T1204:003: User Execution: Malicious Image](https://attack.mitre.org/techniques/T1204/003/)
+
+### Resources
+
+-   [Google Workspace Admin Help: Advanced Gmail settings reference for admins](https://support.google.com/a/answer/2786758#zippy=%2Csetup-settings)
+-   [Google Workspace Admin Help: Turn imports from webmail hosts on or off](https://support.google.com/a/answer/2525613?product_name=UnuFlow&hl=en&visit_id=637832286168108072-385761693&rd=1&src=supportwidget0&hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for User Email Uploads:
+
+#### GWS.GMAIL.8.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Setup -\> User email uploads**.
+4.  Uncheck the **Show users the option to import mail and contacts from Yahoo!, Hotmail, AOL, or other webmail or POP3 accounts from the Gmail settings page** checkbox.
+5.  Select **Save**.
+
+
+## 9. POP and IMAP Access for Users
+
+This section determines whether users have POP3 and IMAP access. Granting POP3 or IMAP access allows the user to access Gmail emails from outside of protected/hardened environments and from older versions of Gmail applications or other third-party mail applications.
+
+### Policies
+
+#### GWS.GMAIL.9.1v1
+POP and IMAP access SHALL be disabled to protect sensitive agency or organization emails from being accessed through legacy applications or other third-party mail clients.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Configurable](https://img.shields.io/badge/Configurable-005288)](../../docs/usage/Config.md#imap-exclusions)
+
+- _Rationale:_ Enabling POP and IMAP access could potentially expose sensitive agency or organization emails to unauthorized access through legacy applications or third-party mail clients, posing a security risk. This risk can be reduced by disabling POP and IMAP access, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ October 2025
+- _Note:_ IMAP access MAY be enabled on a per-OU or per-group basis when there is a specific need, e.g., to support users that require specialized software for accessibility purposes.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
+- MITRE ATT&CK TTP Mapping
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+    - [T1048:002: Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol](https://attack.mitre.org/techniques/T1048/002/)
+
+### Resources
+
+-   [Google Workspace Admin Help: Turn POP and IMAP on and off for users](https://support.google.com/a/answer/105694?hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for POP and IMAP access:
+
+
+#### GWS.GMAIL.9.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **End User Access -\> POP and IMAP access**.
+4.  Uncheck the **Enable IMAP access for all users** checkbox.
+5.  Uncheck the **Enable POP access for all users** checkbox.
+6.  Select **Save**.
+
+
+## 10. Google Workspace Sync
+
+This section determines whether Google Workspace Sync allows data synchronization between Google Workspace and Microsoft Outlook. The data includes email, calendar, and contacts. Data synchronizes each time users start Outlook. This is an additional plugin that must be downloaded.
+
+### Policies
+
+#### GWS.GMAIL.10.1v1
+Google Workspace Sync SHOULD be disabled.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Enabling Google Workspace Sync could potentially expose sensitive agency or organization data to unauthorized access or loss, posing a security risk. This risk can be reduced by disabling Google Workspace Sync, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ April 2025
+- _Note:_ Google Workspace Sync MAY be enabled on a per-user basis as needed.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ CM-7
+- MITRE ATT&CK TTP Mapping
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+    - [T1048:001: Exfiltration Over Alternative Protocol: Exfiltration Over Symmetric Encrypted Non-C2 Protocol](https://attack.mitre.org/techniques/T1048/001/)
+    - [T1048:002: Exfiltration Over Alternative Protocol: Exfiltration Over Asymmetric Encrypted Non-C2 Protocol](https://attack.mitre.org/techniques/T1048/002/)
+    - [T1048:003: Exfiltration Over Alternative Protocol: Exfiltration Over Unencrypted Non-C2 Protocol](https://attack.mitre.org/techniques/T1048/003/)
+  - [T1530: Data from Cloud Storage](https://attack.mitre.org/techniques/T1530/)
+  - [T1199: Trusted Relationship](https://attack.mitre.org/techniques/T1199/)
+
+### Resources
+
+-   [Google Workspace Sync for Microsoft Outlook](https://tools.google.com/dlpage/gssmo)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Google Workspace Sync:
+
+#### GWS.GMAIL.10.1v1 Instructions
+1.  Sign in to the [Google Admin console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **End User Access -\> Google Workspace Sync**.
+4.  Uncheck the **Enable Google Workspace Sync for Microsoft Outlook for my users** checkbox.
+5.  Select **Save**.
+
+
+## 11. Automatic Forwarding
+
+This section determines whether emails can be automatically forwarded from a user's inbox to another of their choosing, possibly to external domains.
+
+### Policies
+
+#### GWS.GMAIL.11.1v1
+Automatic forwarding SHOULD be disabled, especially to external domains.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ By enabling automatic forwarding, especially to external domains, threat actors could gain persistent access to a victim's email, potentially exposing sensitive agency or organization emails to unauthorized access or loss. This risk can be reduced by disabling automatic forwarding, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
+- MITRE ATT&CK TTP Mapping
+  - [T1114: Email Collection](https://attack.mitre.org/techniques/T1114/)
+    - [T1114:003: Email Collection: Email Forwarding Rule](https://attack.mitre.org/techniques/T1114/003/)
+
+### Resources
+-   [Google Workspace Admin Help: Disable automatic forwarding](https://support.google.com/a/answer/2491924?hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Automatic Forwarding:
+
+#### GWS.GMAIL.11.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **End User Access -\> Automatic forwarding**.
+4.  Uncheck the **Allow users to automatically forward incoming email to another address** checkbox.
+5.  Select **Save**.
+
+## 12. Per-user Outbound Gateways
+
+This section determines whether outgoing mail is delivered only through Google Workspace mail servers or through another specified external SMTP server. With this setting, a user can choose which email address displays in the "From" field.
+
+### Policies
+
+#### GWS.GMAIL.12.1v1
+The option to use a per-user outbound gateway that is a mail server other than the Google Workspace (GWS) mail servers SHALL be disabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Using a per-user outbound gateway that is a mail server other than the GWS mail servers could potentially expose sensitive agency or organization emails to unauthorized access or loss, posing a security risk. Disabling this feature can reduce the risk, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
+- MITRE ATT&CK TTP Mapping
+  - [T1114: Email Collection](https://attack.mitre.org/techniques/T1114/)
+    - [T1114:002: Email Collection: Remote Email Collection](https://attack.mitre.org/techniques/T1114/002/)
+  - [T1048: Exfiltration Over Alternative Protocol](https://attack.mitre.org/techniques/T1048/)
+    - [T1204:001: User Execution: Malicious Link](https://attack.mitre.org/techniques/T1204/001/)
+    - [T1204:002: User Execution: Malicious File](https://attack.mitre.org/techniques/T1204/002)
+
+### Resources
+
+-   [Google Workspace Admin Help: Allow per-user outbound gateways](https://support.google.com/a/answer/176054?hl=en#zippy=%2Cwhy-youd-disallow-use-of-an-outbound-gateway%2Cwhy-youd-allow-use-of-an-outbound-gateway)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Per-user Outbound Gateways:
+
+#### GWS.GMAIL.12.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **End User Access -\> Allow per-user outbound gateways**.
+4.  Uncheck the **Allow users to send mail through an external SMTP server when configuring a "from" address hosted outside your email domain** checkbox.
+5.  Select **Save**.
+
+
+## 13. Unintended External Reply Warning
+
+This section determines whether users are prompted with a warning for messages that include external recipients (users with email addresses that are outside of the organization). However, the warning is not shown if the external recipient is in the organization's directory, personal contacts, or other contacts, or if a secondary domain or domain alias address is used.
+
+### Policies
+
+#### GWS.GMAIL.13.1v1
+Unintended external reply warnings SHALL be enabled.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Log-Based Check](https://img.shields.io/badge/Log--Based_Check-F6E8E5)](../../docs/usage/Limitations.md#log-based-policy-checks)
+
+- _Rationale:_ Unintended external reply warnings can help reduce the risk of exposing sensitive information in replies to external messages. Enabling these warnings reminds users to treat external messages with caution, reducing this risk and enhancing the safety and integrity of user data and systems.
+- _Last modified:_ June 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AT-2b
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+
+### Resources
+
+-   [Google Workspace Admin Help: Control Gmail external recipient warnings](https://support.google.com/a/answer/7380041?amp;ref_topic=9974443&product_name=UnuFlow&hl=en&ref_topic=9974443&visit_id=637832389706060412-548862041&rd=1&src=supportwidget0&hl=en)
+-   [Capacity Enhancement Guide Counter-Phishing Recommendations for Federal Agencies \| CISA](https://www.cisa.gov/sites/default/files/publications/Capacity_Enhancement_Guide-Counter-Phishing_Recommendations_for_Federal_Agencies.pdf)
+-   [Actions to Counter Email-Based Attacks on Election-Related Entities \| CISA](https://www.cisa.gov/sites/default/files/publications/CISA_Insights_Actions_to_Counter_Email-Based_Attacks_on_Election-Related_S508C.pdf)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings to warn users of external recipients:
+
+#### GWS.GMAIL.13.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **End User Access -\> Warn for external recipients**.
+4.  Check the **Highlight any external recipients in a conversation. Warn users before they reply to email with external recipients who aren't in their contacts** checkbox.
+5.  Select **Save**.
+
+
+## 14. Email Allowlist
+
+This section determines whether an email allowlist allows Gmail to avoid marking messages from certain IP addresses as spam. If implemented, emails from these senders will bypass important security mechanisms, such as SPF, DKIM, and DMARC.
+
+### Policies
+
+#### GWS.GMAIL.14.1v1
+An email allowlist SHOULD NOT be implemented.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Implementing an email allowlist could potentially expose users to security risks as allowlisted senders bypass important security mechanisms, including spam filtering and sender authentication checks. This risk can be reduced by not implementing an allowlist, enhancing the safety and integrity of the user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ AC-4
+- MITRE ATT&CK TTP Mapping
+  - [T1562: Impair Defenses](https://attack.mitre.org/techniques/T1562/)
+    - [T1562:001: Impair Defenses: Disable or Modify Tools](https://attack.mitre.org/techniques/T1562/001/)
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+
+### Resources
+
+-   [Google Workspace Admin Help: Add IP addresses to allowlists in Gmail](https://support.google.com/a/answer/60751?product_name=UnuFlow&hl=en&visit_id=637832433423162856-2822445044&rd=1&src=supportwidget0&hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Email Allowlists:
+
+#### GWS.GMAIL.14.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Spam, phishing, and malware -\> Email allowlist**.
+4.  Under the **Enter the IP addresses for your email allowlist** field, ensure **no IP addresses** are listed.
+5.  Select **Save**.
+
+
+## 15. Enhanced Pre-Delivery Message Scanning
+
+This section determines whether Gmail can screen and identify suspicious content that may be phishing attempts. In doing so, Google can either show a warning or move the email to spam. Email delivery will experience a short delay due to the additional checks.
+
+A Google Workspace solution is not strictly required to satisfy this baseline control, but the solution selected by an agency should offer services comparable to those offered by Google.
+
+### Policies
+
+#### GWS.GMAIL.15.1v1
+Enhanced pre-delivery message scanning SHALL be enabled to prevent phishing.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Without enhanced pre-delivery message scanning, users may be exposed to phishing attempts, posing a security risk. By enabling this feature, potential phishing emails can be identified and blocked before reaching the user, reducing the risk and enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+    - [T1566:003: Phishing: Spearphishing via Service](https://attack.mitre.org/techniques/T1566/003/)
+
+
+### Resources
+
+-   [Google Workspace Admin Help: Help prevent phishing with pre-delivery message scanning](https://support.google.com/a/answer/7380368?product_name=UnuFlow&hl=en&visit_id=637835839970922069-4253681586&rd=1&src=supportwidget0&hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Enhanced Pre-Delivery Message Scanning:
+
+#### GWS.GMAIL.15.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Spam, phishing, and malware -\> Enhanced pre-delivery message scanning**.
+4.  Check the **Enables improved detection of suspicious content prior to delivery** checkbox.
+5.  Select **Save**.
+
+
+## 16. Security Sandbox
+
+This section determines whether certain messages and their associated attachments are executed in a sandbox environment for protection against malware, ransomware, and zero-day threats. Malicious software may be missed by traditional antivirus programs. However, this may cause some messages to get delayed before final delivery. Some of the file types scanned include Microsoft executables, Microsoft Office, PDF, and archives (zip, rar).
+
+A Google Workspace solution is not strictly required to satisfy this baseline control, but the solution selected by an agency should offer services comparable to those offered by Google.
+
+### Policies
+
+#### GWS.GMAIL.16.1v1
+Security sandbox SHOULD be enabled to provide additional email protections.
+
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+[![Log-Based Check](https://img.shields.io/badge/Log--Based_Check-F6E8E5)](../../docs/usage/Limitations.md#log-based-policy-checks)
+
+- _Rationale:_ Without a security sandbox, emails with malicious content could potentially interact directly with the users' systems, posing a security risk. By enabling the security sandbox, additional protections are provided for email messages, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ July 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-3, SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+
+
+### Resources
+
+-   [Google Workspace Admin Help: Set up rules to detect harmful attachments](https://support.google.com/a/answer/7676854?amp;visit_id=637866938191629894-2885947509&amp;rd=1&product_name=UnuFlow&hl=en&visit_id=637866938191629894-2885947509&rd=2&src=supportwidget0&hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Security sandbox or Security sandbox rules:
+
+#### GWS.GMAIL.16.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Spam, phishing, and malware -\> Security sandbox**.
+4.  Check the **Enable virtual execution of attachments in a sandbox environment for all the users of the Organizational Unit for protection against malware, ransomware, and zero-day threats** checkbox.
+5.  Either **Security sandbox** or **Security sandbox rules** may be enabled but enabling **Security sandbox** takes precedence.
+6.  If **Security sandbox** rules are enabled, then the configuration needs to be completed and consists of the following fields **:**
+    1. A short description.
+    2. Email messages to affect.
+    3. Expressions to describe the content to search for in each message.
+    4. Action to take if expressions match.
+7. Select **Save**.
+
+
+## 17. Comprehensive Mail Storage
+
+This section allows for email messages sent through other Google Workspace applications (i.e., Calendar, Drive, Docs, Sheets, Slides, Drawings, Forms, and Keep) to be stored in the associated users' Gmail mailboxes. This includes a copy of all sent or received messages within a specified domain (including messages sent or received by non-Gmail mailboxes).
+
+### Policies
+
+#### GWS.GMAIL.17.1v1
+Comprehensive mail storage SHOULD be enabled to allow information traceability across applications.
+
+[![Manual](https://img.shields.io/badge/Manual-046B9A)](#gwsgmail171v06-instructions)
+
+- _Rationale:_ The absence of comprehensive mail storage could compromise the ability for information traceability across applications, posing a security risk. Enabling comprehensive mail storage can reduce this risk, enhancing the safety and integrity of user data and systems.
+- _Last modified:_ November 2023
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-12, SC-7(10)
+- MITRE ATT&CK TTP Mapping
+  - None
+
+### Resources
+
+-   [Google Workspace Admin Help: Set up comprehensive mail storage](https://support.google.com/a/answer/3547347?product_name=UnuFlow&hl=en&visit_id=637835896823763789-338955802&rd=1&src=supportwidget0&hl=en)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for Comprehensive Mail Storage:
+
+#### GWS.GMAIL.17.1v1 Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Compliance -\> Comprehensive mail storage**.
+4.  Check the **Ensure that a copy of all sent and received mail is stored in associated users' mailboxes** checkbox.
+5.  Select **Save**.
+
+
+## 18. Spam Filtering
+
+This section covers the settings relating to bypassing spam filters.
+
+### Policies
+
+#### GWS.GMAIL.18.1v1
+Domains SHALL NOT be added to lists that bypass spam filters.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+
+- _Rationale:_ Spam protections may incorrectly filter legitimate emails. Adding allowed senders is an acceptable method of combating these false positives. Allowing an entire domain, especially a common domain like office.com, could enable numerous unknown users to bypass spam protections.
+- _Last modified:_ April 2024
+- _Note:_ Allowed senders MAY be added.
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1534: Internal Spearphishing](https://attack.mitre.org/techniques/T1534/)
+
+#### GWS.GMAIL.18.2v1
+Domains SHALL NOT be added to lists that bypass spam filters and hide warnings.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+- _Rationale:_ Spam protections may incorrectly filter legitimate emails. Adding allowed senders is an acceptable method of combating these false positives. Allowing an entire domain, especially a common domain like office.com, could enable numerous unknown users to bypass spam protections.
+- _Last modified:_ April 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1534: Internal Spearphishing](https://attack.mitre.org/techniques/T1534/)
+
+#### GWS.GMAIL.18.3v1
+"Bypass spam filters" and "hide warnings for all messages from internal and external senders" SHALL NOT be enabled.
+
+[![BOD 25-01 Requirement](https://img.shields.io/badge/BOD_25--01_Requirement-C41230)](https://www.cisa.gov/news-events/directives/bod-25-01-implementation-guidance-implementing-secure-practices-cloud-services)
+[![Automated Check](https://img.shields.io/badge/Automated_Check-5E9732)](#key-terminology)
+
+
+- _Rationale:_ Bypassing spam filters and hiding warnings for all messages from internal and external senders creates a security risk by allowing all messages to bypass filters. Disabling this feature mitigates the risk.
+- _Last modified:_ April 2024
+- _NIST SP 800-53 Rev. 5 FedRAMP High Baseline Mapping:_ SI-8
+- MITRE ATT&CK TTP Mapping
+  - [T1566: Phishing](https://attack.mitre.org/techniques/T1566/)
+    - [T1566:001: Phishing: Spearphishing Attachment](https://attack.mitre.org/techniques/T1566/001/)
+    - [T1566:002: Phishing: Spearphishing Link](https://attack.mitre.org/techniques/T1566/002/)
+  - [T1534: Internal Spearphishing](https://attack.mitre.org/techniques/T1534/)
+
+### Resources
+
+-   [How to bypass the spam filter for incoming emails using the spam settings ](https://knowledge.workspace.google.com/kb/how-to-bypass-the-spam-filter-for-incoming-emails-000006661)
+
+### Prerequisites
+
+-   N/A
+
+### Implementation
+
+To configure the settings for spam filtering:
+
+#### Policy Group 18 Common Instructions
+1.  Sign in to the [Google Admin Console](https://admin.google.com).
+2.  Select **Apps -\> Google Workspace -\> Gmail**.
+3.  Select **Spam, Phishing, and Malware**.
+
+#### GWS.GMAIL.18.1v1 Instructions
+For each rule listed under **Spam**:
+1. Ensure that either:
+    * **Bypass spam filters for messages from senders or domains in selected lists** is not selected, or
+    * None of the lists shown under **Bypass spam filters for messages from senders or domains in selected lists** contain an entire domain. For example, the entire domain "example.com" is not acceptable, but the specific address, john.doe@example.com, would be.
+2. Modify the rule or lists associated with the rule as needed, then select **Save.**
+
+#### GWS.GMAIL.18.2v1 Instructions
+For each rule listed under **Spam**:
+1. Ensure that either:
+    * **Bypass spam filters and hide warnings for messages from senders or domains in selected lists** is not selected, or
+    * None of the lists shown under **Bypass spam filters and hide warnings for messages from senders or domains in selected lists** contain an entire domain. For example, the entire domain "example.com" is not acceptable, but the specific address, john.doe@example.com, would be.
+2. Modify the rule or lists associated with the rule as needed, then select **Save.**
+
+#### GWS.GMAIL.18.3v1 Instructions
+For each rule listed under **Spam**:
+1. Ensure that **Bypass spam filters and hide warnings for all messages from internal and external sender** is not selected.
+2. Select **Save.**
