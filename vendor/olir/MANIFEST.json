@@ -1,0 +1,22 @@
+{
+  "manifestFormat": "olir-vendor-v1",
+  "converterVersion": 1,
+  "retrievedAt": "2026-07-20",
+  "sourceUrl": "https://csrc.nist.gov/extensions/nudp/services/json/csf/download?olirids=all",
+  "release": {
+    "title": "The NIST Cybersecurity Framework (CSF) 2.0",
+    "changeLog": "Final",
+    "generatedDate": "2026-07-20",
+    "lanes": [
+      "SP 800-53 Rev 5.1.1",
+      "SP 800-53 Rev 5.2.0"
+    ],
+    "subcategoryCount": 106,
+    "withdrawnCount": 79
+  },
+  "note": "The CPRT service generates this workbook per request (creation timestamp = fetch time), so the raw bytes are not stable across downloads: the COMMITTED copy is the pin. NIST CPRT/OLIR content is a work of the U.S. Government (public domain). Conversion to the committed JSON happens at vendor time (src/utils/olirWorkbook.mjs); reference strings are preserved raw — all normalization is join logic in src/utils/subcategoryMapping.mjs.",
+  "files": {
+    "csf2-final-2026-07-20/csf-2-0-export.xlsx": "afc0c9e942a0ff83f12bd354f3634cc74b1e7e931781239472631749f44f49dc",
+    "csf2-final-2026-07-20/csf2-sp80053-refs.json": "149a0f8738f9413058983e37acb24dfcd091e5aeb8e10dee6b1a8064c78b16be"
+  }
+}

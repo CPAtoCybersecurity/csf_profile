@@ -3,6 +3,11 @@ src/data/communityProcedures.json text eol=lf
 src/stores/comprehensiveAssessmentData.js text eol=lf
 THIRD-PARTY-NOTICES.md text eol=lf
 src/data/platformProcedures.json text eol=lf
+src/data/platformSubcategoryMap.json text eol=lf
+data/mapping-review-queue.json text eol=lf
+data/mapping-overrides.json text eol=lf
 # Vendored upstream content is byte-frozen: any eol conversion would break
 # the sha256 pins in vendor/scuba/MANIFEST.json (verify-vendor-integrity.mjs)
 vendor/scuba/** -text
+# Same for vendor/olir/ (verify-olir-integrity.mjs); the workbook is binary
+vendor/olir/** -text
