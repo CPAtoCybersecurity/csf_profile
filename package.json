@@ -40,7 +40,16 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "rules": {
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "BinaryExpression[operator=/^(===|!==)$/] > Literal[value='community']",
+          "message": "Do not string-compare bank provenance — use the predicates in src/utils/procedureBank.js (isCommunityBankSource, isBankAttached, ...). The only permitted literal is the frozen v14 migration in assessmentsStore.js."
+        }
+      ]
+    }
   },
   "jest": {
     "transformIgnorePatterns": [

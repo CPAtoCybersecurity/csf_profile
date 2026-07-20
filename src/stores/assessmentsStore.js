@@ -307,6 +307,12 @@ export const migrateAssessmentsState = (persistedState, version) => {
       const observations = {};
       for (const [itemId, obs] of Object.entries(a.observations)) {
         const src = obs?.procedureSource;
+        // FROZEN historical migration (plan §5/§7): the literal
+        // bank === 'community' equality is deliberate. This step rewrites
+        // relative links against the community catalog layout and must
+        // never run over another bank's records — do not generalize to the
+        // procedureBank predicates.
+        // eslint-disable-next-line no-restricted-syntax
         if (src?.bank === 'community' && src.modified === false && !src.tailored &&
             typeof src.bankId === 'string' && typeof obs.testProcedures === 'string') {
           const sourceDir = `ASSESSMENT_CATALOG/3_Test_Procedures/${src.bankId.slice(0, 2)}`;

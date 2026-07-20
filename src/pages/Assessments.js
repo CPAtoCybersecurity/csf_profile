@@ -27,12 +27,13 @@ import useUserStore from '../stores/userStore';
 import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
-import { bankCoverage, getBankProcedure, buildProcedureSource, bankSourceUrl } from '../utils/procedureBank';
+import { bankCoverage, getBankProcedure, canResetToCommunity, resetToCommunityUpdate, sourceUrlFor } from '../utils/procedureBank';
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
 import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
 import ExternalLinksEditor from '../components/ExternalLinksEditor';
+import ProcedureSourceBadge from '../components/ProcedureSourceBadge';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -774,22 +775,21 @@ Format as a numbered list. Be specific and actionable.`;
   }, [currentAssessmentId, selectedItemId, updateObservation]);
 
   // Attach (or re-attach) the community procedure for the selected item.
-  // Both write pristine provenance explicitly so the store's modified-flag
-  // heuristic doesn't mark a deliberate attach as a customization.
+  // The pure producer stamps pristine provenance (so the store's
+  // modified-flag heuristic doesn't mark a deliberate attach as a
+  // customization) and refuses to overwrite another bank's content.
   const handleInsertBankProcedure = useCallback((existingText) => {
     if (!currentAssessmentId || !selectedItemId) return;
-    const entry = getBankProcedure(selectedItemId);
-    if (!entry) return;
+    const existing = getObservation(currentAssessmentId, selectedItemId);
+    const update = resetToCommunityUpdate(selectedItemId, existing?.procedureSource);
+    if (!update) return;
     if (existingText && existingText.trim() &&
         !window.confirm('Replace the current test procedures with the community version?')) {
       return;
     }
-    updateObservation(currentAssessmentId, selectedItemId, {
-      testProcedures: entry.markdown,
-      procedureSource: buildProcedureSource(entry.bankId)
-    });
-    toast.success(`Community procedure for ${entry.bankId} attached`);
-  }, [currentAssessmentId, selectedItemId, updateObservation]);
+    updateObservation(currentAssessmentId, selectedItemId, update);
+    toast.success(`Community procedure for ${update.procedureSource.bankId} attached`);
+  }, [currentAssessmentId, selectedItemId, getObservation, updateObservation]);
 
   // Deterministic tailoring of the selected item's procedure: canned
   // name + tool/platform substitutions from the org profile. No AI, no
@@ -1579,17 +1579,7 @@ Format as a numbered list. Be specific and actionable.`;
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-2">
                         Test Procedures
-                        {currentObservation.procedureSource?.bank === 'community' && (
-                          <span className="px-1.5 py-0.5 rounded text-xs bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 flex items-center gap-1">
-                            <BookOpen size={11} />
-                            {currentObservation.procedureSource.modified ? 'Community · customized' : 'Community'}
-                          </span>
-                        )}
-                        {currentObservation.procedureSource?.tailored && currentObservation.procedureSource?.bank !== 'community' && (
-                          <span className="px-1.5 py-0.5 rounded text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300">
-                            Tailored to your org
-                          </span>
-                        )}
+                        <ProcedureSourceBadge source={currentObservation.procedureSource} />
                       </label>
                       <div className="flex items-center gap-3">
                         {editMode && hasOrgProfile && currentObservation.testProcedures && (
@@ -1615,7 +1605,7 @@ Format as a numbered list. Be specific and actionable.`;
                               : (<><Sparkles size={12} /> Tailor with AI</>)}
                           </button>
                         )}
-                        {editMode && getBankProcedure(selectedItemId) && (
+                        {editMode && getBankProcedure(selectedItemId) && canResetToCommunity(currentObservation.procedureSource) && (
                           <button
                             type="button"
                             onClick={() => handleInsertBankProcedure(currentObservation.testProcedures)}
@@ -1627,9 +1617,9 @@ Format as a numbered list. Be specific and actionable.`;
                               : (<><BookOpen size={12} /> Insert community procedure</>)}
                           </button>
                         )}
-                        {!editMode && currentObservation.procedureSource?.bank === 'community' && bankSourceUrl(currentObservation.procedureSource.bankId) && (
+                        {!editMode && sourceUrlFor(currentObservation.procedureSource) && (
                           <a
-                            href={bankSourceUrl(currentObservation.procedureSource.bankId)}
+                            href={sourceUrlFor(currentObservation.procedureSource)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:underline"
@@ -2537,11 +2527,16 @@ Format as a numbered list. Be specific and actionable.`;
                           <div className="max-h-56 overflow-y-auto space-y-2 mt-2">
                             {scopeCoverage.covered.map((id) => {
                               const entry = getBankProcedure(id);
+                              // Preview through the same producer the create
+                              // path uses (in its untailored form), so the
+                              // previewed trunk text cannot diverge from what
+                              // attaches.
+                              const previewText = bankAttachObservation(entry).testProcedures;
                               return (
                                 <details key={id} className="p-2 bg-white dark:bg-gray-700 rounded border text-sm">
                                   <summary className="cursor-pointer font-medium">{id} — {entry.title}</summary>
                                   <pre className="whitespace-pre-wrap text-xs text-gray-600 dark:text-gray-300 mt-2 max-h-40 overflow-y-auto">
-                                    {entry.markdown.slice(0, 1500)}{entry.markdown.length > 1500 ? '\n…(full procedure attaches on create)' : ''}
+                                    {previewText.slice(0, 1500)}{previewText.length > 1500 ? '\n…(full procedure attaches on create)' : ''}
                                   </pre>
                                 </details>
                               );
