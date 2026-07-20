@@ -74,12 +74,20 @@ const MITRE_TECHNIQUE_URL = /attack\.mitre\.org\/techniques\/(T\d+)(?:\/(\d+))?/
  */
 export const normalizeScubaMarkdown = (markdown) => {
   let text = markdown
-    // HTML comments are upstream build metadata (e.g. <!--Policy: ...-->),
-    // deleted by the sanitizer — strip them at generation instead.
-    .replace(/<!--[\s\S]*?-->/g, '')
     // The serializer would entity-encode a non-breaking space.
     .replace(/ /g, ' ')
     .replace(/\r\n/g, '\n');
+
+  // HTML comments are upstream build metadata (e.g. <!--Policy: ...-->),
+  // deleted by the sanitizer — strip them at generation instead. Loop
+  // until stable: a single pass can resurrect a `<!--` from nested sequences
+  // (CodeQL js/incomplete-multi-character-sanitization); the trailing
+  // `<` → `&lt;` encoding below is the universal backstop either way.
+  let previous;
+  do {
+    previous = text;
+    text = text.replace(/<!--[\s\S]*?-->/g, '');
+  } while (text !== previous);
 
   // <pre> blocks (ScubaGear console click-paths) become fenced code blocks;
   // inline emphasis tags inside them are dropped (markdown emphasis would
