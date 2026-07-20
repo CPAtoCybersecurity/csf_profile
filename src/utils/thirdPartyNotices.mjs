@@ -46,14 +46,19 @@ export const MITRE_NOTICE =
  * CISA-sourced — detected STRUCTURALLY from upstream provenance, not from a
  * hand-entered notice key, so forgetting the key cannot silently omit a
  * required notice (the key remains honored as a belt-and-braces trigger).
+ * Wording reconciled (PR-3) against the disclaimer the vendored baselines
+ * themselves carry: their standard form provides the material "as is" for
+ * informational purposes only and disclaims endorsement of any commercial
+ * product or service — both clauses are reflected below.
  */
 export const CISA_DISCLAIMER =
-  'Portions of this project are derived from CISA Secure Configuration ' +
-  'Baselines (SCuBA), released under CC0 1.0 Universal. CISA and the United ' +
-  'States Government do not endorse this project or its authors, and no such ' +
-  'endorsement may be inferred; CISA material is referenced for informational ' +
-  'purposes only. CC0 1.0 does not waive trademark rights: no CISA or DHS ' +
-  'marks, seals, or logos are used by this project.';
+  'Portions of this project are derived from the CISA Secure Configuration ' +
+  'Baselines (SCuBA), released under CC0 1.0 Universal. Per the disclaimer ' +
+  'those baselines carry, the material is provided "as is" for informational ' +
+  'purposes only. CISA and the United States Government do not endorse this ' +
+  'project, its authors, or any commercial product or service, and no such ' +
+  'endorsement may be inferred. CC0 1.0 does not waive trademark rights: no ' +
+  'CISA or DHS marks, seals, or logos are used by this project.';
 
 /** Structural CISA provenance: the record's upstream repo is a cisagov one. */
 export const isCisaSourced = (record) =>

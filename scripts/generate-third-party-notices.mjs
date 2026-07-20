@@ -37,6 +37,13 @@ const BANKS = [
       JSON.parse(
         fs.readFileSync(path.join(ROOT, 'src', 'data', 'communityProcedures.json'), 'utf8')
       ).procedures
+  },
+  {
+    name: 'Platform procedure bank (src/data/platformProcedures.json)',
+    load: () =>
+      JSON.parse(
+        fs.readFileSync(path.join(ROOT, 'src', 'data', 'platformProcedures.json'), 'utf8')
+      ).procedures
   }
 ];
 
@@ -44,7 +51,7 @@ const BANKS = [
 // BANKS would be silently un-covered by the license gate — the curated-list
 // rot mode. Any src/data/*.json carrying a bankVersion signature must be
 // declared above.
-const COVERED = new Set(['communityProcedures.json']);
+const COVERED = new Set(['communityProcedures.json', 'platformProcedures.json']);
 const dataDir = path.join(ROOT, 'src', 'data');
 const unregistered = fs.readdirSync(dataDir)
   .filter((f) => f.endsWith('.json') && !COVERED.has(f))

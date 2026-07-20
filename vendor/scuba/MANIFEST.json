@@ -1,0 +1,48 @@
+{
+  "manifestFormat": "scuba-vendor-v1",
+  "parserVersion": 1,
+  "licenseSchemaVersion": 1,
+  "retrievedAt": "2026-07-20",
+  "note": "Baseline TEXT only is imported (plan §6 item 3). The upstream repos vendor third-party dependencies under their own licenses; per-file license detection (src/utils/scubaBaseline.mjs), never the repo-level CC0 label, decides what each record stamps. removedpolicies.md (deprecated policies) and README.md are excluded.",
+  "sources": [
+    {
+      "platformId": "google-workspace",
+      "repo": "cisagov/ScubaGoggles",
+      "sha": "95d80462699e469b569e5b5caf921c4b8c6c884a",
+      "baselinesPath": "scubagoggles/baselines",
+      "licenseId": "CC0-1.0",
+      "policyCensus": 137,
+      "files": {
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/assuredcontrols.md": "842c530bdb448e979b8dd44dddb411356341ccafb182925ac7863f42cbc661dc",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/calendar.md": "2eb9434a25659fec204011f3555a09dacb3648f885be608a97667d2dbad24386",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/chat.md": "536b616a6c05d51259d42d8b13261730bd993457d1b576f7d3f5700590436114",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/classroom.md": "ec918f2c2e549eafe41163530b6a0a31fad7fe6897b96fea57352e6ebc4f5806",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/commoncontrols.md": "3b513afae5197b54ea98401db46cdbf92af2a76e85bec2be2c2967abc4b5ddb7",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/drive.md": "0f319850cf02315d812119fd20bbb5f31e5f5e026455c0e48e40792e0f1719ed",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/gemini.md": "4a5ab54aa13c8d63ae12a6321a1f8f2d11648f384589ba6adb1db56558f035f0",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/gmail.md": "f1af0a08aa88ea66d6aae0e92d2b0ce8ad4067f341a2208df3d29d8000ac8592",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/groups.md": "ea8d2f756100f0651bfd5089829625d76f02a1428b1461fb22039c097d0dc51b",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/meet.md": "441b55d0ab40ff7fc197f57069c3df33ff0bddab2e9d7cbf510d4946595121a6",
+        "scubagoggles/95d80462699e469b569e5b5caf921c4b8c6c884a/baselines/sites.md": "3d1617d16aeac86120114eb19c6ea1a1fd0b221ce5936b3afe537f10395d6508"
+      }
+    },
+    {
+      "platformId": "microsoft-365",
+      "repo": "cisagov/ScubaGear",
+      "sha": "d7cf55f53fcc7faddde61086581b06da86a8da1d",
+      "baselinesPath": "PowerShell/ScubaGear/baselines",
+      "licenseId": "CC0-1.0",
+      "policyCensus": 128,
+      "files": {
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/aad.md": "3d2815f597f2be044f9e140535cce4d90b67f4ed734d5a3d4c1323f10ec96604",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/defender.md": "5718b800e9c99ac73f0196a2665ba563e36bfe0236aaf6a54a0eccbcf97f402e",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/exo.md": "de6fd5151958383ecaae4f8a0d1092d5bb6d6d885d21afc8f13221dd775d80c1",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/powerbi.md": "f9d22c204fdd11d53800d1da9afece03edcb05dac11878417f5042f73ea66b1f",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/powerplatform.md": "e87a2d553aa0390dcce5d9e7d4a69e1cd898080cd5cf1c519e8e72e2a1cc98e5",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/securitysuite.md": "46fbd4c9a7212ae968ea4edfe290f0ecc4af6f0d6bf47661740ab45257200104",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/sharepoint.md": "7ea2f414156f2d367924f8a8d5b2267cfd39a679ae65bbfbc2327cafaac2cb10",
+        "scubagear/d7cf55f53fcc7faddde61086581b06da86a8da1d/baselines/teams.md": "6306c7e414785abb85ed9695002b2f27772e179af5c573fb03a9b6f045c6d0df"
+      }
+    }
+  ]
+}
