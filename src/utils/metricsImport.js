@@ -22,6 +22,7 @@
  */
 
 import Papa from 'papaparse';
+import { licenseIsRestricted } from './licenseClass.mjs';
 
 export const METRICS_CSV_FORMAT = 1;
 
@@ -45,25 +46,13 @@ const canonicalType = (raw) => {
 
 const DIRECTIONS = ['higher_is_better', 'lower_is_better', ''];
 
-const RESTRICTED_TOKENS = ['NC', 'ND', 'PROPRIETARY', 'INTERNAL', 'NONCOMMERCIAL', 'NODERIVATIVES', 'NODERIVS'];
-// Spelled-out two-word forms ("Non-Commercial", "No Derivatives") tokenize to
-// adjacent pairs — matched as sequences so ordinary words never false-positive.
-const RESTRICTED_PAIRS = [['NON', 'COMMERCIAL'], ['NO', 'DERIVATIVES'], ['NO', 'DERIVS']];
-
-/**
- * True when a license string forbids redistribution — NC/ND Creative Commons
- * variants (abbreviated or spelled out), proprietary, or explicitly internal
- * content. Token-based so "CC-BY-NC-ND-4.0", "CC BY-NC 4.0", "Creative
- * Commons Noncommercial", and "No Derivatives" all match without substring
- * false-positives.
- */
-export const licenseIsRestricted = (license) => {
-  const tokens = String(license || '').toUpperCase().split(/[^A-Z0-9]+/).filter(Boolean);
-  if (RESTRICTED_TOKENS.some((t) => tokens.includes(t))) return true;
-  return RESTRICTED_PAIRS.some(([a, b]) =>
-    tokens.some((t, i) => t === a && tokens[i + 1] === b)
-  );
-};
+// The restriction predicate is now expressed on the license class +
+// obligations model (licenseClass.js) — REFERENCE_ONLY class or a
+// noDerivatives obligation. Re-exported from HERE as the same binding so the
+// share-block call sites (dataExport/shareRegistry) and this module's
+// catalogue check are untouched. Byte-compatible with the historical token
+// matcher, pinned by a reference-implementation property test.
+export { licenseIsRestricted } from './licenseClass.mjs';
 
 /** True when ANY record in the catalogue carries a restricted license. */
 export const catalogIsRestricted = (records) =>

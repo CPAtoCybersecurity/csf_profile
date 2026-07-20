@@ -20,6 +20,7 @@
  */
 
 import { getBankProcedure, buildProcedureSource } from './procedureBank';
+import { licenseGate, licenseProvenance, mayTailor, refusalPlaceholder } from './licenseClass.mjs';
 import { CLOUD_TERMS, EDR_PRODUCTS, GOOGLE_EMAIL_TERMS } from './stackTailorMaps';
 
 /**
@@ -208,14 +209,31 @@ export const tailorMarkdown = (markdown, profile, options = {}) => {
  * so the tailored flag can never be forgotten at a call site.
  */
 export const bankAttachObservation = (bankEntry, profile, options = {}) => {
+  // License gate — the attach binding of the single license authority.
+  // Unlicensed entries (the whole community bank) pass through untouched.
+  // A refused entry attaches a fail-closed explicit placeholder with ZERO
+  // licensed text; the return stays total because call sites dereference
+  // `.testProcedures` directly. noDerivatives content forces the tailor off:
+  // verbatim and omission are the only forms a no-derivatives license permits.
+  const gate = licenseGate(bankEntry);
+  if (!gate.allow) {
+    return {
+      testProcedures: refusalPlaceholder(gate.reason),
+      procedureSource: { ...buildProcedureSource(bankEntry.bankId), tailored: false }
+    };
+  }
   const { substituteName = false, adaptStack = false } = options;
-  const wantTailor = (substituteName || adaptStack) && profile;
+  const wantTailor = (substituteName || adaptStack) && profile && !gate.verbatimOnly;
   const { text, tailored } = wantTailor
     ? tailorMarkdown(bankEntry.markdown, profile, { substituteName, adaptStack })
     : { text: bankEntry.markdown, tailored: false };
   return {
     testProcedures: text,
-    procedureSource: { ...buildProcedureSource(bankEntry.bankId), tailored }
+    procedureSource: {
+      ...buildProcedureSource(bankEntry.bankId),
+      tailored,
+      ...licenseProvenance(bankEntry)
+    }
   };
 };
 
@@ -226,6 +244,10 @@ export const bankAttachObservation = (bankEntry, profile, options = {}) => {
  * for the toast.
  */
 export const deterministicTailorUpdate = (currentText, existingSource, itemId, profile) => {
+  // Transform binding of the license gate: tailoring no-derivatives content
+  // would create a derivative, so the action is a no-op via the existing
+  // "nothing would change" null contract every call site already handles.
+  if (existingSource && !mayTailor(existingSource)) return null;
   const { text, tailored, applied } = tailorMarkdown(currentText, profile, { substituteName: true, adaptStack: true });
   if (!tailored) return null;
   return {

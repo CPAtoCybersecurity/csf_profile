@@ -26,6 +26,12 @@ jobs:
       - name: Comprehensive assessment data matches catalog
         run: node scripts/generate-comprehensive-assessment.mjs --check
 
+      # License gate (plan §7 PR-2): any attribution-obligated bank record
+      # missing a complete attribution block, any reference-only record found
+      # bundled, or notices drift from the shipped banks fails the build.
+      - name: Third-party notices match shipped banks (license gate)
+        run: node scripts/generate-third-party-notices.mjs --check
+
   private-data-leak-guard:
     name: Private data leak guard
     runs-on: ubuntu-latest
