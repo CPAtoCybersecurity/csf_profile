@@ -28,5 +28,6 @@ jobs:
             --exclude 'example\.com'
             --exclude-path node_modules
             --exclude-path vendor
+            --exclude-path _future
             './**/*.md'
           fail: true
