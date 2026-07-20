@@ -27,9 +27,14 @@ describe('SEEDED_CONTROLS (issue #299)', () => {
     });
   });
 
-  test('stamping adds ONLY the two classification fields', () => {
+  test('stamping adds ONLY the classification fields and the #306 field defaults', () => {
     SEEDED_CONTROLS.forEach((c, i) => {
-      const { assessmentId, seedSource, ...rest } = c;
+      // issue #306 normalizes name/tests/frameworks into the seed so a fresh
+      // install matches a migrated one. Those three are asserted to be exactly
+      // the empty defaults — a seed that smuggled content through them would
+      // fail here — and then removed so the original equality still bites.
+      const { assessmentId, seedSource, name, tests, frameworks, ...rest } = c;
+      expect({ name, tests, frameworks }).toEqual({ name: '', tests: '', frameworks: '' });
       expect(rest).toEqual(DEFAULT_CONTROLS[i]);
     });
   });
@@ -114,10 +119,16 @@ describe('migrateControlsState (v5 → v6 chain, issue #299)', () => {
     expect(after.controls).toEqual(SEEDED_CONTROLS);
   });
 
-  test('a pre-v5 install with its own controls keeps them untouched', () => {
+  test('a pre-v5 install with its own controls keeps them unclassified', () => {
     const mine = { controlId: 'CTL-001', implementationDescription: 'Mine', createdDate: '2026-01-01T00:00:00.000Z' };
     const after = migrateControlsState({ controls: [mine] }, 0);
-    expect(after.controls).toEqual([mine]);
+    // The #306 pass adds the new field defaults to EVERY record, demo or not.
+    // What must not happen is a demo classification landing on a user record.
+    expect(after.controls).toHaveLength(1);
+    expect(after.controls[0]).toMatchObject(mine);
+    expect(after.controls[0].assessmentId).toBeUndefined();
+    expect(after.controls[0].seedSource).toBeUndefined();
+    expect(after.controls[0]).toMatchObject({ name: '', tests: '', frameworks: '', status: 'Not Implemented' });
   });
 
   test('a v5 install with the pristine demo set converges to the fresh v6 seed state', () => {
@@ -130,7 +141,11 @@ describe('migrateControlsState (v5 → v6 chain, issue #299)', () => {
     const mine = { controlId: 'CTL-001', implementationDescription: 'Mine', createdDate: '2026-01-01T00:00:00.000Z' };
     const after = migrateControlsState({ controls: [{ ...SEED }, mine] }, 5);
     expect(after.controls[0].assessmentId).toBe(COMPREHENSIVE_ASSESSMENT_ID);
-    expect(after.controls[1]).toEqual(mine);
+    // The user control keeps its own content and stays unclassified; only the
+    // issue #306 field defaults are added to it.
+    expect(after.controls[1]).toMatchObject(mine);
+    expect(after.controls[1].assessmentId).toBeUndefined();
+    expect(after.controls[1].seedSource).toBeUndefined();
   });
 
   test('migration never changes the record count', () => {

@@ -54,6 +54,32 @@ export function escapeCSVValue(value) {
 }
 
 /**
+ * CSV formula guard for values that are handed to `Papa.unparse`.
+ *
+ * `escapeCSVValue` above does two jobs: it prefixes formula-triggering
+ * characters AND it wraps-and-quotes. The second job is Papa's, and doing it
+ * twice is lossy: Papa sees the already-quoted string, quotes it again, and the
+ * value comes back from a re-import carrying literal `"` characters — which
+ * grow by two on every export → import cycle. An apostrophe alone triggers it,
+ * so `Sam's quarterly review` is enough.
+ *
+ * This helper does the half that is genuinely ours — the injection guard — and
+ * leaves quoting to Papa, which gets it right. Use it at every `Papa.unparse`
+ * call site. `escapeCSVValue` stays for hand-rolled CSV assembly, where the
+ * wrapping IS needed and nothing else quotes.
+ *
+ * @param {string} value - The value to guard
+ * @returns {string} - Value safe to hand to Papa.unparse
+ */
+export function csvFormulaGuard(value) {
+  if (value === null || value === undefined) return '';
+  const stringValue = String(value);
+  // =, +, -, @ (and leading tab/CR, which some parsers strip before the check)
+  // can execute formulas in Excel/LibreOffice.
+  return /^[=+\-@\t\r]/.test(stringValue) ? `'${stringValue}` : stringValue;
+}
+
+/**
  * Validate email format
  * @param {string} email - The email to validate
  * @returns {boolean} - Whether the email is valid

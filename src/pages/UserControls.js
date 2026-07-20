@@ -15,7 +15,7 @@ import DropdownPortal from '../components/DropdownPortal';
 import SortableHeader from '../components/SortableHeader';
 
 // Stores
-import useControlsStore from '../stores/controlsStore';
+import useControlsStore, { CONTROL_STATUSES } from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useFrameworksStore from '../stores/frameworksStore';
 import useUserStore from '../stores/userStore';
@@ -74,6 +74,10 @@ const UserControls = () => {
   // New control form state
   const [newControl, setNewControl] = useState({
     controlId: '',
+    name: '',
+    status: CONTROL_STATUSES[0],
+    tests: '',
+    frameworks: '',
     implementationDescription: '',
     ownerId: null,
     stakeholderIds: [],
@@ -210,6 +214,17 @@ const UserControls = () => {
     return user ? user.name : 'Unknown';
   }, [users]);
 
+  // Implementation-status badge variant (issue #306). Uses the same semantic
+  // badge classes the rest of the app does, so it inherits both themes.
+  const getControlStatusColor = useCallback((status) => {
+    switch (status) {
+      case 'Implemented': return 'badge-success';
+      case 'Partially Implemented': return 'badge-warning';
+      case 'Not Applicable': return 'badge-info';
+      default: return 'badge-neutral';
+    }
+  }, []);
+
   // Filter and sort data
   const filteredData = useMemo(() => {
     let result = [...scopedControls];
@@ -218,6 +233,8 @@ const UserControls = () => {
       const search = searchTerm.toLowerCase();
       result = result.filter(c =>
         c.controlId?.toLowerCase().includes(search) ||
+        // issue #306 — the control name is the field most people will search by
+        c.name?.toLowerCase().includes(search) ||
         c.implementationDescription?.toLowerCase().includes(search)
       );
     }
@@ -313,6 +330,10 @@ const UserControls = () => {
     setIsCreating(true);
     setNewControl({
       controlId: getNextControlId(),
+      name: '',
+      status: CONTROL_STATUSES[0],
+      tests: '',
+      frameworks: '',
       implementationDescription: '',
       ownerId: null,
       stakeholderIds: [],
@@ -421,9 +442,16 @@ const UserControls = () => {
   }, [importControlsCSV]);
 
   const handleDownloadTemplate = useCallback(() => {
+    // Headers match exactly what importControlsCSV reads, so the template can
+    // be filled in and imported without translation (issue #306 added Control
+    // Name / Status / Tests / Frameworks).
     const templateData = [
       {
         'Control ID': 'CTL-001',
+        'Control Name': 'Quarterly Access Review',
+        'Status': CONTROL_STATUSES[0],
+        'Tests': 'Sample 25 accounts per quarter; confirm reviewer sign-off in the ticket.',
+        'Frameworks': 'NIST CSF 2.0; SOC 2',
         'Control Implementation Description': 'Example control description',
         'Control Owner ID': 'Owner Name <owner@example.com>',
         'Stakeholder IDs': 'Person One <person1@example.com>; Person Two <person2@example.com>',
@@ -431,7 +459,17 @@ const UserControls = () => {
       }
     ];
 
-    const headers = ['Control ID', 'Control Implementation Description', 'Control Owner ID', 'Stakeholder IDs', 'Linked Requirements'];
+    const headers = [
+      'Control ID',
+      'Control Name',
+      'Status',
+      'Tests',
+      'Frameworks',
+      'Control Implementation Description',
+      'Control Owner ID',
+      'Stakeholder IDs',
+      'Linked Requirements'
+    ];
     const csv = [
       headers.join(','),
       templateData.map(row => headers.map(h => `"${row[h] || ''}"`).join(',')).join('\n')
@@ -664,6 +702,11 @@ const UserControls = () => {
               <thead className="sticky top-0 z-10">
                 <tr>
                   <SortableHeader label="Control ID" sortKey="controlId" currentSort={sort} onSort={handleSort} />
+                  <SortableHeader label="Control Name" sortKey="name" currentSort={sort} onSort={handleSort} />
+                  <SortableHeader label="Status" sortKey="status" currentSort={sort} onSort={handleSort} />
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Frameworks
+                  </th>
                   <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Implementation Description
                   </th>
@@ -685,6 +728,21 @@ const UserControls = () => {
                     onClick={() => handleSelectControl(control)}
                   >
                     <td className="p-3 text-sm font-medium font-mono">{control.controlId}</td>
+                    <td className="p-3 text-sm">
+                      {control.name
+                        ? <span className="font-medium">{control.name}</span>
+                        : <span className="text-gray-400">Unnamed</span>}
+                    </td>
+                    <td className="p-3 text-sm">
+                      <span className={`badge ${getControlStatusColor(control.status)}`}>
+                        {control.status || CONTROL_STATUSES[0]}
+                      </span>
+                    </td>
+                    <td className="p-3 text-sm">
+                      {control.frameworks
+                        ? <span className="text-gray-600">{control.frameworks}</span>
+                        : <span className="text-gray-400">None</span>}
+                    </td>
                     <td className="p-3 text-sm">
                       <div className="max-w-md line-clamp-2 text-gray-600">
                         {control.implementationDescription || 'No description'}
@@ -883,6 +941,61 @@ const UserControls = () => {
                       )}
                     </div>
 
+                    {/* Control Name (issue #306) */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Control Name</label>
+                      {editMode || isCreating ? (
+                        <input
+                          type="text"
+                          value={currentControl.name || ''}
+                          onChange={(e) => handleFieldChange('name', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded"
+                          placeholder="e.g. Quarterly Access Review"
+                        />
+                      ) : (
+                        <p className="mt-1">{currentControl.name || 'Unnamed'}</p>
+                      )}
+                    </div>
+
+                    {/* Implementation status (issue #306) */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Status</label>
+                      {editMode || isCreating ? (
+                        <select
+                          value={currentControl.status || CONTROL_STATUSES[0]}
+                          onChange={(e) => handleFieldChange('status', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded"
+                        >
+                          {CONTROL_STATUSES.map((value) => (
+                            <option key={value} value={value}>{value}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <p className="mt-1">
+                          <span className={`badge ${getControlStatusColor(currentControl.status)}`}>
+                            {currentControl.status || CONTROL_STATUSES[0]}
+                          </span>
+                        </p>
+                      )}
+                    </div>
+
+                    {/* Frameworks (issue #306) — stored free text, not derived
+                        from the linked requirements below */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Frameworks</label>
+                      {editMode || isCreating ? (
+                        <input
+                          type="text"
+                          value={currentControl.frameworks || ''}
+                          onChange={(e) => handleFieldChange('frameworks', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded"
+                          placeholder="e.g. NIST CSF 2.0; SOC 2"
+                        />
+                      ) : (
+                        <p className="mt-1">{currentControl.frameworks || 'None recorded'}</p>
+                      )}
+                    </div>
+
                     {/* Implementation Description */}
                     <div>
                       <label className="text-sm font-medium text-gray-500">Control Implementation Description</label>
@@ -897,6 +1010,27 @@ const UserControls = () => {
                         <div className="mt-1 prose prose-sm max-w-none">
                           <Markdown>
                             {currentControl.implementationDescription || 'No description'}
+                          </Markdown>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Tests (issue #306) — how this control is tested. The
+                        control's own test plan, distinct from an assessment
+                        observation's point-in-time test procedures. */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">Tests</label>
+                      {editMode || isCreating ? (
+                        <textarea
+                          value={currentControl.tests || ''}
+                          onChange={(e) => handleFieldChange('tests', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded h-24"
+                          placeholder="How is this control tested? Steps, sample size, evidence to collect..."
+                        />
+                      ) : (
+                        <div className="mt-1 prose prose-sm max-w-none">
+                          <Markdown>
+                            {currentControl.tests || 'No tests documented'}
                           </Markdown>
                         </div>
                       )}

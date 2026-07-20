@@ -204,10 +204,16 @@ describe('migrateArtifactsState — the production migrate path (issue #297)', (
       .toBe(COMPREHENSIVE_ASSESSMENT_ID);
   });
 
-  test('a user-created artifact rides the full chain untouched', () => {
+  test('a user-created artifact rides the full chain unclassified', () => {
     const mine = { artifactId: 'AR-9001', name: 'My evidence', link: 'https://intranet.example.com/x' };
     const after = migrateArtifactsState({ artifacts: [mine] }, 7);
-    expect(after.artifacts[0]).toEqual(mine);
+    // The issue #306 pass adds the health/lastModified keys to every record.
+    // What must not happen is a demo classification landing on a user record,
+    // or the user's own content being rewritten.
+    expect(after.artifacts[0]).toMatchObject(mine);
+    expect(after.artifacts[0].assessmentId).toBeUndefined();
+    expect(after.artifacts[0].seedSource).toBeUndefined();
+    expect(after.artifacts[0].health).toBe('');
   });
 });
 

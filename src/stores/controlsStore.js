@@ -1,21 +1,48 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
-import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
+import { sanitizeInput, csvFormulaGuard } from '../utils/sanitize';
 import { DEFAULT_CONTROLS } from './defaultControlsData';
 import { COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
+
+/**
+ * Implementation status a control can carry (issue #306). The first value is
+ * the default for a control that has never been given one; the shipped Alma
+ * demo set already uses 'Implemented' and 'Partially Implemented'.
+ */
+export const CONTROL_STATUSES = [
+  'Not Implemented',
+  'Partially Implemented',
+  'Implemented',
+  'Not Applicable'
+];
+
+// NOTE ON ORDER: CONTROL_STATUSES is declared ABOVE the seed below, and must
+// stay there. The seed is built by calling normalizeControlFields, which reads
+// CONTROL_STATUSES[0] — and a `const` is in its temporal dead zone until its
+// own line runs, so declaring it after the seed throws
+// "Cannot access 'CONTROL_STATUSES' before initialization" at module load and
+// white-screens the app. It does not throw today only because every shipped
+// demo control already has a status, so that branch is never reached; one
+// status-less demo record would be enough to trip it.
 
 // The shipped Alma controls are demo evidence for the demo assessment
 // (issue #299, same segregation scheme as #297 gave users/findings/artifacts):
 // stamped with the demo assessment's id + seed provenance so they appear only
 // in the demo assessment's scope, while anything a user creates (which never
 // carries an assessmentId unless a scope stamps one) stays visible everywhere.
-export const SEEDED_CONTROLS = DEFAULT_CONTROLS.map((c) => ({
-  ...c,
-  assessmentId: COMPREHENSIVE_ASSESSMENT_ID,
-  seedSource: DEMO_SEED_SOURCE
-}));
+// The issue #306 fields are normalized into the seed itself, so a FRESH
+// install and an UPGRADED install hold byte-identical demo records. Without
+// this the v7 migration would add name/tests/frameworks to an existing
+// install's copies while a fresh install's copies lacked them.
+export const SEEDED_CONTROLS = normalizeControlFields({
+  controls: DEFAULT_CONTROLS.map((c) => ({
+    ...c,
+    assessmentId: COMPREHENSIVE_ASSESSMENT_ID,
+    seedSource: DEMO_SEED_SOURCE
+  }))
+}).controls;
 
 const useControlsStore = create(
   persist(
@@ -83,11 +110,24 @@ const useControlsStore = create(
       createControl: (controlData) => {
         const newControl = {
           controlId: controlData.controlId || `CTL-${String(get().controls.length + 1).padStart(3, '0')}`,
+          // Human-readable control name, distinct from the control ID (issue #306).
+          // Not DOMPurify-stripped — see updateControl for why.
+          name: controlData.name || '',
           implementationDescription: sanitizeInput(controlData.implementationDescription || ''),
           ownerId: controlData.ownerId || null,
           stakeholderIds: controlData.stakeholderIds || [],
           linkedRequirementIds: controlData.linkedRequirementIds || [],
-          status: controlData.status || 'Not Implemented',
+          status: controlData.status || CONTROL_STATUSES[0],
+          // How this control is tested (issue #306) — free text, one control's
+          // test plan. Distinct from an assessment observation's testProcedures,
+          // which is point-in-time evidence for one evaluation.
+          tests: controlData.tests || '',
+          // Frameworks this control satisfies (issue #306). STORED and
+          // importable per Steve's 2026-07-19 ratification: a control catalog
+          // imported from elsewhere names its frameworks directly, and may
+          // carry no linked requirements to derive them from. Free text; the
+          // Linked Requirements list remains the machine-readable linkage.
+          frameworks: controlData.frameworks || '',
           // Optional fields from migration
           artifacts: controlData.artifacts || '',
           findings: controlData.findings || '',
@@ -137,13 +177,25 @@ const useControlsStore = create(
 
       // Update existing control
       updateControl: (controlId, updates) => {
-        const sanitizedUpdates = {
-          ...updates,
-          implementationDescription: updates.implementationDescription
-            ? sanitizeInput(updates.implementationDescription)
-            : updates.implementationDescription,
-          lastModified: new Date().toISOString()
-        };
+        // The issue #306 fields (name/tests/frameworks) are deliberately NOT
+        // run through sanitizeInput. That helper is DOMPurify with
+        // ALLOWED_TAGS: [], which DELETES angle-bracket content outright:
+        // "Escalate to <soc@example.com> weekly" becomes "Escalate to  weekly".
+        // The panel writes on every keystroke against a controlled input, so
+        // the address would vanish as the user types it — and `Name <email>`
+        // is this app's own owner convention (see parseUserString below), so
+        // it is exactly the shape a Tests plan will contain.
+        //
+        // Dropping the strip is safe because there is no raw-HTML sink: name
+        // and frameworks render as JSX text (React escapes), and tests renders
+        // through <Markdown>, which is react-markdown WITHOUT rehype-raw, so
+        // embedded HTML is never parsed. CSV export goes through
+        // csvFormulaGuard. implementationDescription keeps its existing
+        // sanitize call — changing pre-existing behavior is not this issue's job.
+        const sanitizedUpdates = { ...updates, lastModified: new Date().toISOString() };
+        if (typeof updates.implementationDescription === 'string') {
+          sanitizedUpdates.implementationDescription = sanitizeInput(updates.implementationDescription);
+        }
 
         const updatedControls = get().controls.map(c =>
           c.controlId === controlId ? { ...c, ...sanitizedUpdates } : c
@@ -294,6 +346,15 @@ const useControlsStore = create(
 
                 return {
                   controlId: row['Control ID'] || row.controlId,
+                  // issue #306 columns. Status closes a PRE-EXISTING silent
+                  // drop: the store has always held a status, but import
+                  // rebuilt every record from scratch without one, so a
+                  // export → import round-trip reset every control to the
+                  // default. A blank cell still falls back to the default.
+                  name: row['Control Name'] || row.name || '',
+                  status: (row['Status'] || row.status || '').trim() || CONTROL_STATUSES[0],
+                  tests: row['Tests'] || row.tests || '',
+                  frameworks: row['Frameworks'] || row.frameworks || '',
                   implementationDescription: sanitizeInput(row['Control Implementation Description'] || row.implementationDescription || ''),
                   ownerId,
                   stakeholderIds,
@@ -329,16 +390,24 @@ const useControlsStore = create(
         };
 
         const csvData = get().controls.map(c => ({
-          'Control ID': escapeCSVValue(c.controlId),
-          'Control Implementation Description': escapeCSVValue(c.implementationDescription),
-          'Control Owner': escapeCSVValue(getUserName(c.ownerId)),
-          'Control Owner ID': c.ownerId || '',
-          'Stakeholder(s)': escapeCSVValue((c.stakeholderIds || []).map(id => getUserName(id)).join('; ')),
-          'Stakeholder IDs': (c.stakeholderIds || []).join('; '),
-          'Linked Requirements': (c.linkedRequirementIds || []).join('; '),
-          'Assessment ID': c.assessmentId || '',
-          'Created Date': c.createdDate,
-          'Last Modified': c.lastModified
+          'Control ID': csvFormulaGuard(c.controlId),
+          // issue #306 — these four round-trip through importControlsCSV
+          'Control Name': csvFormulaGuard(c.name || ''),
+          'Status': csvFormulaGuard(c.status || CONTROL_STATUSES[0]),
+          'Tests': csvFormulaGuard(c.tests || ''),
+          'Frameworks': csvFormulaGuard(c.frameworks || ''),
+          'Control Implementation Description': csvFormulaGuard(c.implementationDescription),
+          'Control Owner': csvFormulaGuard(getUserName(c.ownerId)),
+          'Control Owner ID': csvFormulaGuard(c.ownerId || ''),
+          'Stakeholder(s)': csvFormulaGuard((c.stakeholderIds || []).map(id => getUserName(id)).join('; ')),
+          // Guarded like every other importable column: these are read back
+          // by importControlsCSV, so a crafted file can seed a formula here.
+          'Stakeholder IDs': csvFormulaGuard((c.stakeholderIds || []).join('; ')),
+          'Linked Requirements': csvFormulaGuard((c.linkedRequirementIds || []).join('; ')),
+          // Importable columns are user-controlled; escape them all.
+          'Assessment ID': csvFormulaGuard(c.assessmentId || ''),
+          'Created Date': csvFormulaGuard(c.createdDate),
+          'Last Modified': csvFormulaGuard(c.lastModified)
         }));
 
         const csv = Papa.unparse(csvData);
@@ -368,6 +437,11 @@ const useControlsStore = create(
           dataType: 'Controls',
           controls: get().controls.map(c => ({
             controlId: c.controlId,
+            // issue #306
+            name: c.name || '',
+            status: c.status || CONTROL_STATUSES[0],
+            tests: c.tests || '',
+            frameworks: c.frameworks || '',
             implementationDescription: c.implementationDescription,
             ownerId: c.ownerId || null,
             ownerName: getUserName(c.ownerId),
@@ -499,7 +573,7 @@ const useControlsStore = create(
     }),
     {
       name: 'csf-controls-storage',
-      version: 6,
+      version: 7,
       migrate: (persistedState, version) => migrateControlsState(persistedState, version),
       partialize: (state) => ({
         controls: state.controls
@@ -514,13 +588,54 @@ const useControlsStore = create(
  *   own data keep it untouched.
  * - v6 (issue #299): seeded demo controls gain assessmentId + seedSource so
  *   they appear only in the demo assessment's scope.
+ * - v7 (issue #306): name / tests / frameworks fields, and a status on every
+ *   record rather than only the ones the demo data happened to ship with.
+ *
+ * The v7 pass runs AFTER the version chain rather than as another branch in
+ * it — the branches return early, so a user coming from v4 would never reach
+ * a branch placed at the end (the lesson artifactStore's migration already
+ * learned). It is a no-op on states that already carry the fields.
  */
 export function migrateControlsState(persistedState, version) {
   let state = persistedState;
   if (version < 5) {
     state = state?.controls?.length > 0 ? state : { controls: SEEDED_CONTROLS };
   }
-  return stampSeededDemoControls(state);
+  return normalizeControlFields(stampSeededDemoControls(state));
+}
+
+/**
+ * Fill in the issue #306 fields on any control that predates them.
+ *
+ * Absent-only by construction: a field is written only when the record does
+ * not already carry a string there, so a user's own value — including a
+ * deliberate empty string — is never overwritten. Idempotent: after one pass
+ * every record has all four keys, so a second pass changes nothing and
+ * returns the SAME state object.
+ *
+ * Exported because the restore path (dataImport) uses zustand's bulk setters,
+ * which bypass this store's load-time migrate entirely.
+ */
+export function normalizeControlFields(state) {
+  const controls = state?.controls;
+  if (!Array.isArray(controls)) return state;
+
+  let changed = false;
+  const normalized = controls.map((control) => {
+    if (!control || typeof control !== 'object') return control;
+    const patch = {};
+    ['name', 'tests', 'frameworks'].forEach((field) => {
+      if (typeof control[field] !== 'string') patch[field] = '';
+    });
+    if (typeof control.status !== 'string' || control.status === '') {
+      patch.status = CONTROL_STATUSES[0];
+    }
+    if (Object.keys(patch).length === 0) return control;
+    changed = true;
+    return { ...control, ...patch };
+  });
+
+  return changed ? { ...state, controls: normalized } : state;
 }
 
 /**
