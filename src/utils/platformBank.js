@@ -289,6 +289,44 @@ export const unresolvedRefPlaceholder = (entry) =>
  * identity fields for forks whose corpus is gone. Record text is emitted
  * VERBATIM (never truncated/reflowed), which is also what a noDerivatives
  * license permits, so the verbatim-or-omit rule holds by construction. */
+/*
+ * Derived reference mappings carried by a corpus record, as one italic
+ * line. The control and technique IDs are facts (CISA publishes them per
+ * policy); the derivation caveat that makes them safe to show renders once
+ * per expansion via MAPPINGS_CAVEAT, not once per addendum.
+ */
+const referenceMappingLine = (record) => {
+  const parts = [];
+  if (record.nist80053?.length) {
+    parts.push(`NIST SP 800-53 Rev. 5 (FedRAMP High baseline) ${record.nist80053.join(', ')}`);
+  }
+  if (record.mitreAttack?.length) {
+    parts.push(`MITRE ATT&CK ${record.mitreAttack.join(', ')}`);
+  }
+  return parts.length ? `*Reference mappings: ${parts.join(' · ')}*` : null;
+};
+
+/*
+ * Emitted once per expansion whenever any rendered addendum carries a
+ * reference-mappings line. Without this label the mappings read as a
+ * coverage or authorization claim, which they are not: placement rides a
+ * derived, unranked crosswalk (see platformSubcategoryMap justification).
+ */
+const MAPPINGS_CAVEAT =
+  '*Reference mappings are derived from CISA\'s NIST SP 800-53 FedRAMP High baseline mappings and the NIST CSF 2.0 crosswalk. They are informational only, not a FedRAMP authorization or coverage assertion.*';
+
+/* True when expansion will render a mappings line for this entry: resolved,
+ * license-allowed, not a user-owned fork, and referenceMappingLine emits.
+ * The last check delegates to the SAME function renderAddendum pushes from,
+ * so the caveat tracks actual rendering by construction and the two sites
+ * cannot drift apart (reviewer Finding 2). */
+const rendersMappings = (entry) => {
+  if (isPlatformFork(entry)) return false;
+  const record = getPlatformRecord(entry?.corpusId, entry?.policyId);
+  if (!record || !licenseGate(record).allow) return false;
+  return referenceMappingLine(record) !== null;
+};
+
 const renderAddendum = (entry) => {
   const record = getPlatformRecord(entry.corpusId, entry.policyId);
 
@@ -321,6 +359,8 @@ const renderAddendum = (entry) => {
   }
 
   const lines = [header, record.assertion, record.instructions].filter(Boolean);
+  const mappingLine = referenceMappingLine(record);
+  if (mappingLine) lines.push(mappingLine);
   const attribution = record.attribution || {};
   const credit = [];
   if (attribution.attributionText) credit.push(`*${attribution.attributionText}*`);
@@ -385,6 +425,7 @@ export const expandProcedureText = (observation) => {
     parts.push('---');
     parts.push(renderAddendum(entry));
   });
+  if (entries.some(rendersMappings)) parts.push(MAPPINGS_CAVEAT);
   parts.push(...noticeLines(entries));
   return parts.join('\n\n');
 };

@@ -338,6 +338,24 @@ describe('license gate + verbatim rule at the choke point (synthetic corpora)', 
     expect(out).toContain(nd.instructions);
     expect(out).toContain('Synthetic upstream attribution.');
   });
+
+  test('license-refused record renders neither its mapping IDs nor the derivation caveat', () => {
+    // The refusal must swallow the mappings too: a mappings line on refused
+    // content would be an unlabeled claim standing next to zero licensed
+    // text, and a caveat with no line would orphan the label. Pins the
+    // rendersMappings/renderAddendum gate agreement (reviewer Finding 3).
+    const refused = {
+      ...baseRecord,
+      license: 'CC-BY-NC-4.0',
+      nist80053: ['IA-2(1)', 'CM-7'],
+      mitreAttack: ['T1110']
+    };
+    const out = expandWithCorpus(refused, entryFor());
+    expect(out).toContain('reference-only under its license');
+    expect(out).not.toContain('Reference mappings:');
+    expect(out).not.toContain('IA-2(1)');
+    expect(out).not.toContain('not a FedRAMP authorization or coverage assertion');
+  });
 });
 
 describe('trunk modification indication derives from flags at egress (R-9)', () => {
@@ -450,5 +468,48 @@ describe('advisor adoptions: drift, hash pin, corpus-id stability, degenerate re
     const fork = forkPlatformProcedure(realRef(), 'Adapted text.');
     const out = expandProcedureText({ testProcedures: 't', platformProcedures: [fork] });
     expect(out).toContain(CISA_DISCLAIMER);
+  });
+});
+
+describe('reference mappings surfacing (production render path)', () => {
+  const CAVEAT_MARK = 'not a FedRAMP authorization or coverage assertion';
+
+  test('an allowed resolved addendum renders its 800-53 and ATT&CK IDs', () => {
+    const out = expandProcedureText({ testProcedures: 't', platformProcedures: [realRef()] });
+    expect(out).toContain('*Reference mappings: NIST SP 800-53 Rev. 5 (FedRAMP High baseline) CM-7');
+    expect(out).toContain('MITRE ATT&CK T1110, T1110.001');
+  });
+
+  test('the derivation caveat is emitted exactly once even with several mapping-bearing addenda', () => {
+    const other = bank.procedures['ms.aad.2.1v1'] || bank.procedures[REAL_POLICY];
+    const out = expandProcedureText({
+      testProcedures: 't',
+      platformProcedures: [realRef(), buildPlatformRef(other)]
+    });
+    expect(out.split(CAVEAT_MARK)).toHaveLength(2);
+  });
+
+  test('a user-owned fork renders neither the mappings line nor the caveat', () => {
+    const fork = forkPlatformProcedure(realRef(), 'USER-FORKED addendum body.');
+    const out = expandProcedureText({ testProcedures: 't', platformProcedures: [fork] });
+    expect(out).not.toContain('Reference mappings:');
+    expect(out).not.toContain(CAVEAT_MARK);
+  });
+
+  test('an unresolvable ref renders neither the mappings line nor the caveat', () => {
+    const foreign = { ...realRef(), corpusId: 'myctrl' };
+    const out = expandProcedureText({ testProcedures: 't', platformProcedures: [foreign] });
+    expect(out).not.toContain('Reference mappings:');
+    expect(out).not.toContain(CAVEAT_MARK);
+  });
+
+  test('every corpus record carries mappings, so every pristine expansion is labeled', () => {
+    // Corpus invariant (100% of SCuBA policies map to 800-53); if a future
+    // corpus breaks it, the caveat must still track actual rendering, which
+    // rendersMappings guarantees by reading the same gates as renderAddendum.
+    const withMappings = Object.values(bank.procedures).filter(
+      (r) => (r.nist80053 || []).length > 0
+    );
+    expect(withMappings.length).toBe(bank.procedureCount);
   });
 });
