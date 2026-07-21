@@ -27,6 +27,7 @@ import {
   ASSESSMENTS_SCHEMA_VERSION,
   normalizeAssessmentYear,
   normalizeAssessmentUsers,
+  normalizeAssessmentPlatforms,
   assessmentYearFromCreatedDate
 } from '../stores/assessmentsStore';
 import {
@@ -189,6 +190,12 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
   // or foreign-tool file stamped at the current version could otherwise smuggle
   // PII fields inside assessment.users straight past every producer guard —
   // and users has no share-export rebuild backstop the way externalTracking does.
+  // platforms joins the same pass (plan PR-6, v16): a current-version-stamped
+  // foreign file skips the migration chain entirely, so the platform selection
+  // is normalized here regardless — missing/junk collapses to [], the correct
+  // historical truth. Only the assessment-level string array is touched;
+  // observation platformProcedures refs ride verbatim (PR-5 placeholder-
+  // never-drop semantics own unresolvable refs at expansion, never at import).
   if (Array.isArray(data.assessments)) {
     data.assessments = data.assessments.map((a) => {
       if (!a || typeof a !== 'object') return a;
@@ -196,7 +203,8 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
         ...a,
         externalTracking: normalizeExternalTracking(a.externalTracking),
         year: normalizeAssessmentYear(a.year, assessmentYearFromCreatedDate(a.createdDate)),
-        users: normalizeAssessmentUsers(a.users)
+        users: normalizeAssessmentUsers(a.users),
+        platforms: normalizeAssessmentPlatforms(a.platforms)
       };
       if (a.observations && typeof a.observations === 'object') {
         next.observations = Object.fromEntries(

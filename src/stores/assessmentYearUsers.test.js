@@ -293,3 +293,35 @@ describe('assessment user roster actions (issue #297)', () => {
     expect(DEMO_ASSESSMENT_USERS).toHaveLength(8);
   });
 });
+
+describe('assessment platforms producers (plan PR-6, v16)', () => {
+  const cleanup = [];
+  afterEach(() => {
+    while (cleanup.length) {
+      useAssessmentsStore.getState().deleteAssessment(cleanup.pop());
+    }
+  });
+
+  test('createAssessment defaults platforms to [] and normalizes what it is given', () => {
+    const bare = useAssessmentsStore.getState().createAssessment({ name: 'Platforms default' });
+    cleanup.push(bare.id);
+    expect(bare.platforms).toEqual([]);
+
+    const seeded = useAssessmentsStore.getState().createAssessment({
+      name: 'Platforms seeded',
+      platforms: ['google-workspace', 'google-workspace', '', 9]
+    });
+    cleanup.push(seeded.id);
+    expect(seeded.platforms).toEqual(['google-workspace']);
+  });
+
+  test('updateAssessment guards platforms at the producer (#288 doctrine)', () => {
+    const created = useAssessmentsStore.getState().createAssessment({ name: 'Platforms guard' });
+    cleanup.push(created.id);
+    useAssessmentsStore.getState().updateAssessment(created.id, {
+      platforms: ['microsoft-365', null, 'microsoft-365']
+    });
+    const stored = useAssessmentsStore.getState().assessments.find(a => a.id === created.id);
+    expect(stored.platforms).toEqual(['microsoft-365']);
+  });
+});

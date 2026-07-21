@@ -3,7 +3,7 @@ import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
   Loader2, Bot, Sparkles, User, Settings,
-  BookOpen, ExternalLink, RotateCcw
+  BookOpen, ExternalLink, RotateCcw, Server
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Markdown from '../components/Markdown';
@@ -29,7 +29,9 @@ import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, canResetToCommunity, resetToCommunityUpdate, sourceUrlFor } from '../utils/procedureBank';
 import { expandProcedureText } from '../utils/platformBank';
-import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
+import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, wizardAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
+import { buildEnvironmentMatrix, buildAttachPlan, cellKey, toggleCell, setColumn, columnFullySelected, columnTotal, countAttached, attachedCountForItem, availablePlatforms } from '../utils/environmentStep';
+import { platformIdsFromInfrastructure } from '../utils/infraPresets';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
 import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
@@ -116,7 +118,7 @@ const Assessments = () => {
 
   // New assessment wizard state
   const [showNewModal, setShowNewModal] = useState(false);
-  const [wizardStep, setWizardStep] = useState(1); // 1: Basic + Scope, 2: Test Procedures, 3: Users
+  const [wizardStep, setWizardStep] = useState(1); // 1: Basic + Scope, 2: Environment, 3: Test Procedures, 4: Users
   const [newAssessment, setNewAssessment] = useState({
     name: '',
     description: '',
@@ -151,6 +153,33 @@ const Assessments = () => {
   const [generatedProcedures, setGeneratedProcedures] = useState({});
   const [generationProgress, setGenerationProgress] = useState({ done: 0, total: 0 });
   const cancelGenerationRef = useRef(false);
+
+  // Wizard Environment step (plan PR-6): ephemeral chip + cell state. The
+  // chips seed from the saved org profile (pure read, never written back —
+  // ratified); the assessment persists only the DERIVED platform set of
+  // what actually attaches. All rules live in utils/environmentStep.js.
+  const [envPlatforms, setEnvPlatforms] = useState([]);
+  const [envSelections, setEnvSelections] = useState({});
+
+  // Seed the platform chips each time the wizard opens. Open-time snapshot
+  // on purpose: the profile store hydrates synchronously from localStorage
+  // long before the modal can open, and a profile edited mid-wizard applies
+  // on the next open (the reset link re-derives on demand).
+  React.useEffect(() => {
+    if (showNewModal) {
+      setEnvPlatforms(platformIdsFromInfrastructure(orgProfile?.infrastructure));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showNewModal]);
+
+  const envMatrix = useMemo(
+    () => buildEnvironmentMatrix(Array.from(selectedScopeItems), envPlatforms),
+    [selectedScopeItems, envPlatforms]
+  );
+  const envAttachedCount = useMemo(
+    () => countAttached(envMatrix, envSelections),
+    [envMatrix, envSelections]
+  );
 
   // Wizard Users step (issue #290): people in scope for the assessment.
   // Rows are { name, email, role } while editing; on create they become
@@ -649,6 +678,8 @@ Format as a numbered list. Be specific and actionable.`;
     setScopePreset(null);
     setScopeFilterText('');
     setUseBankProcedures(true);
+    setEnvPlatforms([]);
+    setEnvSelections({});
     setShowBankPreview(false);
     setTailorWithProfile(false);
     setAdaptStackRefs(false);
@@ -686,7 +717,14 @@ Format as a numbered list. Be specific and actionable.`;
       }
     }
 
-    const created = createAssessment({ ...newAssessment, users: scopedUsers });
+    // Environment step (plan PR-6): which platform checks each item attaches
+    // (checked cells only — the user is the only exclusion actor) and the
+    // DERIVED platform set the assessment record persists.
+    const attachPlan = buildAttachPlan(
+      Array.from(selectedScopeItems), envSelections, envPlatforms, useBankProcedures
+    );
+
+    const created = createAssessment({ ...newAssessment, users: scopedUsers, platforms: attachPlan.platforms });
 
     // Add selected items to scope
     for (const itemId of selectedScopeItems) {
@@ -700,7 +738,10 @@ Format as a numbered list. Be specific and actionable.`;
         // the case study's "Alma Security" and/or re-aim tool/platform
         // references at the org's stack (canned maps, no AI). The producer
         // stamps tailored provenance so share export can swap to pristine.
-        updateObservation(created.id, itemId, bankAttachObservation(bankEntry, orgProfile, {
+        // Platform checks selected in the Environment step ride as
+        // references through the composed producer; with none selected the
+        // update is byte-identical to the plain community attach.
+        updateObservation(created.id, itemId, wizardAttachObservation(bankEntry, attachPlan.offersByItem[itemId], orgProfile, {
           substituteName: tailorWithProfile,
           adaptStack: adaptStackRefs
         }));
@@ -714,7 +755,7 @@ Format as a numbered list. Be specific and actionable.`;
     setCurrentAssessmentId(created.id);
     setView('scope');
     toast.success(`Assessment "${created.name}" created with ${selectedScopeItems.size} items`);
-  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, tailorWithProfile, adaptStackRefs, orgProfile, generatedProcedures, wizardUsers, addToScope, updateObservation, setCurrentAssessmentId, resetWizard]);
+  }, [newAssessment, createAssessment, selectedScopeItems, useBankProcedures, envSelections, envPlatforms, tailorWithProfile, adaptStackRefs, orgProfile, generatedProcedures, wizardUsers, addToScope, updateObservation, setCurrentAssessmentId, resetWizard]);
 
   const handleSelectAssessment = useCallback((assessment) => {
     setCurrentAssessmentId(assessment.id);
@@ -2148,8 +2189,9 @@ Format as a numbered list. Be specific and actionable.`;
               <div className="flex items-center justify-center gap-2">
                 {[
                   { num: 1, label: 'Scope' },
-                  { num: 2, label: 'Test Procedures' },
-                  { num: 3, label: 'Users' }
+                  { num: 2, label: 'Environment' },
+                  { num: 3, label: 'Test Procedures' },
+                  { num: 4, label: 'Users' }
                 ].map((step, idx) => (
                   <React.Fragment key={step.num}>
                     <div className={`flex items-center gap-2 ${wizardStep === step.num ? 'text-blue-600' : wizardStep > step.num ? 'text-green-600' : 'text-gray-400'}`}>
@@ -2160,7 +2202,7 @@ Format as a numbered list. Be specific and actionable.`;
                       </div>
                       <span className="text-sm font-medium hidden sm:inline">{step.label}</span>
                     </div>
-                    {idx < 2 && <div className={`w-8 h-0.5 ${wizardStep > step.num ? 'bg-green-600' : 'bg-gray-300'}`} />}
+                    {idx < 3 && <div className={`w-8 h-0.5 ${wizardStep > step.num ? 'bg-green-600' : 'bg-gray-300'}`} />}
                   </React.Fragment>
                 ))}
               </div>
@@ -2490,7 +2532,133 @@ Format as a numbered list. Be specific and actionable.`;
               )}
 
               {/* Step 2: Test Procedures — community bank first, AI fills the gaps */}
+              {/* Step 2: Environment (plan PR-6) — per-assessment platform
+                  selection. Chips are ephemeral and seed from the org profile
+                  (read-only); the assessment stores only what attaches. */}
               {wizardStep === 2 && (
+                <div className="space-y-4">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <Server size={20} className="text-blue-600 mt-0.5" />
+                      <div className="flex-1">
+                        <h4 className="font-medium text-blue-900 dark:text-blue-200">Which platforms does this assessment cover? (optional)</h4>
+                        <p className="text-sm text-blue-800 dark:text-blue-300 mt-1">
+                          Pick a platform to see its configuration checks, drawn from CISA's SCuBA
+                          secure configuration baselines. Checks you select attach alongside the
+                          community test procedure for that subcategory. Nothing attaches unless
+                          you select it, and you can skip this step entirely.
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2 mt-3">
+                          {availablePlatforms().map(({ id, label }) => (
+                            <button
+                              key={id}
+                              type="button"
+                              onClick={() => setEnvPlatforms((prev) => (
+                                prev.includes(id) ? prev.filter((p) => p !== id) : [...prev, id]
+                              ))}
+                              className={`px-3 py-1.5 text-sm rounded-full border ${envPlatforms.includes(id)
+                                ? 'bg-blue-600 border-blue-600 text-white'
+                                : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+                            >
+                              {label}
+                            </button>
+                          ))}
+                          {hasOrgProfile && (
+                            <button
+                              type="button"
+                              onClick={() => setEnvPlatforms(platformIdsFromInfrastructure(orgProfile?.infrastructure))}
+                              className="text-sm text-blue-700 dark:text-blue-400 underline ml-1"
+                            >
+                              Same as my org profile
+                            </button>
+                          )}
+                        </div>
+                        {hasOrgProfile && platformIdsFromInfrastructure(orgProfile?.infrastructure).length > 0 && (
+                          <p className="text-xs text-blue-700 dark:text-blue-400 mt-2">
+                            Pre-selected from your saved org profile. Changes here apply to this
+                            assessment only and never modify the profile.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {envPlatforms.length > 0 && !useBankProcedures && (
+                    <p className="text-sm text-amber-700 dark:text-amber-400">
+                      Platform checks attach alongside community test procedures, which are turned
+                      off in the next step. Turn them back on for these selections to apply.
+                    </p>
+                  )}
+
+                  {envPlatforms.length > 0 && envMatrix.rows.length === 0 && (
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {newAssessment.scopeType === 'controls'
+                        ? 'Platform checks map to CSF subcategories, so control-scope items have no matches.'
+                        : 'None of your scoped items have platform checks for these platforms.'}
+                    </p>
+                  )}
+
+                  {envPlatforms.length > 0 && envMatrix.rows.length > 0 && (
+                    <div className="border dark:border-gray-600 rounded-lg overflow-hidden">
+                      <div className="p-3 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-600 flex items-center justify-between flex-wrap gap-2">
+                        <span className="text-sm font-medium dark:text-white">
+                          {envAttachedCount} of {envMatrix.totalAvailable} available checks selected
+                        </span>
+                        <div className="flex gap-3">
+                          {envPlatforms.filter((p) => columnTotal(envMatrix, p) > 0).map((platformId) => {
+                            const allOn = columnFullySelected(envMatrix, envSelections, platformId);
+                            const label = availablePlatforms().find((ap) => ap.id === platformId)?.label || platformId;
+                            return (
+                              <button
+                                key={platformId}
+                                type="button"
+                                onClick={() => setEnvSelections(setColumn(envMatrix, envSelections, platformId, !allOn))}
+                                className="text-sm text-blue-700 dark:text-blue-400 underline"
+                              >
+                                {allOn
+                                  ? `Clear ${label}`
+                                  : `Select all ${label} (${columnTotal(envMatrix, platformId)} checks)`}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                      <div className="max-h-72 overflow-y-auto divide-y dark:divide-gray-700">
+                        {envMatrix.rows.map((row) => (
+                          <div key={row.itemId} className="p-2 px-3 flex items-center justify-between gap-3">
+                            <span className="text-sm dark:text-gray-200 min-w-0 truncate" title={row.title}>
+                              <span className="font-medium">{row.itemId}</span>
+                              <span className="text-gray-500 dark:text-gray-400"> — {row.title}</span>
+                            </span>
+                            <div className="flex gap-4 shrink-0">
+                              {envPlatforms.filter((p) => p in row.cells).map((platformId) => (
+                                <label key={platformId} className="flex items-center gap-1.5 text-sm cursor-pointer dark:text-gray-300">
+                                  <input
+                                    type="checkbox"
+                                    className="w-4 h-4 rounded"
+                                    checked={!!envSelections[cellKey(row.itemId, platformId)]}
+                                    onChange={() => setEnvSelections(toggleCell(envSelections, row.itemId, platformId))}
+                                  />
+                                  {availablePlatforms().find((ap) => ap.id === platformId)?.label || platformId}
+                                  <span className="text-gray-500 dark:text-gray-400">({row.cells[platformId]})</span>
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      {envMatrix.noOfferCount > 0 && (
+                        <p className="p-2 px-3 text-xs text-gray-500 dark:text-gray-400 border-t dark:border-gray-600">
+                          {envMatrix.noOfferCount} of your scoped items have no platform checks for
+                          these platforms. Their community procedures attach as usual.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {wizardStep === 3 && (
                 <div className="space-y-4">
                   {/* Card 1: community-contributed procedures (default ON) */}
                   <div className={`border rounded-lg p-4 ${useBankProcedures ? 'bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700' : 'bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-600'}`}>
@@ -2514,6 +2682,13 @@ Format as a numbered list. Be specific and actionable.`;
                         <p className="text-sm font-medium mt-2 text-green-900 dark:text-green-200">
                           {scopeCoverage.covered.length} of {selectedScopeItems.size} selected items have community procedures
                         </p>
+                        {envPlatforms.length > 0 && (
+                          <p className="text-sm text-green-800 dark:text-green-300 mt-1">
+                            {envAttachedCount} platform {envAttachedCount === 1 ? 'check' : 'checks'} from
+                            the Environment step {envAttachedCount === 1 ? 'attaches' : 'attach'} as
+                            addenda ({envMatrix.totalAvailable} available).
+                          </p>
+                        )}
                         {scopeCoverage.uncovered.length > 0 && (
                           <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
                             {newAssessment.scopeType === 'controls'
@@ -2547,6 +2722,13 @@ Format as a numbered list. Be specific and actionable.`;
                                   <pre className="whitespace-pre-wrap text-xs text-gray-600 dark:text-gray-300 mt-2 max-h-40 overflow-y-auto">
                                     {previewText.slice(0, 1500)}{previewText.length > 1500 ? '\n…(full procedure attaches on create)' : ''}
                                   </pre>
+                                  {attachedCountForItem(envMatrix, envSelections, id) > 0 && (
+                                    <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
+                                      + {attachedCountForItem(envMatrix, envSelections, id)} platform
+                                      {attachedCountForItem(envMatrix, envSelections, id) === 1 ? ' check attaches' : ' checks attach'} as
+                                      addenda (not shown in this preview).
+                                    </p>
+                                  )}
                                 </details>
                               );
                             })}
@@ -2736,8 +2918,8 @@ Format as a numbered list. Be specific and actionable.`;
                 </div>
               )}
 
-              {/* Step 3: Users in scope (issue #290) */}
-              {wizardStep === 3 && (
+              {/* Step 4: Users in scope (issue #290) */}
+              {wizardStep === 4 && (
                 <div className="space-y-4">
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <div className="flex items-start gap-3">
@@ -2848,7 +3030,7 @@ Format as a numbered list. Be specific and actionable.`;
               </button>
 
               <div className="flex gap-2">
-                {wizardStep < 3 && (
+                {wizardStep < 4 && (
                   <button
                     className="px-4 py-2 text-gray-500 hover:text-gray-700"
                     onClick={() => setWizardStep(prev => prev + 1)}
@@ -2856,7 +3038,7 @@ Format as a numbered list. Be specific and actionable.`;
                     Skip
                   </button>
                 )}
-                {wizardStep < 3 ? (
+                {wizardStep < 4 ? (
                   <button
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded disabled:bg-gray-300"
                     onClick={() => {

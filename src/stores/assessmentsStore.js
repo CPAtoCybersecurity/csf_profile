@@ -158,10 +158,32 @@ export const normalizeAssessmentUsers = (value) => {
 };
 
 /**
+ * Normalize the per-assessment platform selection (plan PR-6). Platform ids
+ * are opaque strings against the platform-procedure map ('google-workspace',
+ * 'microsoft-365'); unknown ids are KEPT — a future corpus adds ids, and a
+ * whitelist here would silently eat them on restore. Dedupes, drops
+ * non-string/empty entries, and collapses any non-array to [] — the correct
+ * historical truth for records that predate the environment step.
+ */
+export const normalizeAssessmentPlatforms = (value) => {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set();
+  const out = [];
+  for (const entry of value) {
+    if (typeof entry !== 'string') continue;
+    const id = entry.trim();
+    if (!id || seen.has(id)) continue;
+    seen.add(id);
+    out.push(id);
+  }
+  return out;
+};
+
+/**
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
-export const ASSESSMENTS_SCHEMA_VERSION = 15;
+export const ASSESSMENTS_SCHEMA_VERSION = 16;
 
 /**
  * Full persisted-state migration chain for csf-assessments-storage.
@@ -357,6 +379,19 @@ export const migrateAssessmentsState = (persistedState, version) => {
     const assessments = (state.assessments || []).map(a =>
       a.id === COMPREHENSIVE_ASSESSMENT_ID && normalizeAssessmentUsers(a.users).length === 0
         ? { ...a, users: DEMO_ASSESSMENT_USERS }
+        : a
+    );
+    state = { ...state, assessments };
+  }
+
+  // v16 (plan PR-6): stamp the per-assessment platform selection. Existing
+  // assessments predate the wizard Environment step, so platforms: [] is the
+  // correct historical truth (ratified). Idempotent: a record already
+  // carrying a platforms array keeps it (normalized).
+  if (version < 16) {
+    const assessments = (state.assessments || []).map(a =>
+      a && typeof a === 'object'
+        ? { ...a, platforms: normalizeAssessmentPlatforms(a.platforms) }
         : a
     );
     state = { ...state, assessments };
@@ -628,6 +663,10 @@ const useAssessmentsStore = create(
           // role auditor | control owner | stakeholder. No PII embedded —
           // names/emails live in the user directory (userStore).
           users: normalizeAssessmentUsers(assessmentData.users),
+          // Per-assessment platform selection (plan PR-6): the DERIVED set of
+          // platforms with at least one attached platform check — never raw
+          // chip state, so an assessment with zero addenda declares nothing.
+          platforms: normalizeAssessmentPlatforms(assessmentData.platforms),
           scopeIds: assessmentData.scopeIds || [], // Array of requirement IDs or control IDs
           frameworkFilter: assessmentData.frameworkFilter || null, // Optional framework filter
           status: 'Not Started', // Not Started, In Progress, Complete
@@ -657,6 +696,9 @@ const useAssessmentsStore = create(
         }
         if (updates && updates.users !== undefined) {
           safeUpdates = { ...safeUpdates, users: normalizeAssessmentUsers(updates.users) };
+        }
+        if (updates && updates.platforms !== undefined) {
+          safeUpdates = { ...safeUpdates, platforms: normalizeAssessmentPlatforms(updates.platforms) };
         }
         const updatedAssessments = get().assessments.map(a =>
           a.id === assessmentId

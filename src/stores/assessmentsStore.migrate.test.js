@@ -1,4 +1,4 @@
-import { migrateAssessmentsState, DEMO_ASSESSMENT_USERS } from './assessmentsStore';
+import { migrateAssessmentsState, normalizeAssessmentPlatforms, DEMO_ASSESSMENT_USERS } from './assessmentsStore';
 import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
 
 /**
@@ -69,7 +69,8 @@ describe('migrateAssessmentsState', () => {
         scoringScale: 10,
         externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } },
         year: 2026,
-        users: [{ userId: 1, role: 'auditor' }]
+        users: [{ userId: 1, role: 'auditor' }],
+        platforms: []
       }],
       currentAssessmentId: 'ASM-x'
     };
@@ -551,5 +552,61 @@ describe('migrateAssessmentsState', () => {
       const twice = migrateAssessmentsState(JSON.parse(JSON.stringify(once)), 15);
       expect(twice.assessments[0].users).toEqual(once.assessments[0].users);
     });
+  });
+
+  describe('v16: per-assessment platforms stamp (plan PR-6)', () => {
+    test('a v15 record gains platforms: [] — the correct historical truth', () => {
+      const state = { assessments: [{ id: 'ASM-old', observations: {} }] };
+      const result = migrateAssessmentsState(state, 15);
+      expect(result.assessments[0].platforms).toEqual([]);
+    });
+
+    test('polarity: a record already carrying platforms keeps them (normalized)', () => {
+      const state = {
+        assessments: [{
+          id: 'ASM-env',
+          observations: {},
+          platforms: ['google-workspace', 'google-workspace', '', 7, 'microsoft-365']
+        }]
+      };
+      const result = migrateAssessmentsState(state, 15);
+      expect(result.assessments[0].platforms).toEqual(['google-workspace', 'microsoft-365']);
+    });
+
+    test('a v0 client falls through all the way to the v16 stamp', () => {
+      const result = migrateAssessmentsState(
+        { assessments: [{ id: 'ASM-ancient', observations: {} }], currentAssessmentId: null }, 0
+      );
+      result.assessments.forEach((a) => {
+        expect(Array.isArray(a.platforms)).toBe(true);
+      });
+    });
+
+    test('is idempotent', () => {
+      const once = migrateAssessmentsState(
+        { assessments: [{ id: 'ASM-x', observations: {}, platforms: ['google-workspace'] }] }, 15
+      );
+      const twice = migrateAssessmentsState(JSON.parse(JSON.stringify(once)), 16);
+      expect(twice.assessments[0].platforms).toEqual(['google-workspace']);
+    });
+  });
+});
+
+describe('normalizeAssessmentPlatforms', () => {
+  test('keeps unknown string ids (future corpora must survive restore)', () => {
+    expect(normalizeAssessmentPlatforms(['okta-corpus-2027'])).toEqual(['okta-corpus-2027']);
+  });
+
+  test('dedupes, trims, drops non-strings and empties', () => {
+    expect(normalizeAssessmentPlatforms([
+      ' google-workspace ', 'google-workspace', '', null, 42, {}, 'microsoft-365'
+    ])).toEqual(['google-workspace', 'microsoft-365']);
+  });
+
+  test('non-array collapses to []', () => {
+    expect(normalizeAssessmentPlatforms(undefined)).toEqual([]);
+    expect(normalizeAssessmentPlatforms(null)).toEqual([]);
+    expect(normalizeAssessmentPlatforms('google-workspace')).toEqual([]);
+    expect(normalizeAssessmentPlatforms({ 0: 'google-workspace' })).toEqual([]);
   });
 });

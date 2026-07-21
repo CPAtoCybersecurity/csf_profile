@@ -274,6 +274,21 @@ export const composeAttachObservation = (bankEntry, platformOffers, profile, opt
 };
 
 /**
+ * The wizard's single attach producer (plan PR-6). Offers present → the
+ * composed attach (trunk + platform references + recipe). Zero offers → the
+ * plain community attach, BYTE-IDENTICAL to what the wizard produced before
+ * the Environment step existed: an assessment that attaches no platform
+ * checks gains no new keys, not even a trunk-only recipe — the recipe
+ * appears when a composition exists to record (advisor ruling, G24).
+ */
+export const wizardAttachObservation = (bankEntry, platformOffers, profile, options = {}) => {
+  const offers = Array.isArray(platformOffers) ? platformOffers : [];
+  return offers.length > 0
+    ? composeAttachObservation(bankEntry, offers, profile, options)
+    : bankAttachObservation(bankEntry, profile, options);
+};
+
+/**
  * Pure producer for the per-item "Adapt to my environment" action.
  * Returns null when nothing would change; otherwise the observation
  * update (tailored provenance always stamped) plus the stack-swap count

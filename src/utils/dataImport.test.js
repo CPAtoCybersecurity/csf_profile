@@ -63,16 +63,17 @@ describe('export → restore round-trip', () => {
       expect.arrayContaining(['users', 'controls', 'assessments', 'requirements', 'frameworks', 'artifacts', 'findings'])
     );
     expect(setters.setUsers).toHaveBeenCalledWith(SAMPLE.users);
-    // Assessments additionally get the externalTracking shape (issue #288)
-    // and the year/users fields (issues #291/#290) guaranteed on restore by
-    // the unconditional normalize — everything else is byte-identical to the
-    // exported section.
+    // Assessments additionally get the externalTracking shape (issue #288),
+    // the year/users fields (issues #291/#290), and the platforms field
+    // (plan PR-6, v16) guaranteed on restore by the unconditional normalize —
+    // everything else is byte-identical to the exported section.
     expect(setters.setAssessments).toHaveBeenCalledWith(
       SAMPLE.assessments.map(a => ({
         ...a,
         externalTracking: { enabled: false, systems: { findings: '', artifacts: '', controls: '' } },
         year: new Date().getFullYear(),
-        users: []
+        users: [],
+        platforms: []
       }))
     );
     expect(setters.setFindings).toHaveBeenCalledWith(SAMPLE.findings);
@@ -678,5 +679,77 @@ describe('PR-5: share-import round trip is NOT permanently detached (recipe ride
   test('a format-4 backup is still accepted (heal-in-place, not stranded at the gate)', () => {
     const result = validateDatabaseExport({ formatVersion: 4, data: { users: [] } });
     expect(result.ok).toBe(true);
+  });
+});
+
+describe('platforms restore-path normalization (plan PR-6, v16)', () => {
+  const baseAssessment = (extra) => ({
+    id: 'ASM-platforms',
+    name: 'Platforms restore fixture',
+    scopeType: 'requirements',
+    scoringScale: 10,
+    scopeIds: [],
+    observations: {},
+    ...extra
+  });
+
+  const restoreWith = (storeVersion, assessment) => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: storeVersion },
+      data: { assessments: [assessment] }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+    return setters.setAssessments.mock.calls[0][0].find((a) => a.id === 'ASM-platforms');
+  };
+
+  test('a v15 backup gains platforms: [] on restore (migration chain path)', () => {
+    const restored = restoreWith(15, baseAssessment());
+    expect(restored.platforms).toEqual([]);
+  });
+
+  test('UNCONDITIONAL: a current-version-stamped file with junk platforms is normalized (bulk setters bypass migrate)', () => {
+    // Stamped at the CURRENT schema version, so the migration chain is
+    // skipped entirely — only the unconditional pass can catch this. A
+    // mutant that drops the restore-path normalize fails here (v16-skipping
+    // restore, analyzer class).
+    const restored = restoreWith(
+      ASSESSMENTS_SCHEMA_VERSION,
+      baseAssessment({ platforms: ['google-workspace', 'google-workspace', 7, '', null] })
+    );
+    expect(restored.platforms).toEqual(['google-workspace']);
+  });
+
+  test('UNCONDITIONAL: a current-version-stamped file missing platforms restores with []', () => {
+    const restored = restoreWith(ASSESSMENTS_SCHEMA_VERSION, baseAssessment());
+    expect(restored.platforms).toEqual([]);
+  });
+
+  test('polarity: valid platforms ride a current-version restore verbatim', () => {
+    const restored = restoreWith(
+      ASSESSMENTS_SCHEMA_VERSION,
+      baseAssessment({ platforms: ['google-workspace', 'microsoft-365'] })
+    );
+    expect(restored.platforms).toEqual(['google-workspace', 'microsoft-365']);
+  });
+
+  test('observation platformProcedures refs ride restore verbatim — normalize never touches them', () => {
+    const REF = {
+      corpusId: 'scuba',
+      corpusVersion: 'v-old',
+      policyId: 'gws.commoncontrols.1.1v1',
+      contentHash: 'deadbeefdeadbeef'
+    };
+    const restored = restoreWith(
+      ASSESSMENTS_SCHEMA_VERSION,
+      baseAssessment({
+        platforms: ['google-workspace'],
+        observations: {
+          'PR.AA-05': { testProcedures: 'trunk text', platformProcedures: [REF] }
+        }
+      })
+    );
+    expect(restored.observations['PR.AA-05'].platformProcedures).toEqual([REF]);
   });
 });
