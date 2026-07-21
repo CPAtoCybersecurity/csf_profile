@@ -131,6 +131,29 @@ export const toggleCell = (selections, itemId, platformId) => {
 };
 
 /**
+ * Step-3 attach-count sentence for the community-procedures card. Pure so
+ * the page stays a dispatcher and so the off state can never claim an
+ * attach that buildAttachPlan will not perform: addenda ride the community
+ * trunk, and the bank toggle gates attachment. Returns null when there is
+ * nothing to say (bank off, nothing selected).
+ */
+export const environmentAttachCopy = (useBank, attachedCount, totalAvailable) => {
+  const noun = attachedCount === 1 ? 'check' : 'checks';
+  if (!useBank) {
+    if (attachedCount === 0) return null;
+    return {
+      active: false,
+      text: `${attachedCount} platform ${noun} selected in the Environment step will not attach while community test procedures are off. Turn them back on to apply your selections.`
+    };
+  }
+  const verb = attachedCount === 1 ? 'attaches' : 'attach';
+  return {
+    active: true,
+    text: `${attachedCount} platform ${noun} from the Environment step ${verb} as addenda (${totalAvailable} available).`
+  };
+};
+
+/**
  * The create-time attach plan. For every scoped item, the offers its checked
  * cells attach (ALL offers of each checked platform — user cells are the only
  * exclusion actor), plus the DERIVED platform set the assessment persists:

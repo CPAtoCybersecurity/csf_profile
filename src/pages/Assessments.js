@@ -30,7 +30,7 @@ import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, canResetToCommunity, resetToCommunityUpdate, sourceUrlFor } from '../utils/procedureBank';
 import { expandProcedureText, derivePlatformsFromObservations } from '../utils/platformBank';
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, wizardAttachObservation, deterministicTailorUpdate, pickerObservationUpdate, pickerAvailability } from '../utils/procedureTailor';
-import { buildEnvironmentMatrix, buildAttachPlan, cellKey, toggleCell, setColumn, columnFullySelected, columnTotal, countAttached, attachedCountForItem, availablePlatforms } from '../utils/environmentStep';
+import { buildEnvironmentMatrix, buildAttachPlan, cellKey, toggleCell, setColumn, columnFullySelected, columnTotal, countAttached, attachedCountForItem, availablePlatforms, environmentAttachCopy } from '../utils/environmentStep';
 import { platformIdsFromInfrastructure } from '../utils/infraPresets';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
@@ -189,6 +189,10 @@ const Assessments = () => {
   const envAttachedCount = useMemo(
     () => countAttached(envMatrix, envSelections),
     [envMatrix, envSelections]
+  );
+  const envAttachCopy = useMemo(
+    () => environmentAttachCopy(useBankProcedures, envAttachedCount, envMatrix.totalAvailable),
+    [useBankProcedures, envAttachedCount, envMatrix.totalAvailable]
   );
 
   // Wizard Users step (issue #290): people in scope for the assessment.
@@ -2709,7 +2713,7 @@ Format as a numbered list. Be specific and actionable.`;
                       {envMatrix.noOfferCount > 0 && (
                         <p className="p-2 px-3 text-xs text-gray-500 dark:text-gray-400 border-t dark:border-gray-600">
                           {envMatrix.noOfferCount} of your scoped items have no platform checks for
-                          these platforms. Their community procedures attach as usual.
+                          these platforms.{useBankProcedures ? ' Their community procedures attach as usual.' : ''}
                         </p>
                       )}
                     </div>
@@ -2741,11 +2745,11 @@ Format as a numbered list. Be specific and actionable.`;
                         <p className="text-sm font-medium mt-2 text-green-900 dark:text-green-200">
                           {scopeCoverage.covered.length} of {selectedScopeItems.size} selected items have community procedures
                         </p>
-                        {envPlatforms.length > 0 && (
-                          <p className="text-sm text-green-800 dark:text-green-300 mt-1">
-                            {envAttachedCount} platform {envAttachedCount === 1 ? 'check' : 'checks'} from
-                            the Environment step {envAttachedCount === 1 ? 'attaches' : 'attach'} as
-                            addenda ({envMatrix.totalAvailable} available).
+                        {envPlatforms.length > 0 && envAttachCopy && (
+                          <p className={envAttachCopy.active
+                            ? 'text-sm text-green-800 dark:text-green-300 mt-1'
+                            : 'text-sm text-amber-700 dark:text-amber-400 mt-1'}>
+                            {envAttachCopy.text}
                           </p>
                         )}
                         {scopeCoverage.uncovered.length > 0 && (
