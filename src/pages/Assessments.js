@@ -28,8 +28,8 @@ import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, canResetToCommunity, resetToCommunityUpdate, sourceUrlFor } from '../utils/procedureBank';
-import { expandProcedureText } from '../utils/platformBank';
-import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, wizardAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
+import { expandProcedureText, derivePlatformsFromObservations } from '../utils/platformBank';
+import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, wizardAttachObservation, deterministicTailorUpdate, pickerObservationUpdate, pickerAvailability } from '../utils/procedureTailor';
 import { buildEnvironmentMatrix, buildAttachPlan, cellKey, toggleCell, setColumn, columnFullySelected, columnTotal, countAttached, attachedCountForItem, availablePlatforms } from '../utils/environmentStep';
 import { platformIdsFromInfrastructure } from '../utils/infraPresets';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
@@ -37,6 +37,8 @@ import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
 import { belongsToAssessment, isUnassigned } from '../utils/assessmentScope';
 import ExternalLinksEditor from '../components/ExternalLinksEditor';
 import ProcedureSourceBadge from '../components/ProcedureSourceBadge';
+import PlatformAddendumBadges from '../components/PlatformAddendumBadges';
+import PlatformCheckPicker from '../components/PlatformCheckPicker';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -74,6 +76,8 @@ const Assessments = () => {
   const deleteAssessment = useAssessmentsStore((state) => state.deleteAssessment);
   const getObservation = useAssessmentsStore((state) => state.getObservation);
   const updateObservation = useAssessmentsStore((state) => state.updateObservation);
+  const getAssessment = useAssessmentsStore((state) => state.getAssessment);
+  const updateAssessment = useAssessmentsStore((state) => state.updateAssessment);
   const updateQuarterlyObservation = useAssessmentsStore((state) => state.updateQuarterlyObservation);
   const addToScope = useAssessmentsStore((state) => state.addToScope);
   const removeFromScope = useAssessmentsStore((state) => state.removeFromScope);
@@ -115,6 +119,12 @@ const Assessments = () => {
   // Export (optional password protection)
   const [showExportPasswordDialog, setShowExportPasswordDialog] = useState(false);
   const [showSingleExportPasswordDialog, setShowSingleExportPasswordDialog] = useState(false);
+
+  // Post-create platform-check picker (plan PR-7)
+  const [showPlatformPicker, setShowPlatformPicker] = useState(false);
+  const allPlatformIds = useMemo(() => availablePlatforms().map((p) => p.id), []);
+  // The dialog is per-subcategory state — close it when the item changes.
+  useEffect(() => { setShowPlatformPicker(false); }, [selectedItemId]);
 
   // New assessment wizard state
   const [showNewModal, setShowNewModal] = useState(false);
@@ -816,6 +826,32 @@ Format as a numbered list. Be specific and actionable.`;
     updateObservation(currentAssessmentId, selectedItemId, { [field]: value });
   }, [currentAssessmentId, selectedItemId, updateObservation]);
 
+  // Recompute the assessment's derived platform set from the live
+  // observations — the SINGLE derivation call site, run after every
+  // composition-changing write (ratified: platforms is recomputed, never
+  // incrementally mutated).
+  const syncDerivedPlatforms = useCallback(() => {
+    if (!currentAssessmentId) return;
+    const assessment = getAssessment(currentAssessmentId);
+    if (!assessment) return;
+    updateAssessment(currentAssessmentId, {
+      platforms: derivePlatformsFromObservations(assessment.observations)
+    });
+  }, [currentAssessmentId, getAssessment, updateAssessment]);
+
+  // Dispatch one picker operation (add / addAll / remove / adopt) through
+  // the pure producer. The observation is re-read from the store at
+  // dispatch time so rapid consecutive operations never build on a stale
+  // snapshot. A null update means nothing would change — no write.
+  const handlePlatformCheckOperation = useCallback((operation) => {
+    if (!currentAssessmentId || !selectedItemId) return;
+    const fresh = getObservation(currentAssessmentId, selectedItemId);
+    const update = pickerObservationUpdate(fresh, selectedItemId, operation);
+    if (!update) return;
+    updateObservation(currentAssessmentId, selectedItemId, update);
+    syncDerivedPlatforms();
+  }, [currentAssessmentId, selectedItemId, getObservation, updateObservation, syncDerivedPlatforms]);
+
   // Attach (or re-attach) the community procedure for the selected item.
   // The pure producer stamps pristine provenance (so the store's
   // modified-flag heuristic doesn't mark a deliberate attach as a
@@ -836,8 +872,9 @@ Format as a numbered list. Be specific and actionable.`;
       return;
     }
     updateObservation(currentAssessmentId, selectedItemId, update);
+    syncDerivedPlatforms();
     toast.success(`Community procedure for ${update.procedureSource.bankId} attached`);
-  }, [currentAssessmentId, selectedItemId, getObservation, updateObservation]);
+  }, [currentAssessmentId, selectedItemId, getObservation, updateObservation, syncDerivedPlatforms]);
 
   // Deterministic tailoring of the selected item's procedure: canned
   // name + tool/platform substitutions from the org profile. No AI, no
@@ -1665,6 +1702,16 @@ Format as a numbered list. Be specific and actionable.`;
                               : (<><BookOpen size={12} /> Insert community procedure</>)}
                           </button>
                         )}
+                        {editMode && pickerAvailability(currentObservation, selectedItemId, allPlatformIds).canOpen && (
+                          <button
+                            type="button"
+                            onClick={() => setShowPlatformPicker(true)}
+                            className="text-xs text-blue-700 dark:text-blue-400 flex items-center gap-1 hover:underline"
+                            title="Add or remove platform checks for this subcategory"
+                          >
+                            <Server size={12} /> Platform checks
+                          </button>
+                        )}
                         {!editMode && sourceUrlFor(currentObservation.procedureSource) && (
                           <a
                             href={sourceUrlFor(currentObservation.procedureSource)}
@@ -1678,6 +1725,9 @@ Format as a numbered list. Be specific and actionable.`;
                         )}
                       </div>
                     </div>
+                    {!editMode && currentObservation.platformProcedures?.length > 0 && (
+                      <PlatformAddendumBadges entries={currentObservation.platformProcedures} />
+                    )}
                     {editMode ? (
                       <textarea
                         value={currentObservation.testProcedures || ''}
@@ -1697,6 +1747,15 @@ Format as a numbered list. Be specific and actionable.`;
                             : formatTestProcedures(currentObservation.testProcedures)) || 'No test procedures defined'}
                         </Markdown>
                       </div>
+                    )}
+                    {showPlatformPicker && (
+                      <PlatformCheckPicker
+                        itemId={selectedItemId}
+                        observation={currentObservation}
+                        canAttach={pickerAvailability(currentObservation, selectedItemId, allPlatformIds).canAttach}
+                        onOperation={handlePlatformCheckOperation}
+                        onClose={() => setShowPlatformPicker(false)}
+                      />
                     )}
                   </div>
 

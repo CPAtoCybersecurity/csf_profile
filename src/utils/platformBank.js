@@ -167,10 +167,11 @@ export const forkPlatformProcedure = (ref, text) => {
  * Content drift between a reference's attach-time fingerprint and the
  * CURRENT corpus record: true (drifted), false (byte-stable), or null when
  * the ref does not resolve (drift is unknowable — the placeholder already
- * carries the identity). PR-5 stores and detects drift but deliberately does
- * NOT surface it in expansion output — the drift badge/notice is PR-7 UI
- * (pinned by the drift-silent expansion test so the deferral is a stated
- * decision, not an assumption).
+ * carries the identity). Drift surfaces as detail-panel badge CHROME only
+ * (PR-7): expansion output stays drift-silent PERMANENTLY — rendered and
+ * exported text always carries the current corpus version, and the badge's
+ * remedy is the explicit adopt action in the picker, which is the ONLY
+ * path that may rewrite a reference's contentHash (ratified 2026-07-21).
  */
 export const platformRefDrift = (entry) => {
   const record = getPlatformRecord(entry?.corpusId, entry?.policyId);
@@ -180,6 +181,95 @@ export const platformRefDrift = (entry) => {
 
 /** A fork carries its own text; everything else is still a reference. */
 export const isPlatformFork = (entry) => typeof entry?.text === 'string';
+
+/**
+ * Upstream source link for one addendum entry, from the CURRENT corpus
+ * record's attribution — never from the entry itself (an entry from a
+ * foreign file could carry an attacker-chosen URL). Null when the ref does
+ * not resolve: an unresolved row gets no link rather than a dead href.
+ */
+export const platformRefSourceUrl = (entry) =>
+  getPlatformRecord(entry?.corpusId, entry?.policyId)?.attribution?.sourceUrl || null;
+
+/**
+ * Canonical addendum order for one subcategory: the committed map's key
+ * order restricted to policies that pair with the subcategory — the same
+ * order getPlatformProcedures offers in, platform-grouped by map
+ * construction. Entries the map cannot place (foreign corpus, withdrawn
+ * policy, or a policy no longer paired here) keep their relative order
+ * after the placeable ones. Pure re-ordering: entry objects pass through
+ * untouched — sorting never reads the corpus records, so it cannot alter
+ * content or fingerprints (the adopt action is the only hash writer).
+ */
+export const sortPlatformAddenda = (entries, subcategoryId) => {
+  const list = Array.isArray(entries) ? entries : [];
+  const index = new Map();
+  let position = 0;
+  Object.entries(subcategoryMap.policies).forEach(([policyId, entry]) => {
+    if (entry.pairs.some((p) => p.subcategoryId === subcategoryId)) {
+      index.set(policyId, position);
+      position += 1;
+    }
+  });
+  return list
+    .map((entry, i) => ({
+      entry,
+      i,
+      key: entry?.corpusId === PLATFORM_CORPUS_ID && index.has(entry?.policyId)
+        ? index.get(entry.policyId)
+        : Infinity
+    }))
+    .sort((a, b) => a.key - b.key || a.i - b.i)
+    .map((x) => x.entry);
+};
+
+/**
+ * The DERIVED per-assessment platform set (ratified: recomputed, never
+ * mutated): sorted unique platform of every addendum entry that resolves in
+ * the current corpus, across all observations. Derived in both directions —
+ * removing a platform's last entry removes its id. Unresolvable entries
+ * contribute nothing (their platform is unknowable from identity fields);
+ * they stay visible through the unresolved badge and placeholder instead.
+ */
+export const derivePlatformsFromObservations = (observations) => {
+  const platforms = new Set();
+  Object.values(observations || {}).forEach((obs) => {
+    const entries = Array.isArray(obs?.platformProcedures) ? obs.platformProcedures : [];
+    entries.forEach((entry) => {
+      const record = getPlatformRecord(entry?.corpusId, entry?.policyId);
+      if (record) platforms.add(record.platform);
+    });
+  });
+  return Array.from(platforms).sort();
+};
+
+/**
+ * Row descriptor for one addendum entry — the ONE derivation the badge row,
+ * the summary counts, and the picker's attached list all read, so the
+ * counts can never disagree with the rows. Branches on the ENTRY (per-
+ * observation state), never on the assessment-level platforms array —
+ * platforms.length === 0 is ambiguous by contract (pre-v16 restore vs
+ * attached-nothing) and must never gate badge logic.
+ *
+ * Badge states are limited to the production-drivable set (ratified):
+ * drifted (attach-time fingerprint differs from the current corpus) and
+ * unresolved (no current corpus record). A fork row shows neither — its
+ * text is user-owned, and the drift badge's remedy (adopt) refuses forks,
+ * so badging drift on a fork would surface a state with no remedy.
+ */
+export const addendumRowDescriptor = (entry) => {
+  const record = getPlatformRecord(entry?.corpusId, entry?.policyId);
+  const fork = isPlatformFork(entry);
+  return {
+    corpusId: entry?.corpusId,
+    policyId: entry?.policyId,
+    platformText: record ? platformLabel(record.platform) : null,
+    fork,
+    unresolved: !record && !fork,
+    drifted: !fork && platformRefDrift(entry) === true,
+    sourceUrl: platformRefSourceUrl(entry)
+  };
+};
 
 /**
  * Explicit placeholder for a reference this installation cannot resolve

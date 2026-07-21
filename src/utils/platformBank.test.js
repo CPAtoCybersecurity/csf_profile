@@ -414,7 +414,11 @@ describe('advisor adoptions: drift, hash pin, corpus-id stability, degenerate re
     expect(platformRefDrift(null)).toBeNull();
   });
 
-  test('expansion is drift-SILENT in PR-5 (deliberate deferral — the drift badge is PR-7 UI)', () => {
+  test('expansion is drift-SILENT permanently (ratified PR-7): drift surfaces as badge CHROME, never in egress text', () => {
+    // PR-5 pinned this as a deferral; PR-7 flipped the pin into the decision:
+    // rendered and exported text always carries the current corpus version,
+    // the detail-panel badge is the consent surface, and the picker's adopt
+    // action is the only path that may rewrite the stored fingerprint.
     const drifted = { ...realRef(), contentHash: '0000000000000000' };
     const out = expandProcedureText({ testProcedures: 't', platformProcedures: [drifted] });
     // resolves and renders the CURRENT corpus text, with no drift marker
