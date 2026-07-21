@@ -204,6 +204,12 @@ const ASSESSMENT = struct({
   externalTracking: { default: REBUILD_EXTERNAL_TRACKING, includePrivate: SHARE },
   year: SHARE,
   users: SHARE, // roster of { userId, role } pairs — opaque ids, no PII
+  // Per-assessment platform selection (plan PR-6). SHARE is honest, not a
+  // leak: the field is DERIVED from attached platform checks (never raw chip
+  // state), and a share that carries any addendum already names its platform
+  // in the expanded header — so the field only exists where the share body
+  // discloses the same fact. An assessment with zero addenda has [].
+  platforms: SHARE,
   scopeIds: SHARE,
   frameworkFilter: SHARE,
   status: SHARE,

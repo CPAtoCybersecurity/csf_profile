@@ -453,7 +453,7 @@ Object {
   },
   "storeVersions": Object {
     "artifacts": 9,
-    "assessments": 15,
+    "assessments": 16,
     "findings": 6,
     "frameworks": 6,
     "metrics": 1,
@@ -774,7 +774,7 @@ Alma's position as a continuous authentication SaaS company creates a unique dyn
   },
   "storeVersions": Object {
     "artifacts": 9,
-    "assessments": 15,
+    "assessments": 16,
     "findings": 6,
     "frameworks": 6,
     "metrics": 1,
@@ -1198,7 +1198,7 @@ Object {
   },
   "storeVersions": Object {
     "artifacts": 9,
-    "assessments": 15,
+    "assessments": 16,
     "findings": 6,
     "frameworks": 6,
     "metrics": 1,

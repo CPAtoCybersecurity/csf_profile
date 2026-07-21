@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Building2, Server, Shield, Gem, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 import useOrgProfileStore, { EMPTY_PROFILE } from '../stores/orgProfileStore';
+import { INFRA_PRESET_LABELS } from '../utils/infraPresets';
 
 /**
  * Optional org-profile mini-wizard. Five questions, every one skippable,
@@ -13,12 +14,9 @@ import useOrgProfileStore, { EMPTY_PROFILE } from '../stores/orgProfileStore';
 const SIZE_BANDS = ['1–49', '50–249', '250–999', '1,000–4,999', '5,000+'];
 
 // Cloud, email, and chat selections drive DETERMINISTIC procedure tailoring
-// (canned substitutions, no AI) — see utils/stackTailorMaps.js.
-const INFRA_PRESETS = [
-  'AWS', 'Azure', 'Google Cloud', 'On-premises data center', 'SaaS-heavy',
-  'Kubernetes / containers', 'OT / ICS', 'Remote-first endpoints',
-  'Microsoft 365', 'Google Workspace', 'Slack', 'Microsoft Teams'
-];
+// (canned substitutions, no AI) — see utils/stackTailorMaps.js. The preset
+// list lives in utils/infraPresets.js so the assessment wizard's Environment
+// step can read the same source of truth; the persisted token stays the label.
 
 // Naming a specific EDR product here enables an exact SentinelOne→product
 // swap in tailored procedures; the generic 'EDR' chip neutralizes instead.
@@ -147,7 +145,7 @@ const OrgProfileWizard = ({ onClose }) => {
       title: 'Key IT infrastructure?',
       body: (
         <ChipPicker
-          presets={INFRA_PRESETS}
+          presets={INFRA_PRESET_LABELS}
           value={draft.infrastructure}
           onChange={(infrastructure) => patch({ infrastructure })}
           placeholder="Add your own and press Enter…"
