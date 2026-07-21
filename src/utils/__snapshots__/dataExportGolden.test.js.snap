@@ -441,7 +441,7 @@ Object {
   },
   "dataType": "Complete Assessment Database",
   "exportDate": "<stripped>",
-  "formatVersion": 4,
+  "formatVersion": 5,
   "metadata": Object {
     "applicationName": "CSF Profile Assessment Tool",
     "assessmentCount": 3,
@@ -762,7 +762,7 @@ Alma's position as a continuous authentication SaaS company creates a unique dyn
   },
   "dataType": "Shareable Assessment Database (private pack data excluded)",
   "exportDate": "<stripped>",
-  "formatVersion": 4,
+  "formatVersion": 5,
   "metadata": Object {
     "applicationName": "CSF Profile Assessment Tool",
     "assessmentCount": 2,
@@ -1186,7 +1186,7 @@ Object {
   },
   "dataType": "Complete Assessment Database (private pack data INCLUDED; restricted-license metrics still excluded)",
   "exportDate": "<stripped>",
-  "formatVersion": 4,
+  "formatVersion": 5,
   "metadata": Object {
     "applicationName": "CSF Profile Assessment Tool",
     "assessmentCount": 3,

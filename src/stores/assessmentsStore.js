@@ -12,6 +12,11 @@ import {
   COMPREHENSIVE_OBSERVATIONS
 } from './comprehensiveAssessmentData';
 import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
+// The single expansion choke point (plan §7 R-3/R-9): every text egress of
+// procedure text below routes through it so platform addendum REFERENCES
+// expand to text + attribution (or the explicit placeholder) instead of
+// silently dropping from CSV/Jira artifacts.
+import { expandProcedureText } from '../utils/platformBank';
 import { cleanCommunityMarkdown } from '../utils/relatedSection.mjs';
 import useAuditLogStore from './auditLogStore';
 
@@ -1019,7 +1024,7 @@ const useAssessmentsStore = create(
             'Scope Type': escapeCSVValue(assessment.scopeType),
             'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
             'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
-            'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
+            'Test Procedure(s)': escapeCSVValue(expandProcedureText(obs) || '')
           };
 
           // Add quarterly columns
@@ -1511,7 +1516,7 @@ const useAssessmentsStore = create(
 
             // Build description
             let description = `Control Evaluation for ${controlDetails.id} - ${quarter}\n\n`;
-            description += `Test Procedures:\n${obs.testProcedures || 'N/A'}\n\n`;
+            description += `Test Procedures:\n${expandProcedureText(obs) || 'N/A'}\n\n`;
             description += `Observations:\n${qData.observations || 'N/A'}\n\n`;
             description += `Assessment Methods: ${methods.join(', ') || 'None'}\n\n`;
             if (controlDetails.linkedReqs) {
@@ -1541,7 +1546,7 @@ const useAssessmentsStore = create(
               'Custom field (Q4 Actual Score)': quarter === 'Q4' ? qData.actualScore : '',
               'Custom field (Q4 Target Score)': quarter === 'Q4' ? qData.targetScore : '',
               'Custom field (Testing Status)': qData.testingStatus,
-              'Custom field (Test Procedures)': escapeCSVValue(obs.testProcedures || ''),
+              'Custom field (Test Procedures)': escapeCSVValue(expandProcedureText(obs) || ''),
               'Custom field (Observations)': escapeCSVValue(qData.observations || ''),
               'Custom field (Assessment Methods)': methods.join(', '),
               'Custom field (Artifacts)': escapeCSVValue((obs.linkedArtifacts || []).join('; ')),
@@ -1658,7 +1663,7 @@ const useAssessmentsStore = create(
                 'Custom field (Actual Score)': qData.actualScore,
                 'Custom field (Target Score)': qData.targetScore,
                 'Custom field (Testing Status)': qData.testingStatus,
-                'Custom field (Test Procedures)': obs.testProcedures || '',
+                'Custom field (Test Procedures)': expandProcedureText(obs) || '',
                 'Custom field (Observations)': qData.observations || '',
                 'Custom field (Assessment Methods)': methods.join(', '),
                 'Custom field (Artifacts)': (obs.linkedArtifacts || []).join('; '),
@@ -1722,7 +1727,7 @@ const useAssessmentsStore = create(
               'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
               'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
               'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
-              'Test Procedure(s)': escapeCSVValue(obs.testProcedures || '')
+              'Test Procedure(s)': escapeCSVValue(expandProcedureText(obs) || '')
             };
 
             // Add quarterly columns

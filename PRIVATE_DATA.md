@@ -121,6 +121,22 @@ the crown-jewel list plus your tooling reads like an attacker's shopping list. I
   as-is (that is what makes them useful to you). The scrubbed artifact is the **Share
   export** only — hand people `csf_share_*.json`, not a CSV, when org context must stay out.
 
+### Platform procedure references (format 5)
+
+Platform addenda (SCuBA baselines) attach as **references**, never copies:
+`platformProcedures: [{ corpusId, corpusVersion, policyId, contentHash }]` on the
+observation, with the composition recipe recorded in `procedureSource.components`. One
+expansion function turns references into text at render and at every text egress (CSV,
+Jira, share export), asserting upstream attribution from provenance each time; a reference
+this install cannot resolve renders an explicit placeholder carrying its identity — never a
+silent drop. **Share exports are self-contained** (format 5): the references are expanded
+into the procedure text so a receiving install never depends on corpus presence or version,
+and the reference list itself never rides a share. **Complete backups carry references
+verbatim** (wholesale by design). Editing an addendum forks it copy-on-write into a
+concrete value you own, so nothing user-authored can ever become unresolvable. There are no
+corpus snapshots: when upstream revises or withdraws a policy, the fix is re-attaching from
+the regenerated corpus, not migrating old text.
+
 ### Procedure provenance and staleness (v1 non-goal)
 
 Attached community procedures are **copies** (`copy-on-attach`) with a provenance object:

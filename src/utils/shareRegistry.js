@@ -42,7 +42,8 @@
  */
 
 import { licenseIsRestricted } from './metricsImport';
-import { resolvePristine } from './procedureBank';
+import { pristineProcedureText } from './procedureBank';
+import { expandProcedureText } from './platformBank';
 
 export const SHARE = 'share';
 export const OMIT = 'omit';
@@ -53,9 +54,7 @@ export const STRIP_IF_EXCLUDED_METRIC = 'strip-if-excluded-metric';
 
 const struct = (fields) => ({ kind: 'struct', fields });
 const map = (of) => ({ kind: 'map', of });
-// A `list` node kind ({ kind: 'list', of }) is supported by the fold for
-// arrays of registered records; no current field needs it (rosters and id
-// arrays are SHARE leaves), so no helper exists until one does.
+const list = (of) => ({ kind: 'list', of });
 
 /**
  * Swap tailored procedures back to the pristine community version. The org
@@ -64,20 +63,40 @@ const map = (of) => ({ kind: 'map', of });
  * derived leak path. Provenance (procedureSource.bankId) makes the fix
  * deterministic: shared copies get the untailored community markdown. If the
  * source cannot be resolved, the text is dropped entirely — never leaked.
- * Resolution is a POSITIVE bank match (resolvePristine): a tailored source
- * carrying a bank label this build does not recognize drops to '' rather
- * than shipping community markdown under a foreign label. Registry-owned so
- * the pristine rule has exactly one home; applied as the observation record
- * transform in default share mode.
+ * Resolution goes through pristineProcedureText (plan §5 C1's ONE named
+ * function): it REPLAYS the recorded composition recipe when the source
+ * carries one and falls back to the positive legacy match otherwise. A
+ * tailored source carrying a bank label this build does not recognize drops
+ * to '' rather than shipping community markdown under a foreign label (the
+ * fail-closed fallback lives inside pristineProcedureText; flag-resetting
+ * stays HERE, in the caller). Registry-owned so the pristine rule has
+ * exactly one home; applied as the observation record transform in default
+ * share mode.
  */
 export const pristineObservation = (obs) => {
   if (!obs?.procedureSource?.tailored) return obs;
-  const pristine = resolvePristine(obs.procedureSource);
   return {
     ...obs,
-    testProcedures: pristine ? pristine.markdown : '',
+    testProcedures: pristineProcedureText(obs.procedureSource),
     procedureSource: { ...obs.procedureSource, tailored: false, modified: false }
   };
+};
+
+/**
+ * Expansion-on-export (plan §7 R-3, ratified default): a share export is the
+ * distributed artifact, so a receiving install must never depend on corpus
+ * presence or version. Observations carrying platform references have their
+ * testProcedures EXPANDED through the single choke point — trunk + addendum
+ * text + attribution (an unresolvable ref expands to its explicit
+ * placeholder); the references themselves are consumed by the expansion and
+ * never ride a share export (their field disposition below is OMIT in both
+ * modes). Complete backups are wholesale by design and carry references
+ * verbatim. Observations with no platform entries pass through untouched —
+ * the pre-platform share output stays byte-identical (golden-pinned).
+ */
+const expandObservationForShare = (obs) => {
+  if (!Array.isArray(obs?.platformProcedures) || obs.platformProcedures.length === 0) return obs;
+  return { ...obs, testProcedures: expandProcedureText(obs) };
 };
 
 const QUARTER = struct({
@@ -127,8 +146,32 @@ const OBSERVATION = struct({
         sha: SHARE,
         path: SHARE
       })
-    })
+    }),
+    // Composition recipe recorded at attach (plan §7 R-6): the trunk entry
+    // plus one platform-ref entry per addendum reference. Public pointers
+    // only — bank/corpus identities, policy ids, content hashes — never org
+    // data, so it rides shares in both modes: it is what tells a receiving
+    // install what an expanded procedure was composed FROM.
+    components: list(
+      struct({
+        kind: SHARE,
+        bank: SHARE,
+        bankId: SHARE,
+        bankVersion: SHARE,
+        corpusId: SHARE,
+        corpusVersion: SHARE,
+        policyId: SHARE,
+        contentHash: SHARE
+      })
+    )
   }),
+  // Platform addendum references / copy-on-write forks (plan §7 R-3).
+  // OMIT in BOTH modes: expansion-on-export already folded their text into
+  // testProcedures above, so shipping the refs too would make a receiving
+  // install double-render them. Complete backups (wholesale by design)
+  // carry them verbatim; the recipe in procedureSource.components preserves
+  // the lineage on shares.
+  platformProcedures: OMIT,
   linkedArtifacts: SHARE,
   linkedFindings: SHARE,
   linkedControls: SHARE,
@@ -350,7 +393,11 @@ export const SHARE_SECTIONS = {
     disposition: 'fold',
     record: ASSESSMENT,
     filter: keepAssessment,
-    observationTransform: (obs, ctx) => (ctx.includePrivate ? obs : pristineObservation(obs))
+    // Order matters: the pristine swap restores the trunk first (default
+    // mode only), then expansion-on-export folds addendum references into
+    // the text (BOTH modes — corpus-independence is not a privacy toggle).
+    observationTransform: (obs, ctx) =>
+      expandObservationForShare(ctx.includePrivate ? obs : pristineObservation(obs))
   },
   requirements: { disposition: 'fold', record: REQUIREMENT },
   frameworks: { disposition: 'fold', record: FRAMEWORK },

@@ -123,20 +123,91 @@ export const buildProcedureSource = (bankId) => ({
 });
 
 /**
+ * The recorded composition recipe (plan §7 R-6). `procedureSource.components`
+ * is written at attach time and REPLAYED — never re-derived — by every
+ * consumer that needs the pristine composition back: the share-export
+ * pristine swap and Reset. Recording the derivation at write time is the
+ * root-cause fix for the class where every egress re-derives with its own
+ * stale copy of the composition rule.
+ *
+ * Component kinds:
+ *  - { kind: 'trunk', bank, bankId, bankVersion } — the procedure trunk
+ *  - { kind: 'platform-ref', corpusId, corpusVersion, policyId, contentHash }
+ *    — one per platform addendum reference attached alongside the trunk
+ */
+const trunkComponentOf = (source) =>
+  Array.isArray(source?.components)
+    ? source.components.find((c) => c && c.kind === 'trunk')
+    : null;
+
+const addendumComponentsOf = (source) =>
+  Array.isArray(source?.components)
+    ? source.components.filter((c) => c && c.kind === 'platform-ref')
+    : [];
+
+/**
+ * Pristine TRUNK text for a provenance source — the ONE named function the
+ * share-export registry resolves pristine text through (plan §5 C1, settled:
+ * dataExport.js is touched only via the registry and this function).
+ *
+ * Replays the recorded recipe when the source carries one (the trunk
+ * component names the bank entry to restore); legacy sources without a
+ * recipe resolve exactly as before via resolvePristine. Positive match only,
+ * and the fail-closed contract stays: an unresolvable trunk returns '' —
+ * "cannot restore — do not substitute", never some other bank's text.
+ * Flag-resetting (tailored/modified) stays in the CALLER.
+ */
+export const pristineProcedureText = (source) => {
+  const trunk = trunkComponentOf(source);
+  const resolved = resolvePristine(trunk ? { bank: trunk.bank, bankId: trunk.bankId } : source);
+  return resolved ? resolved.markdown : '';
+};
+
+/**
  * Pure producer for the detail panel's Insert / Reset-to-community action.
  * Returns the observation update (pristine markdown + pristine provenance),
  * or null when the item has no bank entry or the existing source belongs to
  * another bank — a community reset must never destroy foreign bank content
  * (plan §7 R-10). The page stays a dumb dispatcher.
+ *
+ * Reset REPLAYS the recorded recipe (plan §7 R-6 — the second destroyer,
+ * closed): the trunk goes back to the pristine community text, and every
+ * platform addendum recorded in the recipe survives as its pristine
+ * REFERENCE — copy-on-write forks of an addendum reset to the reference,
+ * they are not destroyed silently. A legacy source with no recipe produces
+ * an update without the platformProcedures key, so a merge-style caller
+ * cannot clobber addenda the recipe never recorded.
+ *
+ * CONTRACT for composition-changing writes (PR-6 and later): this replays
+ * `components[]` VERBATIM. Any UI that adds or removes an addendum must
+ * RE-RECORD the recipe in the same write — a removal that only splices the
+ * live platformProcedures array leaves the stale recipe behind, and Reset
+ * will resurrect the removed addendum. The composition-writer guard test
+ * (egressCensus.test.js) pins which modules may write these keys.
  */
 export const resetToCommunityUpdate = (itemId, existingSource) => {
   if (!canResetToCommunity(existingSource)) return null;
   const entry = getBankProcedure(itemId);
   if (!entry) return null;
-  return {
+  const update = {
     testProcedures: entry.markdown,
     procedureSource: buildProcedureSource(entry.bankId)
   };
+  const addenda = addendumComponentsOf(existingSource);
+  if (addenda.length > 0) {
+    const refs = addenda.map(({ corpusId, corpusVersion, policyId, contentHash }) => ({
+      corpusId,
+      corpusVersion,
+      policyId,
+      contentHash
+    }));
+    update.procedureSource.components = [
+      { kind: 'trunk', bank: COMMUNITY_BANK, bankId: entry.bankId, bankVersion: BANK_VERSION },
+      ...refs.map((r) => ({ kind: 'platform-ref', ...r }))
+    ];
+    update.platformProcedures = refs;
+  }
+  return update;
 };
 
 /**

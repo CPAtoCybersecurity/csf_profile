@@ -28,8 +28,9 @@ import {
   STRIP_IF_EXCLUDED_METRIC,
   declaredPaths
 } from './shareRegistry';
-import { bankAttachObservation } from './procedureTailor';
+import { bankAttachObservation, composeAttachObservation } from './procedureTailor';
 import { getBankProcedure } from './procedureBank';
+import { getPlatformProcedures, getPlatformRecord, PLATFORM_CORPUS_ID } from './platformBank';
 import { importPack } from './packImport';
 import { parseMetricsCSV, validateMetricsCatalog, importMetricsCatalog } from './metricsImport';
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -79,7 +80,14 @@ const OPAQUE_LEAVES = new Set([
   // Legacy v0 tri-state — historical shape, no producer writes it today.
   'assessments[].observations{}.assessmentMethods',
   // User-authored display labels — no privacy class, wholesale by intent.
-  'frameworks[].hierarchyLabels'
+  'frameworks[].hierarchyLabels',
+  // Platform addendum references / copy-on-write forks (plan §7 R-3).
+  // OMIT in both share modes — expansion-on-export folds their text into
+  // testProcedures, so the refs never serialize on the share path at all;
+  // shape is producer-enforced (buildPlatformRef / forkPlatformProcedure,
+  // pinned in platformBank.test.js) and complete backups carry them
+  // wholesale by design.
+  'assessments[].observations{}.platformProcedures'
 ]);
 
 const isLeaf = (spec) => !spec.kind;
@@ -207,6 +215,31 @@ const seedThroughProducers = () => {
     { substituteName: true, adaptStack: true }
   );
   assessments.updateObservation(assessmentId, 'GV.OC-01 Ex1', produced);
+  // The real composed-attach producer (PR-5): trunk + platform addendum
+  // REFERENCES + the recorded recipe, tailored trunk so the pristine-swap ×
+  // expansion composition is exercised on the share path.
+  assessments.addToScope(assessmentId, 'PR.DS-01 Ex1');
+  const composed = composeAttachObservation(
+    getBankProcedure('PR.DS-01'),
+    getPlatformProcedures('PR.DS-01', ['microsoft-365']).slice(0, 2),
+    useOrgProfileStore.getState().profile,
+    { substituteName: true }
+  );
+  assessments.updateObservation(assessmentId, 'PR.DS-01 Ex1', composed);
+  // An unresolvable reference riding a real observation (foreign corpus id):
+  // the share export must expand it to the explicit placeholder.
+  assessments.addToScope(assessmentId, 'DE.CM-09 Ex1');
+  assessments.updateObservation(assessmentId, 'DE.CM-09 Ex1', {
+    testProcedures: 'Trunk with a dead reference.',
+    platformProcedures: [
+      {
+        corpusId: 'foreign-corpus',
+        corpusVersion: 'ffffffffffffffff',
+        policyId: 'gone.policy.1.1v1',
+        contentHash: '0123456789abcdef'
+      }
+    ]
+  });
   assessments.updateObservation(assessmentId, 'GV.OC-01 Ex1', {
     auditorId: 'U-1',
     linkedArtifacts: ['AR-1'],
@@ -606,5 +639,118 @@ describe('share registry enforcement — restore lane', () => {
       interview: false,
       test: false
     });
+  });
+});
+
+describe('PR-5: expansion-on-export + reference dispositions (production share path)', () => {
+  // Earlier describes (the CSV-importer appearance lanes) rebuild store
+  // state; re-seed so these tests read the producer-built assessment.
+  beforeAll(() => {
+    seedThroughProducers();
+  });
+
+  const shareObs = (share, itemId) =>
+    share.data.assessments.find((a) => a.id === assessmentId).observations[itemId];
+
+  test('leak-side: platformProcedures references never serialize on the share path, either mode', () => {
+    expect(JSON.stringify(buildShareableExport(stores()))).not.toContain('platformProcedures');
+    expect(
+      JSON.stringify(buildShareableExport(stores(), { includePrivate: true }))
+    ).not.toContain('platformProcedures');
+  });
+
+  test('complete backups carry the references verbatim (wholesale by design)', () => {
+    const envelope = exportAllDataJSON(stores());
+    const backup = envelope.data.assessments.find((a) => a.id === assessmentId);
+    const refs = backup.observations['PR.DS-01 Ex1'].platformProcedures;
+    expect(refs).toHaveLength(2);
+    refs.forEach((ref) => {
+      expect(Object.keys(ref).sort()).toEqual([
+        'contentHash',
+        'corpusId',
+        'corpusVersion',
+        'policyId'
+      ]);
+    });
+  });
+
+  test('default mode: pristine trunk + expanded addenda + attribution, in one self-contained text', () => {
+    const obs = shareObs(buildShareableExport(stores()), 'PR.DS-01 Ex1');
+    const pristine = getBankProcedure('PR.DS-01').markdown;
+    // trunk swapped back to pristine (tailored org name gone), then expanded
+    expect(obs.testProcedures.startsWith(pristine)).toBe(true);
+    expect(obs.testProcedures).not.toContain('Producer Org');
+    // both referenced addenda expanded from the corpus with attribution
+    const refs = getPlatformProcedures('PR.DS-01', ['microsoft-365']).slice(0, 2);
+    refs.forEach(({ policyId }) => {
+      const record = getPlatformRecord(PLATFORM_CORPUS_ID, policyId);
+      expect(obs.testProcedures).toContain(record.assertion);
+      expect(obs.testProcedures).toContain(record.attribution.attributionText);
+    });
+    // provenance flags reset by the pristine swap, recipe still rides
+    expect(obs.procedureSource.tailored).toBe(false);
+    expect(obs.procedureSource.components).toHaveLength(3);
+    expect(obs.procedureSource.components[0].kind).toBe('trunk');
+  });
+
+  test('include-private mode: user trunk kept, addenda still expanded (corpus-independence is not a privacy toggle)', () => {
+    const obs = shareObs(buildShareableExport(stores(), { includePrivate: true }), 'PR.DS-01 Ex1');
+    expect(obs.testProcedures).toContain('Producer Org'); // tailored trunk rides
+    const refs = getPlatformProcedures('PR.DS-01', ['microsoft-365']).slice(0, 2);
+    refs.forEach(({ policyId }) => {
+      expect(obs.testProcedures).toContain(
+        getPlatformRecord(PLATFORM_CORPUS_ID, policyId).assertion
+      );
+    });
+  });
+
+  test('unresolvable reference expands to the identity-carrying placeholder on the share — never a silent drop', () => {
+    const obs = shareObs(buildShareableExport(stores()), 'DE.CM-09 Ex1');
+    expect(obs.testProcedures).toContain('Trunk with a dead reference.');
+    expect(obs.testProcedures).toContain('Unresolved platform procedure reference');
+    expect(obs.testProcedures).toContain('gone.policy.1.1v1');
+    expect(obs.testProcedures).toContain('ffffffffffffffff');
+    expect(obs.testProcedures).toContain('0123456789abcdef');
+  });
+
+  test('store passthrough: updateObservation persisted the references unmangled (real producer path)', () => {
+    const stored = useAssessmentsStore
+      .getState()
+      .getObservation(assessmentId, 'PR.DS-01 Ex1');
+    expect(stored.platformProcedures).toHaveLength(2);
+    expect(stored.procedureSource.components).toHaveLength(3);
+    // and an untouched observation's default shape has no platform keys
+    const fresh = useAssessmentsStore.getState().getObservation(assessmentId, 'GV.OC-01 Ex1');
+    expect('platformProcedures' in fresh).toBe(false);
+  });
+});
+
+describe('PR-5: copy-on-write forks on the share path', () => {
+  beforeAll(() => {
+    seedThroughProducers();
+    // Fork one PR.DS-01 addendum through the production fork producer and
+    // attach it alongside a pristine reference.
+    const offer = getPlatformProcedures('PR.DS-01', ['microsoft-365'])[0];
+    const { forkPlatformProcedure, buildPlatformRef } =
+      // eslint-disable-next-line global-require
+      require('./platformBank');
+    const fork = forkPlatformProcedure(buildPlatformRef(offer.record), 'FORKED-ADDENDUM user text.');
+    useAssessmentsStore.getState().updateObservation(assessmentId, 'PR.DS-01 Ex1', {
+      platformProcedures: [fork]
+    });
+  });
+
+  test('a forked addendum rides the DEFAULT share as user text with modification indication (pinned current behavior)', () => {
+    // Pins the policy boundary the reviewer flagged for PR-6: hand-edited
+    // addendum text rides default shares exactly like hand-edited trunk
+    // text does today (the pristine swap is tailoring-scoped, not
+    // edit-scoped). If PR-6 decides forks need a pristine reset on default
+    // share, this test is the one that changes — deliberately.
+    const share = buildShareableExport(stores());
+    const obs = share.data.assessments.find((a) => a.id === assessmentId)
+      .observations['PR.DS-01 Ex1'];
+    expect(obs.testProcedures).toContain('FORKED-ADDENDUM user text.');
+    expect(obs.testProcedures).toContain('modified from the referenced original');
+    expect(JSON.stringify(obs)).not.toContain('platformProcedures');
   });
 });
