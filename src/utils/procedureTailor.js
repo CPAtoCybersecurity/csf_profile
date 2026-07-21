@@ -19,9 +19,16 @@
  * must not leak through derived procedure text — see PRIVATE_DATA.md).
  */
 
-import { getBankProcedure, buildProcedureSource } from './procedureBank';
+import { getBankProcedure, buildProcedureSource, isBankAttached, subcategoryFromItemId } from './procedureBank';
 import { licenseGate, licenseProvenance, mayTailor, refusalPlaceholder } from './licenseClass.mjs';
-import { buildPlatformRef } from './platformBank';
+import {
+  buildPlatformRef,
+  getPlatformProcedures,
+  getPlatformRecord,
+  isPlatformFork,
+  platformRefDrift,
+  sortPlatformAddenda
+} from './platformBank';
 import { CLOUD_TERMS, EDR_PRODUCTS, GOOGLE_EMAIL_TERMS } from './stackTailorMaps';
 
 /**
@@ -286,6 +293,126 @@ export const wizardAttachObservation = (bankEntry, platformOffers, profile, opti
   return offers.length > 0
     ? composeAttachObservation(bankEntry, offers, profile, options)
     : bankAttachObservation(bankEntry, profile, options);
+};
+
+/* --- Post-create platform-check picker (plan PR-7) ----------------------- */
+
+const addendaOf = (observation) =>
+  Array.isArray(observation?.platformProcedures) ? observation.platformProcedures : [];
+
+const entryIndexOf = (entries, ref) =>
+  entries.findIndex((e) => e?.corpusId === ref?.corpusId && e?.policyId === ref?.policyId);
+
+/**
+ * Shared rebuild for every picker operation: re-orders the given ENTRY
+ * OBJECTS to canonical committed-map order and re-records the recipe from
+ * them in the same write (a removal that only spliced the live array would
+ * leave a stale recipe behind, and Reset would resurrect the removed
+ * addendum). The rebuild reads no corpus record: existing entries — forks
+ * included — pass through verbatim, so no operation can re-fingerprint or
+ * re-render a neighbor it did not target. Only the add path mints a new
+ * reference and only the adopt path re-reads the corpus, each for exactly
+ * its one target entry.
+ *
+ * The trunk component is preserved verbatim when the recipe already has
+ * one; a legacy source with no recipe heals on this first write — the
+ * trunk component is reconstructed from the bank-attach provenance fields
+ * (only when the trunk IS bank-attached; a hand-written trunk records a
+ * refs-only recipe, which Reset's fail-closed contract already handles).
+ */
+const rebuildPickerComposition = (observation, itemId, entries) => {
+  const sorted = sortPlatformAddenda(entries, subcategoryFromItemId(itemId));
+  const source = observation?.procedureSource;
+  const existingTrunk = Array.isArray(source?.components)
+    ? source.components.find((c) => c && c.kind === 'trunk')
+    : null;
+  const trunk = existingTrunk || (isBankAttached(source)
+    ? { kind: 'trunk', bank: source.bank, bankId: source.bankId, bankVersion: source.bankVersion }
+    : null);
+  const components = [
+    ...(trunk ? [trunk] : []),
+    ...sorted.map(({ corpusId, corpusVersion, policyId, contentHash }) => ({
+      kind: 'platform-ref', corpusId, corpusVersion, policyId, contentHash
+    }))
+  ];
+  return {
+    platformProcedures: sorted,
+    procedureSource: { ...(source || {}), components }
+  };
+};
+
+/**
+ * THE pure producer for the detail panel's platform-check picker — the one
+ * post-create writer of the composition keys (plan PR-7; the composition-
+ * writer guard pins this file as sanctioned). Returns the observation
+ * update for one operation, or null when nothing would change — null means
+ * "no write", the repo-wide producer convention.
+ *
+ * Operations:
+ *  - { op: 'add', offer }      — attach one offer from getPlatformProcedures
+ *  - { op: 'addAll', offers }  — attach every not-yet-attached offer, one write
+ *  - { op: 'remove', ref }     — DELETE the entry from the live array and the
+ *    recipe together (ratified: no tombstones — the recipe means current
+ *    composition; provenance of past exports is self-contained by
+ *    expansion-on-export)
+ *  - { op: 'adopt', ref }      — adopt the upstream update: replace the one
+ *    entry's reference with a fresh fingerprint of the CURRENT corpus
+ *    record. The ONLY path anywhere that rewrites a stored contentHash
+ *    (ratified: drift detection never heals; callers confirm with the user
+ *    first, showing old vs new). Refuses forks (fork management is not this
+ *    surface) and non-drifted or unresolvable refs.
+ *
+ * Attaching requires a bank-attached trunk — addenda ride the community
+ * procedure, and the recipe records the trunk they ride on. Remove and
+ * adopt operate on what exists regardless of trunk provenance.
+ */
+export const pickerObservationUpdate = (observation, itemId, operation) => {
+  const entries = addendaOf(observation);
+  const { op } = operation || {};
+
+  if (op === 'add' || op === 'addAll') {
+    if (!isBankAttached(observation?.procedureSource)) return null;
+    const offers = op === 'add' ? [operation.offer] : (operation.offers || []);
+    const fresh = offers.filter((offer) =>
+      offer?.record && entryIndexOf(entries, offer) === -1);
+    if (fresh.length === 0) return null;
+    const added = fresh.map((offer) => buildPlatformRef(offer.record, offer.corpusId));
+    return rebuildPickerComposition(observation, itemId, [...entries, ...added]);
+  }
+
+  if (op === 'remove') {
+    const idx = entryIndexOf(entries, operation.ref);
+    if (idx === -1) return null;
+    return rebuildPickerComposition(observation, itemId, entries.filter((_, i) => i !== idx));
+  }
+
+  if (op === 'adopt') {
+    const idx = entryIndexOf(entries, operation.ref);
+    if (idx === -1) return null;
+    const entry = entries[idx];
+    if (isPlatformFork(entry) || platformRefDrift(entry) !== true) return null;
+    const record = getPlatformRecord(entry.corpusId, entry.policyId);
+    const adopted = buildPlatformRef(record, entry.corpusId);
+    return rebuildPickerComposition(
+      observation, itemId, entries.map((e, i) => (i === idx ? adopted : e)));
+  }
+
+  return null;
+};
+
+/**
+ * Picker availability for one observation — the visibility rule the page
+ * dispatches on. `canOpen` when there is anything to manage (attached
+ * entries to remove/adopt, or offers an attach could add); `canAttach`
+ * additionally requires the bank-attached trunk the recipe records.
+ * Branches on the observation's own state, never on the assessment-level
+ * platforms array (its emptiness is ambiguous by contract).
+ */
+export const pickerAvailability = (observation, itemId, platformIds) => {
+  const attached = addendaOf(observation).length;
+  const offered = getPlatformProcedures(subcategoryFromItemId(itemId), platformIds).length;
+  const canAttach = offered > 0 && isBankAttached(observation?.procedureSource);
+  return { canOpen: attached > 0 || canAttach, canAttach };
 };
 
 /**
