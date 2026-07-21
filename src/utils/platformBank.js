@@ -105,7 +105,7 @@ const CONTENT_HASH_FIELDS = [
 /* FNV-1a 64-bit over the picked-field JSON — deterministic, dependency-free,
  * synchronous (crypto.subtle is async and node-only hashes don't bundle).
  * The hash is OUR artifact-drift fingerprint, not a security boundary. */
-/* global BigInt */
+/* eslint-env es2020 */
 const fnv1a64 = (str) => {
   let hash = 0xcbf29ce484222325n;
   const prime = 0x100000001b3n;
