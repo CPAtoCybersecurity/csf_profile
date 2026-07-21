@@ -13,7 +13,8 @@ import {
   resolvePristine,
   canResetToCommunity,
   resetToCommunityUpdate,
-  sourceUrlFor
+  sourceUrlFor,
+  pristineProcedureText
 } from './procedureBank';
 import useAssessmentsStore from '../stores/assessmentsStore';
 
@@ -267,5 +268,141 @@ describe('resetToCommunityUpdate producer', () => {
 
   test('uncovered items produce no update', () => {
     expect(resetToCommunityUpdate('CTRL-042', undefined)).toBeNull();
+  });
+});
+
+describe('pristineProcedureText — recipe replay (plan §5 C1, §7 R-6)', () => {
+  const communityMarkdownOf = (bankId) => getBankProcedure(bankId).markdown;
+
+  test('legacy source (no recipe): byte-equal to the community bank markdown', () => {
+    const source = { bank: COMMUNITY_BANK, bankId: 'GV.OC-01', tailored: true };
+    expect(pristineProcedureText(source)).toBe(communityMarkdownOf('GV.OC-01'));
+  });
+
+  test('recipe replay: the trunk component names the entry to restore', () => {
+    const source = {
+      bank: COMMUNITY_BANK,
+      bankId: 'GV.OC-01',
+      components: [{ kind: 'trunk', bank: COMMUNITY_BANK, bankId: 'GV.OC-01', bankVersion: BANK_VERSION }]
+    };
+    expect(pristineProcedureText(source)).toBe(communityMarkdownOf('GV.OC-01'));
+  });
+
+  test('replay polarity: recipe changed ⇒ swap output changes', () => {
+    const withTrunk = (bankId) => ({
+      bank: COMMUNITY_BANK,
+      bankId: 'GV.OC-01',
+      components: [{ kind: 'trunk', bank: COMMUNITY_BANK, bankId, bankVersion: BANK_VERSION }]
+    });
+    const a = pristineProcedureText(withTrunk('GV.OC-01'));
+    const b = pristineProcedureText(withTrunk('PR.AA-05'));
+    expect(a).not.toBe(b);
+    expect(b).toBe(communityMarkdownOf('PR.AA-05'));
+  });
+
+  test('recipe-ignoring-mutant discrimination: when source.bankId and the recorded trunk diverge, the RECIPE wins', () => {
+    // A wrong implementation that re-derives from source.bankId succeeds at
+    // its wrong behavior here — it returns GV.OC-01 markdown. The recipe
+    // records PR.AA-05; replay must return PR.AA-05.
+    const source = {
+      bank: COMMUNITY_BANK,
+      bankId: 'GV.OC-01',
+      components: [{ kind: 'trunk', bank: COMMUNITY_BANK, bankId: 'PR.AA-05', bankVersion: BANK_VERSION }]
+    };
+    expect(pristineProcedureText(source)).toBe(communityMarkdownOf('PR.AA-05'));
+    expect(pristineProcedureText(source)).not.toBe(communityMarkdownOf('GV.OC-01'));
+  });
+
+  test("fail-closed '' stays: foreign trunk bank, dangling bankId, absent source", () => {
+    expect(
+      pristineProcedureText({
+        bank: 'foreign-bank',
+        bankId: 'GV.OC-01',
+        components: [{ kind: 'trunk', bank: 'foreign-bank', bankId: 'GV.OC-01' }]
+      })
+    ).toBe('');
+    expect(
+      pristineProcedureText({
+        bank: COMMUNITY_BANK,
+        bankId: 'GV.OC-01',
+        components: [{ kind: 'trunk', bank: COMMUNITY_BANK, bankId: 'ZZ.ZZ-99' }]
+      })
+    ).toBe('');
+    expect(pristineProcedureText(null)).toBe('');
+    expect(pristineProcedureText({ bank: 'unrecognized', bankId: 'GV.OC-01' })).toBe('');
+  });
+});
+
+describe('resetToCommunityUpdate — recipe replay closes the R-6 destroyer', () => {
+  const REF_A = {
+    corpusId: 'scuba',
+    corpusVersion: 'aaaaaaaaaaaaaaaa',
+    policyId: 'gws.gmail.1.1v1',
+    contentHash: '1111111111111111'
+  };
+  const REF_B = {
+    corpusId: 'scuba',
+    corpusVersion: 'aaaaaaaaaaaaaaaa',
+    policyId: 'ms.aad.1.1v1',
+    contentHash: '2222222222222222'
+  };
+  const composedSource = () => ({
+    bank: COMMUNITY_BANK,
+    bankId: 'GV.OC-01',
+    bankVersion: BANK_VERSION,
+    tailored: true,
+    modified: true,
+    components: [
+      { kind: 'trunk', bank: COMMUNITY_BANK, bankId: 'GV.OC-01', bankVersion: BANK_VERSION },
+      { kind: 'platform-ref', ...REF_A },
+      { kind: 'platform-ref', ...REF_B }
+    ]
+  });
+
+  test('replay: trunk goes pristine AND addendum refs survive from the recipe', () => {
+    const update = resetToCommunityUpdate('GV.OC-01 Ex1', composedSource());
+    expect(update.testProcedures).toBe(getBankProcedure('GV.OC-01').markdown);
+    expect(update.platformProcedures).toEqual([REF_A, REF_B]);
+    // the recipe is re-recorded on the fresh provenance, not dropped
+    expect(update.procedureSource.components).toEqual([
+      { kind: 'trunk', bank: COMMUNITY_BANK, bankId: 'GV.OC-01', bankVersion: BANK_VERSION },
+      { kind: 'platform-ref', ...REF_A },
+      { kind: 'platform-ref', ...REF_B }
+    ]);
+    expect(update.procedureSource.modified).toBe(false);
+  });
+
+  test('destroyer-closed polarity: a copy-on-write FORK resets to the pristine reference — the addendum is never destroyed', () => {
+    // The live observation may hold a fork (edited addendum); the recipe
+    // holds the pristine ref. Reset replays the recipe: the update's refs
+    // carry NO text field. A mutant that preserves the live array keeps the
+    // fork; a mutant that drops addenda loses the ref — both fail here.
+    const update = resetToCommunityUpdate('GV.OC-01 Ex1', composedSource());
+    update.platformProcedures.forEach((ref) => {
+      expect(Object.keys(ref).sort()).toEqual([
+        'contentHash',
+        'corpusId',
+        'corpusVersion',
+        'policyId'
+      ]);
+    });
+    expect(update.platformProcedures).toHaveLength(2);
+  });
+
+  test('legacy source without a recipe: update carries NO platformProcedures key (nothing clobbered)', () => {
+    const update = resetToCommunityUpdate('GV.OC-01 Ex1', {
+      bank: COMMUNITY_BANK,
+      bankId: 'GV.OC-01',
+      tailored: true
+    });
+    expect('platformProcedures' in update).toBe(false);
+    expect('components' in update.procedureSource).toBe(false);
+    expect(update.testProcedures).toBe(getBankProcedure('GV.OC-01').markdown);
+  });
+
+  test('foreign-bank source still refuses outright (R-10 unchanged)', () => {
+    expect(
+      resetToCommunityUpdate('GV.OC-01 Ex1', { bank: 'foreign-bank', bankId: 'GV.OC-01' })
+    ).toBeNull();
   });
 });

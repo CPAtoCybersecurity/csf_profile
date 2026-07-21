@@ -544,3 +544,139 @@ describe('importCompleteDatabase safety semantics', () => {
     expect(setters.setUsers).not.toHaveBeenCalled();
   });
 });
+
+describe('PR-5: platform references on the restore path (format 5)', () => {
+  const REF = {
+    corpusId: 'foreign-corpus',
+    corpusVersion: 'ffffffffffffffff',
+    policyId: 'gone.policy.1.1v1',
+    contentHash: '0123456789abcdef'
+  };
+  const withRefs = () => ({
+    ...SAMPLE,
+    assessments: [
+      {
+        id: 'a1',
+        name: 'Assessment',
+        observations: {
+          'PR.DS-01 Ex1': {
+            testProcedures: 'Trunk text.',
+            platformProcedures: [REF],
+            procedureSource: {
+              bank: 'community',
+              bankId: 'PR.DS-01',
+              components: [
+                { kind: 'trunk', bank: 'community', bankId: 'PR.DS-01' },
+                { kind: 'platform-ref', ...REF }
+              ]
+            },
+            quarters: {}
+          }
+        }
+      }
+    ]
+  });
+
+  test('the export format is 5 — the platform-procedures envelope discriminator', () => {
+    expect(EXPORT_FORMAT_VERSION).toBe(5);
+  });
+
+  test('a format-5 backup carrying references restores them VERBATIM (never dropped, never crashes)', () => {
+    const { stores } = makeStores(withRefs());
+    const exported = exportAllDataJSON(stores);
+    const parsed = JSON.parse(JSON.stringify(exported));
+    const { stores: targetStores, setters } = makeStores();
+    const result = importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+    expect(result.applied).toEqual(expect.arrayContaining(['assessments']));
+    const restored = setters.setAssessments.mock.calls[0][0];
+    const obs = restored[0].observations['PR.DS-01 Ex1'];
+    expect(obs.platformProcedures).toEqual([REF]);
+    expect(obs.procedureSource.components).toHaveLength(2);
+  });
+
+  test('restore-side render: a corpus-less reference renders the explicit placeholder through the production choke point', () => {
+    // What a receiving install WITHOUT the corpus does with refs — the
+    // placeholder, never a silent drop, never a crash (plan §7 R-3).
+    // eslint-disable-next-line global-require
+    const { expandProcedureText } = require('./platformBank');
+    const { stores } = makeStores(withRefs());
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const obs = parsed.data.assessments[0].observations['PR.DS-01 Ex1'];
+    const out = expandProcedureText(obs);
+    expect(out).toContain('Trunk text.');
+    expect(out).toContain('Unresolved platform procedure reference');
+    expect(out).toContain(REF.policyId);
+    expect(out).toContain(REF.corpusVersion);
+    expect(out).toContain(REF.contentHash);
+  });
+
+  test('a file from a newer format (6) is still rejected with the newer-version message', () => {
+    const result = validateDatabaseExport({ formatVersion: 6, data: { users: [] } });
+    expect(result.ok).toBe(false);
+    expect(result.errors.join(' ')).toMatch(/newer version/i);
+  });
+});
+
+describe('PR-5: share-import round trip is NOT permanently detached (recipe rides)', () => {
+  test('resetToCommunityUpdate on an imported share observation re-references from the recipe', () => {
+    // The share consumed the refs (expansion-on-export), but the recipe in
+    // procedureSource.components rides the share — so a receiving install
+    // that Resets gets the trunk pristine AND the addenda back as pristine
+    // REFERENCES. Import of a share is a re-referenceable state, not a
+    // permanent detach.
+    // eslint-disable-next-line global-require
+    const { buildShareableExport } = require('./dataExport');
+    // eslint-disable-next-line global-require
+    const { resetToCommunityUpdate } = require('./procedureBank');
+    const REF_A = {
+      corpusId: 'scuba',
+      corpusVersion: 'aaaaaaaaaaaaaaaa',
+      policyId: 'ms.aad.1.1v1',
+      contentHash: '1111111111111111'
+    };
+    const { stores } = makeStores({
+      ...SAMPLE,
+      assessments: [
+        {
+          id: 'a1',
+          name: 'Assessment',
+          observations: {
+            'PR.DS-01 Ex1': {
+              testProcedures: 'Trunk.',
+              platformProcedures: [REF_A],
+              procedureSource: {
+                bank: 'community',
+                bankId: 'PR.DS-01',
+                tailored: false,
+                modified: false,
+                components: [
+                  { kind: 'trunk', bank: 'community', bankId: 'PR.DS-01' },
+                  { kind: 'platform-ref', ...REF_A }
+                ]
+              },
+              quarters: {}
+            }
+          }
+        }
+      ]
+    });
+    const share = JSON.parse(JSON.stringify(buildShareableExport(stores)));
+    const sharedObs = share.data.assessments[0].observations['PR.DS-01 Ex1'];
+    expect(sharedObs.platformProcedures).toBeUndefined(); // consumed by expansion
+
+    const { stores: targetStores, setters } = makeStores();
+    const result = importCompleteDatabase(share, targetStores, { backupFirst: false });
+    expect(result.applied).toEqual(expect.arrayContaining(['assessments']));
+    const imported = setters.setAssessments.mock.calls[0][0][0].observations['PR.DS-01 Ex1'];
+    expect(imported.platformProcedures).toBeUndefined();
+    expect(imported.procedureSource.components).toHaveLength(2);
+
+    const update = resetToCommunityUpdate('PR.DS-01 Ex1', imported.procedureSource);
+    expect(update.platformProcedures).toEqual([REF_A]); // re-referenced from the recipe
+  });
+
+  test('a format-4 backup is still accepted (heal-in-place, not stranded at the gate)', () => {
+    const result = validateDatabaseExport({ formatVersion: 4, data: { users: [] } });
+    expect(result.ok).toBe(true);
+  });
+});

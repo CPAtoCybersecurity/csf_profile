@@ -15,8 +15,17 @@ import { SHARE_SECTIONS, OMIT, foldSection, buildShareContext } from './shareReg
  * Format 4: adds the orgProfile section (object, not array) to COMPLETE
  *   backups. Share exports NEVER carry it, and tailored procedures are
  *   swapped back to the pristine community text (see PRIVATE_DATA.md).
+ * Format 5: the platform-procedures envelope discriminator. Share-export
+ *   procedure text is SELF-CONTAINED — platform addendum references are
+ *   expanded into testProcedures (trunk + addendum text + attribution) and
+ *   the refs themselves never ride a share; procedureSource.components
+ *   records the composition recipe; complete backups carry
+ *   observation.platformProcedures references verbatim (wholesale by
+ *   design). From format 5 on, ABSENCE is meaningful: a file with no
+ *   components / license metadata / platformProcedures genuinely had none,
+ *   where a format ≤4 file simply predates the machinery.
  */
-export const EXPORT_FORMAT_VERSION = 4;
+export const EXPORT_FORMAT_VERSION = 5;
 
 // zustand persist keys whose schema versions travel with the export so a
 // restore can detect version drift between the exporting and importing app.

@@ -21,6 +21,7 @@
 
 import { getBankProcedure, buildProcedureSource } from './procedureBank';
 import { licenseGate, licenseProvenance, mayTailor, refusalPlaceholder } from './licenseClass.mjs';
+import { buildPlatformRef } from './platformBank';
 import { CLOUD_TERMS, EDR_PRODUCTS, GOOGLE_EMAIL_TERMS } from './stackTailorMaps';
 
 /**
@@ -235,6 +236,41 @@ export const bankAttachObservation = (bankEntry, profile, options = {}) => {
       ...licenseProvenance(bankEntry)
     }
   };
+};
+
+/**
+ * Pure producer for the composed (trunk + platform addenda) attach path —
+ * what the PR-6 wizard Environment step will call. The trunk is the
+ * community attach exactly as bankAttachObservation produces it; platform
+ * offers (from getPlatformProcedures) attach as REFERENCES, never copied
+ * text (plan §7 R-3), and `procedureSource.components[]` records the
+ * composition recipe at attach time (plan §7 R-6) so the pristine swap and
+ * Reset replay a recorded derivation instead of re-deriving with their own
+ * copy of the composition rule.
+ *
+ * Zero offers compose to the trunk attach plus the trunk-only recipe — no
+ * platformProcedures key, so nothing rides observations that have no
+ * platform lane.
+ */
+export const composeAttachObservation = (bankEntry, platformOffers, profile, options = {}) => {
+  const trunk = bankAttachObservation(bankEntry, profile, options);
+  const offers = Array.isArray(platformOffers) ? platformOffers : [];
+  const refs = offers.map((offer) => buildPlatformRef(offer.record, offer.corpusId));
+  const components = [
+    {
+      kind: 'trunk',
+      bank: trunk.procedureSource.bank,
+      bankId: trunk.procedureSource.bankId,
+      bankVersion: trunk.procedureSource.bankVersion
+    },
+    ...refs.map((r) => ({ kind: 'platform-ref', ...r }))
+  ];
+  const composed = {
+    ...trunk,
+    procedureSource: { ...trunk.procedureSource, components }
+  };
+  if (refs.length > 0) composed.platformProcedures = refs;
+  return composed;
 };
 
 /**

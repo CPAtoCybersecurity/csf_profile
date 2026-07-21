@@ -28,6 +28,7 @@ import useAIStore from '../stores/aiStore';
 import useUIStore from '../stores/uiStore';
 import { formatInlineMarkdown, stripMarkdown } from '../utils/markdownText';
 import { bankCoverage, getBankProcedure, canResetToCommunity, resetToCommunityUpdate, sourceUrlFor } from '../utils/procedureBank';
+import { expandProcedureText } from '../utils/platformBank';
 import { canUseProfileWithProvider, buildTailorPrompt, tailoredProvenance, deriveStackTargets, describeStackPlan, bankAttachObservation, deterministicTailorUpdate } from '../utils/procedureTailor';
 import { getScoringScale, scoreBand, CMMI_LEVELS } from '../utils/scoringScale';
 import { SYSTEM_NAME_MAX_LENGTH } from '../utils/externalLinks';
@@ -783,8 +784,14 @@ Format as a numbered list. Be specific and actionable.`;
     const existing = getObservation(currentAssessmentId, selectedItemId);
     const update = resetToCommunityUpdate(selectedItemId, existing?.procedureSource);
     if (!update) return;
-    if (existingText && existingText.trim() &&
-        !window.confirm('Replace the current test procedures with the community version?')) {
+    // The confirm says exactly what resets (plan §7 R-6): the procedure text
+    // goes back to the pristine community version; platform addenda recorded
+    // on the observation are NOT destroyed — they stay attached as their
+    // pristine referenced versions (edits to them are reset too).
+    const confirmMessage = update.platformProcedures?.length
+      ? 'Reset the test procedure text to the pristine community version? Platform addenda stay attached and are reset to their pristine referenced versions (any edits to the text or the addenda are discarded).'
+      : 'Reset the test procedure text to the pristine community version? Any edits to it are discarded.';
+    if (existingText && existingText.trim() && !window.confirm(confirmMessage)) {
       return;
     }
     updateObservation(currentAssessmentId, selectedItemId, update);
@@ -1639,11 +1646,13 @@ Format as a numbered list. Be specific and actionable.`;
                       />
                     ) : (
                       <div className="prose prose-sm max-w-none text-gray-700 dark:text-gray-300">
-                        {/* Bank-attached procedures are real markdown — render as-is;
-                            the reformat helper is only for legacy free-text blobs. */}
+                        {/* Bank-attached procedures are real markdown — render as-is
+                            through the expansion choke point (platform addendum
+                            references expand to text + attribution here); the
+                            reformat helper is only for legacy free-text blobs. */}
                         <Markdown>
-                          {(currentObservation.procedureSource
-                            ? currentObservation.testProcedures
+                          {(currentObservation.procedureSource || currentObservation.platformProcedures?.length
+                            ? expandProcedureText(currentObservation)
                             : formatTestProcedures(currentObservation.testProcedures)) || 'No test procedures defined'}
                         </Markdown>
                       </div>

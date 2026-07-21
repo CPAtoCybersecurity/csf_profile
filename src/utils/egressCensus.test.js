@@ -111,3 +111,74 @@ describe('egress census', () => {
     expect(EGRESS_PATTERN.test(stripComments('// URL.createObjectURL( in prose'))).toBe(false);
   });
 });
+
+describe('report surfaces never render procedure text (plan §7 R-9 rot-stopper)', () => {
+  // The claim "no report/PDF surface renders testProcedures" was a grep FACT
+  // with no pin — so it could rot silently the day a report gained the
+  // field. This turns it into an invariant: the report generators must not
+  // reference testProcedures (or the platform reference field) at all. If a
+  // report legitimately needs procedure text one day, it must consume the
+  // expansion choke point (expandProcedureText) so attribution and
+  // placeholder semantics ride along — update this test deliberately then.
+  const REPORT_SURFACES = ['utils/auditReportMarkdown.js', 'utils/executiveSummaryPDF.js'];
+
+  test.each(REPORT_SURFACES)('%s does not reference testProcedures or platformProcedures', (rel) => {
+    const code = stripComments(fs.readFileSync(path.join(SRC, rel), 'utf8'));
+    expect(code).not.toMatch(/testProcedures/);
+    expect(code).not.toMatch(/platformProcedures/);
+  });
+});
+
+describe('choke-point wiring rot-stoppers (PR-5)', () => {
+  const read = (rel) => stripComments(fs.readFileSync(path.join(SRC, rel), 'utf8'));
+
+  test('the detail-panel render egress routes through expandProcedureText (positive pin)', () => {
+    // The fifth choke-point consumer. A revert of the render call-site swap
+    // to raw currentObservation.testProcedures would show trunk-only text on
+    // screen while every export carries the full expansion — this pin makes
+    // that revert red without mounting the page.
+    const page = read('pages/Assessments.js');
+    expect(page).toMatch(/expandProcedureText\(currentObservation\)/);
+  });
+
+  test('every store egress emission routes through the choke point (residual count-pin)', () => {
+    // assessmentsStore.js legitimately reads obs.testProcedures in exactly
+    // FOUR non-egress places: the frozen v14 migration block (3 reads) and
+    // the observations→evaluations migration (1 read). The four CSV/Jira
+    // egress emissions all call expandProcedureText(obs) — 5 call sites
+    // (exportForJiraCSV emits twice: custom field + description). Pin both
+    // counts: a NEW exporter written against obs.testProcedures bumps the
+    // residual count and goes red here, forcing the expansion decision at
+    // commit time instead of a silent trunk-only artifact.
+    const store = read('stores/assessmentsStore.js');
+    const residualReads = (store.match(/obs\.testProcedures/g) || []).length;
+    const chokeCalls = (store.match(/expandProcedureText\(obs\)/g) || []).length;
+    expect(chokeCalls).toBe(5);
+    expect(residualReads).toBe(4);
+  });
+
+  test('composition-writer guard: only sanctioned modules write the reference/recipe keys', () => {
+    // Reset replays procedureSource.components verbatim, so the recipe and
+    // the live platformProcedures array must be written together — funneled
+    // through the compose/reset producers. A new writer outside this set
+    // (e.g. a PR-6 UI splicing the live array without re-recording the
+    // recipe) must show up here and force the review.
+    const WRITERS = new Set([
+      'utils/procedureBank.js', // resetToCommunityUpdate recipe replay
+      'utils/procedureTailor.js', // composeAttachObservation
+      'utils/shareRegistry.js' // registry DECLARATION of the field (not a write)
+    ]);
+    // Write-shaped matches only: an object-literal key (`platformProcedures:`
+    // on one line) or a property assignment (`.platformProcedures =`).
+    // Multiline ternary READS (expansion) deliberately do not match.
+    const WRITE_PATTERN = /platformProcedures:|\.platformProcedures\s*=[^=]/;
+    const offenders = [];
+    walk(SRC).forEach((full) => {
+      const rel = path.relative(SRC, full);
+      if (WRITE_PATTERN.test(stripComments(fs.readFileSync(full, 'utf8'))) && !WRITERS.has(rel)) {
+        offenders.push(rel);
+      }
+    });
+    expect(offenders).toEqual([]);
+  });
+});
