@@ -197,6 +197,14 @@ Even though packs and catalogues should never be inside a clone, the repo guards
 
 These are backstops, not the mechanism. The mechanism is separation: the pack and your catalogues live outside the tree.
 
+## Imported SCuBA results — private data too
+
+ScubaGoggles and ScubaGear output describes a real tenant's security posture. The importer stores the minimum: the policy id and the verdict (pass/fail/warning and so on), plus an import date and optional tool version. Nothing else from the results file is retained. Details, tenant names, and report prose stay in the tool's own report, which you can link by reference on the observation.
+
+- Imported verdicts are **omitted from shareable exports by default**. The include-private mode keeps them; complete backups always carry them.
+- Verdicts are evidence for your judgment. They never set a subcategory score.
+- `.gitignore` covers `ScubaResults*.json` so a real results file dropped into a clone cannot be committed by accident.
+
 ## Known boundaries (v1)
 
 - **Subcategory matching targets your active (default) framework.** IDs that do not exist in it are skipped and listed in the preview. When one subcategory has several requirement rows, values attach to the lowest row id and the preview says so.

@@ -142,6 +142,32 @@ describe('the four CSV/Jira egresses expand through the choke point', () => {
       .exportAllAssessmentsCSV(useControlsStore, useRequirementsStore, useUserStore);
     expectExpandedProcedureText(await capturedText());
   });
+
+  test('imported SCuBA verdicts ride NO CSV/Jira egress (Evidence lane, R-7)', async () => {
+    // A fail-verdict map is a tenant attack roadmap and these CSVs get
+    // handed to auditors. The exporters build explicit column sets that do
+    // not include platformResults; this pins that as behavior, not luck.
+    const store = useAssessmentsStore.getState();
+    store.updateObservation(assessmentId, 'PR.DS-01 Ex1', {
+      platformResults: [
+        { policyId: 'ms.canary.9.9v9', result: 'fail', importedAt: '2026-07-21T00:00:00Z' }
+      ]
+    });
+    const exporters = [
+      () => store.exportAssessmentCSV(assessmentId, useControlsStore, useRequirementsStore, useUserStore),
+      () => store.exportForJiraCSV(assessmentId, useControlsStore, useRequirementsStore, useUserStore),
+      () => store.exportAllForJiraCSV(useControlsStore, useRequirementsStore, useUserStore),
+      () => store.exportAllAssessmentsCSV(useControlsStore, useRequirementsStore, useUserStore)
+    ];
+    for (const run of exporters) {
+      captured = [];
+      run();
+      const csv = await capturedText(); // eslint-disable-line no-await-in-loop
+      expect(csv).not.toContain('ms.canary.9.9v9');
+      expect(csv).not.toContain('scuba-import');
+      expect(csv).not.toContain('platformResults');
+    }
+  });
 });
 
 describe('store passthrough safety', () => {

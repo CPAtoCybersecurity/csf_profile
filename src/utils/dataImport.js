@@ -34,6 +34,7 @@ import {
   normalizeExternalTracking,
   normalizeExternalLinks
 } from './externalLinks';
+import { normalizePlatformResults } from './scubaResultsImport';
 import { stampSeededDemoArtifacts, normalizeArtifactFields } from '../stores/artifactStore';
 import { stampSeededDemoFindings } from '../stores/findingsStore';
 import { stampSeededDemoUsers } from '../stores/userStore';
@@ -207,12 +208,22 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
         platforms: normalizeAssessmentPlatforms(a.platforms)
       };
       if (a.observations && typeof a.observations === 'object') {
+        // platformResults joins the unconditional pass (Evidence lane, R-7):
+        // a current-version-stamped foreign file skips the migration chain,
+        // and the bulk setters bypass the producer guard — so smuggled junk
+        // verdicts are collapsed here regardless of the stamped version.
         next.observations = Object.fromEntries(
-          Object.entries(a.observations).map(([itemId, obs]) => (
-            obs && obs.externalLinks !== undefined
-              ? [itemId, { ...obs, externalLinks: normalizeExternalLinks(obs.externalLinks) }]
-              : [itemId, obs]
-          ))
+          Object.entries(a.observations).map(([itemId, obs]) => {
+            if (!obs || typeof obs !== 'object') return [itemId, obs];
+            const repaired = { ...obs };
+            if (obs.externalLinks !== undefined) {
+              repaired.externalLinks = normalizeExternalLinks(obs.externalLinks);
+            }
+            if (obs.platformResults !== undefined) {
+              repaired.platformResults = normalizePlatformResults(obs.platformResults);
+            }
+            return [itemId, repaired];
+          })
         );
       }
       return next;

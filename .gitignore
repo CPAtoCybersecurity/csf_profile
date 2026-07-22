@@ -64,4 +64,9 @@ private-data/
 # Server-local persisted state (entry-id mappings) — deployment data, not code
 server/data/
 
+# ScubaGoggles/ScubaGear output describes a real tenant's security posture —
+# never repo content. Covers the default output names and renamed copies.
+ScubaResults*.json
+*.scubaresults.json
+
 CLAUDE.md

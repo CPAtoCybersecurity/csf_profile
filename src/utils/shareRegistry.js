@@ -172,6 +172,10 @@ const OBSERVATION = struct({
   // carry them verbatim; the recipe in procedureSource.components preserves
   // the lineage on shares.
   platformProcedures: OMIT,
+  // Imported SCuBA verdicts (Evidence lane, R-7). A pass/fail map per policy
+  // is a posture map of the tenant — default-deny; include-private keeps it
+  // (same contract as externalLinks). Complete backups carry it wholesale.
+  platformResults: { default: OMIT, includePrivate: SHARE },
   linkedArtifacts: SHARE,
   linkedFindings: SHARE,
   linkedControls: SHARE,

@@ -5,6 +5,7 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import { normalizeExternalTracking, normalizeExternalLinks } from '../utils/externalLinks';
+import { normalizePlatformResults } from '../utils/scubaResultsImport';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import {
   COMPREHENSIVE_ASSESSMENT_ID,
@@ -810,6 +811,7 @@ const useAssessmentsStore = create(
           testProcedures: '',
           linkedArtifacts: [],
           externalLinks: [],
+          platformResults: [],
           remediation: {
             ownerId: null,
             actionPlan: '',
@@ -850,6 +852,12 @@ const useAssessmentsStore = create(
           // written, so no caller can persist junk types/urls or unbounded lists.
           ...(observationData.externalLinks !== undefined
             ? { externalLinks: normalizeExternalLinks(observationData.externalLinks) }
+            : {}),
+          // Producer guard (Evidence lane, R-7): imported SCuBA verdicts are
+          // normalized where they are written — no caller can persist junk
+          // shapes, unvalidated ids, or unbounded strings.
+          ...(observationData.platformResults !== undefined
+            ? { platformResults: normalizePlatformResults(observationData.platformResults) }
             : {}),
           testProcedures: observationData.testProcedures !== undefined
             ? sanitizeInput(observationData.testProcedures)

@@ -3,7 +3,7 @@ import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
   Loader2, Bot, Sparkles, User, Settings,
-  BookOpen, ExternalLink, RotateCcw, Server
+  BookOpen, ExternalLink, RotateCcw, Server, FileCheck2
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Markdown from '../components/Markdown';
@@ -39,6 +39,9 @@ import ExternalLinksEditor from '../components/ExternalLinksEditor';
 import ProcedureSourceBadge from '../components/ProcedureSourceBadge';
 import PlatformAddendumBadges from '../components/PlatformAddendumBadges';
 import PlatformCheckPicker from '../components/PlatformCheckPicker';
+import PlatformResultChips from '../components/PlatformResultChips';
+import ScubaResultsImport from '../components/ScubaResultsImport';
+import { nextPlatformResults } from '../utils/scubaResultsImport';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -122,6 +125,7 @@ const Assessments = () => {
 
   // Post-create platform-check picker (plan PR-7)
   const [showPlatformPicker, setShowPlatformPicker] = useState(false);
+  const [showScubaImport, setShowScubaImport] = useState(false);
   const allPlatformIds = useMemo(() => availablePlatforms().map((p) => p.id), []);
   // The dialog is per-subcategory state — close it when the item changes.
   useEffect(() => { setShowPlatformPicker(false); }, [selectedItemId]);
@@ -993,6 +997,20 @@ Format as a numbered list. Be specific and actionable.`;
     fileInputRef.current?.click();
   }, []);
 
+  // Evidence lane (R-7): the modal computed a pure plan; this is the ONLY
+  // write site. Upsert-by-policyId per observation, producer guard downstream.
+  const handleScubaResultsApply = useCallback((rows, meta) => {
+    const importedAt = new Date().toISOString();
+    rows.forEach(({ itemId, matches }) => {
+      const current = getObservation(currentAssessmentId, itemId);
+      updateObservation(currentAssessmentId, itemId, {
+        platformResults: nextPlatformResults(current.platformResults, matches, meta, importedAt)
+      });
+    });
+    toast.success(`SCuBA results imported as evidence on ${rows.length} item${rows.length === 1 ? '' : 's'}.`);
+    setShowScubaImport(false);
+  }, [currentAssessmentId, getObservation, updateObservation]);
+
   const handleFileImport = useCallback(async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -1133,6 +1151,16 @@ Format as a numbered list. Be specific and actionable.`;
             <Upload size={16} />
             Import
           </button>
+          {(currentAssessment?.platforms?.length || 0) > 0 && (
+            <button
+              className="flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white py-2 px-4 rounded-lg"
+              onClick={() => setShowScubaImport(true)}
+              title="Import ScubaGoggles/ScubaGear results as evidence for this assessment"
+            >
+              <FileCheck2 size={16} />
+              SCuBA Results
+            </button>
+          )}
           <button
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
             onClick={handleExportAll}
@@ -1732,6 +1760,9 @@ Format as a numbered list. Be specific and actionable.`;
                     {!editMode && currentObservation.platformProcedures?.length > 0 && (
                       <PlatformAddendumBadges entries={currentObservation.platformProcedures} />
                     )}
+                    {!editMode && currentObservation.platformResults?.length > 0 && (
+                      <PlatformResultChips entries={currentObservation.platformResults} />
+                    )}
                     {editMode ? (
                       <textarea
                         value={currentObservation.testProcedures || ''}
@@ -2233,6 +2264,14 @@ Format as a numbered list. Be specific and actionable.`;
       />
 
       {/* New Assessment Wizard Modal */}
+      {showScubaImport && currentAssessment && (
+        <ScubaResultsImport
+          assessmentName={currentAssessment.name}
+          observationsByItem={currentAssessment.observations || {}}
+          onApply={handleScubaResultsApply}
+          onClose={() => setShowScubaImport(false)}
+        />
+      )}
       {showNewModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col">

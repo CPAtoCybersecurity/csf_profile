@@ -87,7 +87,13 @@ const OPAQUE_LEAVES = new Set([
   // shape is producer-enforced (buildPlatformRef / forkPlatformProcedure,
   // pinned in platformBank.test.js) and complete backups carry them
   // wholesale by design.
-  'assessments[].observations{}.platformProcedures'
+  'assessments[].observations{}.platformProcedures',
+  // Imported SCuBA verdicts (Evidence lane, R-7) — producer-normalized to a
+  // closed {corpusId, policyId, result, source, importedAt, toolVersion?,
+  // reportDate?} shape (normalizePlatformResults, pinned in
+  // scubaResultsImport.test.js); default-OMIT, rides only under
+  // includePrivate.
+  'assessments[].observations{}.platformResults'
 ]);
 
 const isLeaf = (spec) => !spec.kind;
@@ -226,6 +232,13 @@ const seedThroughProducers = () => {
     { substituteName: true }
   );
   assessments.updateObservation(assessmentId, 'PR.DS-01 Ex1', composed);
+  // Imported SCuBA verdicts through the real producer path (Evidence lane):
+  // tenant-posture data that must ride ONLY under includePrivate.
+  assessments.updateObservation(assessmentId, 'PR.DS-01 Ex1', {
+    platformResults: [
+      { policyId: 'ms.defender.1.2v1', result: 'fail', importedAt: '2026-07-21T00:00:00Z' }
+    ]
+  });
   // An unresolvable reference riding a real observation (foreign corpus id):
   // the share export must expand it to the explicit placeholder.
   assessments.addToScope(assessmentId, 'DE.CM-09 Ex1');
@@ -437,6 +450,19 @@ describe('share registry enforcement', () => {
     useAssessmentsStore.getState().updateObservation(assessmentId, 'GV.OC-01 Ex1', {
       linkedControls: ['CTRL-1']
     });
+  });
+
+  test('imported SCuBA verdicts are OMITTED from the default share and ride only under includePrivate (Evidence lane, R-7)', () => {
+    const share = JSON.stringify(buildShareableExport(stores()));
+    expect(share).not.toContain('platformResults');
+    expect(share).not.toContain('ms.defender.1.2v1');
+
+    const optIn = buildShareableExport(stores(), { includePrivate: true });
+    const obs = optIn.data.assessments.find((a) => a.id === assessmentId)
+      .observations['PR.DS-01 Ex1'];
+    expect(obs.platformResults).toEqual([
+      expect.objectContaining({ policyId: 'ms.defender.1.2v1', result: 'fail', source: 'scuba-import' })
+    ]);
   });
 
   test('sections omitted by disposition are deleted, never emptied', () => {

@@ -471,6 +471,47 @@ describe('importCompleteDatabase safety semantics', () => {
     expect(restored.year).toBe(2024); // junk year repaired to the record's createdDate vintage
   });
 
+  test('a current-version file cannot smuggle junk platformResults past the producer guard (Evidence lane, R-7)', () => {
+    const { stores, setters } = makeStores();
+    const parsed = {
+      formatVersion: EXPORT_FORMAT_VERSION,
+      storeVersions: { assessments: ASSESSMENTS_SCHEMA_VERSION },
+      data: {
+        assessments: [{
+          id: 'ASM-scuba-tamper',
+          name: 'Claims current version, smuggles verdict junk',
+          scopeType: 'requirements',
+          scoringScale: 10,
+          scopeIds: [],
+          createdDate: '2026-07-01T00:00:00.000Z',
+          observations: {
+            'PR.AA-01 Ex1': {
+              testProcedures: 't',
+              platformResults: [
+                { policyId: 'ms.aad.1.1v1', result: 'fail', importedAt: '2026-07-21T00:00:00Z' },
+                { policyId: 'DROP TABLE tenants', result: 'fail' },
+                { policyId: 'ms.aad.2.1v1', result: 'exploited!!' },
+                { policyId: 'ms.aad.3.1v1', result: 'pass', details: 'SMUGGLED tenant prose', tenant: 'corp.example' },
+                'not-an-object'
+              ]
+            }
+          }
+        }]
+      }
+    };
+    importCompleteDatabase(parsed, stores, { backupFirst: false });
+
+    const written = setters.setAssessments.mock.calls[0][0];
+    const restored = written.find(a => a.id === 'ASM-scuba-tamper');
+    const results = restored.observations['PR.AA-01 Ex1'].platformResults;
+    expect(results.map((r) => r.policyId)).toEqual(['ms.aad.1.1v1', 'ms.aad.3.1v1']);
+    const serialized = JSON.stringify(restored);
+    expect(serialized).not.toContain('DROP TABLE');
+    expect(serialized).not.toContain('exploited');
+    expect(serialized).not.toContain('SMUGGLED tenant prose');
+    expect(serialized).not.toContain('corp.example');
+  });
+
   test('observation external links round-trip through a complete backup (issue #288)', () => {
     const withLinks = {
       ...SAMPLE,
