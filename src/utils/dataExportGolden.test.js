@@ -26,6 +26,7 @@ import useUserStore from '../stores/userStore';
 import useFindingsStore from '../stores/findingsStore';
 import useMetricsStore from '../stores/metricsStore';
 import useOrgProfileStore from '../stores/orgProfileStore';
+import useInventoryStore from '../stores/inventoryStore';
 
 const CANARY_JEWEL = 'CustomerVault9000';
 const CANARY_ORG = 'Northwind Insurance';
@@ -394,6 +395,68 @@ const FIXTURE = {
       catalogSlug: 'foreign',
       importedAt: '2026-01-02T00:00:00.000Z'
     }
+  ],
+  // System inventory (format 6). The record carries its own canaries — a
+  // system name, an internal admin URL, a vendor-contact identity, and weak
+  // posture answers — so the DEFAULT share snapshot pins their total absence
+  // while the include-private snapshot pins the exact folded shape.
+  systems: [
+    {
+      id: 'SYS-001',
+      name: 'InventoryCanaryApp',
+      description: 'Payroll platform',
+      vendor: 'CanaryVendor',
+      deploymentType: 'SaaS',
+      applicationUrl: 'https://vault.internal.example/admin',
+      stage: 'Live',
+      vendorEolDate: '',
+      businessOwnerId: 'U-1',
+      technologyOwnerId: 'U-1',
+      primaryContactId: '',
+      vendorContact: 'Sam Vendor sam@canaryvendor.example',
+      dataClassification: 'Strictly Confidential',
+      pii: 'Yes',
+      regulatedDataTypes: ['PCI'],
+      dataResidency: 'United States',
+      complianceScope: ['SOC 2'],
+      ssoMfa: 'No',
+      authMethod: 'Password only',
+      localAccounts: 'Yes',
+      adminCount: 7,
+      secretsInVault: 'No',
+      provisioningMethod: 'Manual',
+      deprovisioningTrigger: 'Manual ticket',
+      accessReviewCadence: 'None',
+      lastAccessReviewDate: '',
+      securityTier: 'Tier 1',
+      internetExposure: 'Public internet',
+      siemLogging: 'No',
+      customCode: 'Yes',
+      segregatedEnvironments: 'No',
+      patchingResponsibility: 'Ours',
+      tprmDueDiligenceDate: '',
+      tprmArtifacts: [],
+      contractRenewalDate: '2027-06-01',
+      aiFeatures: 'Yes',
+      bcdrTier: 'Tier 0 - Critical',
+      rtoHours: 4,
+      rpoHours: 1,
+      mtoHours: 24,
+      backupsInPlace: 'Yes',
+      backupsLastTestedDate: '2026-04-01',
+      discoverySource: 'Expense report',
+      onboardedDate: '2024-01-01',
+      retiredDate: '',
+      lastReviewedDate: '2026-06-01',
+      attestedById: 'U-1',
+      evidenceLinks: [
+        { id: 'EL-1', label: 'Review ticket', url: 'https://tickets.internal.example/T-9' }
+      ],
+      notes: 'golden inventory fixture',
+      source: 'manual',
+      createdDate: '2026-01-01',
+      lastModified: '2026-06-01'
+    }
   ]
 };
 
@@ -406,7 +469,8 @@ const stores = () => ({
   userStore: useUserStore,
   findingsStore: useFindingsStore,
   metricsStore: useMetricsStore,
-  orgProfileStore: useOrgProfileStore
+  orgProfileStore: useOrgProfileStore,
+  inventoryStore: useInventoryStore
 });
 
 const seedAll = () => {
@@ -418,6 +482,7 @@ const seedAll = () => {
   useArtifactStore.getState().setArtifacts(FIXTURE.artifacts);
   useFindingsStore.getState().setFindings(FIXTURE.findings);
   useMetricsStore.getState().setMetrics(FIXTURE.metrics);
+  useInventoryStore.getState().setSystems(FIXTURE.systems);
   useOrgProfileStore.getState().saveProfile({
     orgName: CANARY_ORG,
     industry: 'Insurance',

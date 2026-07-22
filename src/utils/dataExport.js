@@ -24,8 +24,12 @@ import { SHARE_SECTIONS, OMIT, foldSection, buildShareContext } from './shareReg
  *   design). From format 5 on, ABSENCE is meaningful: a file with no
  *   components / license metadata / platformProcedures genuinely had none,
  *   where a format ≤4 file simply predates the machinery.
+ * Format 6: adds the systems section (system inventory records). Complete
+ *   backups carry it wholesale; share exports OMIT it by default and carry
+ *   it only under the include-private opt-in (see shareRegistry.js — a
+ *   populated inventory reads as a target list).
  */
-export const EXPORT_FORMAT_VERSION = 5;
+export const EXPORT_FORMAT_VERSION = 6;
 
 // zustand persist keys whose schema versions travel with the export so a
 // restore can detect version drift between the exporting and importing app.
@@ -39,7 +43,8 @@ export const PERSIST_KEYS = {
   // issue #297: artifact/user schema versions travel too, so future restores
   // can version-gate instead of relying on the unconditional stamp passes
   artifacts: 'csf-artifacts-storage',
-  users: 'csf-users-storage'
+  users: 'csf-users-storage',
+  systems: 'csf-inventory-storage'
 };
 
 /**
@@ -80,7 +85,8 @@ export const exportAllDataJSON = (stores) => {
     userStore,
     findingsStore,
     metricsStore,
-    orgProfileStore
+    orgProfileStore,
+    inventoryStore
   } = stores;
 
   const orgProfileState = orgProfileStore?.getState?.();
@@ -97,7 +103,8 @@ export const exportAllDataJSON = (stores) => {
       controlCount: controlsStore?.getState?.()?.controls?.length || 0,
       assessmentCount: assessmentsStore?.getState?.()?.assessments?.length || 0,
       findingCount: findingsStore?.getState?.()?.findings?.length || 0,
-      metricCount: metricsStore?.getState?.()?.metrics?.length || 0
+      metricCount: metricsStore?.getState?.()?.metrics?.length || 0,
+      systemCount: inventoryStore?.getState?.()?.systems?.length || 0
     },
     data: {
       users: userStore?.getState?.()?.users || [],
@@ -108,6 +115,7 @@ export const exportAllDataJSON = (stores) => {
       artifacts: artifactStore?.getState?.()?.artifacts || [],
       findings: findingsStore?.getState?.()?.findings || [],
       metrics: metricsStore?.getState?.()?.metrics || [],
+      systems: inventoryStore?.getState?.()?.systems || [],
       // Object section (not an array): the org profile rides COMPLETE
       // backups only; buildShareableExport strips it unconditionally.
       orgProfile: orgProfileState
@@ -176,6 +184,7 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
         ? 'Complete Assessment Database (private pack data INCLUDED; restricted-license metrics still excluded)'
         : 'Complete Assessment Database (private pack data INCLUDED)';
     jsonData.metadata.metricCount = jsonData.data.metrics.length;
+    jsonData.metadata.systemCount = jsonData.data.systems.length;
     return jsonData;
   }
 
@@ -184,6 +193,9 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
   jsonData.metadata.assessmentCount = jsonData.data.assessments.length;
   jsonData.metadata.findingCount = jsonData.data.findings.length;
   jsonData.metadata.metricCount = jsonData.data.metrics.length;
+  // The systems section is deleted in default mode; the count is an
+  // aggregate leak on its own (it discloses fleet size), so it zeroes with it.
+  jsonData.metadata.systemCount = 0;
   return jsonData;
 };
 

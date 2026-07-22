@@ -16,7 +16,8 @@ const SAMPLE = {
   frameworks: [{ id: 'nist-csf-2.0', name: 'NIST CSF 2.0', isDefault: true }],
   artifacts: [{ id: 'art1', name: 'Policy doc' }],
   findings: [{ id: 'f1', title: 'Gap found' }],
-  metrics: [{ id: 'm1', name: 'Patch latency', catalogSlug: 'sample', source: 'csv-import' }]
+  metrics: [{ id: 'm1', name: 'Patch latency', catalogSlug: 'sample', source: 'csv-import' }],
+  systems: []
 };
 
 const makeStores = (data = SAMPLE) => {
@@ -29,6 +30,7 @@ const makeStores = (data = SAMPLE) => {
     setArtifacts: jest.fn(),
     setFindings: jest.fn(),
     setMetrics: jest.fn(),
+    setSystems: jest.fn(),
     setProfileState: jest.fn()
   };
   const stores = {
@@ -40,6 +42,7 @@ const makeStores = (data = SAMPLE) => {
     artifactStore: { getState: () => ({ artifacts: data.artifacts, setArtifacts: setters.setArtifacts }) },
     findingsStore: { getState: () => ({ findings: data.findings, setFindings: setters.setFindings }) },
     metricsStore: { getState: () => ({ metrics: data.metrics, setMetrics: setters.setMetrics }) },
+    inventoryStore: { getState: () => ({ systems: data.systems || [], setSystems: setters.setSystems }) },
     orgProfileStore: { getState: () => ({ profile: null, cloudConsent: false, setProfileState: setters.setProfileState }) }
   };
   return { stores, setters };
@@ -578,8 +581,8 @@ describe('PR-5: platform references on the restore path (format 5)', () => {
     ]
   });
 
-  test('the export format is 5 — the platform-procedures envelope discriminator', () => {
-    expect(EXPORT_FORMAT_VERSION).toBe(5);
+  test('the export format is 6 — systems section joins the envelope', () => {
+    expect(EXPORT_FORMAT_VERSION).toBe(6);
   });
 
   test('a format-5 backup carrying references restores them VERBATIM (never dropped, never crashes)', () => {
@@ -611,8 +614,8 @@ describe('PR-5: platform references on the restore path (format 5)', () => {
     expect(out).toContain(REF.contentHash);
   });
 
-  test('a file from a newer format (6) is still rejected with the newer-version message', () => {
-    const result = validateDatabaseExport({ formatVersion: 6, data: { users: [] } });
+  test('a file from a newer format (7) is still rejected with the newer-version message', () => {
+    const result = validateDatabaseExport({ formatVersion: 7, data: { users: [] } });
     expect(result.ok).toBe(false);
     expect(result.errors.join(' ')).toMatch(/newer version/i);
   });

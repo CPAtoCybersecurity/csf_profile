@@ -64,6 +64,7 @@ const makeStores = ({ metrics = [], assessments = [], findings = [] } = {}) => (
   controlsStore: { getState: () => ({ controls: [], setControls: jest.fn() }) },
   artifactStore: { getState: () => ({ artifacts: [], setArtifacts: jest.fn() }) },
   userStore: { getState: () => ({ users: [], setUsers: jest.fn() }) },
+  inventoryStore: { getState: () => ({ systems: [], setSystems: jest.fn() }) },
   orgProfileStore: { getState: () => ({ profile: null, cloudConsent: false, setProfileState: jest.fn() }) }
 });
 

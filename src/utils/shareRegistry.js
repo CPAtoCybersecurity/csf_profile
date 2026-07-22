@@ -366,6 +366,74 @@ const METRIC = struct({
   importedAt: SHARE
 });
 
+// System inventory record (format 6). Every field is declared SHARE at leaf
+// grain, but the SECTION disposition below is { default: OMIT } — a populated
+// inventory is a target list (system names + URLs + "MFA: No, secrets outside
+// the vault, Confidential data"), so nothing here serializes into a default
+// share under any field-level setting. The leaf declarations govern the
+// include-private fold only, and force every FUTURE inventory field through
+// the appearance test at commit time.
+const SYSTEM = struct({
+  id: SHARE,
+  name: SHARE,
+  description: SHARE,
+  vendor: SHARE,
+  deploymentType: SHARE,
+  applicationUrl: SHARE, // include-private only (section-gated); render-gated by sanitizeExternalUrl
+  stage: SHARE,
+  vendorEolDate: SHARE,
+  businessOwnerId: SHARE, // opaque refs; the directory itself is include-private-gated
+  technologyOwnerId: SHARE,
+  primaryContactId: SHARE,
+  vendorContact: SHARE, // inline external-party PII — include-private only by section gate
+  dataClassification: SHARE,
+  pii: SHARE,
+  regulatedDataTypes: SHARE,
+  dataResidency: SHARE,
+  complianceScope: SHARE,
+  ssoMfa: SHARE,
+  authMethod: SHARE,
+  localAccounts: SHARE,
+  adminCount: SHARE,
+  secretsInVault: SHARE,
+  provisioningMethod: SHARE,
+  deprovisioningTrigger: SHARE,
+  accessReviewCadence: SHARE,
+  lastAccessReviewDate: SHARE,
+  securityTier: SHARE,
+  internetExposure: SHARE,
+  siemLogging: SHARE,
+  customCode: SHARE,
+  segregatedEnvironments: SHARE,
+  patchingResponsibility: SHARE,
+  tprmDueDiligenceDate: SHARE,
+  tprmArtifacts: SHARE,
+  contractRenewalDate: SHARE,
+  aiFeatures: SHARE,
+  bcdrTier: SHARE,
+  rtoHours: SHARE,
+  rpoHours: SHARE,
+  mtoHours: SHARE,
+  backupsInPlace: SHARE,
+  backupsLastTestedDate: SHARE,
+  discoverySource: SHARE,
+  onboardedDate: SHARE,
+  retiredDate: SHARE,
+  lastReviewedDate: SHARE,
+  attestedById: SHARE,
+  evidenceLinks: list(
+    struct({
+      id: SHARE,
+      label: SHARE,
+      url: SHARE
+    })
+  ),
+  notes: SHARE,
+  source: SHARE,
+  createdDate: SHARE,
+  lastModified: SHARE
+});
+
 // Record filters, per section and mode. A filter decides whether a record
 // appears in the share AT ALL; field dispositions then govern its shape.
 const keepAssessment = (a, ctx) => (ctx.includePrivate ? true : a.source !== 'pack');
@@ -410,6 +478,15 @@ export const SHARE_SECTIONS = {
   artifacts: { disposition: 'fold', record: ARTIFACT },
   findings: { disposition: 'fold', record: FINDING, filter: keepFinding },
   metrics: { disposition: 'fold', record: METRIC, filter: keepMetric },
+  // System inventory: the users-directory pattern, hardened. OMIT by default
+  // (deleted, never emptied — an emptied section would wipe the receiving
+  // install's own inventory on restore); rides only under the explicit
+  // include-private opt-in. metadata.systemCount is recomputed post-filter in
+  // dataExport.js so the count cannot aggregate-leak the fleet size.
+  systems: {
+    disposition: { default: OMIT, includePrivate: 'fold' },
+    record: SYSTEM
+  },
   // The org profile (crown jewels + tooling) is never share material —
   // unconditionally, opt-in or not.
   orgProfile: { disposition: OMIT }
