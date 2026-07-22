@@ -8,6 +8,7 @@ import {
   FileArchive,
   ClipboardList,
   Gauge,
+  Server,
   Shield,
   Settings,
   Bot,
@@ -34,6 +35,7 @@ const NAV_GROUPS = [
   {
     title: 'Evidence',
     items: [
+      { to: '/inventory', label: 'Inventory', Icon: Server },
       { to: '/artifacts', label: 'Artifacts', Icon: FileArchive },
       { to: '/findings', label: 'Findings', Icon: AlertTriangle },
     ],

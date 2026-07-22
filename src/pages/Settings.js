@@ -35,6 +35,7 @@ import useArtifactStore from '../stores/artifactStore';
 import useFindingsStore from '../stores/findingsStore';
 import useMetricsStore from '../stores/metricsStore';
 import useOrgProfileStore from '../stores/orgProfileStore';
+import useInventoryStore from '../stores/inventoryStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
 // Utils
@@ -129,7 +130,8 @@ const Settings = () => {
         userStore: useUserStore,
         findingsStore: useFindingsStore,
         metricsStore: useMetricsStore,
-        orgProfileStore: useOrgProfileStore
+        orgProfileStore: useOrgProfileStore,
+        inventoryStore: useInventoryStore
       });
       toast.success('Complete database exported as JSON');
     } catch (err) {
@@ -159,7 +161,8 @@ const Settings = () => {
         userStore: useUserStore,
         findingsStore: useFindingsStore,
         metricsStore: useMetricsStore,
-        orgProfileStore: useOrgProfileStore
+        orgProfileStore: useOrgProfileStore,
+        inventoryStore: useInventoryStore
       }, { includePrivate: includePackData });
       toast.success(includePackData
         ? 'Export created WITH private pack data — handle with care'
@@ -305,7 +308,8 @@ const Settings = () => {
         userStore: useUserStore,
         findingsStore: useFindingsStore,
         metricsStore: useMetricsStore,
-        orgProfileStore: useOrgProfileStore
+        orgProfileStore: useOrgProfileStore,
+        inventoryStore: useInventoryStore
       };
 
       const validation = validateDatabaseExport(parsed);

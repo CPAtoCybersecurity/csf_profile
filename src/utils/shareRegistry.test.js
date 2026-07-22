@@ -42,6 +42,7 @@ import useUserStore from '../stores/userStore';
 import useFindingsStore from '../stores/findingsStore';
 import useMetricsStore from '../stores/metricsStore';
 import useOrgProfileStore from '../stores/orgProfileStore';
+import useInventoryStore from '../stores/inventoryStore';
 
 const stores = () => ({
   controlsStore: useControlsStore,
@@ -52,7 +53,8 @@ const stores = () => ({
   userStore: useUserStore,
   findingsStore: useFindingsStore,
   metricsStore: useMetricsStore,
-  orgProfileStore: useOrgProfileStore
+  orgProfileStore: useOrgProfileStore,
+  inventoryStore: useInventoryStore
 });
 
 // ---------------------------------------------------------------------------
@@ -333,6 +335,60 @@ const seedThroughProducers = () => {
       controlEvaluationBackLink: ''
     }
   ]);
+
+  // System inventory producer — maximal record so the appearance walk covers
+  // every field addSystem writes (a new inventory field is a red test here,
+  // forcing a registry disposition decision before it can ship).
+  useInventoryStore.getState().addSystem({
+    name: 'Registry HR Platform',
+    description: 'HR SaaS',
+    vendor: 'PeopleCo',
+    deploymentType: 'SaaS',
+    applicationUrl: 'https://hr.example.test',
+    stage: 'Live',
+    vendorEolDate: '2030-01-01',
+    businessOwnerId: 'U-REG-1',
+    technologyOwnerId: 'U-REG-1',
+    primaryContactId: 'U-REG-1',
+    vendorContact: 'Vera Vendor vera@peopleco.example',
+    dataClassification: 'Confidential',
+    pii: 'Yes',
+    regulatedDataTypes: ['PHI'],
+    dataResidency: 'Canada',
+    complianceScope: ['SOC 2'],
+    ssoMfa: 'Yes',
+    authMethod: 'SAML SSO',
+    localAccounts: 'No',
+    adminCount: 3,
+    secretsInVault: 'Yes',
+    provisioningMethod: 'SCIM',
+    deprovisioningTrigger: 'Automatic via IdP',
+    accessReviewCadence: 'Quarterly',
+    lastAccessReviewDate: '2026-06-30',
+    securityTier: 'Tier 2',
+    internetExposure: 'Public internet',
+    siemLogging: 'Yes',
+    customCode: 'No',
+    segregatedEnvironments: 'N/A',
+    patchingResponsibility: 'Vendor-managed',
+    tprmDueDiligenceDate: '2026-01-15',
+    tprmArtifacts: ['SOC 2 report', 'DPA'],
+    contractRenewalDate: '2027-01-15',
+    aiFeatures: 'No',
+    bcdrTier: 'Tier 1',
+    rtoHours: 24,
+    rpoHours: 4,
+    mtoHours: 72,
+    backupsInPlace: 'Yes',
+    backupsLastTestedDate: '2026-05-01',
+    discoverySource: 'SSO logs',
+    onboardedDate: '2025-03-01',
+    retiredDate: '',
+    lastReviewedDate: '2026-07-01',
+    attestedById: 'U-REG-1',
+    evidenceLinks: [{ label: 'Access review ticket', url: 'https://tickets.example.test/AR-1' }],
+    notes: 'registry appearance seed'
+  });
 
   const validation = validateMetricsCatalog(parseMetricsCSV(METRICS_CSV));
   importMetricsCatalog(validation, stores(), { catalogSlug: 'registry-catalogue' });

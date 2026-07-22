@@ -184,6 +184,7 @@ code {
 .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .md\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .md\:col-span-2 { grid-column: span 2 / span 2; }
+.md\:col-span-3 { grid-column: span 3 / span 3; }
 
 /* Display */
 .block { display: block; }
@@ -296,6 +297,8 @@ code {
 .max-w-2xl { max-width: 42rem; }
 .max-w-3xl { max-width: 48rem; }
 .max-w-4xl { max-width: 56rem; }
+.max-w-5xl { max-width: 64rem; }
+.max-w-6xl { max-width: 72rem; }
 .max-w-none { max-width: none; }
 /* max-height scale (Tailwind spacing: N x 0.25rem). No Tailwind build here, so
    every utility the JSX uses must be defined by hand — an undefined one computes

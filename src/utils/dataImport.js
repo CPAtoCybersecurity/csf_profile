@@ -38,6 +38,7 @@ import { stampSeededDemoArtifacts, normalizeArtifactFields } from '../stores/art
 import { stampSeededDemoFindings } from '../stores/findingsStore';
 import { stampSeededDemoUsers } from '../stores/userStore';
 import { stampSeededDemoControls, normalizeControlFields } from '../stores/controlsStore';
+import { normalizeSystemFields } from '../stores/inventoryStore';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
 // Format-2 exports carry no metrics section — it is simply skipped (untouched),
@@ -50,7 +51,8 @@ const SECTIONS = [
   { key: 'frameworks', store: 'frameworksStore', setter: 'setFrameworks' },
   { key: 'artifacts', store: 'artifactStore', setter: 'setArtifacts' },
   { key: 'findings', store: 'findingsStore', setter: 'setFindings' },
-  { key: 'metrics', store: 'metricsStore', setter: 'setMetrics' }
+  { key: 'metrics', store: 'metricsStore', setter: 'setMetrics' },
+  { key: 'systems', store: 'inventoryStore', setter: 'setSystems' }
 ];
 
 /**
@@ -252,6 +254,15 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
   }
   if (Array.isArray(data.artifacts)) {
     data.artifacts = normalizeArtifactFields({ artifacts: data.artifacts }).artifacts;
+  }
+
+  // System inventory records (format 6) get the same unconditional pass: the
+  // bulk setter bypasses zustand's load-time migrate, and a foreign or
+  // hand-edited file stamped at the current version would otherwise restore
+  // junk-shaped or duplicate-id records straight into the store. Shape-only,
+  // absent-only, idempotent (normalizeSystemFields).
+  if (Array.isArray(data.systems)) {
+    data.systems = normalizeSystemFields({ systems: data.systems }).systems;
   }
 
   // Resolve every write BEFORE applying any, so a missing setter can never
