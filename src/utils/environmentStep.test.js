@@ -16,7 +16,8 @@ import {
   columnTotal,
   countAttached,
   attachedCountForItem,
-  compareCsfOrder
+  compareCsfOrder,
+  environmentAttachCopy
 } from './environmentStep';
 import { getPlatformProcedures } from './platformBank';
 
@@ -190,5 +191,42 @@ describe('buildAttachPlan', () => {
     expect(plan.offersByItem['DE.CM-01'].map((o) => o.policyId)).toEqual(
       getPlatformProcedures('DE.CM-01', ['google-workspace']).map((o) => o.policyId)
     );
+  });
+});
+
+describe('environmentAttachCopy', () => {
+  test('bank on, plural: byte-matches the shipped step-3 sentence', () => {
+    expect(environmentAttachCopy(true, 493, 493)).toEqual({
+      active: true,
+      text: '493 platform checks from the Environment step attach as addenda (493 available).'
+    });
+  });
+
+  test('bank on, singular: attaches/check agreement preserved', () => {
+    expect(environmentAttachCopy(true, 1, 12)).toEqual({
+      active: true,
+      text: '1 platform check from the Environment step attaches as addenda (12 available).'
+    });
+  });
+
+  test('bank on, zero attached: still an honest active sentence', () => {
+    expect(environmentAttachCopy(true, 0, 493).text).toBe(
+      '0 platform checks from the Environment step attach as addenda (493 available).'
+    );
+  });
+
+  test('bank OFF with selections: inactive warning, never an attach claim', () => {
+    const copy = environmentAttachCopy(false, 493, 493);
+    expect(copy.active).toBe(false);
+    expect(copy.text).toContain('will not attach');
+    expect(copy.text).not.toContain('attach as addenda');
+  });
+
+  test('bank OFF, singular selection keeps noun agreement', () => {
+    expect(environmentAttachCopy(false, 1, 12).text).toContain('1 platform check selected');
+  });
+
+  test('bank OFF with nothing selected renders nothing', () => {
+    expect(environmentAttachCopy(false, 0, 493)).toBeNull();
   });
 });
