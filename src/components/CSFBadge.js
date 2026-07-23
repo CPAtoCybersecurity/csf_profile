@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * CSF Function Badge Component
- * Displays CSF functions with appropriate color coding matching Confluence styling
+ * Displays CSF functions with appropriate color coding matching the NIST CSF 2.0 wheel
  */
 
 // Color mapping for CSF functions (matching the official NIST CSF 2.0 wheel)

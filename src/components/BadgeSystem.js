@@ -6,7 +6,7 @@ import React from 'react';
  *
  * Badge Types and Colors:
  * - Framework: Blue (#dbeafe / #2563eb)
- * - CSF Function: Matches function (DETECT=red, PROTECT=green, etc.)
+ * - CSF Function: Matches the NIST CSF 2.0 wheel (GOVERN=yellow, PROTECT=purple, DETECT=orange, etc.)
  * - Subcategory: Amber/Orange (#ffedd5 / #f59e0b)
  * - Artifact: Green (#dcfce7 / #16a34a)
  * - Finding: Red/Orange (#fee2e2 / #ef4444)
@@ -16,14 +16,16 @@ import React from 'react';
 
 // Color definitions for consistency
 export const BADGE_COLORS = {
-  // CSF Functions
+  // CSF Functions — light values track CSFBadge.js FUNCTION_COLORS (NIST CSF 2.0 wheel).
+  // darkBg/darkText are still the pre-wheel values; dark-palette work lands with the
+  // design tokens. Nothing renders this table today (no caller passes colorScheme="function").
   function: {
-    GOVERN: { bg: '#E8DEF8', text: '#6B21A8', darkBg: '#581c87', darkText: '#e9d5ff' },
-    IDENTIFY: { bg: '#DBEAFE', text: '#1E40AF', darkBg: '#1e3a8a', darkText: '#bfdbfe' },
-    PROTECT: { bg: '#DCFCE7', text: '#166534', darkBg: '#14532d', darkText: '#bbf7d0' },
-    DETECT: { bg: '#FEE2E2', text: '#991B1B', darkBg: '#7f1d1d', darkText: '#fecaca' },
-    RESPOND: { bg: '#FFEDD5', text: '#C2410C', darkBg: '#7c2d12', darkText: '#fed7aa' },
-    RECOVER: { bg: '#FEF3C7', text: '#B45309', darkBg: '#78350f', darkText: '#fde68a' },
+    GOVERN: { bg: '#FBF0BF', text: '#6B5200', darkBg: '#581c87', darkText: '#e9d5ff' },
+    IDENTIFY: { bg: '#D6EBF7', text: '#10527D', darkBg: '#1e3a8a', darkText: '#bfdbfe' },
+    PROTECT: { bg: '#E5E0F5', text: '#463C8A', darkBg: '#14532d', darkText: '#bbf7d0' },
+    DETECT: { bg: '#FCE6C6', text: '#9A5300', darkBg: '#7f1d1d', darkText: '#fecaca' },
+    RESPOND: { bg: '#F8D9D7', text: '#9E2B27', darkBg: '#7c2d12', darkText: '#fed7aa' },
+    RECOVER: { bg: '#D5F3E1', text: '#16713E', darkBg: '#78350f', darkText: '#fde68a' },
   },
   // Entity types
   framework: { bg: '#dbeafe', text: '#1e40af', darkBg: '#1e3a8a', darkText: '#bfdbfe' },

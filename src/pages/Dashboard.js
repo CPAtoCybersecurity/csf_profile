@@ -468,12 +468,16 @@ const Dashboard = () => {
 
   // Colors for each CSF function in the trend line chart
   const FUNCTION_LINE_COLORS = {
-    'GOVERN (GV)': '#E0B011',
-    'IDENTIFY (ID)': '#3B9BD6',
-    'PROTECT (PR)': '#8B7FD0',
-    'DETECT (DE)': '#F39A1F',
-    'RESPOND (RS)': '#D9534F',
-    'RECOVER (RC)': '#47C97A',
+    // NIST CSF 2.0 wheel hues, held at the lightness that clears WCAG 1.4.11 (3:1)
+    // against BOTH chart backgrounds — white and the dark-mode #1f2937 (see line 178).
+    // The audit report captures this chart onto white whatever theme is active, so a
+    // single set has to satisfy both. Keep any edit above 3:1 on each.
+    'GOVERN (GV)': '#A07E0C',
+    'IDENTIFY (ID)': '#2989C5',
+    'PROTECT (PR)': '#8477CD',
+    'DETECT (DE)': '#BB710A',
+    'RESPOND (RS)': '#DA5753',
+    'RECOVER (RC)': '#2C9455',
   };
 
   // Calculate quarterly trend data: average actualScore per function per quarter
