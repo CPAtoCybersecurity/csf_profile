@@ -1228,13 +1228,13 @@ nav a:active { text-decoration: none !important; }
 }
 .dark .terminal-app-header { background-color: var(--bg-primary); }
 
-/* Black circular disc behind the Simply Cyber white-on-transparent logo
-   so it doesn't wash out on the light cream/blue paper background. */
+/* White circular disc behind the Simply Cyber shield, which is dark-on-transparent
+   and would otherwise disappear against the dark navy header bar. */
 .terminal-logo-disc {
   width: 56px;
   height: 56px;
   border-radius: 9999px;
-  background: #000000;
+  background: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1249,7 +1249,7 @@ nav a:active { text-decoration: none !important; }
   display: block;
 }
 .dark .terminal-logo-disc {
-  background: #000000;
+  background: #ffffff;
   border-color: var(--accent);
 }
 .terminal-statusbar-segment {

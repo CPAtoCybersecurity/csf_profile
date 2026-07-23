@@ -133,8 +133,8 @@ const AppContent = () => {
             <div className="flex items-center gap-3">
               <div className="terminal-logo-disc">
                 <img
-                  src="/SC_SimplyCyberAcademy.png"
-                  alt="Simply Cyber Academy Logo"
+                  src="/SC_Logo.png"
+                  alt="Simply Cyber shield"
                 />
               </div>
               <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />

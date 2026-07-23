@@ -565,12 +565,13 @@ The organization's overall cybersecurity maturity is assessed at **${overallMatu
   if (trendChartUri) {
     maturitySection += `#### Score Trends by Quarter\n\n<img src="${trendChartUri}" alt="Quarterly score trends" width="1400" />\n\n`;
     maturitySection += `<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:4px;font-size:13px">`;
-    maturitySection += `<span><span style="color:#8b5cf6;font-weight:700">━━</span> Govern (GV)</span>`;
-    maturitySection += `<span><span style="color:#3b82f6;font-weight:700">━━</span> Identify (ID)</span>`;
-    maturitySection += `<span><span style="color:#10b981;font-weight:700">━━</span> Protect (PR)</span>`;
-    maturitySection += `<span><span style="color:#f59e0b;font-weight:700">━━</span> Detect (DE)</span>`;
-    maturitySection += `<span><span style="color:#ef4444;font-weight:700">━━</span> Respond (RS)</span>`;
-    maturitySection += `<span><span style="color:#6366f1;font-weight:700">━━</span> Recover (RC)</span>`;
+    // Must track FUNCTION_LINE_COLORS in Dashboard.js — the chart above is captured from it.
+    maturitySection += `<span><span style="color:#A07E0C;font-weight:700">━━</span> Govern (GV)</span>`;
+    maturitySection += `<span><span style="color:#2989C5;font-weight:700">━━</span> Identify (ID)</span>`;
+    maturitySection += `<span><span style="color:#8477CD;font-weight:700">━━</span> Protect (PR)</span>`;
+    maturitySection += `<span><span style="color:#BB710A;font-weight:700">━━</span> Detect (DE)</span>`;
+    maturitySection += `<span><span style="color:#DA5753;font-weight:700">━━</span> Respond (RS)</span>`;
+    maturitySection += `<span><span style="color:#2C9455;font-weight:700">━━</span> Recover (RC)</span>`;
     maturitySection += `</div>\n\n`;
   }
   if (!barChartUri && !radarChartUri && !trendChartUri) {
