@@ -1234,7 +1234,7 @@ nav a:active { text-decoration: none !important; }
   width: 56px;
   height: 56px;
   border-radius: 9999px;
-  background: #000000;
+  background: #ffffff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1249,7 +1249,7 @@ nav a:active { text-decoration: none !important; }
   display: block;
 }
 .dark .terminal-logo-disc {
-  background: #000000;
+  background: #ffffff;
   border-color: var(--accent);
 }
 .terminal-statusbar-segment {

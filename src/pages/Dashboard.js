@@ -468,12 +468,12 @@ const Dashboard = () => {
 
   // Colors for each CSF function in the trend line chart
   const FUNCTION_LINE_COLORS = {
-    'GOVERN (GV)': '#8b5cf6',
-    'IDENTIFY (ID)': '#3b82f6',
-    'PROTECT (PR)': '#10b981',
-    'DETECT (DE)': '#f59e0b',
-    'RESPOND (RS)': '#ef4444',
-    'RECOVER (RC)': '#6366f1',
+    'GOVERN (GV)': '#E0B011',
+    'IDENTIFY (ID)': '#3B9BD6',
+    'PROTECT (PR)': '#8B7FD0',
+    'DETECT (DE)': '#F39A1F',
+    'RESPOND (RS)': '#D9534F',
+    'RECOVER (RC)': '#47C97A',
   };
 
   // Calculate quarterly trend data: average actualScore per function per quarter

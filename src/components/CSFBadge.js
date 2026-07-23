@@ -5,14 +5,14 @@ import React from 'react';
  * Displays CSF functions with appropriate color coding matching Confluence styling
  */
 
-// Color mapping for CSF functions (matching Confluence UI)
+// Color mapping for CSF functions (matching the official NIST CSF 2.0 wheel)
 const FUNCTION_COLORS = {
-  'GOVERN': { bg: '#E8DEF8', text: '#6B21A8' },        // Purple
-  'IDENTIFY': { bg: '#DBEAFE', text: '#1E40AF' },     // Blue
-  'PROTECT': { bg: '#DCFCE7', text: '#166534' },      // Green
-  'DETECT': { bg: '#FEE2E2', text: '#991B1B' },       // Red
-  'RESPOND': { bg: '#FFEDD5', text: '#C2410C' },      // Orange
-  'RECOVER': { bg: '#FEF3C7', text: '#B45309' }       // Amber
+  'GOVERN': { bg: '#FBF0BF', text: '#6B5200' },       // Yellow
+  'IDENTIFY': { bg: '#D6EBF7', text: '#10527D' },     // Blue
+  'PROTECT': { bg: '#E5E0F5', text: '#463C8A' },      // Purple
+  'DETECT': { bg: '#FCE6C6', text: '#9A5300' },       // Orange
+  'RESPOND': { bg: '#F8D9D7', text: '#9E2B27' },      // Red
+  'RECOVER': { bg: '#D5F3E1', text: '#16713E' }       // Green
 };
 
 // Extract function code from full function name (e.g., "DETECT (DE)" -> "DETECT")
