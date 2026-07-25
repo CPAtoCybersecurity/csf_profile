@@ -142,11 +142,35 @@ const RETIRED = [
   '#ebe6d8', '#f5f1e8', //                                   warm cream chrome
 ];
 
+/**
+ * The same colors as translucent tints. A hex-only sweep declared the palette
+ * retired while twelve `rgba(51, 255, 102, …)` surfaces were still shipping —
+ * row hovers, selected rows, and every `bg-*-900/xx` overlay. Channel triplets
+ * rather than strings, so spacing and alpha cannot hide them.
+ */
+const RETIRED_RGB = [
+  [51, 255, 102], // phosphor green
+  [102, 255, 153], // phosphor green, bright
+  [42, 106, 42], //  terminal green, light theme
+  [255, 68, 68], //  CRT red
+];
+
 describe('the retired terminal palette does not reappear', () => {
   it.each(RETIRED)('%s is absent from index.css', (hex) => {
     const found = [];
     root.walkDecls((decl) => {
       if (new RegExp(`${hex}\\b`, 'i').test(decl.value)) {
+        found.push(`${decl.parent.selector} { ${decl.prop}: ${decl.value} }`);
+      }
+    });
+    expect(found).toEqual([]);
+  });
+
+  it.each(RETIRED_RGB)('rgba(%i, %i, %i, …) is absent from index.css', (r, g, b) => {
+    const pattern = new RegExp(`rgba?\\(\\s*${r}\\s*,\\s*${g}\\s*,\\s*${b}\\s*[,)]`, 'i');
+    const found = [];
+    root.walkDecls((decl) => {
+      if (pattern.test(decl.value)) {
         found.push(`${decl.parent.selector} { ${decl.prop}: ${decl.value} }`);
       }
     });

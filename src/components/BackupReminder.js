@@ -22,7 +22,7 @@ const BackupReminder = ({ onClose, onExport }) => {
           <div className="flex items-start gap-3">
             <AlertCircle className="text-orange-500 dark:text-orange-400 flex-shrink-0 mt-0.5" size={24} />
             <div className="flex-1">
-              <h3 className="font-semibold uppercase tracking-wide text-gray-900 dark:text-gray-100 mb-1">
+              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">
                 Time to Back Up Your Data
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">

@@ -444,7 +444,7 @@ const Inventory = () => {
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-sm border border-gray-200 dark:border-gray-600">
           <thead>
-            <tr className="bg-gray-50 dark:bg-gray-900 text-left text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <tr className="bg-gray-50 dark:bg-gray-900 text-left text-xs text-gray-500 dark:text-gray-400">
               <th className="px-3 py-2 font-semibold">ID</th>
               <th className="px-3 py-2 font-semibold">Name</th>
               <th className="px-3 py-2 font-semibold">Deployment</th>

@@ -704,17 +704,17 @@ const UserControls = () => {
                   <SortableHeader label="Control ID" sortKey="controlId" currentSort={sort} onSort={handleSort} />
                   <SortableHeader label="Control Name" sortKey="name" currentSort={sort} onSort={handleSort} />
                   <SortableHeader label="Status" sortKey="status" currentSort={sort} onSort={handleSort} />
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">
                     Frameworks
                   </th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">
                     Implementation Description
                   </th>
                   <SortableHeader label="Control Owner" sortKey="ownerId" currentSort={sort} onSort={handleSort} />
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">
                     Stakeholder(s)
                   </th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">
                     Linked Requirements
                   </th>
                 </tr>

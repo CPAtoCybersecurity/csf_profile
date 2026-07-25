@@ -171,12 +171,14 @@ const Dashboard = () => {
   const scoringScale = getScoringScale(selectedAssessment);
 
   // Chart colors based on theme
+  // Slate design-system values. `background` in particular is read by the
+  // contrast note on FUNCTION_LINE_COLORS below, so it tracks --bg-secondary.
   const chartColors = {
-    text: darkMode ? '#e5e7eb' : '#374151',
-    textMuted: darkMode ? '#9ca3af' : '#6b7280',
-    grid: darkMode ? '#374151' : '#e5e7eb',
-    background: darkMode ? '#1f2937' : '#ffffff',
-    border: darkMode ? '#374151' : '#e5e7eb',
+    text: darkMode ? '#e2e8f0' : '#334155',
+    textMuted: darkMode ? '#94a3b8' : '#64748b',
+    grid: darkMode ? '#253451' : '#e2e8f0',
+    background: darkMode ? '#1a2540' : '#ffffff',
+    border: darkMode ? '#253451' : '#e2e8f0',
   };
 
   // Build dashboard data from selected assessment
@@ -469,9 +471,10 @@ const Dashboard = () => {
   // Colors for each CSF function in the trend line chart
   const FUNCTION_LINE_COLORS = {
     // NIST CSF 2.0 wheel hues, held at the lightness that clears WCAG 1.4.11 (3:1)
-    // against BOTH chart backgrounds — white and the dark-mode #1f2937 (see line 178).
-    // The audit report captures this chart onto white whatever theme is active, so a
-    // single set has to satisfy both. Keep any edit above 3:1 on each.
+    // against BOTH chart backgrounds — white and the dark-mode #1a2540 (chartColors
+    // above, which tracks --bg-secondary). The audit report captures this chart onto
+    // white whatever theme is active, so a single set has to satisfy both. Worst case
+    // is 3.82:1 on white; keep any edit above 3:1 on each.
     'GOVERN (GV)': '#A07E0C',
     'IDENTIFY (ID)': '#2989C5',
     'PROTECT (PR)': '#8477CD',
@@ -625,12 +628,12 @@ const Dashboard = () => {
         <div className="mb-4 p-3 font-mono bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-semibold uppercase tracking-wider text-blue-700 dark:text-green-300">{selectedAssessment.name}</span>
+              <span className="font-semibold text-blue-700 dark:text-green-300">{selectedAssessment.name}</span>
               {selectedAssessment.description && (
                 <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">— {selectedAssessment.description}</span>
               )}
             </div>
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {selectedAssessment.scopeIds?.length || 0} items in scope
             </div>
           </div>
@@ -883,7 +886,7 @@ const Dashboard = () => {
                       dataKey="actual"
                       stackId="a"
                       fill="#60a5fa"
-                      radius={[0, 0, 0, 0]}
+                      radius={[4, 4, 0, 0]}
                       name="actual"
                       barSize={80}
                     />
@@ -1288,7 +1291,7 @@ const Dashboard = () => {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className={`text-xs uppercase border-b ${darkMode ? 'text-gray-400 border-gray-600' : 'text-gray-500 border-gray-200'}`}>
+              <tr className={`text-xs border-b ${darkMode ? 'text-gray-400 border-gray-600' : 'text-gray-500 border-gray-200'}`}>
                 <th className="text-left py-2 px-3">Rank</th>
                 <th className="text-left py-2 px-3">ID</th>
                 <th className="text-left py-2 px-3">Function</th>

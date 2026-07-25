@@ -558,7 +558,7 @@ const Requirements = () => {
                 )}
                 {/* Row number column */}
                 {showRowNumbers && (
-                  <th className="p-3 w-12 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700">
+                  <th className="p-3 w-12 text-left text-xs font-medium text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700">
                     #
                   </th>
                 )}
@@ -567,20 +567,20 @@ const Requirements = () => {
                 <SortableHeader label="CSF Function" sortKey="function" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200 dark:border-gray-700" />
                 <SortableHeader label="Category" sortKey="category" currentSort={sort} onSort={handleSort} className="w-36 border-r border-gray-200 dark:border-gray-700" />
                 <SortableHeader label="Subcategory" sortKey="subcategoryId" currentSort={sort} onSort={handleSort} className="w-28 border-r border-gray-200 dark:border-gray-700" />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 w-48">Description</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 w-44 bg-blue-50/50 dark:bg-blue-900/20">
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700 w-48">Description</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700 w-44 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-1">
                     <Link2 size={12} className="text-blue-500" />
                     <span>Control Owner</span>
                   </div>
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-r border-gray-200 dark:border-gray-700 w-32 bg-blue-50/50 dark:bg-blue-900/20">
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 border-r border-gray-200 dark:border-gray-700 w-32 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-1">
                     <Link2 size={12} className="text-blue-500" />
                     <span>Artifacts</span>
                   </div>
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider w-32 bg-blue-50/50 dark:bg-blue-900/20">
+                <th className="p-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 w-32 bg-blue-50/50 dark:bg-blue-900/20">
                   <div className="flex items-center gap-1">
                     <Link2 size={12} className="text-blue-500" />
                     <span>Findings</span>

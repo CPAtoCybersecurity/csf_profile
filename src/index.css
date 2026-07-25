@@ -734,15 +734,15 @@ table {
 th {
   background: var(--bg-secondary);
   letter-spacing: 0.01em;
-  color: var(--text-primary);
+  color: var(--text-muted);
   font-size: 11px;
   font-weight: 600;
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--accent);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-dark);
   text-align: left;
 }
 td {
-  padding: 4px 8px;
+  padding: 9px 12px;
   border-bottom: 1px solid var(--border-color);
   font-size: 12px;
 }
@@ -919,20 +919,20 @@ nav a:active { text-decoration: none !important; }
 .dark .divide-y > * + * { border-top-color: var(--border-color); }
 
 /* Dark — backgrounds with opacity (blue tints → phosphor green tints) */
-.dark .bg-red-900\/10 { background-color: rgba(255, 68, 68, 0.10); }
-.dark .bg-blue-50\/30 { background-color: rgba(51, 255, 102, 0.08); }
-.dark .bg-blue-900\/10 { background-color: rgba(51, 255, 102, 0.08); }
-.dark .bg-blue-900\/30 { background-color: rgba(51, 255, 102, 0.16); }
-.dark .bg-blue-900\/40 { background-color: rgba(51, 255, 102, 0.22); }
+.dark .bg-red-900\/10 { background-color: rgba(248, 113, 113, 0.10); }
+.dark .bg-blue-50\/30 { background-color: rgba(96, 165, 250, 0.08); }
+.dark .bg-blue-900\/10 { background-color: rgba(96, 165, 250, 0.08); }
+.dark .bg-blue-900\/30 { background-color: rgba(96, 165, 250, 0.16); }
+.dark .bg-blue-900\/40 { background-color: rgba(96, 165, 250, 0.22); }
 .dark .bg-gray-900\/50 { background-color: rgba(10, 10, 10, 0.7); }
 .dark .bg-amber-900\/20 { background-color: rgba(94, 138, 213, 0.20); }
 .dark .bg-amber-900\/30 { background-color: rgba(94, 138, 213, 0.30); }
 .dark .bg-amber-900\/40 { background-color: rgba(94, 138, 213, 0.40); }
 .dark .bg-amber-900\/50 { background-color: rgba(94, 138, 213, 0.50); }
-.dark .bg-green-900\/20 { background-color: rgba(51, 255, 102, 0.10); }
-.dark .bg-green-900\/30 { background-color: rgba(51, 255, 102, 0.16); }
-.dark .bg-green-900\/40 { background-color: rgba(51, 255, 102, 0.22); }
-.dark .bg-green-900\/50 { background-color: rgba(51, 255, 102, 0.30); }
+.dark .bg-green-900\/20 { background-color: rgba(74, 222, 128, 0.10); }
+.dark .bg-green-900\/30 { background-color: rgba(74, 222, 128, 0.16); }
+.dark .bg-green-900\/40 { background-color: rgba(74, 222, 128, 0.22); }
+.dark .bg-green-900\/50 { background-color: rgba(74, 222, 128, 0.30); }
 
 /* Dark — semantic backgrounds */
 .dark .bg-blue-50 { background-color: var(--accent-soft); }
@@ -967,9 +967,9 @@ nav a:active { text-decoration: none !important; }
 /* Dark — hover states */
 .dark .hover\:bg-gray-50:hover { background-color: var(--bg-secondary); }
 .dark .hover\:bg-gray-700:hover { background-color: var(--bg-tertiary); }
-.dark .hover\:bg-blue-50:hover { background-color: rgba(51, 255, 102, 0.08); }
+.dark .hover\:bg-blue-50:hover { background-color: rgba(96, 165, 250, 0.08); }
 .dark .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
-.dark .hover\:bg-red-50:hover { background-color: rgba(255, 68, 68, 0.08); }
+.dark .hover\:bg-red-50:hover { background-color: rgba(248, 113, 113, 0.10); }
 
 /* Dark — focus */
 .dark .focus\:ring-2:focus { box-shadow: 0 0 0 1px var(--accent); }
@@ -1088,7 +1088,7 @@ nav a:active { text-decoration: none !important; }
   background: currentColor;
   flex-shrink: 0;
 }
-.badge-success { background-color: rgba(42, 106, 42, 0.10); border-color: #2a6a2a; color: #2a6a2a; }
+.badge-success { background-color: rgba(21, 128, 61, 0.10); border-color: #15803d; color: #15803d; }
 .badge-warning { background-color: rgba(163, 95, 0, 0.10); border-color: #a35f00; color: #a35f00; }
 .badge-danger  { background-color: rgba(160, 0, 0, 0.10); border-color: #a00000; color: #a00000; }
 .badge-info    { background-color: rgba(0, 106, 142, 0.10); border-color: #006a8e; color: #006a8e; }
@@ -1159,16 +1159,16 @@ nav a:active { text-decoration: none !important; }
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: var(--text-secondary);
-  padding: 4px 8px;
-  border-bottom: 1px solid var(--accent);
+  color: var(--text-muted);
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-dark);
   position: sticky;
   top: 0;
   z-index: 10;
   text-align: left;
 }
 .table-professional tbody td {
-  padding: 4px 8px;
+  padding: 9px 12px;
   border-bottom: 1px solid var(--border-color);
   font-size: 12px;
   font-family: var(--font-mono);
@@ -1184,17 +1184,17 @@ nav a:active { text-decoration: none !important; }
 /* Dark mode professional tables */
 .dark .table-professional thead th {
   background: var(--bg-secondary);
-  color: var(--text-secondary);
-  border-bottom-color: var(--accent);
+  color: var(--text-muted);
+  border-bottom-color: var(--border-dark);
 }
 .dark .table-professional tbody td {
   border-bottom-color: var(--border-color);
 }
 .dark .table-professional tbody tr:hover {
-  background: rgba(51, 255, 102, 0.08);
+  background: rgba(96, 165, 250, 0.10);
 }
 .dark .table-professional tbody tr.selected {
-  background: rgba(51, 255, 102, 0.18);
+  background: rgba(96, 165, 250, 0.18);
 }
 
 /* ==========================================================================
@@ -1216,34 +1216,8 @@ nav a:active { text-decoration: none !important; }
    ========================================================================== */
 
 /* --- Status bar (top of app, dense intel-feed strip) --- */
-.terminal-statusbar {
-  width: 100%;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  padding: 0 8px;
-  background: var(--bg-header);
-  color: #e2e8f0;
-  border-bottom: 1px solid var(--accent);
-  font-size: 11px;
-  letter-spacing: 0.01em;
-  font-variant-numeric: tabular-nums;
-  overflow: hidden;
-  white-space: nowrap;
-  /* Freeze pane — stick to top of viewport */
-  position: sticky;
-  top: 0;
-  z-index: 60;
-}
 
 /* Main app header — sticky beneath the status bar (22px tall) */
-.terminal-app-header {
-  position: sticky;
-  top: 22px;
-  z-index: 55;
-  background-color: var(--bg-primary);
-}
-.dark .terminal-app-header { background-color: var(--bg-primary); }
 
 /* White circular disc behind the Simply Cyber shield, which is dark-on-transparent
    and would otherwise disappear against the dark navy header bar. */
@@ -1269,243 +1243,25 @@ nav a:active { text-decoration: none !important; }
   background: #ffffff;
   border-color: var(--accent);
 }
-.terminal-statusbar-segment {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 8px;
-}
-.terminal-statusbar-segment + .terminal-statusbar-segment {
-  border-left: 1px solid rgba(148, 163, 184, 0.25);
-  margin-left: 4px;
-}
-.terminal-statusbar-segment.terminal-statusbar-flex { flex: 1; }
-.terminal-statusbar-label {
-  color: var(--on-header-muted);
-  letter-spacing: 0.01em;
-  font-weight: 600;
-  margin-right: 4px;
-}
-.terminal-statusbar-value { color: #3ea6ff; font-family: var(--font-mono); }
-
-.dark .terminal-statusbar { color: var(--accent); }
-.dark .terminal-statusbar-label { color: var(--on-header-muted); }
-.dark .terminal-statusbar-value { color: var(--accent); }
 
 /* --- Interactive selector inside status bar (assessment) --- */
-.terminal-statusbar-select {
-  background: transparent;
-  color: #3ea6ff;
-  border: 1px solid #3ea6ff;
-  border-radius: 0;
-  font-size: 11px;
-  letter-spacing: 0.01em;
-  padding: 0 18px 0 6px;
-  height: 16px;
-  line-height: 14px;
-  margin-left: 2px;
-  cursor: pointer;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #3ea6ff 50%),
-                    linear-gradient(135deg, #3ea6ff 50%, transparent 50%);
-  background-position: calc(100% - 9px) 6px, calc(100% - 5px) 6px;
-  background-size: 4px 4px, 4px 4px;
-  background-repeat: no-repeat;
-  max-width: 280px;
-  text-overflow: ellipsis;
-}
-.terminal-statusbar-select:focus { box-shadow: none; }
-.terminal-statusbar-select option {
-  background: var(--bg-header);
-  color: var(--on-header-accent);
-}
-.dark .terminal-statusbar-select {
-  color: var(--accent);
-  border-color: var(--accent);
-  background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%),
-                    linear-gradient(135deg, var(--accent) 50%, transparent 50%);
-  background-position: calc(100% - 9px) 6px, calc(100% - 5px) 6px;
-  background-size: 4px 4px, 4px 4px;
-  background-repeat: no-repeat;
-}
-.dark .terminal-statusbar-select option {
-  background: var(--bg-primary);
-  color: var(--accent);
-}
 
 /* --- Quarter buttons inside status bar --- */
-.terminal-statusbar-qbtns {
-  display: inline-flex;
-  margin-left: 2px;
-  border: 1px solid #3ea6ff;
-}
-.dark .terminal-statusbar-qbtns { border-color: var(--accent); }
-.terminal-statusbar-qbtn {
-  background: transparent;
-  color: #3ea6ff;
-  border: none;
-  border-right: 1px solid #3ea6ff;
-  border-radius: 0;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  padding: 0 6px;
-  height: 14px;
-  line-height: 14px;
-  cursor: pointer;
-  transition: background-color 0.1s, color 0.1s;
-  outline: none;
-}
-.terminal-statusbar-qbtn:last-child { border-right: none; }
-.terminal-statusbar-qbtn:hover {
-  background: rgba(94, 138, 213, 0.18);
-}
-.terminal-statusbar-qbtn.is-active {
-  background: var(--on-header-accent);
-  color: var(--bg-header);
-}
-.dark .terminal-statusbar-qbtn {
-  color: var(--accent);
-  border-right-color: var(--accent);
-}
-.dark .terminal-statusbar-qbtn:hover {
-  background: rgba(96, 165, 250, 0.18);
-}
-.dark .terminal-statusbar-qbtn.is-active {
-  background: var(--accent);
-  color: var(--bg-primary);
-}
 
 /* --- Inline action buttons in the status bar --- */
-.terminal-statusbar-action {
-  background: transparent;
-  color: #3ea6ff;
-  border: none;
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  padding: 0 4px;
-  height: 16px;
-  line-height: 14px;
-  cursor: pointer;
-  transition: color 0.1s, background-color 0.1s;
-  outline: none;
-}
-.terminal-statusbar-action:hover:not(:disabled) {
-  background: rgba(94, 138, 213, 0.18);
-}
-.terminal-statusbar-action:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-.dark .terminal-statusbar-action { color: var(--accent); }
-.dark .terminal-statusbar-action:hover:not(:disabled) {
-  background: rgba(51, 255, 102, 0.15);
-}
 
 /* CTA variant for action buttons (filled fill when prominent action like BACKUP NOW) */
-.terminal-statusbar-action-cta {
-  border: 1px solid #3ea6ff;
-  margin-left: 4px;
-}
-.dark .terminal-statusbar-action-cta { border-color: var(--accent); }
 
 /* Inline backup-age chip with severity coloring */
-.terminal-statusbar-backup {
-  font-size: 11px;
-  letter-spacing: 0.01em;
-  padding: 0 6px;
-  height: 14px;
-  line-height: 14px;
-  border: 1px solid currentColor;
-  margin-left: 2px;
-}
-.terminal-statusbar-backup-success { color: #4ade80; }
-.terminal-statusbar-backup-warning { color: #fbbf24; }
-.terminal-statusbar-backup-danger  { color: #ff5555; }
-.terminal-statusbar-backup-neutral { color: #8a93a6; }
-.dark .terminal-statusbar-backup-success { color: var(--terminal-green); }
-.dark .terminal-statusbar-backup-warning { color: #fbbf24; }
-.dark .terminal-statusbar-backup-danger  { color: var(--terminal-red); }
-.dark .terminal-statusbar-backup-neutral { color: var(--text-muted); }
 
 /* Status dot indicator (online/offline) */
-.terminal-status-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  background: #2a6a2a;
-  margin-right: 4px;
-  vertical-align: middle;
-  border-radius: 0;
-  box-shadow: 0 0 4px rgba(42, 106, 42, 0.6);
-}
-.dark .terminal-status-dot {
-  background: var(--terminal-green);
-  box-shadow: 0 0 4px rgba(74, 222, 128, 0.7);
-}
 
 /* --- Bracket-style nav link --- */
-.terminal-bracket-link {
-  display: inline-block;
-  font-size: 12px;
-  letter-spacing: 0.01em;
-  color: var(--text-secondary);
-  text-decoration: none;
-  padding: 2px 4px;
-  transition: color 0.1s ease;
-}
-.terminal-bracket-link:hover,
-.terminal-bracket-link.is-active {
-  color: var(--accent);
-}
-.terminal-bracket-link:hover::before,
-.terminal-bracket-link:hover::after,
-.terminal-bracket-link.is-active::before,
-.terminal-bracket-link.is-active::after {
-  color: var(--accent);
-}
 
 /* --- Section heading --- */
-.terminal-section-heading {
-  display: block;
-  font-size: 12px;
-  letter-spacing: 0.01em;
-  color: var(--accent) !important;
-  border-bottom: 1px solid var(--border-color);
-  padding: 4px 0;
-  margin-bottom: 8px;
-}
 /* Suffix '//' removed at user request — heading reads cleanly without it. */
-.dark .terminal-section-heading {
-  color: var(--accent) !important;
-}
 
 /* --- Nav links (used by Navigation.js) --- */
-.terminal-nav-link {
-  letter-spacing: 0.01em;
-  color: var(--text-secondary);
-  background-color: transparent;
-  border-bottom: 2px solid transparent;
-  transition: color 0.1s, border-color 0.1s;
-  text-decoration: none;
-}
-.terminal-nav-link:hover {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
-.terminal-nav-link-active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-  background-color: transparent;
-}
-.dark .terminal-nav-link { color: var(--text-secondary); }
-.dark .terminal-nav-link:hover,
-.dark .terminal-nav-link-active {
-  color: var(--accent);
-  border-bottom-color: var(--accent);
-}
 
 /* --- KPI card (used by KPICard.js) --- */
 .terminal-kpi {
@@ -1620,27 +1376,12 @@ nav a:active { text-decoration: none !important; }
 }
 
 /* --- Compact keyboard hints inside the terminal status bar --- */
-.terminal-statusbar-kbdhints {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0 2px;
-  outline: none;
-}
 .terminal-statusbar-kbdhints .terminal-kbd {
   height: 14px;
   line-height: 12px;
   color: var(--on-header-accent);
   border-color: var(--on-header-accent);
 }
-.terminal-statusbar-kbdhints .terminal-statusbar-kbdlabel {
-  color: var(--on-header-muted);
-  letter-spacing: 0.01em;
-}
-.terminal-statusbar-kbdhints:hover .terminal-statusbar-kbdlabel { color: var(--on-header-accent); }
 
 /* --- Keyboard-shortcuts overlay modal --- */
 .kbd-overlay-backdrop {
@@ -1774,81 +1515,8 @@ nav a:active { text-decoration: none !important; }
 }
 
 /* --- Responsive navigation: hamburger below 1200px --- */
-.terminal-nav-desktop { display: flex; align-items: center; }
-.terminal-nav-mobile { display: none; position: relative; }
-
-.terminal-nav-hamburger {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 0;
-  transition: color 0.1s, border-color 0.1s;
-}
-.terminal-nav-hamburger:hover,
-.terminal-nav-hamburger[aria-expanded="true"] {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-
-.terminal-nav-menu {
-  position: absolute;
-  top: calc(100% + 6px);
-  right: 0;
-  z-index: 120;
-  min-width: 240px;
-  max-height: 70vh;
-  overflow-y: auto;
-  background: var(--bg-primary);
-  border: 1px solid var(--accent);
-  border-radius: 0;
-  padding: 6px;
-}
-.terminal-nav-menu-group + .terminal-nav-menu-group {
-  margin-top: 4px;
-  border-top: 1px solid var(--border-color);
-  padding-top: 4px;
-}
-.terminal-nav-menu-group-title {
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--text-faint);
-  padding: 4px 8px 2px;
-}
-.terminal-nav-menu-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 8px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: var(--text-secondary);
-  text-decoration: none;
-  border-left: 2px solid transparent;
-  transition: color 0.1s, background-color 0.1s, border-color 0.1s;
-}
-.terminal-nav-menu-item:hover {
-  background: var(--bg-secondary);
-  color: var(--accent);
-}
-.terminal-nav-menu-item.is-active {
-  color: var(--accent);
-  border-left-color: var(--accent);
-  background: var(--bg-secondary);
-}
 
 @media (max-width: 1199px) {
-  .terminal-nav-desktop { display: none; }
-  .terminal-nav-mobile { display: inline-flex; }
 }
 
 /* ==========================================================================
@@ -1910,3 +1578,273 @@ nav a:active { text-decoration: none !important; }
 }
 .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
 .btn-icon-danger:hover { border-color: var(--terminal-red); color: var(--terminal-red); }
+
+/* ==========================================================================
+   Application shell — sidebar rail + main column
+   Replaces the horizontal nav bar and the 22px TerminalStatusBar strip.
+   ========================================================================== */
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* --- Left rail --- */
+
+.app-sidebar {
+  flex: 0 0 230px;
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+.app-sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.app-sidebar-brand-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.app-sidebar-brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.app-sidebar-nav {
+  padding: 12px 10px 20px;
+}
+
+.app-nav-group + .app-nav-group {
+  margin-top: 18px;
+}
+.app-nav-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  padding: 0 8px 6px;
+  letter-spacing: 0.02em;
+}
+
+.app-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  margin-bottom: 1px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background-color 0.1s, color 0.1s;
+}
+.app-nav-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+/* Active state is a soft-blue filled pill — the old underline read as a tab
+   strip, which is the wrong affordance for a vertical rail. */
+.app-nav-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.app-nav-icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* --- Main column --- */
+
+.app-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* --- Toolbar --- */
+
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 12px;
+}
+.app-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-toolbar-spacer { flex: 1 1 auto; }
+.app-toolbar-label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.app-toolbar-value {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.app-toolbar-select {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 12px;
+  max-width: 320px;
+}
+.app-toolbar-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.app-toolbar-segmented {
+  display: inline-flex;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.app-toolbar-segment {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
+}
+.app-toolbar-segment + .app-toolbar-segment {
+  border-left: 1px solid var(--border-color);
+}
+.app-toolbar-segment:hover { background: var(--bg-tertiary); }
+.app-toolbar-segment.is-active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.app-toolbar-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.app-toolbar-chip-success { color: var(--status-success, var(--terminal-green)); border-color: currentColor; }
+.app-toolbar-chip-warning { color: var(--terminal-amber); border-color: currentColor; }
+.app-toolbar-chip-danger  { color: var(--terminal-red); border-color: currentColor; }
+
+.app-toolbar-kbd-hint {
+  background: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* --- Drawer (below 1024px) --- */
+
+.app-drawer-trigger { display: none; }
+
+@media (max-width: 1023px) {
+  .app-sidebar { display: none; }
+
+  .app-drawer-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 70;
+    width: 34px;
+    height: 34px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  /* Clear the fixed trigger so it never sits on top of the first control. */
+  .app-toolbar { padding-left: 52px; }
+
+  .app-drawer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    background: rgba(15, 23, 42, 0.45);
+  }
+  .app-drawer {
+    width: 260px;
+    height: 100%;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+  }
+}
+
+/* ==========================================================================
+   Focus & hit targets (a11y)
+   The utility layer only ever offered a 1px ring, and several component
+   classes cleared the outline without putting anything back. A single
+   :focus-visible rule covers every interactive element, keyboard-only, so it
+   cannot regress per-component the way the old per-class rings did.
+   ========================================================================== */
+
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* The ring must stay visible on the chrome that is dark in both themes. */
+:where(.kbd-overlay-header) :where(a, button):focus-visible {
+  outline-color: var(--on-header-accent);
+}
+
+/* Comfortable hit targets on the controls that sit closest together. */
+.app-nav-item { min-height: 34px; }
+.app-toolbar-segment { min-height: 28px; min-width: 34px; }
+.app-drawer-trigger { min-height: 34px; min-width: 34px; }
+.btn-terminal { min-height: 28px; }

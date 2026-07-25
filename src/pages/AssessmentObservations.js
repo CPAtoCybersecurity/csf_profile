@@ -116,8 +116,8 @@ const AssessmentObservations = () => {
                 <SortableHeader label="In Scope" sortKey="In Scope? " currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="Status" sortKey="Testing Status" currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="Date" sortKey="Observation Date" currentSort={sort} onSort={handleSort} />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Auditor</th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Observations</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500">Auditor</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500">Observations</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">

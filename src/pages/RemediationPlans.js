@@ -84,9 +84,9 @@ const RemediationPlans = () => {
               <tr>
                 <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Owner</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500">Owner</th>
                 <SortableHeader label="Due Date" sortKey="Remediation Due Date" currentSort={sort} onSort={handleSort} />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action Plan</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500">Action Plan</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">

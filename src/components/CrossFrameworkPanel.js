@@ -33,7 +33,7 @@ const CrossFrameworkPanel = ({ categoryId }) => {
       >
         <div className="flex items-center gap-2">
           <GitBranch size={14} className="text-indigo-500 dark:text-indigo-400 flex-shrink-0" />
-          <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
             Cross-Framework References
           </span>
           {categoryId && (

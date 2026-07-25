@@ -2067,7 +2067,7 @@ Format as a numbered list. Be specific and actionable.`;
         <div className="flex-1 overflow-auto">
           {/* Column headers */}
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
-            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-max">
+            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 min-w-max">
               <div className="w-8 flex-shrink-0"></div>
               <div className="w-32 flex-shrink-0">Work</div>
               <div className="w-28 flex-shrink-0">Auditor</div>
@@ -2187,7 +2187,7 @@ Format as a numbered list. Be specific and actionable.`;
 
                   {/* Status column */}
                   <div className="w-24 flex-shrink-0">
-                    <span className={`uppercase ${getJiraStatusStyle(quarterData.testingStatus || obs?.testingStatus || 'Not Started')}`}>
+                    <span className={`${getJiraStatusStyle(quarterData.testingStatus || obs?.testingStatus || 'Not Started')}`}>
                       {quarterData.testingStatus || obs?.testingStatus || 'Not Started'}
                       <ChevronRight size={12} className="ml-1 rotate-90" />
                     </span>

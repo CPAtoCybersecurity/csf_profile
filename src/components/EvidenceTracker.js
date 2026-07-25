@@ -118,7 +118,7 @@ const EvidenceTracker = ({ assessment, artifacts }) => {
       {/* Per-function breakdown */}
       {functionBreakdown.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
             By Function
           </h3>
           {functionBreakdown.map(({ prefix, label, total, withEvidence, pct }) => (

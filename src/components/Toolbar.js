@@ -6,6 +6,9 @@ import useAssessmentsStore from '../stores/assessmentsStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useFindingsStore from '../stores/findingsStore';
 import useArtifactStore from '../stores/artifactStore';
+import AutoSaveIndicator from './AutoSaveIndicator';
+import UndoRedoButtons from './UndoRedoButtons';
+import ThemeToggle from './ThemeToggle';
 import { generateExecutiveSummary } from '../utils/executiveSummaryPDF';
 import { filterByScope } from '../utils/assessmentScope';
 import {
@@ -16,7 +19,14 @@ import {
 
 const QUARTERS = [1, 2, 3, 4];
 
-const TerminalStatusBar = ({ onBackupClick }) => {
+/**
+ * The top toolbar of the main column — successor to the dense navy
+ * TerminalStatusBar strip. Same controls and the same behavior; what changed
+ * is that it sits inside the content column at normal weight instead of
+ * spanning the viewport as a 22px intel feed. The SYS / USER / CONN readouts
+ * the old strip carried were decoration, not state, and did not come across.
+ */
+const Toolbar = ({ onBackupClick }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -91,127 +101,109 @@ const TerminalStatusBar = ({ onBackupClick }) => {
     return d ? `Last backup: ${d.toLocaleString()}` : 'No backup yet — export your data to protect your work';
   })();
 
-  const backupLevelClass = `terminal-statusbar-backup-${backupLevel || 'neutral'}`;
-
   return (
-    <div className="terminal-statusbar" role="status" aria-live="polite">
-      <span className="terminal-statusbar-segment">
-        <span className="terminal-statusbar-label">SYS</span>
-        <span className="terminal-statusbar-value">CSF Profile v2.2</span>
-      </span>
-
-      <span className="terminal-statusbar-segment">
-        <span className="terminal-statusbar-label">ASSESSMENT</span>
+    <header className="app-toolbar" role="status" aria-live="polite">
+      <div className="app-toolbar-group">
+        <label className="app-toolbar-label" htmlFor="toolbar-assessment">Assessment</label>
         <select
-          className="terminal-statusbar-select"
+          id="toolbar-assessment"
+          className="app-toolbar-select"
           value={currentAssessmentId || ''}
           onChange={handleAssessmentChange}
           aria-label="Current assessment"
         >
-          <option value="">-- SELECT --</option>
+          <option value="">Select an assessment…</option>
           {assessments.map((a) => (
             <option key={a.id} value={a.id}>
-              {(a.name || a.id).toUpperCase()}
+              {a.name || a.id}
             </option>
           ))}
         </select>
-      </span>
+      </div>
 
       {/* Assessment year (issue #291) — shown ahead of the quarter selector */}
       {currentAssessment?.year && (
-        <span className="terminal-statusbar-segment">
-          <span className="terminal-statusbar-label">YEAR</span>
-          <span className="terminal-statusbar-value">{currentAssessment.year}</span>
-        </span>
+        <div className="app-toolbar-group">
+          <span className="app-toolbar-label">Year</span>
+          <span className="app-toolbar-value">{currentAssessment.year}</span>
+        </div>
       )}
 
-      <span className="terminal-statusbar-segment">
-        <span className="terminal-statusbar-label">QTR</span>
-        <span className="terminal-statusbar-qbtns" role="tablist" aria-label="Quarter selector">
+      <div className="app-toolbar-group">
+        <span className="app-toolbar-segmented" role="tablist" aria-label="Quarter selector">
           {QUARTERS.map((q) => (
             <button
               key={q}
               type="button"
               role="tab"
               aria-selected={selectedQuarter === q}
-              className={`terminal-statusbar-qbtn${selectedQuarter === q ? ' is-active' : ''}`}
+              className={`app-toolbar-segment${selectedQuarter === q ? ' is-active' : ''}`}
               onClick={() => setSelectedQuarter(q)}
             >
               Q{q}
             </button>
           ))}
         </span>
-      </span>
+      </div>
 
-      <span className="terminal-statusbar-segment">
-        <span className="terminal-statusbar-label">BACKUP</span>
-        <span className={`terminal-statusbar-backup ${backupLevelClass}`} title={backupTooltip}>
-          {backupAge}
+      <div className="app-toolbar-spacer" />
+
+      <div className="app-toolbar-group">
+        <span
+          className={`app-toolbar-chip app-toolbar-chip-${backupLevel || 'neutral'}`}
+          title={backupTooltip}
+        >
+          Backup {backupAge}
         </span>
         {backupLevel !== 'success' && (
           <button
             type="button"
-            className="terminal-statusbar-action terminal-statusbar-action-cta"
+            className="btn-terminal"
             onClick={onBackupClick}
             title="Export data now"
           >
-            [ BACKUP NOW ]
+            Back up now
           </button>
         )}
-      </span>
+      </div>
 
-      <span className="terminal-statusbar-segment terminal-statusbar-flex" />
-
-      <span className="terminal-statusbar-segment">
+      <div className="app-toolbar-group">
         <button
           type="button"
-          className="terminal-statusbar-kbdhints"
-          onClick={() => window.dispatchEvent(new CustomEvent('keyboard-show-help'))}
-          title="Show keyboard shortcuts (press ?)"
-          aria-label="Show keyboard shortcuts"
-        >
-          <kbd className="terminal-kbd">?</kbd>
-          <span className="terminal-statusbar-kbdlabel">Shortcuts</span>
-          <kbd className="terminal-kbd">/</kbd>
-          <span className="terminal-statusbar-kbdlabel">Search</span>
-          <kbd className="terminal-kbd">↑↓</kbd>
-          <span className="terminal-statusbar-kbdlabel">Nav</span>
-        </button>
-      </span>
-
-      <span className="terminal-statusbar-segment">
-        <button
-          type="button"
-          className="terminal-statusbar-action"
+          className="btn-terminal"
           onClick={handleExportSummary}
           disabled={!hasAssessment}
           title="Export executive summary PDF for current assessment"
         >
           Export summary
         </button>
-      </span>
-      <span className="terminal-statusbar-segment">
         <button
           type="button"
-          className="terminal-statusbar-action"
+          className="btn-terminal"
           onClick={handleAuditReport}
           disabled={!hasAssessment}
           title="Open audit report for current assessment"
         >
           Audit report
         </button>
-      </span>
+      </div>
 
-      <span className="terminal-statusbar-segment">
-        <span className="terminal-statusbar-label">USER</span>
-        <span className="terminal-statusbar-value">GRC_ANALYST</span>
-      </span>
-      <span className="terminal-statusbar-segment">
-        <span className="terminal-statusbar-label">CONN</span>
-        <span className="terminal-statusbar-value">Secure</span>
-      </span>
-    </div>
+      <div className="app-toolbar-group">
+        <button
+          type="button"
+          className="app-toolbar-kbd-hint"
+          onClick={() => window.dispatchEvent(new CustomEvent('keyboard-show-help'))}
+          title="Show keyboard shortcuts (press ?)"
+          aria-label="Show keyboard shortcuts"
+        >
+          <kbd className="terminal-kbd">?</kbd>
+        </button>
+        <AutoSaveIndicator />
+        <UndoRedoButtons />
+        <ThemeToggle />
+      </div>
+    </header>
   );
 };
 
-export default TerminalStatusBar;
+export default Toolbar;
