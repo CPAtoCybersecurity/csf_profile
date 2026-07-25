@@ -139,8 +139,8 @@ const AppContent = () => {
               </div>
               <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
               <div className="flex flex-col">
-                <span className="terminal-section-heading text-sm font-semibold">CSF_PROFILE</span>
-                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal uppercase tracking-wider">NIST CSF 2.0 Assessment Tool</span>
+                <span className="terminal-section-heading text-sm font-semibold">CSF Profile</span>
+                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">NIST CSF 2.0 Assessment Tool</span>
               </div>
             </div>
 

@@ -97,7 +97,7 @@ const TerminalStatusBar = ({ onBackupClick }) => {
     <div className="terminal-statusbar" role="status" aria-live="polite">
       <span className="terminal-statusbar-segment">
         <span className="terminal-statusbar-label">SYS</span>
-        <span className="terminal-statusbar-value">CSF_PROFILE / v2.2</span>
+        <span className="terminal-statusbar-value">CSF Profile v2.2</span>
       </span>
 
       <span className="terminal-statusbar-segment">
@@ -187,7 +187,7 @@ const TerminalStatusBar = ({ onBackupClick }) => {
           disabled={!hasAssessment}
           title="Export executive summary PDF for current assessment"
         >
-          [ EXPORT SUMMARY ]
+          Export summary
         </button>
       </span>
       <span className="terminal-statusbar-segment">
@@ -198,7 +198,7 @@ const TerminalStatusBar = ({ onBackupClick }) => {
           disabled={!hasAssessment}
           title="Open audit report for current assessment"
         >
-          [ AUDIT REPORT ]
+          Audit report
         </button>
       </span>
 
@@ -208,7 +208,7 @@ const TerminalStatusBar = ({ onBackupClick }) => {
       </span>
       <span className="terminal-statusbar-segment">
         <span className="terminal-statusbar-label">CONN</span>
-        <span className="terminal-statusbar-value">SECURE<span className="terminal-blink">_</span></span>
+        <span className="terminal-statusbar-value">Secure</span>
       </span>
     </div>
   );

@@ -39,8 +39,8 @@ const KPICard = ({ title, value, subtitle, trend }) => {
 
   return (
     <div className="terminal-kpi p-4">
-      <div className="terminal-kpi-label text-xs uppercase tracking-wider mb-1">
-        <span className="terminal-kpi-marker">▌</span> {title}
+      <div className="terminal-kpi-label text-xs mb-1">
+        {title}
       </div>
       <div className="terminal-kpi-value text-3xl tracking-tight">
         {value}
