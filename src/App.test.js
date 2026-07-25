@@ -52,7 +52,7 @@ describe('App Component', () => {
       render(<App />);
     });
 
-    expect(screen.getByText('CSF_PROFILE')).toBeInTheDocument();
+    expect(screen.getByText('CSF Profile')).toBeInTheDocument();
     // The subtitle appears in both the header and the boot splash screen.
     expect(screen.getAllByText(/NIST CSF 2.0 Assessment Tool/i).length).toBeGreaterThan(0);
   });

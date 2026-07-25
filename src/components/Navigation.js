@@ -55,8 +55,8 @@ const NAV_GROUPS = [
 
 const linkStyle = { textDecoration: 'none' };
 
-// Base styles for desktop nav items — terminal bracket aesthetic, mono, uppercase.
-const baseStyles = 'terminal-nav-link flex items-center gap-1.5 px-3 py-2 text-xs font-semibold uppercase tracking-wider transition-colors border-b-[2px]';
+// Base styles for desktop nav items.
+const baseStyles = 'terminal-nav-link flex items-center gap-1.5 px-3 py-2 text-[13px] font-medium transition-colors border-b-[2px]';
 const activeStyles = 'terminal-nav-link-active border-amber-600 dark:border-green-400 text-amber-700 dark:text-green-300 bg-transparent';
 const inactiveStyles = 'border-transparent text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800';
 // AI link (success) variant.
