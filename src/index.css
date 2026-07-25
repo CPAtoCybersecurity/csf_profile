@@ -1380,15 +1380,15 @@ nav a:active { text-decoration: none !important; }
   background: rgba(94, 138, 213, 0.18);
 }
 .terminal-statusbar-qbtn.is-active {
-  background: #3ea6ff;
-  color: #000000;
+  background: var(--on-header-accent);
+  color: var(--bg-header);
 }
 .dark .terminal-statusbar-qbtn {
   color: var(--accent);
   border-right-color: var(--accent);
 }
 .dark .terminal-statusbar-qbtn:hover {
-  background: rgba(51, 255, 102, 0.15);
+  background: rgba(96, 165, 250, 0.18);
 }
 .dark .terminal-statusbar-qbtn.is-active {
   background: var(--accent);
