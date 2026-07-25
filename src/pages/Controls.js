@@ -310,7 +310,7 @@ const Controls = () => {
           <table className="table-professional min-w-full">
             <thead className="sticky top-0 z-10">
               <tr>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-8">
+                <th className="p-3 text-left text-xs font-medium text-gray-500 w-8">
                   <input
                     type="checkbox"
                     onChange={(e) => {
@@ -326,12 +326,12 @@ const Controls = () => {
                 <SortableHeader label="Function/Category" sortKey="Function" currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="Subcategory" sortKey="Subcategory ID" currentSort={sort} onSort={handleSort} />
                 <SortableHeader label="ID" sortKey="ID" currentSort={sort} onSort={handleSort} />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Implementation Example</th>
+                <th className="p-3 text-left text-xs font-medium text-gray-500">Implementation Example</th>
                 <SortableHeader label="In Scope" sortKey="In Scope? " currentSort={sort} onSort={handleSort} />
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-3 text-left text-xs font-medium text-gray-500">
                   Score <span className="text-blue-600">(Q{selectedQuarter})</span>
                 </th>
-                <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="p-3 text-left text-xs font-medium text-gray-500">
                   Status <span className="text-blue-600">(Q{selectedQuarter})</span>
                 </th>
               </tr>

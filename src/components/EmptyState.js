@@ -86,7 +86,7 @@ const EmptyState = ({
       </div>
 
       {title && (
-        <h3 className={`font-mono font-semibold uppercase tracking-wide text-gray-700 dark:text-gray-200 mb-2 ${sizes.title}`}>
+        <h3 className={`font-mono font-semibold text-gray-700 dark:text-gray-200 mb-2 ${sizes.title}`}>
           {title}
         </h3>
       )}

@@ -96,10 +96,10 @@ const ScoringLegend = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evaluation Criteria</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">How Secure (Resilient)?</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Score</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Description</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Evaluation Criteria</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">How Secure (Resilient)?</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -157,9 +157,9 @@ const ScoringLegend = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-100">
             <tr>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Maturity Level</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expectation of Policy Maturity Level</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Expectation of Process Maturity Level</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Maturity Level</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Expectation of Policy Maturity Level</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Expectation of Process Maturity Level</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">

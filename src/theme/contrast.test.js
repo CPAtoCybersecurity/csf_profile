@@ -154,9 +154,11 @@ const pairs = [
   ['light', 'active chip label on accent fill', 'var(--bg-header)', resolve('var(--on-header-accent)', LIGHT_VARS)],
   ['dark', 'active chip label on accent fill', 'var(--bg-header)', resolve('var(--on-header-accent)', DARK_VARS)],
 
-  // Status-bar literals (read from the stylesheet, not retyped).
-  ['light', 'status-bar value literal', declValue('.terminal-statusbar-value', 'color'), lightSurfaces.header],
-  ['light', 'status-bar bar text', declValue('.terminal-statusbar', 'color'), lightSurfaces.header],
+  // Overlay-header literals (read from the stylesheet, not retyped). This is
+  // the last surface that stays dark in both themes now that the status bar
+  // is gone, so it is what keeps the --on-header-* tokens honest.
+  ['light', 'overlay header text', declValue('.kbd-overlay-header', 'color'), lightSurfaces.header],
+  ['dark', 'overlay header text', declValue('.kbd-overlay-header', 'color'), darkSurfaces.header],
 
   // Warning badge on the page surface.
   ['light', 'badge-warning', declValue('.badge-warning', 'color'), lightSurfaces.base],

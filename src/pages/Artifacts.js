@@ -436,7 +436,7 @@ const Artifacts = () => {
               stop at the first viewport-width while ~1300px of columns scroll
               past — rows would slide under a transparent header. */}
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 min-w-max">
-            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider min-w-max">
+            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 min-w-max">
               <div className="w-8 flex-shrink-0"></div>
               <div className="w-56 flex-shrink-0">ID</div>
               <div className="w-64 flex-shrink-0">Artifact Name</div>

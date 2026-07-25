@@ -298,10 +298,10 @@ const UserManagement = () => {
         <table className="table-professional min-w-full">
           <thead>
             <tr>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-              <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Name</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Title</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Email</th>
+              <th className="p-3 text-left text-xs font-medium text-gray-500">Actions</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">

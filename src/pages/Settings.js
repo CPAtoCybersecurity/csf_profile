@@ -713,12 +713,12 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Framework</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Version</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Source</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Requirements</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="p-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">Framework</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">Version</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">Source</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">Requirements</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">Status</th>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">

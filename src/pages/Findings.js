@@ -415,7 +415,7 @@ const Findings = () => {
         <div className={`${selectedFinding || editMode ? 'w-1/2' : 'w-full'} overflow-auto border-r dark:border-gray-700`}>
           {/* Column headers */}
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
-            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+            <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400">
               <div className="w-8 flex-shrink-0"></div>
               <div className="w-24 flex-shrink-0">ID</div>
               <div className="flex-1 min-w-0">Summary</div>

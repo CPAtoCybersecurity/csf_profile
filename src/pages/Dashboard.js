@@ -628,12 +628,12 @@ const Dashboard = () => {
         <div className="mb-4 p-3 font-mono bg-gray-50 dark:bg-gray-800 border border-gray-300 dark:border-gray-700">
           <div className="flex items-center justify-between">
             <div>
-              <span className="font-semibold uppercase tracking-wider text-blue-700 dark:text-green-300">{selectedAssessment.name}</span>
+              <span className="font-semibold text-blue-700 dark:text-green-300">{selectedAssessment.name}</span>
               {selectedAssessment.description && (
                 <span className="text-sm text-gray-600 dark:text-gray-300 ml-2">— {selectedAssessment.description}</span>
               )}
             </div>
-            <div className="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               {selectedAssessment.scopeIds?.length || 0} items in scope
             </div>
           </div>
@@ -1291,7 +1291,7 @@ const Dashboard = () => {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className={`text-xs uppercase border-b ${darkMode ? 'text-gray-400 border-gray-600' : 'text-gray-500 border-gray-200'}`}>
+              <tr className={`text-xs border-b ${darkMode ? 'text-gray-400 border-gray-600' : 'text-gray-500 border-gray-200'}`}>
                 <th className="text-left py-2 px-3">Rank</th>
                 <th className="text-left py-2 px-3">ID</th>
                 <th className="text-left py-2 px-3">Function</th>
