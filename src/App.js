@@ -5,12 +5,9 @@ import { Toaster } from 'react-hot-toast';
 // Components (eager — part of the always-visible shell)
 import Navigation from './components/Navigation';
 import ErrorBoundary from './components/ErrorBoundary';
-import AutoSaveIndicator from './components/AutoSaveIndicator';
-import UndoRedoButtons from './components/UndoRedoButtons';
-import ThemeToggle from './components/ThemeToggle';
 import FirstVisitWarning from './components/FirstVisitWarning';
 import BackupReminder from './components/BackupReminder';
-import TerminalStatusBar from './components/TerminalStatusBar';
+import Toolbar from './components/Toolbar';
 import KeyboardShortcutsOverlay from './components/KeyboardShortcutsOverlay';
 import { SkeletonTable } from './components/SkeletonLoader';
 
@@ -121,43 +118,15 @@ const AppContent = () => {
 
   return (
     <React.Fragment>
-    <div className="flex flex-col h-screen">
-      <div className="flex flex-col h-full bg-white text-gray-700">
-        {/* Terminal top status bar — sticky, top of frozen panes */}
-        <TerminalStatusBar onBackupClick={handleExportFromIndicator} />
+    <div className="app-shell">
+      {/* Left rail — brand + primary nav; a drawer below 1024px */}
+      <Navigation />
 
-        {/* Header — sticky right beneath the status bar */}
-        <header className="terminal-app-header bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shadow-sm px-6 py-3">
-          <div className="flex justify-between items-center">
-            {/* Left: Logo and title */}
-            <div className="flex items-center gap-3">
-              <div className="terminal-logo-disc">
-                <img
-                  src="/SC_Logo.png"
-                  alt="Simply Cyber shield"
-                />
-              </div>
-              <div className="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-              <div className="flex flex-col">
-                <span className="terminal-section-heading text-sm font-semibold">CSF Profile</span>
-                <span className="text-xs text-gray-400 dark:text-gray-500 font-normal">NIST CSF 2.0 Assessment Tool</span>
-              </div>
-            </div>
-
-            {/* Center: Navigation */}
-            <Navigation />
-
-            {/* Right: Utilities */}
-            <div className="flex items-center gap-2">
-              <AutoSaveIndicator />
-              <UndoRedoButtons />
-              <ThemeToggle />
-            </div>
-          </div>
-        </header>
+      <div className="app-main">
+        <Toolbar onBackupClick={handleExportFromIndicator} />
 
         {/* Main content */}
-        <main className="flex-1 overflow-hidden">
+        <main className="app-content">
           <Suspense fallback={<RouteFallback />}>
             <Routes>
               <Route path="/" element={<Dashboard />} />
@@ -206,40 +175,26 @@ const App = () => {
           position="bottom-right"
           toastOptions={{
             duration: 3000,
+            className: 'app-toast',
             style: {
-              background: '#000000',
-              color: '#33ff66',
-              border: '1px solid #33ff66',
-              borderRadius: 0,
-              fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace",
-              fontSize: '12px',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-              padding: '8px 12px',
-              boxShadow: 'none',
+              background: 'var(--bg-secondary)',
+              color: 'var(--text-primary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--radius-lg)',
+              fontSize: '13px',
+              padding: '10px 14px',
+              boxShadow: 'var(--shadow-lg)',
             },
             success: {
               iconTheme: {
-                primary: '#33ff66',
-                secondary: '#000000',
+                primary: 'var(--terminal-green)',
+                secondary: 'var(--bg-secondary)',
               },
             },
             error: {
-              style: {
-                background: '#000000',
-                color: '#ff4444',
-                border: '1px solid #ff4444',
-                borderRadius: 0,
-                fontFamily: "'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace",
-                fontSize: '12px',
-                letterSpacing: '0.04em',
-                textTransform: 'uppercase',
-                padding: '8px 12px',
-                boxShadow: 'none',
-              },
               iconTheme: {
-                primary: '#ff4444',
-                secondary: '#000000',
+                primary: 'var(--terminal-red)',
+                secondary: 'var(--bg-secondary)',
               },
             },
           }}

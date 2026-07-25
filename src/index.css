@@ -1910,3 +1910,248 @@ nav a:active { text-decoration: none !important; }
 }
 .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
 .btn-icon-danger:hover { border-color: var(--terminal-red); color: var(--terminal-red); }
+
+/* ==========================================================================
+   Application shell — sidebar rail + main column
+   Replaces the horizontal nav bar and the 22px TerminalStatusBar strip.
+   ========================================================================== */
+
+.app-shell {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* --- Left rail --- */
+
+.app-sidebar {
+  flex: 0 0 230px;
+  width: 230px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.app-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 16px 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+.app-sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.app-sidebar-brand-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+.app-sidebar-brand-sub {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.3;
+  margin-top: 2px;
+}
+
+.app-sidebar-nav {
+  padding: 12px 10px 20px;
+}
+
+.app-nav-group + .app-nav-group {
+  margin-top: 18px;
+}
+.app-nav-group-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  padding: 0 8px 6px;
+  letter-spacing: 0.02em;
+}
+
+.app-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px;
+  margin-bottom: 1px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: background-color 0.1s, color 0.1s;
+}
+.app-nav-item:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+/* Active state is a soft-blue filled pill — the old underline read as a tab
+   strip, which is the wrong affordance for a vertical rail. */
+.app-nav-item.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.app-nav-icon {
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+/* --- Main column --- */
+
+.app-main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-content {
+  flex: 1 1 auto;
+  overflow: auto;
+  min-height: 0;
+}
+
+/* --- Toolbar --- */
+
+.app-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 20px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 12px;
+}
+.app-toolbar-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.app-toolbar-spacer { flex: 1 1 auto; }
+.app-toolbar-label {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.app-toolbar-value {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+.app-toolbar-select {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 12px;
+  max-width: 320px;
+}
+.app-toolbar-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.app-toolbar-segmented {
+  display: inline-flex;
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.app-toolbar-segment {
+  background: transparent;
+  border: none;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color 0.1s, color 0.1s;
+}
+.app-toolbar-segment + .app-toolbar-segment {
+  border-left: 1px solid var(--border-color);
+}
+.app-toolbar-segment:hover { background: var(--bg-tertiary); }
+.app-toolbar-segment.is-active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.app-toolbar-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 9px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+.app-toolbar-chip-success { color: var(--status-success, var(--terminal-green)); border-color: currentColor; }
+.app-toolbar-chip-warning { color: var(--terminal-amber); border-color: currentColor; }
+.app-toolbar-chip-danger  { color: var(--terminal-red); border-color: currentColor; }
+
+.app-toolbar-kbd-hint {
+  background: transparent;
+  border: none;
+  padding: 2px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* --- Drawer (below 1024px) --- */
+
+.app-drawer-trigger { display: none; }
+
+@media (max-width: 1023px) {
+  .app-sidebar { display: none; }
+
+  .app-drawer-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    z-index: 70;
+    width: 34px;
+    height: 34px;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+  }
+
+  /* Clear the fixed trigger so it never sits on top of the first control. */
+  .app-toolbar { padding-left: 52px; }
+
+  .app-drawer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 65;
+    background: rgba(15, 23, 42, 0.45);
+  }
+  .app-drawer {
+    width: 260px;
+    height: 100%;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    box-shadow: var(--shadow-lg);
+    overflow-y: auto;
+  }
+}
