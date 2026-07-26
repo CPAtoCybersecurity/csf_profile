@@ -78,6 +78,31 @@ Sanitize input using DOMPurify before rendering...
 - Browser security policies apply
 - Local storage accessible only from the same origin
 
+## AI-Assisted Security Review
+
+This project uses AI-assisted review in two layers, mapped to NIST CSF 2.0 functions the same way the app itself maps assessments:
+
+### Layer 1: PR-time diff review (continuous — CSF DE.CM)
+
+Every same-repo pull request is analyzed by [Anthropic's claude-code-security-review](https://github.com/anthropics/claude-code-security-review) GitHub Action (MIT license). It reviews only the changed files, filters false positives, and leaves inline comments. See `.github/workflows/security-review.yml`.
+
+Operating notes:
+
+- **Findings are advisory, never auto-filed.** A human maintainer verifies every finding before it becomes an issue or a fix. Unverified AI findings are noise at best and a disclosure problem at worst.
+- **Fork PRs are skipped by design.** GitHub strips repo secrets from `pull_request` runs triggered from forks, so the workflow guards on `head.repo.full_name == github.repository`. Maintainers review external PRs locally with the `/security-review` slash command that ships with Claude Code.
+- **The action itself is a prompt-injection surface.** Per Anthropic's own documentation, the reviewer is not hardened against adversarial PR content. The repository uses GitHub's "require approval for outside contributors" workflow setting, and this check stays out of required branch protection until a maintainer has verified a green run.
+- **Setup (maintainers):** add a `CLAUDE_API_KEY` repository secret (a dedicated Anthropic API key with a spend cap, enabled for the Claude API and Claude Code). Runs are billed API usage with a 20-minute default timeout.
+- **The reviewer is a third-party dependency too.** Both actions in the workflow are pinned to full commit SHAs rather than tags or `@main`, and both belong in the same supply-chain inventory (GV.SC) this section describes. Pin bumps happen deliberately, via PR.
+- **Coverage is honest, not total.** Because fork PRs and Dependabot runs are skipped, the automated layer only sees maintainer branches. External contributions, the population that most needs review, get human review plus a local `/security-review` pass instead.
+
+### Layer 2: point-in-time deep review (periodic — CSF ID.RA)
+
+Scheduled deep assessments use [Google's Mantis](https://github.com/google/mantis) (Apache-2.0), a toolkit of security-review skills for AI coding agents covering threat modeling through finding calibration. Mantis is demonstration-grade by Google's own statement and is deliberately **not** wired into CI: it has no CLI, its output is non-deterministic, and running it requires an isolated environment. Assessments run offline on a scoped copy of the repository, findings are human-verified, and confirmed issues enter the normal vulnerability response process above.
+
+### Why two layers
+
+Diff review catches what a change introduces; it cannot see what the codebase already carries. Deep review sees the whole system but is too slow and expensive to run per-PR. Together they cover continuous monitoring (DE.CM) and periodic risk assessment (ID.RA) without pretending either tool replaces the supply-chain and access controls (GV.SC, PR.AA) that bound what any code change can reach.
+
 ## Vulnerability Response Process
 
 1. **Report Received**: We'll acknowledge receipt within 48 hours
