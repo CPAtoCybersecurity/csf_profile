@@ -41,6 +41,7 @@
 - [ ] Evidence storage access control configuration
 - [ ] Incident record retention policy
 - [ ] Sample evidence catalog from a recent incident
+- [ ] [Evidence Preservation Guide](../../5_Artifacts/Procedures/PROC-evidence-preservation-guide.md) (ALMA-SOP-2025-010b)
 
 ---
 

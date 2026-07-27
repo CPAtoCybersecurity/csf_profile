@@ -41,6 +41,7 @@
 - [ ] Evidence storage access control lists
 - [ ] Sample chain-of-custody documentation from recent incident
 - [ ] Automated collection tool output logs
+- [ ] [Evidence Preservation Guide](../../5_Artifacts/Procedures/PROC-evidence-preservation-guide.md) (ALMA-SOP-2025-010b)
 
 ---
 
