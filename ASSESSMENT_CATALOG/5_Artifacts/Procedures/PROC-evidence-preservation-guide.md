@@ -101,8 +101,7 @@ Evidence attached to a ServiceNow incident ticket is retained per the ticket's o
 schedule, which follows the [Information Security Policy](../Policies/POL-information-security.md)
 (ALMA-POL-2025-001). Evidence relevant to an incident still under active review by Internal Audit or
 Legal is held past the standard schedule until that review closes, consistent with the Business
-Continuity Plan (ALMA-SOP-2025-013) referenced in the playbook's own Related Documents table — not
-itself written up as a standalone artifact in this catalog yet.
+Continuity Plan (ALMA-SOP-2025-013).
 
 ---
 
