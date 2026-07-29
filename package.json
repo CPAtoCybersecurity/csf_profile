@@ -70,6 +70,6 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.9.6",
-    "postcss": "^8.4.31"
+    "postcss": "^8.5.18"
   }
 }
