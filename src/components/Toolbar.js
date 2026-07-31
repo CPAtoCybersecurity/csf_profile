@@ -83,6 +83,9 @@ const Toolbar = ({ onBackupClick }) => {
         selectedQuarter,
       });
     } catch (err) {
+      // Toast is transient — keep a durable trace so export failures are
+      // diagnosable after the 3s window closes.
+      console.error('Export summary failed:', err);
       toast.error(`Export failed: ${err.message || err}`);
     }
   }, [hasAssessment, currentAssessment, requirements, findings, artifacts, selectedQuarter]);

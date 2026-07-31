@@ -1,6 +1,10 @@
 import jsPDF from 'jspdf';
-import 'jspdf-autotable';
+import { applyPlugin } from 'jspdf-autotable';
 import { getScoringScale, CMMI_LEVELS } from './scoringScale';
+
+// jspdf-autotable v5 no longer patches jsPDF on import; without this the
+// doc.autoTable calls below throw and the export dies with only a toast.
+applyPlugin(jsPDF);
 
 // CSF function order for consistent display
 const FUNCTION_ORDER = [
