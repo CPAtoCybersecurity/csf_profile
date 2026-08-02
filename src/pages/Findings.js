@@ -12,6 +12,7 @@ import { SCOPE_ALL, SCOPE_UNASSIGNED, filterByScope, resolveScopeStamp, defaultS
 import useSort from '../hooks/useSort';
 import EmptyState from '../components/EmptyState';
 import Markdown from '../components/Markdown';
+import RecordPanel, { CommentsButton } from '../components/RecordPanel';
 import { formatInlineMarkdown } from '../utils/markdownText';
 
 const Findings = () => {
@@ -63,6 +64,8 @@ const Findings = () => {
   const [editMode, setEditMode] = useState(false);
   const [errors, setErrors] = useState({});
   const [selectedFinding, setSelectedFinding] = useState(null);
+  // Comments/History panel for the open finding
+  const [recordPanelOpen, setRecordPanelOpen] = useState(false);
 
   // Panel resize state
   const [panelWidth, setPanelWidth] = useState(480);
@@ -581,6 +584,13 @@ const Findings = () => {
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
+                  {selectedFinding && (
+                    <CommentsButton
+                      targetType="finding"
+                      targetId={selectedFinding.id}
+                      onClick={() => setRecordPanelOpen(true)}
+                    />
+                  )}
                   {!editMode && selectedFinding && (
                     <>
                       <button
@@ -611,6 +621,16 @@ const Findings = () => {
                   </button>
                 </div>
               </div>
+
+              {selectedFinding && (
+                <RecordPanel
+                  open={recordPanelOpen}
+                  onClose={() => setRecordPanelOpen(false)}
+                  targetType="finding"
+                  targetId={selectedFinding.id}
+                  title={selectedFinding.jiraKey || selectedFinding.id}
+                />
+              )}
 
               {/* Summary */}
               <div className="mb-6">

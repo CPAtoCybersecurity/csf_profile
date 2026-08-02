@@ -1848,3 +1848,27 @@ nav a:active { text-decoration: none !important; }
 .app-toolbar-segment { min-height: 28px; min-width: 34px; }
 .app-drawer-trigger { min-height: 34px; min-width: 34px; }
 .btn-terminal { min-height: 28px; }
+
+/* Acting-user selector (sidebar + drawer): who comments and audit entries
+   are attributed to. Theme-var surface so both modes inherit correctly. */
+.app-acting-user {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-color);
+}
+.app-acting-user-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+.app-acting-user select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
