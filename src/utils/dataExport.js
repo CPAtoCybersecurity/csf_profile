@@ -29,8 +29,12 @@ import { filterExportByAssessments } from './assessmentSelection';
  *   backups carry it wholesale; share exports OMIT it by default and carry
  *   it only under the include-private opt-in (see shareRegistry.js — a
  *   populated inventory reads as a target list).
+ * Format 7: adds the comments section (per-record discussion threads on
+ *   evaluations/controls/findings). Complete backups carry it wholesale;
+ *   share exports OMIT it by default (author names + free discussion text —
+ *   the users-directory pattern) and carry it only under include-private.
  */
-export const EXPORT_FORMAT_VERSION = 6;
+export const EXPORT_FORMAT_VERSION = 7;
 
 // zustand persist keys whose schema versions travel with the export so a
 // restore can detect version drift between the exporting and importing app.
@@ -45,7 +49,8 @@ export const PERSIST_KEYS = {
   // can version-gate instead of relying on the unconditional stamp passes
   artifacts: 'csf-artifacts-storage',
   users: 'csf-users-storage',
-  systems: 'csf-inventory-storage'
+  systems: 'csf-inventory-storage',
+  comments: 'csf-comments-storage'
 };
 
 /**
@@ -87,7 +92,8 @@ export const exportAllDataJSON = (stores) => {
     findingsStore,
     metricsStore,
     orgProfileStore,
-    inventoryStore
+    inventoryStore,
+    commentsStore
   } = stores;
 
   const orgProfileState = orgProfileStore?.getState?.();
@@ -117,6 +123,7 @@ export const exportAllDataJSON = (stores) => {
       findings: findingsStore?.getState?.()?.findings || [],
       metrics: metricsStore?.getState?.()?.metrics || [],
       systems: inventoryStore?.getState?.()?.systems || [],
+      comments: commentsStore?.getState?.()?.comments || [],
       // Object section (not an array): the org profile rides COMPLETE
       // backups only; buildShareableExport strips it unconditionally.
       orgProfile: orgProfileState

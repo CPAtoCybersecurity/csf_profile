@@ -57,6 +57,31 @@ export const parseMentions = (text, users) => {
   return [...new Set(ids)];
 };
 
+/**
+ * Shape repair for the restore/import lane (bulk setters bypass zustand's
+ * load-time migrate). Drops junk-shaped records, coerces mentions to an
+ * array, backfills authorName. Absent-only and idempotent — a well-formed
+ * comment passes through unchanged.
+ */
+export const normalizeCommentFields = (state) => {
+  if (!Array.isArray(state?.comments)) return state;
+  const comments = state.comments
+    .filter(c =>
+      c && typeof c === 'object' &&
+      typeof c.id === 'string' &&
+      typeof c.targetType === 'string' &&
+      typeof c.targetId === 'string' &&
+      typeof c.text === 'string'
+    )
+    .map(c => ({
+      ...c,
+      mentions: Array.isArray(c.mentions) ? c.mentions : [],
+      authorName: typeof c.authorName === 'string' && c.authorName ? c.authorName : 'System',
+      createdAt: typeof c.createdAt === 'string' ? c.createdAt : new Date().toISOString()
+    }));
+  return { ...state, comments };
+};
+
 const useCommentsStore = create(
   persist(
     (set, get) => ({
