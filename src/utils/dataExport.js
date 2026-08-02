@@ -5,6 +5,7 @@
  */
 
 import { SHARE_SECTIONS, OMIT, foldSection, buildShareContext } from './shareRegistry';
+import { filterExportByAssessments } from './assessmentSelection';
 
 /**
  * Export format version. Bump when the envelope shape changes and teach
@@ -201,13 +202,24 @@ export const buildShareableExport = (stores, { includePrivate = false } = {}) =>
 
 /**
  * Download a shareable export (csf_share_YYYY-MM-DD.json).
+ *
+ * Assessment selection runs AFTER the share fold, never before: the fold is
+ * the privacy boundary, and a post-fold narrowing can only remove more
+ * records, never re-admit one the fold dropped.
+ *
  * @param {Object} stores - All store references
  * @param {Object} [options] - See buildShareableExport
+ * @param {string[]|null} [options.assessmentIds] - Selected assessments; null = all
  */
 export const exportShareableDatabase = (stores, options = {}) => {
-  const jsonData = buildShareableExport(stores, options);
+  const { assessmentIds = null, ...shareOptions } = options;
+  const jsonData = filterExportByAssessments(
+    buildShareableExport(stores, shareOptions),
+    assessmentIds
+  );
   const date = new Date().toISOString().split('T')[0];
-  downloadJSON(jsonData, `csf_share_${date}.json`);
+  const subset = jsonData.metadata?.assessmentSelection ? '_subset' : '';
+  downloadJSON(jsonData, `csf_share${subset}_${date}.json`);
 };
 
 /**
@@ -231,35 +243,65 @@ export const downloadJSON = (jsonData, filename) => {
 };
 
 /**
- * Export all data with proper filename formatting
+ * Export all data with proper filename formatting.
+ *
+ * With a subset selected the file is named `csf_assessment_subset_*.json`, NOT
+ * `csf_assessment_*.json`. That distinction is load-bearing: the restore
+ * control performs a full replace, so a slice restored as a backup would
+ * silently delete the assessments it left behind. The filename, the dataType
+ * suffix, and `metadata.assessmentSelection` all say the same thing, and
+ * validateDatabaseExport turns the last one into a warning at restore time.
+ *
  * @param {Object} stores - All store references
+ * @param {Object} [options]
+ * @param {string[]|null} [options.assessmentIds] - Selected assessments; null = all
  */
-export const exportCompleteDatabase = (stores) => {
-  const jsonData = exportAllDataJSON(stores);
+export const exportCompleteDatabase = (stores, { assessmentIds = null } = {}) => {
+  const jsonData = filterExportByAssessments(exportAllDataJSON(stores), assessmentIds);
   const date = new Date().toISOString().split('T')[0];
-  const filename = `csf_assessment_${date}.json`;
-  downloadJSON(jsonData, filename);
+  const subset = jsonData.metadata?.assessmentSelection ? '_subset' : '';
+  downloadJSON(jsonData, `csf_assessment${subset}_${date}.json`);
 };
 
 /**
  * Export assessments data to JSON
  * @param {Object} assessmentsStore - The assessments store
  * @param {Object} controlsStore - The controls store (for context)
+ * @param {Object} userStore - The user store (auditor-name enrichment)
+ * @param {Object} [options]
+ * @param {string[]|null} [options.assessmentIds] - Selected assessments; null = all
  */
-export const exportAssessmentsJSON = (assessmentsStore, controlsStore, userStore) => {
+export const exportAssessmentsJSON = (
+  assessmentsStore,
+  controlsStore,
+  userStore,
+  { assessmentIds = null } = {}
+) => {
   const users = userStore?.getState?.()?.users || [];
   const getUserName = (userId) => {
     const user = users.find(u => u.id === userId);
     return user ? user.name : userId || '';
   };
 
-  const assessments = assessmentsStore?.getState?.()?.assessments || [];
+  const allAssessments = assessmentsStore?.getState?.()?.assessments || [];
+  const wanted = Array.isArray(assessmentIds) ? new Set(assessmentIds) : null;
+  const assessments = wanted ? allAssessments.filter(a => wanted.has(a?.id)) : allAssessments;
+  const isSubset = assessments.length < allAssessments.length;
   const date = new Date().toISOString().split('T')[0];
-  
+
   const jsonData = {
     exportDate: new Date().toISOString(),
-    dataType: 'Assessments',
+    dataType: isSubset ? 'Assessments — selected assessments only' : 'Assessments',
     count: assessments.length,
+    ...(isSubset
+      ? {
+          assessmentSelection: {
+            selectedIds: assessments.map(a => a.id),
+            selectedCount: assessments.length,
+            totalCount: allAssessments.length
+          }
+        }
+      : {}),
     assessments: assessments.map(a => ({
       ...a,
       // Enhance with user names for readability
@@ -273,5 +315,5 @@ export const exportAssessmentsJSON = (assessmentsStore, controlsStore, userStore
     }))
   };
 
-  downloadJSON(jsonData, `assessments_${date}.json`);
+  downloadJSON(jsonData, `assessments${isSubset ? '_subset' : ''}_${date}.json`);
 };

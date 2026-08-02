@@ -16,6 +16,7 @@ import FindingSelector from '../components/FindingSelector';
 import ControlSelector from '../components/ControlSelector';
 import SortableHeader from '../components/SortableHeader';
 import ExportPasswordDialog from '../components/ExportPasswordDialog';
+import AssessmentPicker from '../components/AssessmentPicker';
 import EmptyState from '../components/EmptyState';
 import ScoreSelect from '../components/ScoreSelect';
 
@@ -119,6 +120,9 @@ const Assessments = () => {
   // Export (optional password protection)
   const [showExportPasswordDialog, setShowExportPasswordDialog] = useState(false);
   const [showSingleExportPasswordDialog, setShowSingleExportPasswordDialog] = useState(false);
+  const [showExportAssessmentPicker, setShowExportAssessmentPicker] = useState(false);
+  // Selection carried between the picker and the password dialog; null = all
+  const [exportAssessmentIds, setExportAssessmentIds] = useState(null);
 
   // Post-create platform-check picker (plan PR-7)
   const [showPlatformPicker, setShowPlatformPicker] = useState(false);
@@ -1009,32 +1013,62 @@ Format as a numbered list. Be specific and actionable.`;
     e.target.value = '';
   }, [importAssessmentsCSV]);
 
+  // Two-step export: pick the assessments, then set an optional password.
+  // The picker hands back null when everything is selected, which is the
+  // historical export-everything path unchanged.
   const handleExportAll = useCallback(() => {
+    // Nothing to choose with 0 or 1 assessments — go straight to the password
+    // step rather than showing a picker whose confirm is disabled at zero.
+    if (assessments.length <= 1) {
+      setExportAssessmentIds(null);
+      setShowExportPasswordDialog(true);
+      return;
+    }
+    setShowExportAssessmentPicker(true);
+  }, [assessments.length]);
+
+  const handleCancelExportPicker = useCallback(() => {
+    setShowExportAssessmentPicker(false);
+  }, []);
+
+  const handleConfirmExportPicker = useCallback((assessmentIds) => {
+    setShowExportAssessmentPicker(false);
+    setExportAssessmentIds(assessmentIds);
     setShowExportPasswordDialog(true);
   }, []);
 
   const handleCancelExportAll = useCallback(() => {
     setShowExportPasswordDialog(false);
+    setExportAssessmentIds(null);
   }, []);
 
   const handleConfirmExportAll = useCallback(async (password) => {
     setShowExportPasswordDialog(false);
+    const assessmentIds = exportAssessmentIds;
+    setExportAssessmentIds(null);
     try {
       const trimmed = (password || '').trim();
       await exportAllAssessmentsCSV(useControlsStore, useRequirementsStore, useUserStore, {
-        password: trimmed
+        password: trimmed,
+        assessmentIds
       });
-      toast.success(trimmed ? 'Assessments exported (encrypted)' : 'Assessments exported');
+      const scopeNote = assessmentIds ? ` (${assessmentIds.length} selected)` : '';
+      toast.success(trimmed
+        ? `Assessments exported (encrypted)${scopeNote}`
+        : `Assessments exported${scopeNote}`);
     } catch (err) {
       console.error('Assessment export error:', err);
       toast.error('Export failed. Please verify the file and try again.');
     }
-  }, [exportAllAssessmentsCSV]);
+  }, [exportAllAssessmentsCSV, exportAssessmentIds]);
 
   const handleDownloadTemplate = useCallback(() => {
     const templateData = [
       {
         'ID': 'GV.OC-01 Ex1',
+        // Reference text only — the exporters join it in from the framework
+        // catalogue on the ID key, and the importer ignores whatever is here.
+        'Implementation Example': 'Ex1: Share the organization\'s mission and vision statements with third parties who have a role in achieving the mission',
         'Assessment': '2025 Security Assessment',
         'Scope Type': 'controls',
         'Auditor': 'Auditor Name <auditor@example.com>',
@@ -1079,7 +1113,7 @@ Format as a numbered list. Be specific and actionable.`;
     ];
 
     const headers = [
-      'ID', 'Assessment', 'Scope Type', 'Auditor', 'Test Procedure(s)',
+      'ID', 'Implementation Example', 'Assessment', 'Scope Type', 'Auditor', 'Test Procedure(s)',
       'Q1 Actual Score', 'Q1 Target Score', 'Q1 Observations', 'Q1 Observation Date', 'Q1 Testing Status', 'Q1 Examine', 'Q1 Interview', 'Q1 Test',
       'Q2 Actual Score', 'Q2 Target Score', 'Q2 Observations', 'Q2 Observation Date', 'Q2 Testing Status', 'Q2 Examine', 'Q2 Interview', 'Q2 Test',
       'Q3 Actual Score', 'Q3 Target Score', 'Q3 Observations', 'Q3 Observation Date', 'Q3 Testing Status', 'Q3 Examine', 'Q3 Interview', 'Q3 Test',
@@ -1136,7 +1170,7 @@ Format as a numbered list. Be specific and actionable.`;
           <button
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg"
             onClick={handleExportAll}
-            title="Export all assessments to CSV"
+            title="Choose assessments to export to CSV"
           >
             <Download size={16} />
             Export
@@ -2216,9 +2250,19 @@ Format as a numbered list. Be specific and actionable.`;
       {view === 'scope' && currentAssessment && renderScopeView()}
       {view === 'assess' && currentAssessment && renderAssessView()}
 
+      <AssessmentPicker
+        isOpen={showExportAssessmentPicker}
+        title="Export Assessments — choose which"
+        description="All assessments are selected by default. Narrow the list to export only the ones you need."
+        assessments={assessments}
+        onCancel={handleCancelExportPicker}
+        onConfirm={handleConfirmExportPicker}
+        confirmLabel="Continue"
+      />
+
       <ExportPasswordDialog
         isOpen={showExportPasswordDialog}
-        title="Export All Assessments"
+        title={exportAssessmentIds ? `Export ${exportAssessmentIds.length} Assessment${exportAssessmentIds.length === 1 ? '' : 's'}` : 'Export All Assessments'}
         description="Optionally set a password to encrypt the export before download."
         onCancel={handleCancelExportAll}
         onConfirm={handleConfirmExportAll}

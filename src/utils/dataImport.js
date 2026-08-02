@@ -136,6 +136,20 @@ export const validateDatabaseExport = (parsed) => {
     });
   }
 
+  // Selective exports (assessmentSelection.js) carry a provenance stamp. They
+  // are slices, not backups — and restore is a FULL REPLACE, so restoring one
+  // deletes every assessment the slice left behind. Warn, don't reject: a
+  // deliberate "give me only this assessment" restore is a legitimate move.
+  const selection = parsed.metadata?.assessmentSelection;
+  if (selection && typeof selection === 'object') {
+    const selected = selection.selectedCount ?? '?';
+    const total = selection.totalCount ?? '?';
+    warnings.push(
+      `This file is a SELECTIVE export (${selected} of ${total} assessments), not a complete backup. ` +
+      'Restoring it replaces all current data, so any assessment not in the file will be removed.'
+    );
+  }
+
   return { ok: errors.length === 0, errors, warnings, counts };
 };
 
