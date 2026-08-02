@@ -1161,13 +1161,15 @@ const useAssessmentsStore = create(
           entity: `${assessment.name} / ${itemId}`,
           before: currentQuarter,
           after: {
-            score: quarterData.score,
+            actualScore: quarterData.actualScore,
+            targetScore: quarterData.targetScore,
             testingStatus: quarterData.testingStatus,
             // compare the sanitized text that was actually persisted
             observations: quarterData.observations === undefined ? undefined : sanitizedQuarterData.observations
           },
           fields: [
-            { key: 'score', label: `${quarter} score`, action: 'score_changed' },
+            { key: 'actualScore', label: `${quarter} actualScore`, action: 'score_changed' },
+            { key: 'targetScore', label: `${quarter} targetScore`, action: 'score_changed' },
             { key: 'testingStatus', label: `${quarter} testingStatus`, action: 'status_changed' },
             { key: 'observations', label: `${quarter} observations`, action: 'observation_updated' }
           ]

@@ -90,11 +90,11 @@ describe('assessmentsStore wiring', () => {
       name: 'Quarterly Test', scopeIds: ['PR.DS-02'], scopeType: 'requirements'
     });
     useAssessmentsStore.getState().updateQuarterlyObservation(assessment.id, 'PR.DS-02', 'Q2', {
-      score: 7, observations: 'Improved coverage'
+      actualScore: 7, observations: 'Improved coverage'
     });
     const tid = evaluationTargetId(assessment.id, 'PR.DS-02');
     const fields = entriesFor('evaluation', tid).map(e => e.field);
-    expect(fields).toEqual(expect.arrayContaining(['Q2 score', 'Q2 observations']));
+    expect(fields).toEqual(expect.arrayContaining(['Q2 actualScore', 'Q2 observations']));
   });
 
   test('assessment create, rename, delete are logged', () => {

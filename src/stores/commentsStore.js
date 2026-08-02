@@ -33,8 +33,9 @@ export const segmentMentions = (text, users) => {
   let i = 0;
   while (i < value.length) {
     if (value[i] === '@') {
+      const nameStart = i + 1;
       const match = candidates.find(u =>
-        lower.startsWith(u.name.toLowerCase(), i + 1)
+        lower.startsWith(u.name.toLowerCase(), nameStart)
       );
       if (match) {
         if (i > plainStart) segments.push({ text: value.slice(plainStart, i) });
