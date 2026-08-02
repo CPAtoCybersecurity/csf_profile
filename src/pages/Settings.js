@@ -37,6 +37,7 @@ import useMetricsStore from '../stores/metricsStore';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import useInventoryStore from '../stores/inventoryStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
+import AssessmentPicker from '../components/AssessmentPicker';
 
 // Utils
 import { exportCompleteDatabase, exportAssessmentsJSON, exportShareableDatabase } from '../utils/dataExport';
@@ -104,6 +105,8 @@ const Settings = () => {
   const packImportRef = useRef(null);
   const [packPreview, setPackPreview] = useState(null); // { parsed, preview }
   const [includePackData, setIncludePackData] = useState(false);
+  // Which export is waiting on the assessment picker: 'complete' | 'assessments' | 'shareable' | null
+  const [pendingExport, setPendingExport] = useState(null);
   const metricsImportRef = useRef(null);
   const [metricsPreview, setMetricsPreview] = useState(null); // { validation, preview }
   const importedMetrics = useMetricsStore((s) => s.metrics);
@@ -118,30 +121,47 @@ const Settings = () => {
     return [...bySlug.values()].sort((a, b) => a.catalogSlug.localeCompare(b.catalogSlug));
   }, [importedMetrics]);
 
-  // Export handlers
-  const handleExportCompleteDatabase = useCallback(() => {
-    try {
-      exportCompleteDatabase({
-        controlsStore: useControlsStore,
-        assessmentsStore: useAssessmentsStore,
-        requirementsStore: useRequirementsStore,
-        frameworksStore: useFrameworksStore,
-        artifactStore: useArtifactStore,
-        userStore: useUserStore,
-        findingsStore: useFindingsStore,
-        metricsStore: useMetricsStore,
-        orgProfileStore: useOrgProfileStore,
-        inventoryStore: useInventoryStore
-      });
-      toast.success('Complete database exported as JSON');
-    } catch (err) {
-      console.error('Complete DB export error:', err);
-      toast.error('Export failed. Please try again.');
-    }
-  }, []);
+  // Export handlers.
+  //
+  // All three JSON exports route through AssessmentPicker first, so "export"
+  // means "export the assessments I chose" rather than "export everything".
+  // pendingExport names which one is waiting on the picker; the picker hands
+  // back `null` when every assessment is selected, and null flows straight
+  // through the export utils as "no narrowing".
+  const buildExportStores = useCallback(() => ({
+    controlsStore: useControlsStore,
+    assessmentsStore: useAssessmentsStore,
+    requirementsStore: useRequirementsStore,
+    frameworksStore: useFrameworksStore,
+    artifactStore: useArtifactStore,
+    userStore: useUserStore,
+    findingsStore: useFindingsStore,
+    metricsStore: useMetricsStore,
+    orgProfileStore: useOrgProfileStore,
+    inventoryStore: useInventoryStore
+  }), []);
 
-  const handleExportShareable = useCallback(() => {
+  const handleCancelExportPicker = useCallback(() => setPendingExport(null), []);
+
+  const runExport = useCallback((kind, assessmentIds) => {
+    if (!kind) return;
+
+    const scopeNote = assessmentIds ? ` (${assessmentIds.length} selected)` : '';
+
     try {
+      if (kind === 'complete') {
+        exportCompleteDatabase(buildExportStores(), { assessmentIds });
+        toast.success(`Complete database exported as JSON${scopeNote}`);
+        return;
+      }
+
+      if (kind === 'assessments') {
+        exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore, { assessmentIds });
+        toast.success(`Assessments exported as JSON${scopeNote}`);
+        return;
+      }
+
+      // kind === 'shareable'
       if (includePackData) {
         const confirmed = window.confirm(
           'Include private pack data in this export?\n\n' +
@@ -152,26 +172,35 @@ const Settings = () => {
         );
         if (!confirmed) return;
       }
-      exportShareableDatabase({
-        controlsStore: useControlsStore,
-        assessmentsStore: useAssessmentsStore,
-        requirementsStore: useRequirementsStore,
-        frameworksStore: useFrameworksStore,
-        artifactStore: useArtifactStore,
-        userStore: useUserStore,
-        findingsStore: useFindingsStore,
-        metricsStore: useMetricsStore,
-        orgProfileStore: useOrgProfileStore,
-        inventoryStore: useInventoryStore
-      }, { includePrivate: includePackData });
+      exportShareableDatabase(buildExportStores(), {
+        includePrivate: includePackData,
+        assessmentIds
+      });
       toast.success(includePackData
-        ? 'Export created WITH private pack data — handle with care'
-        : 'Shareable export created (private pack data excluded)');
+        ? `Export created WITH private pack data — handle with care${scopeNote}`
+        : `Shareable export created (private pack data excluded)${scopeNote}`);
     } catch (err) {
-      console.error('Shareable export error:', err);
+      console.error(`${kind} export error:`, err);
       toast.error('Export failed. Please try again.');
     }
-  }, [includePackData]);
+  }, [includePackData, buildExportStores]);
+
+  // With 0 or 1 assessments there is nothing to choose, and a picker whose
+  // confirm is disabled at zero-selected would hard-block a brand-new user from
+  // exporting at all. Go straight to the export in that case.
+  const startExport = useCallback((kind) => {
+    if (assessments.length <= 1) {
+      runExport(kind, null);
+      return;
+    }
+    setPendingExport(kind);
+  }, [assessments.length, runExport]);
+
+  const handleConfirmExportPicker = useCallback((assessmentIds) => {
+    const kind = pendingExport;
+    setPendingExport(null);
+    runExport(kind, assessmentIds);
+  }, [pendingExport, runExport]);
 
   // Pack import — preview first, no writes until the user confirms.
   const handlePackFileSelected = useCallback(async (e) => {
@@ -281,16 +310,6 @@ const Settings = () => {
     }
   }, []);
 
-  const handleExportAssessments = useCallback(() => {
-    try {
-      exportAssessmentsJSON(useAssessmentsStore, useControlsStore, useUserStore);
-      toast.success('Assessments exported as JSON');
-    } catch (err) {
-      console.error('Export assessments error:', err);
-      toast.error('Export failed. Please try again.');
-    }
-  }, []);
-
   // Restore handler — full replace of store data from a complete-database export.
   const handleRestoreDatabase = useCallback(async (e) => {
     const file = e.target.files?.[0];
@@ -322,9 +341,19 @@ const Settings = () => {
         .map(([section, count]) => `${section}: ${count}`)
         .join(', ');
       const warningText = validation.warnings.length ? `\n\nNote: ${validation.warnings.join(' ')}` : '';
+      // Name the number about to be destroyed, computed against CURRENT state.
+      // "this file is a slice" is a fact about the file; "11 of your 12
+      // assessments will be deleted" is a fact about what is about to happen,
+      // and only the second one reliably stops a reflex click.
+      const selection = parsed.metadata?.assessmentSelection;
+      const losing = selection ? assessments.length - (validation.counts.assessments ?? 0) : 0;
+      const destructionText = losing > 0
+        ? `\n\n⚠ You currently have ${assessments.length} assessment${assessments.length === 1 ? '' : 's'}; ` +
+          `this file has ${validation.counts.assessments}. Restoring it DELETES ${losing} of yours.`
+        : '';
       const confirmed = window.confirm(
         `RESTORE DATABASE — this REPLACES your current data.\n\n` +
-        `File contains — ${summary}.${warningText}\n\n` +
+        `File contains — ${summary}.${warningText}${destructionText}\n\n` +
         `A backup download of your current data will be ATTEMPTED first ` +
         `(csf_pre_restore_*.backup.json) — browsers cannot guarantee it lands, ` +
         `so only continue if you also have a recent export of your own. Continue?`
@@ -337,7 +366,7 @@ const Settings = () => {
       console.error('Database restore error:', err);
       toast.error(err.message || 'Restore failed. Please verify the file and try again.');
     }
-  }, []);
+  }, [assessments.length]);
 
   // Get requirement count for each framework
   const getFrameworkStats = useCallback((frameworkId) => {
@@ -866,21 +895,21 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             <div className="flex flex-wrap gap-2">
               <button
                 className="btn-terminal"
-                onClick={handleExportCompleteDatabase}
+                onClick={() => startExport('complete')}
               >
                 <Download size={14} />
                 Complete Database
               </button>
               <button
                 className="btn-terminal"
-                onClick={handleExportAssessments}
+                onClick={() => startExport('assessments')}
               >
                 <Download size={14} />
                 Assessments Only
               </button>
               <button
                 className="btn-terminal"
-                onClick={handleExportShareable}
+                onClick={() => startExport('shareable')}
               >
                 <Download size={14} />
                 Shareable Copy
@@ -894,6 +923,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             </p>
             <p className="settings-section-desc mt-2">
               <strong>Shareable Copy:</strong> Same as Complete Database but excludes private data-pack records by default (csf_share_YYYY-MM-DD.json) — safe for demos and sharing
+            </p>
+            <p className="settings-section-desc mt-2">
+              <strong>Choosing assessments:</strong> every button above opens a picker with all
+              assessments selected. Leave it as-is for the usual full export, or narrow it to
+              export a slice. A slice drops the findings and evidence artifacts belonging to the
+              assessments you left out, and its filename is marked <code>_subset</code> so it is
+              never mistaken for a full backup at restore time.
             </p>
             <label className="flex items-center gap-2 settings-section-desc mt-2" style={{ cursor: 'pointer' }}>
               <input
@@ -1550,6 +1586,23 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
       {showOrgProfileWizard && (
         <OrgProfileWizard onClose={() => setShowOrgProfileWizard(false)} />
       )}
+
+      <AssessmentPicker
+        isOpen={pendingExport !== null}
+        title={
+          pendingExport === 'complete' ? 'Complete Database — choose assessments'
+            : pendingExport === 'shareable' ? 'Shareable Copy — choose assessments'
+              : 'Assessments Only — choose assessments'
+        }
+        description={
+          pendingExport === 'complete'
+            ? 'Everything is selected by default, which produces the usual full backup. Narrow it to export a slice instead.'
+            : 'Everything is selected by default. Narrow it to export only the assessments you need.'
+        }
+        assessments={assessments}
+        onCancel={handleCancelExportPicker}
+        onConfirm={handleConfirmExportPicker}
+      />
     </div>
   );
 };

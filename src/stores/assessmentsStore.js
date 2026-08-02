@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { quotaSafeLocalStorage } from '../utils/safeStorage';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
-import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
+import { sanitizeInput, escapeCSVValue, csvFormulaGuard } from '../utils/sanitize';
 import { normalizeExternalTracking, normalizeExternalLinks } from '../utils/externalLinks';
 import { buildEncryptedFilename, encryptBytesWithPassword } from '../utils/exportEncryption';
 import {
@@ -76,6 +76,29 @@ const createDefaultQuarters = () => ({
   Q3: createDefaultQuarter(),
   Q4: createDefaultQuarter()
 });
+
+/**
+ * The framework's implementation-example text for a scope item, keyed on the
+ * same requirement id the CSV's `ID` column carries (`GV.SC-04 Ex1`). The `ID`
+ * alone is opaque — this column is what makes an exported assessment readable
+ * without a second lookup against the framework catalogue, matching the
+ * reference workbook in GET_THE_SPREADSHEETS/.
+ *
+ * Read-only FRAMEWORK data, not observation data. It is exported for
+ * readability and deliberately ignored by importAssessmentsCSV: writing it
+ * back would fork the NIST text into a second, divergent copy living inside
+ * user-owned observation state.
+ *
+ * Controls-scoped assessments get an empty cell rather than a control's
+ * `implementationDescription` — those are different things (the reference
+ * workbook carries both as separate columns), and emitting one under the
+ * other's header would mislabel it.
+ */
+const getRequirementImplementationExample = (assessment, requirementsStore, itemId) => {
+  if (assessment?.scopeType === 'controls') return '';
+  const req = requirementsStore?.getState?.()?.getRequirement?.(itemId);
+  return req?.implementationExample || '';
+};
 
 // Helper to migrate old observation format to new quarterly format
 const migrateObservationToQuarterly = (oldObs) => {
@@ -1055,6 +1078,9 @@ const useAssessmentsStore = create(
           }
         };
 
+        const getImplementationExample = (itemId) =>
+          getRequirementImplementationExample(assessment, requirementsStore, itemId);
+
         const csvData = assessment.scopeIds.map(itemId => {
           const rawObs = assessment.observations[itemId] || {};
           const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
@@ -1062,6 +1088,10 @@ const useAssessmentsStore = create(
 
           const row = {
             'ID': escapeCSVValue(getItemName(itemId)),
+            // csvFormulaGuard, not escapeCSVValue: this is long free prose that
+            // routinely contains commas and apostrophes, and escapeCSVValue
+            // wraps-and-quotes on top of Papa's own quoting (see sanitize.js).
+            'Implementation Example': csvFormulaGuard(getImplementationExample(itemId)),
             'Assessment': escapeCSVValue(assessment.name),
             'Scope Type': escapeCSVValue(assessment.scopeType),
             'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
@@ -1145,6 +1175,15 @@ const useAssessmentsStore = create(
       },
 
       // Import assessments from CSV with quarterly columns support
+      //
+      // The `Implementation Example` column the exporters emit is READ ON
+      // PURPOSE BY NOTHING here. It is framework reference text owned by
+      // requirementsStore (loaded from Confluence-Requirements.csv), joined
+      // into the export on the `ID` key for readability. Round-tripping it
+      // into observations[itemId] would create a second copy of the NIST text
+      // inside user data, free to diverge from the catalogue. Unknown columns
+      // are inert under Papa's header mode, so the file imports unchanged.
+      //
       // Supports both standard format AND Jira EVAL format:
       // - Jira Epic (Issue Type = "Epic") → React Assessment
       // - Jira Work paper with Parent/Parent key → React Observation within that Assessment
@@ -1732,8 +1771,13 @@ const useAssessmentsStore = create(
       },
 
       // Export all assessments to CSV with quarterly columns
-      exportAllAssessmentsCSV: async (controlsStore, requirementsStore, userStore, { password } = {}) => {
-        const assessments = get().assessments;
+      // `assessmentIds` narrows the export to a chosen subset; null/omitted
+      // keeps the historical export-everything behaviour byte-for-byte.
+      exportAllAssessmentsCSV: async (controlsStore, requirementsStore, userStore, { password, assessmentIds = null } = {}) => {
+        const allAssessments = get().assessments;
+        const wanted = Array.isArray(assessmentIds) ? new Set(assessmentIds) : null;
+        const assessments = wanted ? allAssessments.filter(a => wanted.has(a?.id)) : allAssessments;
+        const isSubset = assessments.length < allAssessments.length;
         if (assessments.length === 0) return;
 
         const users = userStore?.getState?.()?.users || [];
@@ -1756,6 +1800,9 @@ const useAssessmentsStore = create(
             }
           };
 
+          const getImplementationExample = (itemId) =>
+            getRequirementImplementationExample(assessment, requirementsStore, itemId);
+
           assessment.scopeIds.forEach(itemId => {
             const rawObs = assessment.observations[itemId] || {};
             const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
@@ -1763,6 +1810,9 @@ const useAssessmentsStore = create(
 
             const row = {
               'ID': escapeCSVValue(getItemName(itemId)),
+              // See the single-assessment exporter above for why this column
+              // uses csvFormulaGuard rather than escapeCSVValue.
+              'Implementation Example': csvFormulaGuard(getImplementationExample(itemId)),
               'Assessment': escapeCSVValue(assessment.name),
               'Description': escapeCSVValue(assessment.description || ''),
               'Scope Type': escapeCSVValue(assessment.scopeType),
@@ -1796,7 +1846,7 @@ const useAssessmentsStore = create(
 
         const csv = Papa.unparse(csvData);
         const date = new Date().toISOString().split('T')[0];
-        const baseFilename = `assessments_${date}.csv`;
+        const baseFilename = `assessments${isSubset ? '_subset' : ''}_${date}.csv`;
 
         let blob;
         let filename;
