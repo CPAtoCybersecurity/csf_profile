@@ -67,6 +67,18 @@ describe('RecordPanel', () => {
     expect(screen.getByText('@Nadia.Khan')).toBeInTheDocument();
   });
 
+  test('mention insertion is literal even for names with replacement patterns', () => {
+    useUserStore.setState({
+      users: [...USERS, { id: 9, name: 'Bad $& Actor', title: 'QA', email: 'b@x.com' }],
+      currentUserId: 1
+    });
+    render(<RecordPanel open onClose={() => {}} {...target} title="FND-panel-1" />);
+    const textarea = screen.getByPlaceholderText(/add a comment/i);
+    fireEvent.change(textarea, { target: { value: 'cc @Bad' } });
+    fireEvent.click(screen.getByText('Bad $& Actor'));
+    expect(textarea).toHaveValue('cc @Bad $& Actor ');
+  });
+
   test('History tab lists a scoped change with actor and old → new', () => {
     useAuditLogStore.getState().addEntry({
       action: 'finding_updated', entity: 'FND-panel-1', field: 'status',

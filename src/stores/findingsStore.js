@@ -4,6 +4,7 @@ import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
 import useAuditLogStore from './auditLogStore';
+import useCommentsStore from './commentsStore';
 import { COMPREHENSIVE_FINDINGS, COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { LEGACY_EXAMPLE_ASSESSMENT_IDS } from './assessmentsStore';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -169,6 +170,9 @@ const useFindingsStore = create(
           findings: state.findings.filter(f => f.id !== findingId)
         }));
         if (existing) {
+          // Discussion goes with the record (unreachable once deleted);
+          // the audit trail is retained.
+          useCommentsStore.getState().deleteCommentsFor('finding', findingId);
           useAuditLogStore.getState().addEntry({
             action: 'finding_deleted',
             entity: findingLabel(existing),

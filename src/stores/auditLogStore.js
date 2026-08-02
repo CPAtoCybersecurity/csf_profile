@@ -20,6 +20,12 @@ const MAX_VALUE_LENGTH = 120;
 // not one row per character.
 export const COALESCE_WINDOW_MS = 5 * 60 * 1000;
 
+// A change typed straight back to its original value is dropped as a no-op —
+// but ONLY at genuine keystroke/misclick grain. Past this window the trail
+// stays append-only: a deliberate A → B → A sequence keeps the A → B entry
+// and gains a B → A entry, so the log never loses evidence that B existed.
+export const REVERT_DROP_WINDOW_MS = 15 * 1000;
+
 const truncateValue = (v) => {
   if (v == null) return null;
   const s = String(v);
@@ -64,18 +70,24 @@ const useAuditLogStore = create(
           );
           if (idx !== -1 && now - new Date(entries[idx].timestamp).getTime() < COALESCE_WINDOW_MS) {
             const truncatedNew = truncateValue(newValue);
-            // Typed back to the original value — the net change is nothing;
-            // drop the entry entirely rather than logging a no-op. Only when
-            // the comparison is unambiguous: a truncated stored oldValue can
-            // no longer prove full-value equality, so it never triggers this.
+            // Typed back to the original value — at keystroke grain the net
+            // change is nothing, so drop the entry. Only when the comparison
+            // is unambiguous (a truncated stored oldValue can no longer prove
+            // full-value equality) AND within the tight revert window: a
+            // LATER revert falls through to append its own B → A entry, so
+            // the trail stays append-only for deliberate changes.
             const unambiguous = entries[idx].oldValue == null || entries[idx].oldValue.length < MAX_VALUE_LENGTH;
             if (unambiguous && entries[idx].oldValue === truncatedNew) {
-              set({ entries: entries.filter((_, i) => i !== idx) });
+              if (now - new Date(entries[idx].timestamp).getTime() < REVERT_DROP_WINDOW_MS) {
+                set({ entries: entries.filter((_, i) => i !== idx) });
+                return;
+              }
+              // fall through — append a new entry recording the revert
+            } else {
+              const updated = { ...entries[idx], newValue: truncatedNew, timestamp: new Date().toISOString() };
+              set({ entries: [updated, ...entries.filter((_, i) => i !== idx)].slice(0, MAX_ENTRIES) });
               return;
             }
-            const updated = { ...entries[idx], newValue: truncatedNew, timestamp: new Date().toISOString() };
-            set({ entries: [updated, ...entries.filter((_, i) => i !== idx)].slice(0, MAX_ENTRIES) });
-            return;
           }
         }
 

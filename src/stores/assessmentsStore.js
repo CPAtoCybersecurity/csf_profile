@@ -19,6 +19,7 @@ import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
 import { expandProcedureText } from '../utils/platformBank';
 import { cleanCommunityMarkdown } from '../utils/relatedSection.mjs';
 import useAuditLogStore from './auditLogStore';
+import useCommentsStore from './commentsStore';
 
 // The demo assessment's user roster (issue #297): the 8 shipped Alma
 // directory users, so the example demonstrates the per-assessment user scope
@@ -967,6 +968,9 @@ const useAssessmentsStore = create(
           set({ currentAssessmentId: null });
         }
         if (existing) {
+          // Sweep the assessment's discussion and every evaluation thread
+          // under it; the audit trail is retained.
+          useCommentsStore.getState().deleteCommentsForAssessment(assessmentId);
           useAuditLogStore.getState().addEntry({
             action: 'assessment_deleted',
             entity: existing.name,

@@ -155,6 +155,31 @@ const useCommentsStore = create(
         set({ comments: Array.isArray(comments) ? comments : [] });
       },
 
+      // Called by the record stores' delete paths: a deleted record's
+      // discussion is unreachable in the UI, and — because control ids are
+      // recycled (max+1) — leaving it behind would silently attach the old
+      // thread to a future unrelated record with the same id.
+      deleteCommentsFor: (targetType, targetId) => {
+        if (!targetType || !targetId) return;
+        set((state) => ({
+          comments: state.comments.filter(c => !(c.targetType === targetType && c.targetId === targetId))
+        }));
+      },
+
+      // Assessment deletion sweep: the assessment's own thread plus every
+      // evaluation-record thread under it (targetId `assessmentId::itemId`).
+      deleteCommentsForAssessment: (assessmentId) => {
+        if (!assessmentId) return;
+        const prefix = `${assessmentId}::`;
+        set((state) => ({
+          comments: state.comments.filter(c => {
+            if (c.targetType === 'assessment' && c.targetId === assessmentId) return false;
+            if (c.targetType === 'evaluation' && typeof c.targetId === 'string' && c.targetId.startsWith(prefix)) return false;
+            return true;
+          })
+        }));
+      },
+
       // Record-id rename support (controls key on user-editable controlId):
       // comments follow the record instead of orphaning.
       retargetComments: (targetType, oldTargetId, newTargetId) => {

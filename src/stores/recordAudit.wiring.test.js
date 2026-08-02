@@ -63,6 +63,43 @@ describe('controlsStore wiring', () => {
     expect(useControlsStore.getState().getControl('CTL-OLD')).toBeUndefined();
   });
 
+  test('empty or colliding controlId renames are refused at the producer', () => {
+    useControlsStore.getState().createControl({ controlId: 'CTL-KEEP-A', name: 'A' });
+    useControlsStore.getState().createControl({ controlId: 'CTL-KEEP-B', name: 'B' });
+    useControlsStore.getState().updateControl('CTL-KEEP-A', { controlId: '' });
+    useControlsStore.getState().updateControl('CTL-KEEP-A', { controlId: 'CTL-KEEP-B' });
+    // record keeps its id in both cases — no orphaning, no silent merge
+    expect(useControlsStore.getState().getControl('CTL-KEEP-A')).toBeTruthy();
+    expect(useControlsStore.getState().controls.filter(c => c.controlId === 'CTL-KEEP-B')).toHaveLength(1);
+  });
+
+  test('deleting a record removes its comments but keeps its audit trail', () => {
+    useCommentsStore.setState({ comments: [] });
+    const control = useControlsStore.getState().createControl({ controlId: 'CTL-GONE', name: 'G' });
+    useCommentsStore.getState().addComment({ targetType: 'control', targetId: 'CTL-GONE', text: 'orphan me not' });
+    useControlsStore.getState().deleteControl(control.controlId);
+    // comments gone (id recycling would re-attach them to a future control)
+    expect(useCommentsStore.getState().getComments('control', 'CTL-GONE')).toHaveLength(0);
+    // audit trail retained
+    const actions = entriesFor('control', 'CTL-GONE').map(e => e.action);
+    expect(actions).toContain('control_deleted');
+    expect(actions).toContain('control_created');
+  });
+
+  test('deleting an assessment sweeps its evaluation comment threads', () => {
+    useCommentsStore.setState({ comments: [] });
+    const assessment = useAssessmentsStore.getState().createAssessment({
+      name: 'Sweep', scopeIds: ['PR.DS-09'], scopeType: 'requirements'
+    });
+    useCommentsStore.getState().addComment({
+      targetType: 'evaluation', targetId: evaluationTargetId(assessment.id, 'PR.DS-09'), text: 'eval note'
+    });
+    useCommentsStore.getState().addComment({ targetType: 'control', targetId: 'CTL-UNRELATED', text: 'stays' });
+    useAssessmentsStore.getState().deleteAssessment(assessment.id);
+    expect(useCommentsStore.getState().getComments('evaluation', evaluationTargetId(assessment.id, 'PR.DS-09'))).toHaveLength(0);
+    expect(useCommentsStore.getState().getComments('control', 'CTL-UNRELATED')).toHaveLength(1);
+  });
+
   test('programmatic bulk auto-create does not flood the log', () => {
     useControlsStore.getState().ensureControlsForRequirements([
       { id: 'GV.OC-01' }, { id: 'GV.OC-02' }, { id: 'GV.OC-03' }

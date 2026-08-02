@@ -72,6 +72,11 @@ const RecordPanel = ({ open, onClose, targetType, targetId, title }) => {
   const [draft, setDraft] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   const [mentionQuery, setMentionQuery] = useState(null); // null = dropdown closed
+  // Ref mirror so the Escape handler can branch WITHOUT side effects inside
+  // a state updater (StrictMode double-invokes updaters; onClose in one is
+  // a render-phase setState hazard).
+  const mentionQueryRef = useRef(null);
+  mentionQueryRef.current = mentionQuery;
   const textareaRef = useRef(null);
 
   const users = useUserStore((state) => state.users);
@@ -100,11 +105,11 @@ const RecordPanel = ({ open, onClose, targetType, targetId, title }) => {
     const onKey = (e) => {
       if (e.key !== 'Escape') return;
       e.stopPropagation();
-      setMentionQuery((q) => {
-        if (q !== null) return null;
+      if (mentionQueryRef.current !== null) {
+        setMentionQuery(null);
+      } else {
         onClose();
-        return null;
-      });
+      }
     };
     document.addEventListener('keydown', onKey, true);
     return () => document.removeEventListener('keydown', onKey, true);
@@ -138,7 +143,9 @@ const RecordPanel = ({ open, onClose, targetType, targetId, title }) => {
     const el = textareaRef.current;
     const caret = el?.selectionStart ?? draft.length;
     const beforeCaret = draft.slice(0, caret);
-    const replaced = beforeCaret.replace(/@(\S*)$/, `@${user.name} `);
+    // Function replacer: a directory name containing $&, $1, $$ etc. must be
+    // inserted literally, not treated as a replacement pattern.
+    const replaced = beforeCaret.replace(/@(\S*)$/, () => `@${user.name} `);
     setDraft(replaced + draft.slice(caret));
     setMentionQuery(null);
     el?.focus();

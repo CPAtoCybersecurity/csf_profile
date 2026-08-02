@@ -3,7 +3,7 @@
  * coalescing, actor attribution (behavioral, via the production path), value
  * truncation, and CSV formula guarding.
  */
-import useAuditLogStore, { COALESCE_WINDOW_MS, getActorName } from './auditLogStore';
+import useAuditLogStore, { COALESCE_WINDOW_MS, REVERT_DROP_WINDOW_MS, getActorName } from './auditLogStore';
 import useUserStore from './userStore';
 
 const target = { targetType: 'control', targetId: 'CTL-1' };
@@ -70,6 +70,25 @@ describe('keystroke coalescing', () => {
     add({ action: 'control_updated', entity: 'e', field: 'name', oldValue: 'A', newValue: 'Ab', ...target });
     add({ action: 'control_updated', entity: 'e', field: 'name', oldValue: 'Ab', newValue: 'A', ...target });
     expect(useAuditLogStore.getState().entries).toHaveLength(0);
+  });
+
+  test('a DELIBERATE revert (outside the drop window) stays append-only', () => {
+    const add = useAuditLogStore.getState().addEntry;
+    add({ action: 'score_changed', entity: 'e', field: 'score', oldValue: '2', newValue: '5', ...target });
+    // age the entry past the revert-drop window but inside the coalesce window
+    const aged = useAuditLogStore.getState().entries.map(e => ({
+      ...e,
+      timestamp: new Date(Date.now() - REVERT_DROP_WINDOW_MS - 1000).toISOString()
+    }));
+    useAuditLogStore.setState({ entries: aged });
+    add({ action: 'score_changed', entity: 'e', field: 'score', oldValue: '5', newValue: '2', ...target });
+    const entries = useAuditLogStore.getState().entries;
+    // both the 2 → 5 and the 5 → 2 rows survive — evidence that 5 existed
+    expect(entries).toHaveLength(2);
+    expect(entries[0].oldValue).toBe('5');
+    expect(entries[0].newValue).toBe('2');
+    expect(entries[1].oldValue).toBe('2');
+    expect(entries[1].newValue).toBe('5');
   });
 
   test('a different field or record never coalesces', () => {
