@@ -151,9 +151,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1009,
     "artifactId": "AR-110",
-    "name": "Incident Response Playbook (Excerpt)",
-    "description": "Catalog evidence: PROC-incident-response-playbook.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-incident-response-playbook.md",
+    "name": "Evidence Preservation Guide (Excerpt)",
+    "description": "Catalog evidence: PROC-evidence-preservation-guide.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-evidence-preservation-guide.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -167,9 +167,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1010,
     "artifactId": "AR-111",
-    "name": "Patch Management Procedure",
-    "description": "Catalog evidence: PROC-patch-management.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-patch-management.md",
+    "name": "Incident Response Playbook (Excerpt)",
+    "description": "Catalog evidence: PROC-incident-response-playbook.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-incident-response-playbook.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -183,9 +183,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1011,
     "artifactId": "AR-112",
-    "name": "Hardware Inventory Sampling Walkthrough",
-    "description": "Catalog evidence: PROC-sampling-walkthrough.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-sampling-walkthrough.md",
+    "name": "Patch Management Procedure",
+    "description": "Catalog evidence: PROC-patch-management.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-patch-management.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -199,14 +199,14 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1012,
     "artifactId": "AR-113",
-    "name": "Q4 2025 Access Recertification Report",
-    "description": "Catalog evidence: RPT-access-certification-q4.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-access-certification-q4.md",
+    "name": "Hardware Inventory Sampling Walkthrough",
+    "description": "Catalog evidence: PROC-sampling-walkthrough.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-sampling-walkthrough.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
     "linkedEvaluationIds": [],
-    "type": "Report",
+    "type": "Procedure",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
     "jiraKey": "AR-113",
@@ -215,9 +215,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1013,
     "artifactId": "AR-114",
-    "name": "AWS Tag Compliance Report",
-    "description": "Catalog evidence: RPT-aws-tag-compliance.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-aws-tag-compliance.md",
+    "name": "Q4 2025 Access Recertification Report",
+    "description": "Catalog evidence: RPT-access-certification-q4.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-access-certification-q4.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -231,9 +231,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1014,
     "artifactId": "AR-115",
-    "name": "Quarterly Backup Restore Test Report",
-    "description": "Catalog evidence: RPT-backup-restore-test.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-backup-restore-test.md",
+    "name": "AWS Tag Compliance Report",
+    "description": "Catalog evidence: RPT-aws-tag-compliance.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-aws-tag-compliance.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -247,9 +247,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1015,
     "artifactId": "AR-116",
-    "name": "Network Discovery Scan Results",
-    "description": "Catalog evidence: RPT-nmap-scan-results.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-nmap-scan-results.md",
+    "name": "Quarterly Backup Restore Test Report",
+    "description": "Catalog evidence: RPT-backup-restore-test.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-backup-restore-test.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -263,9 +263,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1016,
     "artifactId": "AR-117",
-    "name": "Q1 2026 Phishing Simulation Report",
-    "description": "Catalog evidence: RPT-phishing-simulation-q1.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-phishing-simulation-q1.md",
+    "name": "Network Discovery Scan Results",
+    "description": "Catalog evidence: RPT-nmap-scan-results.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-nmap-scan-results.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -279,9 +279,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1017,
     "artifactId": "AR-118",
-    "name": "Weekly Vulnerability Scan Summary",
-    "description": "Catalog evidence: RPT-vulnerability-scan-summary.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-vulnerability-scan-summary.md",
+    "name": "Q1 2026 Phishing Simulation Report",
+    "description": "Catalog evidence: RPT-phishing-simulation-q1.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-phishing-simulation-q1.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -295,14 +295,14 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1018,
     "artifactId": "AR-119",
-    "name": "Alma Security Hardware Inventory",
-    "description": "Catalog evidence: INV-hardware-inventory.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Inventories/INV-hardware-inventory.md",
+    "name": "Weekly Vulnerability Scan Summary",
+    "description": "Catalog evidence: RPT-vulnerability-scan-summary.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Reports/RPT-vulnerability-scan-summary.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
     "linkedEvaluationIds": [],
-    "type": "Inventory",
+    "type": "Report",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
     "jiraKey": "AR-119",
@@ -311,9 +311,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1019,
     "artifactId": "AR-120",
-    "name": "Service Account Inventory",
-    "description": "Catalog evidence: INV-service-accounts.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Inventories/INV-service-accounts.md",
+    "name": "Alma Security Hardware Inventory",
+    "description": "Catalog evidence: INV-hardware-inventory.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Inventories/INV-hardware-inventory.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -327,9 +327,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1020,
     "artifactId": "AR-121",
-    "name": "Authorized Software Inventory",
-    "description": "Catalog evidence: INV-software-inventory.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Inventories/INV-software-inventory.md",
+    "name": "Service Account Inventory",
+    "description": "Catalog evidence: INV-service-accounts.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Inventories/INV-service-accounts.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -343,14 +343,14 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1021,
     "artifactId": "AR-122",
-    "name": "SOC Incident Ticket",
-    "description": "Catalog evidence: TKT-SOC-1001-phishing.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1001-phishing.md",
+    "name": "Authorized Software Inventory",
+    "description": "Catalog evidence: INV-software-inventory.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Inventories/INV-software-inventory.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
     "linkedEvaluationIds": [],
-    "type": "Ticket",
+    "type": "Inventory",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
     "jiraKey": "AR-122",
@@ -360,8 +360,8 @@ export const COMPREHENSIVE_ARTIFACTS = [
     "id": 1022,
     "artifactId": "AR-123",
     "name": "SOC Incident Ticket",
-    "description": "Catalog evidence: TKT-SOC-1004.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1004.md",
+    "description": "Catalog evidence: TKT-SOC-1001-phishing.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1001-phishing.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -376,8 +376,8 @@ export const COMPREHENSIVE_ARTIFACTS = [
     "id": 1023,
     "artifactId": "AR-124",
     "name": "SOC Incident Ticket",
-    "description": "Catalog evidence: TKT-SOC-1005.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1005.md",
+    "description": "Catalog evidence: TKT-SOC-1004.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1004.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -391,14 +391,14 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1024,
     "artifactId": "AR-125",
-    "name": "GV.RM — Risk Management Strategy: Assessment Artifacts",
-    "description": "Catalog evidence: EVD-GV.RM-02-assessment-artifacts.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-GV.RM-02-assessment-artifacts.md",
+    "name": "SOC Incident Ticket",
+    "description": "Catalog evidence: TKT-SOC-1005.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Tickets/TKT-SOC-1005.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
     "linkedEvaluationIds": [],
-    "type": "Evidence",
+    "type": "Ticket",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
     "jiraKey": "AR-125",
@@ -407,9 +407,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1025,
     "artifactId": "AR-126",
-    "name": "PR.IP Assessment Artifacts",
-    "description": "Catalog evidence: EVD-PR.IP-assessment-artifacts.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-PR.IP-assessment-artifacts.md",
+    "name": "GV.RM — Risk Management Strategy: Assessment Artifacts",
+    "description": "Catalog evidence: EVD-GV.RM-02-assessment-artifacts.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-GV.RM-02-assessment-artifacts.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -423,9 +423,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1026,
     "artifactId": "AR-127",
-    "name": "Alma Security Business Case",
-    "description": "Catalog evidence: EVD-alma-business-case.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-alma-business-case.md",
+    "name": "PR.IP Assessment Artifacts",
+    "description": "Catalog evidence: EVD-PR.IP-assessment-artifacts.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-PR.IP-assessment-artifacts.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -439,9 +439,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1027,
     "artifactId": "AR-128",
-    "name": "AWS Config Compliance Snapshot",
-    "description": "Catalog evidence: EVD-aws-config-compliance.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-aws-config-compliance.md",
+    "name": "Alma Security Business Case",
+    "description": "Catalog evidence: EVD-alma-business-case.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-alma-business-case.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -455,9 +455,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1028,
     "artifactId": "AR-129",
-    "name": "�-k_�&D��_�\u0016T�s��R��&�l�A���nY�w\u0004�5?�J�I\u0010\u000e�T;P���8N��d�tz��^l9�0nm�z�d�5��\u000bb�c�'�hW�qDh�6�6$��GQK-VH�5Q��>l*{\u0017<SF+w�/V\u0007��]�V���-3������O��wn#�9\u0003\u001c8:&'\t��\bP^�R�k��T��H*hA���#ȫ�Ÿ\u00133}?��\u0001o\u000f�����B\u0012\r�Ҳ{1u���m��V�P�\u0010C�4�\u000b\r��\u0019V\u0000�\u0010��ޓ��}#:$�X�D�<e����\u0014k0\u0011�@\u001a߄���c����-�5�ox��v�������\u0018\"�;\u001a��}8h)��h�+\u001f\u0003�6�\u0011��\u001f��X�\u0002]o\u0017�t�\u001b��*��=�zl���D��{J\u001b��\u000bMW4`\b���]�ܩ+\u001a�ʖI\u0007�\u0010�t�\u0019Ow�¥^Dr7�\u00024zK��։tX�Q�\u001b�[�q���\u0011T^�R4Y��-ȁ)X!�1�R�\u0011l�-�H]NG\u0003�\u0001�qe��T���&��E�~��W�c�U�\t6��\u0004h�몧�眂c�����TB�җ�!�/�mL{w������!�\u001e�����C<1�N唕��M\u0011�NI��|l��+�I'f\u0011�ao�k��\u001fRm+i�/9�6���#�0��\u0007HsfX��VK.�I��\u0001p&FU���8�'2�\u0017�Կ\u0000}���8:L3�M���J]�T�ޖ5� ]\u0018+e�~<h  ���@&\u001bz^E�n\u0002��D\u0000��2]\t�",
-    "description": "Catalog evidence: EVD-csf-assessment-workbook.xlsx",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-csf-assessment-workbook.xlsx",
+    "name": "AWS Config Compliance Snapshot",
+    "description": "Catalog evidence: EVD-aws-config-compliance.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-aws-config-compliance.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -472,8 +472,8 @@ export const COMPREHENSIVE_ARTIFACTS = [
     "id": 1029,
     "artifactId": "AR-130",
     "name": "�-k_�&D��_�\u0016T�s��R��&�l�A���nY�w\u0004�5?�J�I\u0010\u000e�T;P���8N��d�tz��^l9�0nm�z�d�5��\u000bb�c�'�hW�qDh�6�6$��GQK-VH�5Q��>l*{\u0017<SF+w�/V\u0007��]�V���-3������O��wn#�9\u0003\u001c8:&'\t��\bP^�R�k��T��H*hA���#ȫ�Ÿ\u00133}?��\u0001o\u000f�����B\u0012\r�Ҳ{1u���m��V�P�\u0010C�4�\u000b\r��\u0019V\u0000�\u0010��ޓ��}#:$�X�D�<e����\u0014k0\u0011�@\u001a߄���c����-�5�ox��v�������\u0018\"�;\u001a��}8h)��h�+\u001f\u0003�6�\u0011��\u001f��X�\u0002]o\u0017�t�\u001b��*��=�zl���D��{J\u001b��\u000bMW4`\b���]�ܩ+\u001a�ʖI\u0007�\u0010�t�\u0019Ow�¥^Dr7�\u00024zK��։tX�Q�\u001b�[�q���\u0011T^�R4Y��-ȁ)X!�1�R�\u0011l�-�H]NG\u0003�\u0001�qe��T���&��E�~��W�c�U�\t6��\u0004h�몧�眂c�����TB�җ�!�/�mL{w������!�\u001e�����C<1�N唕��M\u0011�NI��|l��+�I'f\u0011�ao�k��\u001fRm+i�/9�6���#�0��\u0007HsfX��VK.�I��\u0001p&FU���8�'2�\u0017�Կ\u0000}���8:L3�M���J]�T�ޖ5� ]\u0018+e�~<h  ���@&\u001bz^E�n\u0002��D\u0000��2]\t�",
-    "description": "Catalog evidence: EVD-phish-campaign-2025-05-26.xlsx",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx",
+    "description": "Catalog evidence: EVD-csf-assessment-workbook.xlsx",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-csf-assessment-workbook.xlsx",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -487,9 +487,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1030,
     "artifactId": "AR-131",
-    "name": "Security Awareness Program — Alma Security",
-    "description": "Catalog evidence: EVD-security-awareness-program.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-security-awareness-program.md",
+    "name": "�-k_�&D��_�\u0016T�s��R��&�l�A���nY�w\u0004�5?�J�I\u0010\u000e�T;P���8N��d�tz��^l9�0nm�z�d�5��\u000bb�c�'�hW�qDh�6�6$��GQK-VH�5Q��>l*{\u0017<SF+w�/V\u0007��]�V���-3������O��wn#�9\u0003\u001c8:&'\t��\bP^�R�k��T��H*hA���#ȫ�Ÿ\u00133}?��\u0001o\u000f�����B\u0012\r�Ҳ{1u���m��V�P�\u0010C�4�\u000b\r��\u0019V\u0000�\u0010��ޓ��}#:$�X�D�<e����\u0014k0\u0011�@\u001a߄���c����-�5�ox��v�������\u0018\"�;\u001a��}8h)��h�+\u001f\u0003�6�\u0011��\u001f��X�\u0002]o\u0017�t�\u001b��*��=�zl���D��{J\u001b��\u000bMW4`\b���]�ܩ+\u001a�ʖI\u0007�\u0010�t�\u0019Ow�¥^Dr7�\u00024zK��։tX�Q�\u001b�[�q���\u0011T^�R4Y��-ȁ)X!�1�R�\u0011l�-�H]NG\u0003�\u0001�qe��T���&��E�~��W�c�U�\t6��\u0004h�몧�眂c�����TB�җ�!�/�mL{w������!�\u001e�����C<1�N唕��M\u0011�NI��|l��+�I'f\u0011�ao�k��\u001fRm+i�/9�6���#�0��\u0007HsfX��VK.�I��\u0001p&FU���8�'2�\u0017�Կ\u0000}���8:L3�M���J]�T�ޖ5� ]\u0018+e�~<h  ���@&\u001bz^E�n\u0002��D\u0000��2]\t�",
+    "description": "Catalog evidence: EVD-phish-campaign-2025-05-26.xlsx",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-phish-campaign-2025-05-26.xlsx",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -503,9 +503,9 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1031,
     "artifactId": "AR-132",
-    "name": "SentinelOne Application Control Configuration Evidence",
-    "description": "Catalog evidence: EVD-sentinelone-app-control.md",
-    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-sentinelone-app-control.md",
+    "name": "Security Awareness Program — Alma Security",
+    "description": "Catalog evidence: EVD-security-awareness-program.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-security-awareness-program.md",
     "complianceRequirement": null,
     "controlId": null,
     "linkedSubcategoryIds": [],
@@ -519,6 +519,22 @@ export const COMPREHENSIVE_ARTIFACTS = [
   {
     "id": 1032,
     "artifactId": "AR-133",
+    "name": "SentinelOne Application Control Configuration Evidence",
+    "description": "Catalog evidence: EVD-sentinelone-app-control.md",
+    "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-sentinelone-app-control.md",
+    "complianceRequirement": null,
+    "controlId": null,
+    "linkedSubcategoryIds": [],
+    "linkedEvaluationIds": [],
+    "type": "Evidence",
+    "createdDate": "2026-04-30T00:00:00.000Z",
+    "lastModified": "2026-04-30T00:00:00.000Z",
+    "jiraKey": "AR-133",
+    "status": "ACTIVE"
+  },
+  {
+    "id": 1033,
+    "artifactId": "AR-134",
     "name": "Q1 2026 Security Awareness Training Completion Evidence",
     "description": "Catalog evidence: EVD-training-completion-q1.md",
     "link": "https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Evidence/EVD-training-completion-q1.md",
@@ -529,7 +545,7 @@ export const COMPREHENSIVE_ARTIFACTS = [
     "type": "Evidence",
     "createdDate": "2026-04-30T00:00:00.000Z",
     "lastModified": "2026-04-30T00:00:00.000Z",
-    "jiraKey": "AR-133",
+    "jiraKey": "AR-134",
     "status": "ACTIVE"
   }
 ];
@@ -649,7 +665,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.AE-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -717,7 +733,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.AE-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -785,7 +801,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.AE-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -853,7 +869,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.AE-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -921,7 +937,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.AE-07",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -990,7 +1006,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.AE-08",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1058,7 +1074,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.CM-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1126,7 +1142,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.CM-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1193,7 +1209,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.CM-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1262,7 +1278,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.CM-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1330,7 +1346,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "DE.CM-09",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1399,7 +1415,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OC-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1464,7 +1480,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OC-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1530,7 +1546,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OC-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1595,7 +1611,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OC-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1660,7 +1676,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OC-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1726,7 +1742,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OV-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1791,7 +1807,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.OV-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1856,7 +1872,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.PO-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1920,7 +1936,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.PO-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -1984,7 +2000,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2048,7 +2064,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2112,7 +2128,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2174,7 +2190,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2239,7 +2255,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2303,7 +2319,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2367,7 +2383,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RM-07",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2431,7 +2447,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RR-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2495,7 +2511,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RR-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2559,7 +2575,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RR-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2623,7 +2639,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.RR-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2688,7 +2704,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2752,7 +2768,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2816,7 +2832,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2881,7 +2897,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -2943,7 +2959,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3007,7 +3023,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3071,7 +3087,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-07",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3135,7 +3151,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-08",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3199,7 +3215,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-09",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3264,7 +3280,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "GV.SC-10",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3329,7 +3345,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3396,7 +3412,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3459,7 +3475,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3522,7 +3538,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3585,7 +3601,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3648,7 +3664,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-07",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3711,7 +3727,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.AM-08",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3774,7 +3790,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.IM-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3837,7 +3853,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.IM-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3900,7 +3916,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.IM-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -3963,7 +3979,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.IM-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4026,7 +4042,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4089,7 +4105,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4152,7 +4168,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4215,7 +4231,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4278,7 +4294,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4341,7 +4357,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4404,7 +4420,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-07",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4467,7 +4483,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-08",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4530,7 +4546,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-09",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4593,7 +4609,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "ID.RA-10",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4656,7 +4672,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AA-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4725,7 +4741,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AA-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4793,7 +4809,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AA-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4863,7 +4879,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AA-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -4933,7 +4949,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AA-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5001,7 +5017,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AA-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5071,7 +5087,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AT-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5139,7 +5155,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.AT-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5209,7 +5225,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.DS-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5280,7 +5296,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.DS-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5351,7 +5367,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.DS-10",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5422,7 +5438,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.DS-11",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5495,7 +5511,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.IR-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5565,7 +5581,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.IR-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5635,7 +5651,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.IR-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5705,7 +5721,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.IR-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5778,7 +5794,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.PS-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5847,7 +5863,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.PS-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5918,7 +5934,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.PS-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -5989,7 +6005,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.PS-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6060,7 +6076,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.PS-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6131,7 +6147,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "PR.PS-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6205,7 +6221,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.CO-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6273,7 +6289,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.CO-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6341,7 +6357,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.RP-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6409,7 +6425,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.RP-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6477,7 +6493,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.RP-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6545,7 +6561,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.RP-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6613,7 +6629,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.RP-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6681,7 +6697,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RC.RP-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6748,7 +6764,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.AN-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6812,11 +6828,11 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.AN-06 Ex1": {
     "auditorId": 2,
-    "testProcedures": "# RS.AN-06: Investigation Action Recording Test Procedures\n\n**CSF Subcategory:** RS.AN-06 - Actions performed during an investigation are recorded, and the records' integrity and provenance are preserved\n\n---\n\n## Test Procedures\n\n1. **Review investigation documentation requirements**\n   - Obtain incident response policy sections governing investigation record-keeping\n   - Verify requirements for individual responder action logging during incidents\n   - Confirm the incident lead role and responsibilities for documentation oversight are defined\n   - Check that evidence chain-of-custody procedures are documented\n\n2. **Examine investigation records for completeness**\n   - Pull 3-5 recent incident tickets from ServiceNow (TKT-SOC series)\n   - Verify each ticket contains timestamped action logs from individual responders\n   - Confirm the incident lead documented the incident narrative with supporting evidence\n   - Check that all investigation steps are traceable and attributed to specific personnel\n\n3. **Validate record integrity and preservation controls**\n   - Review ServiceNow audit logging configuration for SOC ticket modifications\n   - Verify incident records cannot be altered without audit trail\n   - Confirm evidence storage locations have access controls and integrity verification\n   - Check retention periods for investigation records against policy requirements\n\n4. **Test provenance tracking for collected evidence**\n   - Select a recent incident and trace evidence from collection through analysis\n   - Verify evidence items are cataloged with source, collector, timestamp, and hash values\n   - Confirm digital evidence handling follows documented forensic procedures\n   - Check that evidence is stored in tamper-evident or write-once storage\n\n---\n\n## Evidence Requests\n\n- [ ] Incident response policy (investigation documentation section)\n- [ ] 3-5 ServiceNow SOC tickets with investigation action logs\n- [ ] ServiceNow audit log configuration for incident tickets\n- [ ] Evidence chain-of-custody procedures\n- [ ] Evidence storage access control configuration\n- [ ] Incident record retention policy\n- [ ] Sample evidence catalog from a recent incident\n\n---\n\n## Notes\n\nThis test procedure validates that investigation actions are systematically recorded with integrity and provenance controls. Mature organizations maintain detailed, tamper-evident investigation logs attributed to individual responders, with the incident lead responsible for comprehensive documentation. The integrity of these records is critical for post-incident reviews, legal proceedings, and regulatory compliance. ServiceNow ticket audit trails provide a baseline, but dedicated evidence management may be needed for complex incidents.",
+    "testProcedures": "# RS.AN-06: Investigation Action Recording Test Procedures\n\n**CSF Subcategory:** RS.AN-06 - Actions performed during an investigation are recorded, and the records' integrity and provenance are preserved\n\n---\n\n## Test Procedures\n\n1. **Review investigation documentation requirements**\n   - Obtain incident response policy sections governing investigation record-keeping\n   - Verify requirements for individual responder action logging during incidents\n   - Confirm the incident lead role and responsibilities for documentation oversight are defined\n   - Check that evidence chain-of-custody procedures are documented\n\n2. **Examine investigation records for completeness**\n   - Pull 3-5 recent incident tickets from ServiceNow (TKT-SOC series)\n   - Verify each ticket contains timestamped action logs from individual responders\n   - Confirm the incident lead documented the incident narrative with supporting evidence\n   - Check that all investigation steps are traceable and attributed to specific personnel\n\n3. **Validate record integrity and preservation controls**\n   - Review ServiceNow audit logging configuration for SOC ticket modifications\n   - Verify incident records cannot be altered without audit trail\n   - Confirm evidence storage locations have access controls and integrity verification\n   - Check retention periods for investigation records against policy requirements\n\n4. **Test provenance tracking for collected evidence**\n   - Select a recent incident and trace evidence from collection through analysis\n   - Verify evidence items are cataloged with source, collector, timestamp, and hash values\n   - Confirm digital evidence handling follows documented forensic procedures\n   - Check that evidence is stored in tamper-evident or write-once storage\n\n---\n\n## Evidence Requests\n\n- [ ] Incident response policy (investigation documentation section)\n- [ ] 3-5 ServiceNow SOC tickets with investigation action logs\n- [ ] ServiceNow audit log configuration for incident tickets\n- [ ] Evidence chain-of-custody procedures\n- [ ] Evidence storage access control configuration\n- [ ] Incident record retention policy\n- [ ] Sample evidence catalog from a recent incident\n- [ ] [Evidence Preservation Guide](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-evidence-preservation-guide.md) (ALMA-SOP-2025-010b)\n\n---\n\n## Notes\n\nThis test procedure validates that investigation actions are systematically recorded with integrity and provenance controls. Mature organizations maintain detailed, tamper-evident investigation logs attributed to individual responders, with the incident lead responsible for comprehensive documentation. The integrity of these records is critical for post-incident reviews, legal proceedings, and regulatory compliance. ServiceNow ticket audit trails provide a baseline, but dedicated evidence management may be needed for complex incidents.",
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.AN-06",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6880,11 +6896,11 @@ export const COMPREHENSIVE_OBSERVATIONS = {
   },
   "RS.AN-07 Ex1": {
     "auditorId": 2,
-    "testProcedures": "# RS.AN-07: Incident Data Collection and Integrity Test Procedures\n\n**CSF Subcategory:** RS.AN-07 - Incident data and metadata are collected, and their integrity and provenance are preserved\n\n---\n\n## Test Procedures\n\n1. **Review incident data collection procedures**\n   - Obtain documented procedures for collecting incident data and metadata\n   - Verify procedures specify data types to collect (logs, network captures, disk images, memory dumps)\n   - Confirm procedures address metadata preservation including timestamps, source systems, and collection methods\n   - Check that procedures account for volatile data collection priority and sequencing\n\n2. **Examine data collection tooling and capabilities**\n   - Review SentinelOne endpoint data collection capabilities for incident response\n   - Verify SIEM log aggregation includes all relevant data sources for incident reconstruction\n   - Confirm GuardDuty finding metadata is preserved with original context\n   - Check that network traffic capture capabilities exist for incident analysis\n\n3. **Validate integrity preservation mechanisms**\n   - Verify cryptographic hashing is applied to collected evidence\n   - Confirm write-once or tamper-evident storage is used for incident data\n   - Review access controls on evidence repositories\n   - Check that integrity verification is performed before evidence is used in analysis\n\n4. **Test provenance documentation for collected data**\n   - Select a recent incident and trace data collection chain\n   - Verify each evidence item has documented source, collection time, collector identity, and method\n   - Confirm chain-of-custody records exist for evidence transferred between systems or personnel\n   - Check that automated collection tools log their actions and outputs\n\n---\n\n## Evidence Requests\n\n- [ ] Incident data collection procedures and checklists\n- [ ] SentinelOne incident response data collection configuration\n- [ ] SIEM log source inventory and retention configuration\n- [ ] Evidence hashing and integrity verification procedures\n- [ ] Evidence storage access control lists\n- [ ] Sample chain-of-custody documentation from recent incident\n- [ ] Automated collection tool output logs\n\n---\n\n## Notes\n\nThis test procedure validates that incident data and metadata are collected systematically with integrity and provenance controls. The distinction from RS.AN-06 is that this subcategory focuses on the raw data and metadata collected as evidence, while RS.AN-06 addresses the recording of investigation actions themselves. Mature organizations automate evidence collection where possible, apply cryptographic integrity verification, and maintain detailed provenance records. The quality of collected data directly impacts the effectiveness of root cause analysis under RS.AN-03.",
+    "testProcedures": "# RS.AN-07: Incident Data Collection and Integrity Test Procedures\n\n**CSF Subcategory:** RS.AN-07 - Incident data and metadata are collected, and their integrity and provenance are preserved\n\n---\n\n## Test Procedures\n\n1. **Review incident data collection procedures**\n   - Obtain documented procedures for collecting incident data and metadata\n   - Verify procedures specify data types to collect (logs, network captures, disk images, memory dumps)\n   - Confirm procedures address metadata preservation including timestamps, source systems, and collection methods\n   - Check that procedures account for volatile data collection priority and sequencing\n\n2. **Examine data collection tooling and capabilities**\n   - Review SentinelOne endpoint data collection capabilities for incident response\n   - Verify SIEM log aggregation includes all relevant data sources for incident reconstruction\n   - Confirm GuardDuty finding metadata is preserved with original context\n   - Check that network traffic capture capabilities exist for incident analysis\n\n3. **Validate integrity preservation mechanisms**\n   - Verify cryptographic hashing is applied to collected evidence\n   - Confirm write-once or tamper-evident storage is used for incident data\n   - Review access controls on evidence repositories\n   - Check that integrity verification is performed before evidence is used in analysis\n\n4. **Test provenance documentation for collected data**\n   - Select a recent incident and trace data collection chain\n   - Verify each evidence item has documented source, collection time, collector identity, and method\n   - Confirm chain-of-custody records exist for evidence transferred between systems or personnel\n   - Check that automated collection tools log their actions and outputs\n\n---\n\n## Evidence Requests\n\n- [ ] Incident data collection procedures and checklists\n- [ ] SentinelOne incident response data collection configuration\n- [ ] SIEM log source inventory and retention configuration\n- [ ] Evidence hashing and integrity verification procedures\n- [ ] Evidence storage access control lists\n- [ ] Sample chain-of-custody documentation from recent incident\n- [ ] Automated collection tool output logs\n- [ ] [Evidence Preservation Guide](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/5_Artifacts/Procedures/PROC-evidence-preservation-guide.md) (ALMA-SOP-2025-010b)\n\n---\n\n## Notes\n\nThis test procedure validates that incident data and metadata are collected systematically with integrity and provenance controls. The distinction from RS.AN-06 is that this subcategory focuses on the raw data and metadata collected as evidence, while RS.AN-06 addresses the recording of investigation actions themselves. Mature organizations automate evidence collection where possible, apply cryptographic integrity verification, and maintain detailed provenance records. The quality of collected data directly impacts the effectiveness of root cause analysis under RS.AN-03.",
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.AN-07",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -6952,7 +6968,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.AN-08",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7020,7 +7036,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.CO-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7088,7 +7104,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.CO-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7156,7 +7172,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MA-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7224,7 +7240,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MA-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7292,7 +7308,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MA-03",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7360,7 +7376,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MA-04",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7428,7 +7444,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MA-05",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7496,7 +7512,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MI-01",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
@@ -7564,7 +7580,7 @@ export const COMPREHENSIVE_OBSERVATIONS = {
     "procedureSource": {
       "bank": "community",
       "bankId": "RS.MI-02",
-      "bankVersion": "47e1c68ed81d375c",
+      "bankVersion": "61b4d2be5f1e7ea9",
       "attachedAt": "2026-04-30T00:00:00.000Z",
       "modified": false
     },
