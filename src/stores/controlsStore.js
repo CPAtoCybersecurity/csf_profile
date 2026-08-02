@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput, csvFormulaGuard } from '../utils/sanitize';
+import useAuditLogStore from './auditLogStore';
 import { DEFAULT_CONTROLS } from './defaultControlsData';
 import { COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -106,8 +107,10 @@ const useControlsStore = create(
         );
       },
 
-      // Create new control
-      createControl: (controlData) => {
+      // Create new control. options.log defaults true for user-initiated
+      // creates; programmatic bulk lanes (getOrCreateControlForRequirement,
+      // CSV import via setControls) must not flood the audit log.
+      createControl: (controlData, options = {}) => {
         const newControl = {
           controlId: controlData.controlId || `CTL-${String(get().controls.length + 1).padStart(3, '0')}`,
           // Human-readable control name, distinct from the control ID (issue #306).
@@ -145,6 +148,14 @@ const useControlsStore = create(
 
         const updatedControls = [...get().controls, newControl];
         get().setControls(updatedControls);
+        if (options.log !== false) {
+          useAuditLogStore.getState().addEntry({
+            action: 'control_created',
+            entity: newControl.name ? `${newControl.controlId} ${newControl.name}` : newControl.controlId,
+            targetType: 'control',
+            targetId: newControl.controlId
+          });
+        }
         return newControl;
       },
 
@@ -158,12 +169,13 @@ const useControlsStore = create(
           return existingControl;
         }
 
-        // Auto-create control linked to this requirement
+        // Auto-create control linked to this requirement (programmatic —
+        // never audit-logged, this lane runs in bulk per scoped requirement)
         return get().createControl({
           controlId,
           linkedRequirementIds: [requirement.id],
           status: 'Not Implemented'
-        });
+        }, { log: false });
       },
 
       // Bulk get or create controls for multiple requirements
@@ -197,16 +209,40 @@ const useControlsStore = create(
           sanitizedUpdates.implementationDescription = sanitizeInput(updates.implementationDescription);
         }
 
+        const before = get().getControl(controlId);
         const updatedControls = get().controls.map(c =>
           c.controlId === controlId ? { ...c, ...sanitizedUpdates } : c
         );
         get().setControls(updatedControls);
+
+        // Field-level change log. The detail panel writes per keystroke; the
+        // audit store coalesces those into one entry per field per session.
+        if (before) {
+          useAuditLogStore.getState().logFieldChanges({
+            targetType: 'control',
+            targetId: controlId,
+            entity: before.name ? `${controlId} ${before.name}` : controlId,
+            before,
+            after: sanitizedUpdates,
+            defaultAction: 'control_updated',
+            fields: ['name', 'implementationDescription', 'status', 'tests', 'frameworks', 'ownerId', 'externalUrl']
+          });
+        }
       },
 
       // Delete control
       deleteControl: (controlId) => {
+        const existing = get().getControl(controlId);
         const updatedControls = get().controls.filter(c => c.controlId !== controlId);
         get().setControls(updatedControls);
+        if (existing) {
+          useAuditLogStore.getState().addEntry({
+            action: 'control_deleted',
+            entity: existing.name ? `${controlId} ${existing.name}` : controlId,
+            targetType: 'control',
+            targetId: controlId
+          });
+        }
       },
 
       // Link requirement to control
