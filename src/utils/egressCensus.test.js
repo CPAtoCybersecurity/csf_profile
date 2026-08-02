@@ -145,15 +145,17 @@ describe('choke-point wiring rot-stoppers (PR-5)', () => {
     // assessmentsStore.js legitimately reads obs.testProcedures in exactly
     // FOUR non-egress places: the frozen v14 migration block (3 reads) and
     // the observations→evaluations migration (1 read). The four CSV/Jira
-    // egress emissions all call expandProcedureText(obs) — 5 call sites
-    // (exportForJiraCSV emits twice: custom field + description). Pin both
+    // egress emissions all route through expandProcedureText(obs) — 4 call
+    // sites since the spreadsheet/UI parity refactor: the two CSV exporters
+    // share buildAssessmentCsvRow (1 call), and exportForJiraCSV emits twice
+    // (custom field + description) plus exportAllForJiraCSV once. Pin both
     // counts: a NEW exporter written against obs.testProcedures bumps the
     // residual count and goes red here, forcing the expansion decision at
     // commit time instead of a silent trunk-only artifact.
     const store = read('stores/assessmentsStore.js');
     const residualReads = (store.match(/obs\.testProcedures/g) || []).length;
     const chokeCalls = (store.match(/expandProcedureText\(obs\)/g) || []).length;
-    expect(chokeCalls).toBe(5);
+    expect(chokeCalls).toBe(4);
     expect(residualReads).toBe(4);
   });
 

@@ -21,7 +21,7 @@
  * a Blob and hand it to URL.createObjectURL, neither of which jsdom
  * implements, so both are stubbed and the CSV is read back from the Blob parts.
  */
-import useAssessmentsStore from './assessmentsStore';
+import useAssessmentsStore, { ASSESSMENT_CSV_HEADERS } from './assessmentsStore';
 import useControlsStore from './controlsStore';
 import useRequirementsStore from './requirementsStore';
 import useUserStore from './userStore';
@@ -152,55 +152,22 @@ describe('column shape', () => {
     expect(headers[1]).toBe('Implementation Example');
   });
 
-  test('no pre-existing column is dropped or reordered by the insertion', async () => {
+  test('exportAssessmentCSV emits exactly the canonical header list', async () => {
     const id = makeAssessment('requirements', [REQ_ID]);
     await useAssessmentsStore
       .getState()
       .exportAssessmentCSV(id, useControlsStore, useRequirementsStore, useUserStore);
 
-    const headers = parseHeaderRow(capturedText());
-    // The pre-change header list, with the new column spliced in at index 1.
-    expect(headers).toEqual([
-      'ID',
-      'Implementation Example',
-      'Assessment',
-      'Scope Type',
-      'Scoring Scale',
-      'Auditor',
-      'Test Procedure(s)',
-      ...['Q1', 'Q2', 'Q3', 'Q4'].flatMap((q) => [
-        `${q} Actual Score`,
-        `${q} Target Score`,
-        `${q} Observations`,
-        `${q} Observation Date`,
-        `${q} Testing Status`,
-        `${q} Examine`,
-        `${q} Interview`,
-        `${q} Test`
-      ]),
-      'Linked Artifacts',
-      'Remediation Owner',
-      'Action Plan',
-      'Remediation Due Date'
-    ]);
+    expect(parseHeaderRow(capturedText())).toEqual(ASSESSMENT_CSV_HEADERS);
   });
 
-  test('exportAllAssessmentsCSV keeps Description and Framework Filter in place', async () => {
+  test('exportAllAssessmentsCSV emits exactly the canonical header list', async () => {
     makeAssessment('requirements', [REQ_ID]);
     await useAssessmentsStore
       .getState()
       .exportAllAssessmentsCSV(useControlsStore, useRequirementsStore, useUserStore);
 
-    const headers = parseHeaderRow(capturedText());
-    expect(headers.slice(0, 7)).toEqual([
-      'ID',
-      'Implementation Example',
-      'Assessment',
-      'Description',
-      'Scope Type',
-      'Framework Filter',
-      'Scoring Scale'
-    ]);
+    expect(parseHeaderRow(capturedText())).toEqual(ASSESSMENT_CSV_HEADERS);
   });
 });
 

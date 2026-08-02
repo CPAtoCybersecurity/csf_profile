@@ -203,6 +203,168 @@ export const normalizeAssessmentPlatforms = (value) => {
 };
 
 /**
+ * Canonical assessment CSV column set — the single source of truth for BOTH
+ * exporters AND the template download in Assessments.js. Three hand-maintained
+ * lists is how the spreadsheet drifted from the evaluation panel in the first
+ * place. The rule the list encodes: every field the assessment UI shows, and
+ * none it doesn't. Columns with no live surface (per-quarter Observation Date,
+ * Remediation Owner / Action Plan / Remediation Due Date — their pages were
+ * never routed) are gone; UI fields the sheet lacked (Year, Users, Linked
+ * Findings, Linked Controls, External Links) are in. Old files carrying the
+ * dropped columns still import — unknown columns are inert under Papa's
+ * header mode.
+ */
+export const ASSESSMENT_CSV_HEADERS = [
+  'ID',
+  'Implementation Example',
+  'Assessment',
+  'Description',
+  'Scope Type',
+  'Framework Filter',
+  'Scoring Scale',
+  'Year',
+  'Users',
+  'Auditor',
+  'Test Procedure(s)',
+  ...['Q1', 'Q2', 'Q3', 'Q4'].flatMap(q => [
+    `${q} Actual Score`,
+    `${q} Target Score`,
+    `${q} Observations`,
+    `${q} Testing Status`,
+    `${q} Examine`,
+    `${q} Interview`,
+    `${q} Test`
+  ]),
+  'Linked Artifacts',
+  'Linked Findings',
+  'Linked Controls',
+  'External Links'
+];
+
+/**
+ * Users cell: `Name <email> (role)` entries joined by `; ` — the Linked
+ * Artifacts list convention, with the roster role parenthesized so a
+ * round-trip can restore it. Unknown userIds fall back to the raw id so the
+ * cell never silently shrinks.
+ */
+const serializeAssessmentUsersCell = (assessment, users) =>
+  normalizeAssessmentUsers(assessment.users)
+    .map(({ userId, role }) => {
+      const user = users.find(u => u.id === userId);
+      const name = user ? (user.email ? `${user.name} <${user.email}>` : user.name) : userId;
+      return `${name} (${role})`;
+    })
+    .join('; ');
+
+/**
+ * External-links cell: `type|url` pairs joined by `; `. The pipe keeps the
+ * cell readable in a spreadsheet; a URL containing `;` is the same accepted
+ * limitation the Linked Artifacts convention already carries.
+ */
+const serializeExternalLinksCell = (links) =>
+  (links || []).map(l => `${l.type}|${l.url}`).join('; ');
+
+/** Inverse of the `; `-joined list cells. */
+const splitListCell = (value) =>
+  (value || '').split(';').map(s => s.trim()).filter(Boolean);
+
+/** External-links cell inverse; junk types/urls die in normalizeExternalLinks. */
+const parseExternalLinksCell = (value) => normalizeExternalLinks(
+  splitListCell(value)
+    .map(part => {
+      const sep = part.indexOf('|');
+      if (sep === -1) return null;
+      return { type: part.slice(0, sep).trim(), url: part.slice(sep + 1).trim() };
+    })
+    .filter(Boolean)
+);
+
+/**
+ * Parse a person cell: `Name <email>`, a bare email, or a bare name.
+ * Module-scoped because both the Auditor column and the Users roster cell
+ * need it.
+ */
+const parseUserString = (str) => {
+  if (!str || !str.trim()) return null;
+  str = str.trim();
+  const match = str.match(/^(.+?)\s*<([^>]+)>$/);
+  if (match) {
+    return { name: match[1].trim(), email: match[2].trim() };
+  }
+  if (str.includes('@')) {
+    const namePart = str.split('@')[0].replace(/[._]/g, ' ');
+    return { name: namePart, email: str };
+  }
+  return { name: str, email: null };
+};
+
+/**
+ * Users roster cell inverse: `Name <email> (role); ...` → [{ userId, role }].
+ * People land in the user directory via findOrCreateUser (names/emails are
+ * never embedded on the assessment); an unknown or missing role defaults to
+ * 'stakeholder', matching addAssessmentUser.
+ */
+const parseAssessmentUsersCell = (value, findOrCreateUser) => {
+  if (!findOrCreateUser) return [];
+  const entries = [];
+  for (const part of splitListCell(value)) {
+    const roleMatch = part.match(/\(([^()]*)\)\s*$/);
+    const rawRole = roleMatch ? roleMatch[1].trim().toLowerCase() : '';
+    const role = ASSESSMENT_USER_ROLES.includes(rawRole) ? rawRole : 'stakeholder';
+    const personStr = roleMatch ? part.slice(0, roleMatch.index).trim() : part;
+    const info = parseUserString(personStr);
+    if (!info) continue;
+    const userId = findOrCreateUser(info);
+    if (userId) entries.push({ userId, role });
+  }
+  return normalizeAssessmentUsers(entries);
+};
+
+/**
+ * Build one canonical CSV row for a scoped item. Shared by BOTH exporters so
+ * their cell values can never diverge the way their header lists once did.
+ * Keys must stay in lockstep with ASSESSMENT_CSV_HEADERS — Papa.unparse is
+ * called with { columns: ASSESSMENT_CSV_HEADERS } at both call sites, so a
+ * missing key surfaces as an empty column, never a shifted one.
+ */
+const buildAssessmentCsvRow = ({ assessment, itemId, obs, getItemName, getImplementationExample, getUserName, users }) => {
+  const row = {
+    'ID': escapeCSVValue(getItemName(itemId)),
+    // csvFormulaGuard, not escapeCSVValue: this is long free prose that
+    // routinely contains commas and apostrophes, and escapeCSVValue
+    // wraps-and-quotes on top of Papa's own quoting (see sanitize.js).
+    'Implementation Example': csvFormulaGuard(getImplementationExample(itemId)),
+    'Assessment': escapeCSVValue(assessment.name),
+    'Description': escapeCSVValue(assessment.description || ''),
+    'Scope Type': escapeCSVValue(assessment.scopeType),
+    'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
+    'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
+    'Year': assessment.year || '',
+    'Users': csvFormulaGuard(serializeAssessmentUsersCell(assessment, users)),
+    'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
+    'Test Procedure(s)': escapeCSVValue(expandProcedureText(obs) || '')
+  };
+
+  ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
+    const qData = obs.quarters?.[q] || createDefaultQuarter();
+    row[`${q} Actual Score`] = qData.actualScore || 0;
+    row[`${q} Target Score`] = qData.targetScore || 0;
+    row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
+    row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
+    row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
+    row[`${q} Interview`] = qData.interview ? 'Yes' : 'No';
+    row[`${q} Test`] = qData.test ? 'Yes' : 'No';
+  });
+
+  row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
+  row['Linked Findings'] = csvFormulaGuard((obs.linkedFindings || []).join('; '));
+  row['Linked Controls'] = csvFormulaGuard((obs.linkedControls || []).join('; '));
+  row['External Links'] = csvFormulaGuard(serializeExternalLinksCell(obs.externalLinks));
+
+  return row;
+};
+
+/**
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
@@ -1084,43 +1246,12 @@ const useAssessmentsStore = create(
         const csvData = assessment.scopeIds.map(itemId => {
           const rawObs = assessment.observations[itemId] || {};
           const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
-          const remediation = obs.remediation || {};
-
-          const row = {
-            'ID': escapeCSVValue(getItemName(itemId)),
-            // csvFormulaGuard, not escapeCSVValue: this is long free prose that
-            // routinely contains commas and apostrophes, and escapeCSVValue
-            // wraps-and-quotes on top of Papa's own quoting (see sanitize.js).
-            'Implementation Example': csvFormulaGuard(getImplementationExample(itemId)),
-            'Assessment': escapeCSVValue(assessment.name),
-            'Scope Type': escapeCSVValue(assessment.scopeType),
-            'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
-            'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
-            'Test Procedure(s)': escapeCSVValue(expandProcedureText(obs) || '')
-          };
-
-          // Add quarterly columns
-          ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
-            const qData = obs.quarters?.[q] || createDefaultQuarter();
-            row[`${q} Actual Score`] = qData.actualScore || 0;
-            row[`${q} Target Score`] = qData.targetScore || 0;
-            row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
-            row[`${q} Observation Date`] = qData.observationDate || '';
-            row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
-            row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
-            row[`${q} Interview`] = qData.interview ? 'Yes' : 'No';
-            row[`${q} Test`] = qData.test ? 'Yes' : 'No';
+          return buildAssessmentCsvRow({
+            assessment, itemId, obs, getItemName, getImplementationExample, getUserName, users
           });
-
-          row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
-          row['Remediation Owner'] = escapeCSVValue(getUserName(remediation.ownerId));
-          row['Action Plan'] = escapeCSVValue(remediation.actionPlan || '');
-          row['Remediation Due Date'] = remediation.dueDate || '';
-
-          return row;
         });
 
-        const csv = Papa.unparse(csvData);
+        const csv = Papa.unparse(csvData, { columns: ASSESSMENT_CSV_HEADERS });
         const trimmedPassword = (password || '').trim();
 
         let blob;
@@ -1282,27 +1413,17 @@ const useAssessmentsStore = create(
                     frameworkFilter: row['Framework Filter'] || row.frameworkFilter || null,
                     // Round-trip the scoring scale; CSVs without the column default to 10 (issue #277)
                     scoringScale: Number(row['Scoring Scale']) === 5 ? 5 : 10,
+                    // Round-trip year and the user roster (issues #290/#291);
+                    // files without the columns get the current year and an
+                    // empty roster, same as the creation wizard's defaults.
+                    year: normalizeAssessmentYear(row['Year'] || row.year),
+                    users: parseAssessmentUsersCell(row['Users'] || row.users, findOrCreateUser),
                     jiraKey: assessmentJiraKey, // Store Jira Epic key for reference
                     rows: []
                   };
                 }
                 assessmentGroups[assessmentName].rows.push(row);
               });
-
-              // Parse user string helper
-              const parseUserString = (str) => {
-                if (!str || !str.trim()) return null;
-                str = str.trim();
-                const match = str.match(/^(.+?)\s*<([^>]+)>$/);
-                if (match) {
-                  return { name: match[1].trim(), email: match[2].trim() };
-                }
-                if (str.includes('@')) {
-                  const namePart = str.split('@')[0].replace(/[._]/g, ' ');
-                  return { name: namePart, email: str };
-                }
-                return { name: str, email: null };
-              };
 
               // Helper to convert Excel serial date to ISO date string (YYYY-MM-DD)
               const parseDate = (value) => {
@@ -1327,12 +1448,14 @@ const useAssessmentsStore = create(
               // Helper to detect if CSV has quarterly columns
               const hasQuarterlyColumns = results.meta.fields?.some(f => f.startsWith('Q1 '));
 
-              // Helper to parse quarter data from row
+              // Helper to parse quarter data from row. Observation Date is no
+              // longer a spreadsheet column (no live UI surface shows it) —
+              // the field stays in the quarter shape, empty.
               const parseQuarterData = (row, quarter) => ({
                 actualScore: parseFloat(row[`${quarter} Actual Score`]) || 0,
                 targetScore: parseFloat(row[`${quarter} Target Score`]) || 0,
                 observations: sanitizeInput(row[`${quarter} Observations`] || ''),
-                observationDate: parseDate(row[`${quarter} Observation Date`]),
+                observationDate: '',
                 testingStatus: row[`${quarter} Testing Status`] || 'Not Started',
                 examine: (row[`${quarter} Examine`] || '').toLowerCase() === 'yes',
                 interview: (row[`${quarter} Interview`] || '').toLowerCase() === 'yes',
@@ -1370,14 +1493,6 @@ const useAssessmentsStore = create(
                   if (auditorStr && findOrCreateUser) {
                     const info = parseUserString(auditorStr);
                     if (info) auditorId = findOrCreateUser(info);
-                  }
-
-                  // Parse remediation owner
-                  let remediationOwnerId = null;
-                  const remOwnerStr = row['Remediation Owner'] || row.remediationOwner;
-                  if (remOwnerStr && findOrCreateUser) {
-                    const info = parseUserString(remOwnerStr);
-                    if (info) remediationOwnerId = findOrCreateUser(info);
                   }
 
                   if (isJiraFormat) {
@@ -1440,17 +1555,17 @@ const useAssessmentsStore = create(
 
                     observations[itemId] = existingObs;
                   } else if (hasQuarterlyColumns) {
-                    // New quarterly format
+                    // New quarterly format. Remediation columns were dropped
+                    // from the sheet (no live UI surface); the empty structure
+                    // keeps the observation shape invariant.
                     observations[itemId] = {
                       auditorId,
                       testProcedures: sanitizeInput(row['Test Procedure(s)'] || row['Test Procedures'] || ''),
-                      linkedArtifacts: (row['Linked Artifacts'] || row.linkedArtifacts || '')
-                        .split(';').map(s => s.trim()).filter(Boolean),
-                      remediation: {
-                        ownerId: remediationOwnerId,
-                        actionPlan: sanitizeInput(row['Action Plan'] || row.actionPlan || ''),
-                        dueDate: parseDate(row['Remediation Due Date'] || row['Due Date'] || row.dueDate)
-                      },
+                      linkedArtifacts: splitListCell(row['Linked Artifacts'] || row.linkedArtifacts),
+                      linkedFindings: splitListCell(row['Linked Findings'] || row.linkedFindings),
+                      linkedControls: splitListCell(row['Linked Controls'] || row.linkedControls),
+                      externalLinks: parseExternalLinksCell(row['External Links'] || row.externalLinks),
+                      remediation: { ownerId: null, actionPlan: '', dueDate: '' },
                       quarters: {
                         Q1: parseQuarterData(row, 'Q1'),
                         Q2: parseQuarterData(row, 'Q2'),
@@ -1463,19 +1578,17 @@ const useAssessmentsStore = create(
                     observations[itemId] = {
                       auditorId,
                       testProcedures: sanitizeInput(row['Test Procedure(s)'] || row['Test Procedures'] || ''),
-                      linkedArtifacts: (row['Linked Artifacts'] || row.linkedArtifacts || '')
-                        .split(';').map(s => s.trim()).filter(Boolean),
-                      remediation: {
-                        ownerId: remediationOwnerId,
-                        actionPlan: sanitizeInput(row['Action Plan'] || row.actionPlan || ''),
-                        dueDate: parseDate(row['Remediation Due Date'] || row['Due Date'] || row.dueDate)
-                      },
+                      linkedArtifacts: splitListCell(row['Linked Artifacts'] || row.linkedArtifacts),
+                      linkedFindings: splitListCell(row['Linked Findings'] || row.linkedFindings),
+                      linkedControls: splitListCell(row['Linked Controls'] || row.linkedControls),
+                      externalLinks: parseExternalLinksCell(row['External Links'] || row.externalLinks),
+                      remediation: { ownerId: null, actionPlan: '', dueDate: '' },
                       quarters: {
                         Q1: {
                           actualScore: parseFloat(row['Actual Score'] || row.actualScore) || 0,
                           targetScore: parseFloat(row['Target Score'] || row.targetScore) || 0,
                           observations: sanitizeInput(row['Observations'] || row.observations || ''),
-                          observationDate: parseDate(row['Observation Date'] || row.observationDate),
+                          observationDate: '',
                           testingStatus: row['Testing Status'] || row.testingStatus || 'Not Started',
                           examine: (row['Examine'] || '').toLowerCase() === 'yes',
                           interview: (row['Interview'] || '').toLowerCase() === 'yes',
@@ -1495,6 +1608,8 @@ const useAssessmentsStore = create(
                   description: group.description,
                   scopeType: group.scopeType,
                   scoringScale: group.scoringScale === 5 ? 5 : 10,
+                  year: group.year,
+                  users: group.users,
                   scopeIds: [...new Set(scopeIds)],
                   frameworkFilter: group.frameworkFilter,
                   jiraKey: group.jiraKey || null, // Store Jira Epic key for sync reference
@@ -1806,45 +1921,13 @@ const useAssessmentsStore = create(
           assessment.scopeIds.forEach(itemId => {
             const rawObs = assessment.observations[itemId] || {};
             const obs = rawObs.quarters ? rawObs : migrateObservationToQuarterly(rawObs) || { quarters: createDefaultQuarters() };
-            const remediation = obs.remediation || {};
-
-            const row = {
-              'ID': escapeCSVValue(getItemName(itemId)),
-              // See the single-assessment exporter above for why this column
-              // uses csvFormulaGuard rather than escapeCSVValue.
-              'Implementation Example': csvFormulaGuard(getImplementationExample(itemId)),
-              'Assessment': escapeCSVValue(assessment.name),
-              'Description': escapeCSVValue(assessment.description || ''),
-              'Scope Type': escapeCSVValue(assessment.scopeType),
-              'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
-              'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
-              'Auditor': escapeCSVValue(getUserName(obs.auditorId)),
-              'Test Procedure(s)': escapeCSVValue(expandProcedureText(obs) || '')
-            };
-
-            // Add quarterly columns
-            ['Q1', 'Q2', 'Q3', 'Q4'].forEach(q => {
-              const qData = obs.quarters?.[q] || createDefaultQuarter();
-              row[`${q} Actual Score`] = qData.actualScore || 0;
-              row[`${q} Target Score`] = qData.targetScore || 0;
-              row[`${q} Observations`] = escapeCSVValue(qData.observations || '');
-              row[`${q} Observation Date`] = qData.observationDate || '';
-              row[`${q} Testing Status`] = qData.testingStatus || 'Not Started';
-              row[`${q} Examine`] = qData.examine ? 'Yes' : 'No';
-              row[`${q} Interview`] = qData.interview ? 'Yes' : 'No';
-              row[`${q} Test`] = qData.test ? 'Yes' : 'No';
-            });
-
-            row['Linked Artifacts'] = escapeCSVValue((obs.linkedArtifacts || []).join('; '));
-            row['Remediation Owner'] = escapeCSVValue(getUserName(remediation.ownerId));
-            row['Action Plan'] = escapeCSVValue(remediation.actionPlan || '');
-            row['Remediation Due Date'] = remediation.dueDate || '';
-
-            csvData.push(row);
+            csvData.push(buildAssessmentCsvRow({
+              assessment, itemId, obs, getItemName, getImplementationExample, getUserName, users
+            }));
           });
         });
 
-        const csv = Papa.unparse(csvData);
+        const csv = Papa.unparse(csvData, { columns: ASSESSMENT_CSV_HEADERS });
         const date = new Date().toISOString().split('T')[0];
         const baseFilename = `assessments${isSubset ? '_subset' : ''}_${date}.csv`;
 
