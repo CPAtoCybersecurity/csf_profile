@@ -153,6 +153,19 @@ const useCommentsStore = create(
       // Bulk setter for restore/import lanes (bypasses per-comment logging).
       setComments: (comments) => {
         set({ comments: Array.isArray(comments) ? comments : [] });
+      },
+
+      // Record-id rename support (controls key on user-editable controlId):
+      // comments follow the record instead of orphaning.
+      retargetComments: (targetType, oldTargetId, newTargetId) => {
+        if (!targetType || !oldTargetId || !newTargetId || oldTargetId === newTargetId) return;
+        set((state) => ({
+          comments: state.comments.map(c =>
+            c.targetType === targetType && c.targetId === oldTargetId
+              ? { ...c, targetId: newTargetId }
+              : c
+          )
+        }));
       }
     }),
     {

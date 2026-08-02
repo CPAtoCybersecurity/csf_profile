@@ -765,9 +765,9 @@ Format as a numbered list. Be specific and actionable.`;
         updateObservation(created.id, itemId, wizardAttachObservation(bankEntry, attachPlan.offersByItem[itemId], orgProfile, {
           substituteName: tailorWithProfile,
           adaptStack: adaptStackRefs
-        }));
+        }), { log: false });
       } else if (generatedProcedures[itemId]) {
-        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
+        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] }, { log: false });
       }
     }
 

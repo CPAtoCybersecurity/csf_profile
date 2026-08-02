@@ -1046,7 +1046,10 @@ const useAssessmentsStore = create(
       // Update observation for a scoped item
       // observationData can include: auditorId, testProcedures, linkedArtifacts, remediation
       // For quarterly data, use updateQuarterlyObservation instead
-      updateObservation: (assessmentId, itemId, observationData) => {
+      // options.log defaults true for user edits; programmatic bulk lanes
+      // (wizard bank-attach loop, migration seeding) pass { log: false } so a
+      // 105-item attach cannot flood the audit log's retention cap.
+      updateObservation: (assessmentId, itemId, observationData, options = {}) => {
         const assessment = get().getAssessment(assessmentId);
         if (!assessment) return;
 
@@ -1103,6 +1106,7 @@ const useAssessmentsStore = create(
         // Audit logging: field-level diffs on the evaluation record,
         // attributed to the acting user. Score/status keep their historical
         // action names; everything else logs as observation_updated.
+        if (options.log === false) return;
         useAuditLogStore.getState().logFieldChanges({
           targetType: 'evaluation',
           targetId: evaluationTargetId(assessmentId, itemId),

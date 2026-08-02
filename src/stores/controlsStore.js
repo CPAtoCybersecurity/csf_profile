@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput, csvFormulaGuard } from '../utils/sanitize';
 import useAuditLogStore from './auditLogStore';
+import useCommentsStore from './commentsStore';
 import { DEFAULT_CONTROLS } from './defaultControlsData';
 import { COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -215,13 +216,33 @@ const useControlsStore = create(
         );
         get().setControls(updatedControls);
 
+        // Controls are keyed by the user-EDITABLE controlId. On rename,
+        // comments and history retarget to the new id so neither orphans —
+        // then the rename itself is logged (under the new id, so the
+        // record's history shows it).
+        const renamedTo = typeof sanitizedUpdates.controlId === 'string' &&
+          sanitizedUpdates.controlId !== controlId ? sanitizedUpdates.controlId : null;
+        if (renamedTo) {
+          useCommentsStore.getState().retargetComments('control', controlId, renamedTo);
+          useAuditLogStore.getState().retargetRecord('control', controlId, renamedTo);
+          useAuditLogStore.getState().addEntry({
+            action: 'control_updated',
+            entity: before?.name ? `${renamedTo} ${before.name}` : renamedTo,
+            field: 'controlId',
+            oldValue: controlId,
+            newValue: renamedTo,
+            targetType: 'control',
+            targetId: renamedTo
+          });
+        }
+
         // Field-level change log. The detail panel writes per keystroke; the
         // audit store coalesces those into one entry per field per session.
         if (before) {
           useAuditLogStore.getState().logFieldChanges({
             targetType: 'control',
-            targetId: controlId,
-            entity: before.name ? `${controlId} ${before.name}` : controlId,
+            targetId: renamedTo || controlId,
+            entity: before.name ? `${renamedTo || controlId} ${before.name}` : (renamedTo || controlId),
             before,
             after: sanitizedUpdates,
             defaultAction: 'control_updated',

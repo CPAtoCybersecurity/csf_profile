@@ -377,6 +377,11 @@ const UserControls = () => {
       setNewControl(prev => ({ ...prev, [field]: value }));
     } else if (selectedControlId) {
       updateControl(selectedControlId, { [field]: value });
+      // Controls are keyed by controlId, so editing it renames the record —
+      // follow it, or the panel (and the store's next write) targets a ghost.
+      if (field === 'controlId' && value && value !== selectedControlId) {
+        setSelectedControlId(value);
+      }
     }
   }, [isCreating, selectedControlId, updateControl]);
 

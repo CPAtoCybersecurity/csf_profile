@@ -142,6 +142,19 @@ const useAuditLogStore = create(
         return get().entries.filter(e => e.targetType === targetType && e.targetId === targetId);
       },
 
+      // Record-id rename support: history follows the record instead of
+      // orphaning (accountability survives a controlId edit).
+      retargetRecord: (targetType, oldTargetId, newTargetId) => {
+        if (!targetType || !oldTargetId || !newTargetId || oldTargetId === newTargetId) return;
+        set((state) => ({
+          entries: state.entries.map(e =>
+            e.targetType === targetType && e.targetId === oldTargetId
+              ? { ...e, targetId: newTargetId }
+              : e
+          )
+        }));
+      },
+
       // Clear all entries
       clearLog: () => set({ entries: [] }),
 

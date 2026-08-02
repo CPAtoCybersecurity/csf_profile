@@ -6,6 +6,7 @@
  */
 import useAuditLogStore from './auditLogStore';
 import useUserStore from './userStore';
+import useCommentsStore from './commentsStore';
 import useControlsStore from './controlsStore';
 import useFindingsStore from './findingsStore';
 import useAssessmentsStore, { evaluationTargetId } from './assessmentsStore';
@@ -41,6 +42,25 @@ describe('controlsStore wiring', () => {
     const before = entriesFor('control', control.controlId).length;
     useControlsStore.getState().updateControl(control.controlId, { name: 'N' });
     expect(entriesFor('control', control.controlId).length).toBe(before);
+  });
+
+  test('controlId rename retargets comments and history, and is itself logged', () => {
+    useCommentsStore.setState({ comments: [] });
+    const control = useControlsStore.getState().createControl({ controlId: 'CTL-OLD', name: 'Renamable' });
+    useCommentsStore.getState().addComment({ targetType: 'control', targetId: 'CTL-OLD', text: 'keep me' });
+    useControlsStore.getState().updateControl(control.controlId, { controlId: 'CTL-NEW' });
+
+    // comments and history both follow the record to the new id
+    expect(useCommentsStore.getState().getComments('control', 'CTL-NEW')).toHaveLength(1);
+    expect(useCommentsStore.getState().getComments('control', 'CTL-OLD')).toHaveLength(0);
+    const newEntries = entriesFor('control', 'CTL-NEW');
+    expect(entriesFor('control', 'CTL-OLD')).toHaveLength(0);
+    const rename = newEntries.find(e => e.field === 'controlId');
+    expect(rename.oldValue).toBe('CTL-OLD');
+    expect(rename.newValue).toBe('CTL-NEW');
+    // the record itself was renamed
+    expect(useControlsStore.getState().getControl('CTL-NEW')).toBeTruthy();
+    expect(useControlsStore.getState().getControl('CTL-OLD')).toBeUndefined();
   });
 
   test('programmatic bulk auto-create does not flood the log', () => {
@@ -106,6 +126,17 @@ describe('assessmentsStore wiring', () => {
     const rename = entriesFor('assessment', assessment.id).find(e => e.action === 'assessment_updated');
     expect(rename.oldValue).toBe('Lifecycle A');
     expect(rename.newValue).toBe('Lifecycle B');
+  });
+
+  test('bulk lanes pass log:false and write nothing (wizard attach / migration)', () => {
+    const assessment = useAssessmentsStore.getState().createAssessment({
+      name: 'Bulk', scopeIds: ['GV.OC-01'], scopeType: 'requirements'
+    });
+    useAuditLogStore.setState({ entries: [] });
+    useAssessmentsStore.getState().updateObservation(assessment.id, 'GV.OC-01', {
+      testProcedures: 'attached bank text', testingStatus: 'Not Started'
+    }, { log: false });
+    expect(useAuditLogStore.getState().entries).toHaveLength(0);
   });
 
   test('an observations-payload updateAssessment call does not double-log', () => {
