@@ -21,7 +21,7 @@ import EmptyState from '../components/EmptyState';
 import ScoreSelect from '../components/ScoreSelect';
 
 // Stores
-import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES } from '../stores/assessmentsStore';
+import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES, ASSESSMENT_CSV_HEADERS } from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore, { isCsfRequirement } from '../stores/requirementsStore';
 import useUserStore from '../stores/userStore';
@@ -1063,66 +1063,54 @@ Format as a numbered list. Be specific and actionable.`;
   }, [exportAllAssessmentsCSV, exportAssessmentIds]);
 
   const handleDownloadTemplate = useCallback(() => {
-    const templateData = [
-      {
-        'ID': 'GV.OC-01 Ex1',
-        // Reference text only — the exporters join it in from the framework
-        // catalogue on the ID key, and the importer ignores whatever is here.
-        'Implementation Example': 'Ex1: Share the organization\'s mission and vision statements with third parties who have a role in achieving the mission',
-        'Assessment': '2025 Security Assessment',
-        'Scope Type': 'controls',
-        'Auditor': 'Auditor Name <auditor@example.com>',
-        'Test Procedure(s)': 'Review documentation; Interview control owner; Test implementation',
-        'Q1 Actual Score': '5',
-        'Q1 Target Score': '5',
-        'Q1 Observations': 'Q1 observation notes',
-        'Q1 Observation Date': '2025-01-15',
-        'Q1 Testing Status': 'Complete',
-        'Q1 Examine': 'Yes',
-        'Q1 Interview': 'Yes',
-        'Q1 Test': 'Yes',
-        'Q2 Actual Score': '6',
-        'Q2 Target Score': '5',
-        'Q2 Observations': 'Q2 observation notes',
-        'Q2 Observation Date': '2025-04-15',
-        'Q2 Testing Status': 'Complete',
-        'Q2 Examine': 'Yes',
-        'Q2 Interview': 'Yes',
-        'Q2 Test': 'Yes',
-        'Q3 Actual Score': '',
-        'Q3 Target Score': '',
-        'Q3 Observations': '',
-        'Q3 Observation Date': '',
-        'Q3 Testing Status': 'Not Started',
-        'Q3 Examine': 'No',
-        'Q3 Interview': 'No',
-        'Q3 Test': 'No',
-        'Q4 Actual Score': '',
-        'Q4 Target Score': '',
-        'Q4 Observations': '',
-        'Q4 Observation Date': '',
-        'Q4 Testing Status': 'Not Started',
-        'Q4 Examine': 'No',
-        'Q4 Interview': 'No',
-        'Q4 Test': 'No',
-        'Linked Artifacts': 'artifact1; artifact2',
-        'Remediation Owner': 'Owner Name <owner@example.com>',
-        'Action Plan': 'Example remediation action',
-        'Remediation Due Date': '2025-03-01'
-      }
-    ];
+    // Headers come from the store's canonical list — the same one both
+    // exporters unparse against — so the template can never drift from the
+    // real export format again.
+    const sampleRow = {
+      'ID': 'GV.OC-01 Ex1',
+      // Reference text only — the exporters join it in from the framework
+      // catalogue on the ID key, and the importer ignores whatever is here.
+      'Implementation Example': 'Ex1: Share the organization\'s mission and vision statements with third parties who have a role in achieving the mission',
+      'Assessment': '2025 Security Assessment',
+      'Description': 'Annual NIST CSF 2.0 assessment',
+      'Scope Type': 'controls',
+      'Framework Filter': '',
+      'Scoring Scale': '10',
+      'Year': '2025',
+      'Users': 'Auditor Name <auditor@example.com> (auditor); Owner Name <owner@example.com> (control owner)',
+      'Auditor': 'Auditor Name <auditor@example.com>',
+      'Test Procedure(s)': 'Review documentation; Interview control owner; Test implementation',
+      'Q1 Actual Score': '5',
+      'Q1 Target Score': '5',
+      'Q1 Observations': 'Q1 observation notes',
+      'Q1 Testing Status': 'Complete',
+      'Q1 Examine': 'Yes',
+      'Q1 Interview': 'Yes',
+      'Q1 Test': 'Yes',
+      'Q2 Actual Score': '6',
+      'Q2 Target Score': '5',
+      'Q2 Observations': 'Q2 observation notes',
+      'Q2 Testing Status': 'Complete',
+      'Q2 Examine': 'Yes',
+      'Q2 Interview': 'Yes',
+      'Q2 Test': 'Yes',
+      'Q3 Testing Status': 'Not Started',
+      'Q3 Examine': 'No',
+      'Q3 Interview': 'No',
+      'Q3 Test': 'No',
+      'Q4 Testing Status': 'Not Started',
+      'Q4 Examine': 'No',
+      'Q4 Interview': 'No',
+      'Q4 Test': 'No',
+      'Linked Artifacts': 'artifact1; artifact2',
+      'Linked Findings': 'FND-001; FND-002',
+      'Linked Controls': 'CTL-001',
+      'External Links': 'findings|https://example.atlassian.net/browse/SEC-123'
+    };
 
-    const headers = [
-      'ID', 'Implementation Example', 'Assessment', 'Scope Type', 'Auditor', 'Test Procedure(s)',
-      'Q1 Actual Score', 'Q1 Target Score', 'Q1 Observations', 'Q1 Observation Date', 'Q1 Testing Status', 'Q1 Examine', 'Q1 Interview', 'Q1 Test',
-      'Q2 Actual Score', 'Q2 Target Score', 'Q2 Observations', 'Q2 Observation Date', 'Q2 Testing Status', 'Q2 Examine', 'Q2 Interview', 'Q2 Test',
-      'Q3 Actual Score', 'Q3 Target Score', 'Q3 Observations', 'Q3 Observation Date', 'Q3 Testing Status', 'Q3 Examine', 'Q3 Interview', 'Q3 Test',
-      'Q4 Actual Score', 'Q4 Target Score', 'Q4 Observations', 'Q4 Observation Date', 'Q4 Testing Status', 'Q4 Examine', 'Q4 Interview', 'Q4 Test',
-      'Linked Artifacts', 'Remediation Owner', 'Action Plan', 'Remediation Due Date'
-    ];
     const csv = [
-      headers.join(','),
-      templateData.map(row => headers.map(h => `"${row[h] || ''}"`).join(',')).join('\n')
+      ASSESSMENT_CSV_HEADERS.join(','),
+      ASSESSMENT_CSV_HEADERS.map(h => `"${sampleRow[h] || ''}"`).join(',')
     ].join('\n');
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
