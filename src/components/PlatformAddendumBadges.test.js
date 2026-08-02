@@ -99,6 +99,7 @@ describe('PlatformAddendumBadges', () => {
       findingsStore: storeOf({ findings: data.findings, setFindings: jest.fn() }),
       metricsStore: storeOf({ metrics: data.metrics, setMetrics: jest.fn() }),
       inventoryStore: storeOf({ systems: [], setSystems: jest.fn() }),
+      commentsStore: storeOf({ comments: [], setComments: jest.fn() }),
       orgProfileStore: storeOf({ profile: null, cloudConsent: false, setProfileState: jest.fn() })
     };
     const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));

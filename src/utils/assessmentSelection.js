@@ -50,7 +50,12 @@ export const SECTION_DISPOSITION = {
   frameworks: 'keep-whole',
   metrics: 'keep-whole',
   systems: 'keep-whole',
-  orgProfile: 'keep-whole'
+  orgProfile: 'keep-whole',
+  // Comments cascade with their records: evaluation comments carry the
+  // assessment id inside targetId, finding comments follow their finding
+  // (see the comments block in filterExportByAssessments); control comments
+  // ride whole with the control catalogue.
+  comments: 'cascade'
 };
 
 /**

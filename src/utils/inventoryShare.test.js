@@ -17,6 +17,7 @@ import useFindingsStore from '../stores/findingsStore';
 import useMetricsStore from '../stores/metricsStore';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import useInventoryStore from '../stores/inventoryStore';
+import useCommentsStore from '../stores/commentsStore';
 
 const stores = () => ({
   controlsStore: useControlsStore,
@@ -28,7 +29,8 @@ const stores = () => ({
   findingsStore: useFindingsStore,
   metricsStore: useMetricsStore,
   orgProfileStore: useOrgProfileStore,
-  inventoryStore: useInventoryStore
+  inventoryStore: useInventoryStore,
+  commentsStore: useCommentsStore
 });
 
 // Canary strings: a system identity, an internal admin URL, an external
@@ -60,8 +62,9 @@ describe('complete backup (format 6)', () => {
   test('carries the systems section, count, and schema version slot', () => {
     seedCanarySystem();
     const envelope = exportAllDataJSON(stores());
-    expect(EXPORT_FORMAT_VERSION).toBe(6);
-    expect(envelope.formatVersion).toBe(6);
+    // ≥6: the systems section landed in format 6; later formats keep it.
+    expect(EXPORT_FORMAT_VERSION).toBeGreaterThanOrEqual(6);
+    expect(envelope.formatVersion).toBe(EXPORT_FORMAT_VERSION);
     expect(envelope.data.systems).toHaveLength(1);
     expect(envelope.data.systems[0].name).toBe(CANARY_NAME);
     expect(envelope.metadata.systemCount).toBe(1);

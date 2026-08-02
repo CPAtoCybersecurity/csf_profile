@@ -31,6 +31,7 @@ const makeStores = (data = SAMPLE) => {
     setFindings: jest.fn(),
     setMetrics: jest.fn(),
     setSystems: jest.fn(),
+    setComments: jest.fn(),
     setProfileState: jest.fn()
   };
   const stores = {
@@ -43,6 +44,7 @@ const makeStores = (data = SAMPLE) => {
     findingsStore: { getState: () => ({ findings: data.findings, setFindings: setters.setFindings }) },
     metricsStore: { getState: () => ({ metrics: data.metrics, setMetrics: setters.setMetrics }) },
     inventoryStore: { getState: () => ({ systems: data.systems || [], setSystems: setters.setSystems }) },
+    commentsStore: { getState: () => ({ comments: data.comments || [], setComments: setters.setComments }) },
     orgProfileStore: { getState: () => ({ profile: null, cloudConsent: false, setProfileState: setters.setProfileState }) }
   };
   return { stores, setters };
@@ -50,6 +52,41 @@ const makeStores = (data = SAMPLE) => {
 
 afterEach(() => {
   window.localStorage.clear();
+});
+
+describe('comments restore semantics (format 7)', () => {
+  const COMMENT = {
+    id: 'c-1', targetType: 'finding', targetId: 'FND-1', text: 'note',
+    authorId: 1, authorName: 'A', mentions: [], createdAt: '2026-01-01T00:00:00.000Z'
+  };
+
+  test('comments round-trip through the bulk setter', () => {
+    const { stores } = makeStores({ ...SAMPLE, comments: [COMMENT] });
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    const { stores: targetStores, setters } = makeStores();
+    const result = importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+    expect(result.applied).toContain('comments');
+    expect(setters.setComments).toHaveBeenCalledWith([COMMENT]);
+  });
+
+  test('a file without a comments section leaves the receiver comments untouched', () => {
+    const { stores } = makeStores();
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    delete parsed.data.comments; // pre-format-7 backup or a share export (OMIT)
+    const { stores: targetStores, setters } = makeStores();
+    const result = importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+    expect(result.skipped).toContain('comments');
+    expect(setters.setComments).not.toHaveBeenCalled();
+  });
+
+  test('junk-shaped comment records are dropped on the way in', () => {
+    const { stores } = makeStores({ ...SAMPLE, comments: [COMMENT] });
+    const parsed = JSON.parse(JSON.stringify(exportAllDataJSON(stores)));
+    parsed.data.comments = [COMMENT, null, { id: 'no-target' }, 'junk'];
+    const { stores: targetStores, setters } = makeStores();
+    importCompleteDatabase(parsed, targetStores, { backupFirst: false });
+    expect(setters.setComments).toHaveBeenCalledWith([COMMENT]);
+  });
 });
 
 describe('export → restore round-trip', () => {
@@ -581,8 +618,8 @@ describe('PR-5: platform references on the restore path (format 5)', () => {
     ]
   });
 
-  test('the export format is 6 — systems section joins the envelope', () => {
-    expect(EXPORT_FORMAT_VERSION).toBe(6);
+  test('the export format is 7 — comments section joins the envelope', () => {
+    expect(EXPORT_FORMAT_VERSION).toBe(7);
   });
 
   test('a format-5 backup carrying references restores them VERBATIM (never dropped, never crashes)', () => {
@@ -614,8 +651,8 @@ describe('PR-5: platform references on the restore path (format 5)', () => {
     expect(out).toContain(REF.contentHash);
   });
 
-  test('a file from a newer format (7) is still rejected with the newer-version message', () => {
-    const result = validateDatabaseExport({ formatVersion: 7, data: { users: [] } });
+  test('a file from a newer format (8) is still rejected with the newer-version message', () => {
+    const result = validateDatabaseExport({ formatVersion: 8, data: { users: [] } });
     expect(result.ok).toBe(false);
     expect(result.errors.join(' ')).toMatch(/newer version/i);
   });
