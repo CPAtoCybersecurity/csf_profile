@@ -22,9 +22,11 @@ import {
   ReferenceLine,
   LineChart,
   Line,
+  LabelList,
 } from 'recharts';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
+import useUserStore from '../stores/userStore';
 import useRequirementsStore from '../stores/requirementsStore';
 import useUIStore from '../stores/uiStore';
 import useFindingsStore from '../stores/findingsStore';
@@ -98,6 +100,8 @@ const STATUS_ORDER = ['Not Started', 'In Progress', 'Submitted', 'Complete', 'Bl
 const Dashboard = () => {
   const assessments = useAssessmentsStore((state) => state.assessments);
   const getControl = useControlsStore((state) => state.getControl);
+  const controls = useControlsStore((state) => state.controls);
+  const getUserById = useUserStore((state) => state.getUserById);
   const requirements = useRequirementsStore((state) => state.requirements);
   const darkMode = useUIStore((state) => state.darkMode);
   const findings = useFindingsStore((state) => state.findings);
@@ -602,6 +606,69 @@ const Dashboard = () => {
     };
   }, [selectedAssessment, dashboardData, selectedQuarter, artifacts, findings]);
   // ── End KPI Cards ──────────────────────────────────────────────────────────
+
+  // ── Portfolio Overview ─────────────────────────────────────────────────────
+  // Workspace-wide rollups across ALL assessments and ALL controls. These are
+  // deliberately independent of selectedAssessmentId / selectedQuarter — they
+  // answer "how is the whole program doing", not "how is this eval doing".
+
+  // Assessments by status (assessment.status: Not Started | In Progress | Complete)
+  const portfolioStatusData = useMemo(() => {
+    const counts = assessments.reduce((acc, a) => {
+      const status = a.status || 'Not Started';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+
+    return Object.entries(counts)
+      .map(([name, value]) => ({
+        name,
+        value,
+        color: STATUS_COLORS[name] || '#9ca3af',
+      }))
+      .sort((a, b) => {
+        const indexA = STATUS_ORDER.indexOf(a.name);
+        const indexB = STATUS_ORDER.indexOf(b.name);
+        if (indexA === -1 && indexB === -1) return a.name.localeCompare(b.name);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      });
+  }, [assessments]);
+
+  const portfolioStatusTotal = useMemo(() => {
+    return portfolioStatusData.reduce((sum, item) => sum + item.value, 0);
+  }, [portfolioStatusData]);
+
+  // Controls per owner, sorted highest count first. Null/missing ownerId
+  // aggregates into "Unassigned"; a deleted user's ID degrades to a stable
+  // fallback label rather than crashing the lookup.
+  const controlOwnerChartData = useMemo(() => {
+    const counts = new Map();
+    controls.forEach(c => {
+      const key = c.ownerId || null;
+      counts.set(key, (counts.get(key) || 0) + 1);
+    });
+
+    return Array.from(counts.entries())
+      .map(([ownerId, count]) => ({
+        name: ownerId === null
+          ? 'Unassigned'
+          : (getUserById(ownerId)?.name || `User ${ownerId}`),
+        count,
+        unassigned: ownerId === null,
+      }))
+      .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+  }, [controls, getUserById]);
+
+  const unassignedControlsCount = useMemo(() => {
+    return controls.filter(c => !c.ownerId).length;
+  }, [controls]);
+
+  const unassignedAssessmentsCount = useMemo(() => {
+    return assessments.filter(a => !a.users || a.users.length === 0).length;
+  }, [assessments]);
+  // ── End Portfolio Overview ─────────────────────────────────────────────────
 
   if (assessments.length === 0) {
     return (
@@ -1218,6 +1285,170 @@ const Dashboard = () => {
           </div>
         </>
       )}
+
+      {/* Portfolio Overview — workspace-wide, independent of the selected assessment */}
+      <div className="mt-6">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Portfolio Overview</h1>
+
+        {/* Assignment coverage KPI cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <KPICard
+            title="Assessments"
+            value={assessments.length}
+            subtitle="Total evaluations in workspace"
+            darkMode={darkMode}
+          />
+          <KPICard
+            title="Unassigned Assessments"
+            value={unassignedAssessmentsCount}
+            subtitle={`${unassignedAssessmentsCount} of ${assessments.length} with no users assigned`}
+            darkMode={darkMode}
+          />
+          <KPICard
+            title="Controls"
+            value={controls.length}
+            subtitle="Total controls in library"
+            darkMode={darkMode}
+          />
+          <KPICard
+            title="Unassigned Controls"
+            value={unassignedControlsCount}
+            subtitle={`${unassignedControlsCount} of ${controls.length} with no control owner`}
+            darkMode={darkMode}
+          />
+        </div>
+
+        {/* Assessments by Status Pie Chart */}
+        <div className="card mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Assessment Status — All Evaluations</h2>
+          </div>
+
+          <div className="flex gap-8 items-center">
+            {/* Pie Chart */}
+            <div className="flex-shrink-0">
+              {portfolioStatusData.length > 0 ? (
+                <ResponsiveContainer width={520} height={360}>
+                  <PieChart margin={{ left: 100, right: 80 }}>
+                    <Pie
+                      data={portfolioStatusData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={{ stroke: chartColors.textMuted }}
+                      label={({ name, percent, x, y }) => (
+                        <text x={x} y={y} fill={chartColors.text} textAnchor="middle" dominantBaseline="middle" fontSize={12}>
+                          {`${name} (${(percent * 100).toFixed(0)}%)`}
+                        </text>
+                      )}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {portfolioStatusData.map((entry, index) => (
+                        <Cell key={`portfolio-cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      formatter={(value, name) => [`${value} assessments (${((value / portfolioStatusTotal) * 100).toFixed(1)}%)`, name]}
+                      contentStyle={{ backgroundColor: chartColors.background, border: `1px solid ${chartColors.border}`, borderRadius: 8, color: chartColors.text }}
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="flex items-center justify-center" style={{ width: 520, height: 360 }}>
+                  <span className="text-gray-500">No assessments yet.</span>
+                </div>
+              )}
+            </div>
+
+            {/* Per-evaluation status table */}
+            <div className="flex-1">
+              <h3 className="text-base font-semibold text-gray-700 mb-3">Status by Evaluation</h3>
+              <table className="border-collapse w-full max-w-md">
+                <thead>
+                  <tr className="bg-gray-100">
+                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">Assessment</th>
+                    <th className="border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {assessments.map((a, index) => {
+                    const status = a.status || 'Not Started';
+                    return (
+                      <tr key={a.id} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                        <td className="border border-gray-300 px-3 py-2 text-sm font-medium text-gray-900">{a.name}</td>
+                        <td className="border border-gray-300 px-3 py-2 text-sm">
+                          <div className="flex items-center gap-2">
+                            <div
+                              className="w-3 h-3 rounded-full"
+                              style={{ backgroundColor: STATUS_COLORS[status] || '#9ca3af' }}
+                            />
+                            {status}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                  {assessments.length > 0 && (
+                    <tr className="bg-blue-100 font-semibold">
+                      <td className="border border-gray-300 px-3 py-2 text-sm">Total</td>
+                      <td className="border border-gray-300 px-3 py-2 text-sm">{portfolioStatusTotal} assessments</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        {/* Controls by Owner Bar Chart */}
+        <div className="card mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold">Controls by Owner</h2>
+          </div>
+
+          {controlOwnerChartData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={Math.max(220, controlOwnerChartData.length * 40 + 60)}>
+              <ComposedChart
+                layout="vertical"
+                data={controlOwnerChartData}
+                margin={{ top: 10, right: 60, left: 10, bottom: 10 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={chartColors.grid} />
+                <XAxis
+                  type="number"
+                  allowDecimals={false}
+                  tick={{ fontSize: 11, fill: chartColors.text }}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  type="category"
+                  dataKey="name"
+                  width={160}
+                  tick={{ fontSize: 12, fill: chartColors.text }}
+                  tickLine={false}
+                />
+                <Tooltip
+                  formatter={(value) => [`${value} control${value === 1 ? '' : 's'}`, 'Controls']}
+                  cursor={{ fill: 'rgba(148, 163, 184, 0.1)' }}
+                  contentStyle={{ backgroundColor: chartColors.background, border: `1px solid ${chartColors.border}`, borderRadius: 6, fontSize: 12, color: chartColors.text }}
+                />
+                <Bar dataKey="count" name="Controls" radius={[0, 4, 4, 0]} barSize={22}>
+                  {controlOwnerChartData.map((entry, index) => (
+                    <Cell key={`owner-cell-${index}`} fill={entry.unassigned ? '#9ca3af' : '#60a5fa'} />
+                  ))}
+                  <LabelList dataKey="count" position="right" style={{ fill: chartColors.text, fontSize: 12 }} />
+                </Bar>
+              </ComposedChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="flex items-center justify-center h-48 text-gray-500 text-sm">
+              No controls in the library yet.
+            </div>
+          )}
+        </div>
+      </div>
 
       {/* Audit Report Metadata Modal */}
       {showAuditModal && (
