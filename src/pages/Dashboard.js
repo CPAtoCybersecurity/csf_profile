@@ -101,7 +101,7 @@ const Dashboard = () => {
   const assessments = useAssessmentsStore((state) => state.assessments);
   const getControl = useControlsStore((state) => state.getControl);
   const controls = useControlsStore((state) => state.controls);
-  const getUserById = useUserStore((state) => state.getUserById);
+  const users = useUserStore((state) => state.users);
   const requirements = useRequirementsStore((state) => state.requirements);
   const darkMode = useUIStore((state) => state.darkMode);
   const findings = useFindingsStore((state) => state.findings);
@@ -644,6 +644,7 @@ const Dashboard = () => {
   // aggregates into "Unassigned"; a deleted user's ID degrades to a stable
   // fallback label rather than crashing the lookup.
   const controlOwnerChartData = useMemo(() => {
+    const nameById = new Map(users.map(u => [u.id, u.name]));
     const counts = new Map();
     controls.forEach(c => {
       const key = c.ownerId || null;
@@ -654,12 +655,12 @@ const Dashboard = () => {
       .map(([ownerId, count]) => ({
         name: ownerId === null
           ? 'Unassigned'
-          : (getUserById(ownerId)?.name || `User ${ownerId}`),
+          : (nameById.get(ownerId) || `User ${ownerId}`),
         count,
         unassigned: ownerId === null,
       }))
       .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-  }, [controls, getUserById]);
+  }, [controls, users]);
 
   const unassignedControlsCount = useMemo(() => {
     return controls.filter(c => !c.ownerId).length;
@@ -1288,7 +1289,7 @@ const Dashboard = () => {
 
       {/* Portfolio Overview — workspace-wide, independent of the selected assessment */}
       <div className="mt-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Portfolio Overview</h1>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Portfolio Overview</h2>
 
         {/* Assignment coverage KPI cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
