@@ -2,6 +2,8 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { sanitizeInput, csvFormulaGuard } from '../utils/sanitize';
+import useAuditLogStore from './auditLogStore';
+import useCommentsStore from './commentsStore';
 import { DEFAULT_CONTROLS } from './defaultControlsData';
 import { COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -106,8 +108,10 @@ const useControlsStore = create(
         );
       },
 
-      // Create new control
-      createControl: (controlData) => {
+      // Create new control. options.log defaults true for user-initiated
+      // creates; programmatic bulk lanes (getOrCreateControlForRequirement,
+      // CSV import via setControls) must not flood the audit log.
+      createControl: (controlData, options = {}) => {
         const newControl = {
           controlId: controlData.controlId || `CTL-${String(get().controls.length + 1).padStart(3, '0')}`,
           // Human-readable control name, distinct from the control ID (issue #306).
@@ -145,6 +149,14 @@ const useControlsStore = create(
 
         const updatedControls = [...get().controls, newControl];
         get().setControls(updatedControls);
+        if (options.log !== false) {
+          useAuditLogStore.getState().addEntry({
+            action: 'control_created',
+            entity: newControl.name ? `${newControl.controlId} ${newControl.name}` : newControl.controlId,
+            targetType: 'control',
+            targetId: newControl.controlId
+          });
+        }
         return newControl;
       },
 
@@ -158,12 +170,13 @@ const useControlsStore = create(
           return existingControl;
         }
 
-        // Auto-create control linked to this requirement
+        // Auto-create control linked to this requirement (programmatic —
+        // never audit-logged, this lane runs in bulk per scoped requirement)
         return get().createControl({
           controlId,
           linkedRequirementIds: [requirement.id],
           status: 'Not Implemented'
-        });
+        }, { log: false });
       },
 
       // Bulk get or create controls for multiple requirements
@@ -197,16 +210,79 @@ const useControlsStore = create(
           sanitizedUpdates.implementationDescription = sanitizeInput(updates.implementationDescription);
         }
 
+        // controlId is the record's KEY. A rename is honored only when the
+        // new id is non-empty and not already taken — an empty id would
+        // orphan the record, and a collision would silently merge two
+        // records' comment threads and histories. (The UI currently disables
+        // the field outside create mode; this guard is producer-side defense
+        // for when that changes or a programmatic caller passes one.)
+        if ('controlId' in sanitizedUpdates) {
+          const nextId = typeof sanitizedUpdates.controlId === 'string' ? sanitizedUpdates.controlId.trim() : '';
+          if (!nextId || nextId === controlId || get().getControl(nextId)) {
+            delete sanitizedUpdates.controlId;
+          } else {
+            sanitizedUpdates.controlId = nextId;
+          }
+        }
+
+        const before = get().getControl(controlId);
         const updatedControls = get().controls.map(c =>
           c.controlId === controlId ? { ...c, ...sanitizedUpdates } : c
         );
         get().setControls(updatedControls);
+
+        // Controls are keyed by controlId, so a (guarded, see above) rename
+        // retargets comments and history to the new id so neither orphans —
+        // then the rename itself is logged (under the new id, so the
+        // record's history shows it).
+        const renamedTo = typeof sanitizedUpdates.controlId === 'string' &&
+          sanitizedUpdates.controlId !== controlId ? sanitizedUpdates.controlId : null;
+        if (renamedTo) {
+          useCommentsStore.getState().retargetComments('control', controlId, renamedTo);
+          useAuditLogStore.getState().retargetRecord('control', controlId, renamedTo);
+          useAuditLogStore.getState().addEntry({
+            action: 'control_updated',
+            entity: before?.name ? `${renamedTo} ${before.name}` : renamedTo,
+            field: 'controlId',
+            oldValue: controlId,
+            newValue: renamedTo,
+            targetType: 'control',
+            targetId: renamedTo
+          });
+        }
+
+        // Field-level change log. The detail panel writes per keystroke; the
+        // audit store coalesces those into one entry per field per session.
+        if (before) {
+          useAuditLogStore.getState().logFieldChanges({
+            targetType: 'control',
+            targetId: renamedTo || controlId,
+            entity: before.name ? `${renamedTo || controlId} ${before.name}` : (renamedTo || controlId),
+            before,
+            after: sanitizedUpdates,
+            defaultAction: 'control_updated',
+            fields: ['name', 'implementationDescription', 'status', 'tests', 'frameworks', 'ownerId', 'externalUrl']
+          });
+        }
       },
 
       // Delete control
       deleteControl: (controlId) => {
+        const existing = get().getControl(controlId);
         const updatedControls = get().controls.filter(c => c.controlId !== controlId);
         get().setControls(updatedControls);
+        if (existing) {
+          // Remove the record's discussion: control ids are recycled (max+1),
+          // so an orphaned thread would re-attach to a future unrelated
+          // control. The audit trail itself is retained (accountability).
+          useCommentsStore.getState().deleteCommentsFor('control', controlId);
+          useAuditLogStore.getState().addEntry({
+            action: 'control_deleted',
+            entity: existing.name ? `${controlId} ${existing.name}` : controlId,
+            targetType: 'control',
+            targetId: controlId
+          });
+        }
       },
 
       // Link requirement to control

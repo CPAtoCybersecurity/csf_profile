@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import useUserStore from '../stores/userStore';
 import {
   LayoutDashboard,
   Users,
@@ -89,6 +90,36 @@ const NavGroups = ({ pathname, onNavigate }) => (
   </>
 );
 
+// Who comments and audit-log entries are attributed to. Honor-system by
+// design — the app has no authentication; this is a directory pick.
+const ActingUserSelect = () => {
+  const users = useUserStore((state) => state.users);
+  const currentUserId = useUserStore((state) => state.currentUserId);
+  const setCurrentUser = useUserStore((state) => state.setCurrentUser);
+
+  return (
+    <div className="app-acting-user">
+      <label className="app-acting-user-label" htmlFor="acting-user-select">Acting as</label>
+      <select
+        id="acting-user-select"
+        value={currentUserId ?? ''}
+        onChange={(e) => {
+          const raw = e.target.value;
+          if (raw === '') { setCurrentUser(null); return; }
+          // ids are numeric for seeded users, uuid strings for created ones
+          const user = users.find(u => String(u.id) === raw);
+          setCurrentUser(user ? user.id : null);
+        }}
+      >
+        <option value="">Not selected (System)</option>
+        {users.map((user) => (
+          <option key={user.id} value={String(user.id)}>{user.name}</option>
+        ))}
+      </select>
+    </div>
+  );
+};
+
 const Brand = () => (
   <div className="app-sidebar-brand">
     <div className="terminal-logo-disc">
@@ -151,6 +182,7 @@ const Navigation = () => {
         <nav className="app-sidebar-nav">
           <NavGroups pathname={pathname} />
         </nav>
+        <ActingUserSelect />
       </aside>
 
       {/* Drawer trigger — only visible below 1024px (see CSS). */}
@@ -180,6 +212,7 @@ const Navigation = () => {
             <nav className="app-sidebar-nav">
               <NavGroups pathname={pathname} onNavigate={closeDrawer} />
             </nav>
+            <ActingUserSelect />
           </div>
         </div>
       )}

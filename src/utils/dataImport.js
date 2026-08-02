@@ -39,6 +39,7 @@ import { stampSeededDemoFindings } from '../stores/findingsStore';
 import { stampSeededDemoUsers } from '../stores/userStore';
 import { stampSeededDemoControls, normalizeControlFields } from '../stores/controlsStore';
 import { normalizeSystemFields } from '../stores/inventoryStore';
+import { normalizeCommentFields } from '../stores/commentsStore';
 
 // Sections a restore knows how to apply, with the store + bulk setter each uses.
 // Format-2 exports carry no metrics section — it is simply skipped (untouched),
@@ -52,7 +53,11 @@ const SECTIONS = [
   { key: 'artifacts', store: 'artifactStore', setter: 'setArtifacts' },
   { key: 'findings', store: 'findingsStore', setter: 'setFindings' },
   { key: 'metrics', store: 'metricsStore', setter: 'setMetrics' },
-  { key: 'systems', store: 'inventoryStore', setter: 'setSystems' }
+  { key: 'systems', store: 'inventoryStore', setter: 'setSystems' },
+  // Format 7. Absent in older files → skipped, so a pre-comments backup (or a
+  // share export, which OMITS the section) leaves the receiver's comments
+  // untouched rather than wiping them.
+  { key: 'comments', store: 'commentsStore', setter: 'setComments' }
 ];
 
 /**
@@ -277,6 +282,13 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
   // absent-only, idempotent (normalizeSystemFields).
   if (Array.isArray(data.systems)) {
     data.systems = normalizeSystemFields({ systems: data.systems }).systems;
+  }
+
+  // Comments (format 7) get the same unconditional shape pass — junk-shaped
+  // or truncated records from a hand-edited file are dropped, well-formed
+  // ones ride verbatim.
+  if (Array.isArray(data.comments)) {
+    data.comments = normalizeCommentFields({ comments: data.comments }).comments;
   }
 
   // Resolve every write BEFORE applying any, so a missing setter can never

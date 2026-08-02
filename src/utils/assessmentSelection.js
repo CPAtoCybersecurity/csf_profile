@@ -50,7 +50,12 @@ export const SECTION_DISPOSITION = {
   frameworks: 'keep-whole',
   metrics: 'keep-whole',
   systems: 'keep-whole',
-  orgProfile: 'keep-whole'
+  orgProfile: 'keep-whole',
+  // Comments cascade with their records: evaluation comments carry the
+  // assessment id inside targetId, finding comments follow their finding
+  // (see the comments block in filterExportByAssessments); control comments
+  // ride whole with the control catalogue.
+  comments: 'cascade'
 };
 
 /**
@@ -132,6 +137,25 @@ export const filterExportByAssessments = (envelope, assessmentIds = null) => {
   };
   cascade('findings');
   cascade('artifacts');
+
+  // Comments cascade with their records: evaluation comments follow the kept
+  // assessments (targetId is `assessmentId::itemId`), finding comments follow
+  // the findings that survived above, control comments ride wholesale because
+  // the control catalogue itself rides wholesale.
+  if (Array.isArray(data.comments)) {
+    const keptFindingIds = new Set(
+      (Array.isArray(next.data.findings) ? next.data.findings : []).map((f) => f?.id)
+    );
+    next.data.comments = data.comments.filter((c) => {
+      if (!c || typeof c !== 'object') return false;
+      if (c.targetType === 'evaluation') {
+        const idx = typeof c.targetId === 'string' ? c.targetId.indexOf('::') : -1;
+        return idx > 0 && wanted.has(c.targetId.slice(0, idx));
+      }
+      if (c.targetType === 'finding') return keptFindingIds.has(c.targetId);
+      return true;
+    });
+  }
 
   next.metadata = {
     ...(envelope.metadata || {}),

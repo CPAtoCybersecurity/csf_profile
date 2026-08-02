@@ -86,6 +86,31 @@ const useUserStore = create(
     (set, get) => ({
       users: DEFAULT_USERS,
 
+      // Acting user (comments/audit attribution). Honor-system by design —
+      // there is no authentication anywhere in this app; this is the same
+      // trust model as every other store. null = no selection → 'System'.
+      currentUserId: null,
+
+      setCurrentUser: (id) => {
+        // Positive resolution: only a truthy directory lookup may be stored,
+        // so a stale/garbage id can never brand writes (null clears).
+        if (id !== null && !get().getUserById(id)) return;
+        set({ currentUserId: id });
+      },
+
+      getCurrentUser: () => {
+        const id = get().currentUserId;
+        if (id == null) return null;
+        // Resolve positively on every read — a persisted id whose user was
+        // deleted (or arrived via restore) must not resolve to a ghost.
+        return get().getUserById(id) || null;
+      },
+
+      getCurrentUserName: () => {
+        const user = get().getCurrentUser();
+        return user?.name || 'System';
+      },
+
       // Add a single user
       addUser: (user) => {
         const newUser = {
@@ -110,7 +135,9 @@ const useUserStore = create(
       // Delete a user
       deleteUser: (id) => {
         set((state) => ({
-          users: state.users.filter(user => user.id !== id)
+          users: state.users.filter(user => user.id !== id),
+          // Deleting the acting user resets attribution to the fallback.
+          ...(state.currentUserId === id ? { currentUserId: null } : {})
         }));
       },
 

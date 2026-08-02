@@ -234,6 +234,20 @@ const USER = struct({
   seedSource: SHARE
 });
 
+// Per-record discussion comments (evaluations/controls/findings). Author
+// names + free discussion text — private by the same reasoning as the user
+// directory; the section rides only under the include-private opt-in.
+const COMMENT = struct({
+  id: SHARE,
+  targetType: SHARE,
+  targetId: SHARE,
+  text: SHARE,
+  authorId: SHARE,
+  authorName: SHARE,
+  mentions: SHARE,
+  createdAt: SHARE
+});
+
 const CONTROL = struct({
   controlId: SHARE,
   name: SHARE,
@@ -486,6 +500,12 @@ export const SHARE_SECTIONS = {
   systems: {
     disposition: { default: OMIT, includePrivate: 'fold' },
     record: SYSTEM
+  },
+  // Record comments: the users-directory pattern — OMIT by default (deleted,
+  // never emptied), include-private opt-in rides them whole.
+  comments: {
+    disposition: { default: OMIT, includePrivate: 'fold' },
+    record: COMMENT
   },
   // The org profile (crown jewels + tooling) is never share material —
   // unconditionally, opt-in or not.

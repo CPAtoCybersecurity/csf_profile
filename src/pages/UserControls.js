@@ -12,6 +12,7 @@ import { sanitizeExternalUrl } from '../utils/externalLinks';
 import FrameworkBadge from '../components/FrameworkBadge';
 import UserSelector from '../components/UserSelector';
 import DropdownPortal from '../components/DropdownPortal';
+import RecordPanel, { CommentsButton } from '../components/RecordPanel';
 import SortableHeader from '../components/SortableHeader';
 
 // Stores
@@ -70,6 +71,8 @@ const UserControls = () => {
   const [detailPanelOpen, setDetailPanelOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  // Comments/History panel for the open control
+  const [recordPanelOpen, setRecordPanelOpen] = useState(false);
 
   // New control form state
   const [newControl, setNewControl] = useState({
@@ -374,6 +377,11 @@ const UserControls = () => {
       setNewControl(prev => ({ ...prev, [field]: value }));
     } else if (selectedControlId) {
       updateControl(selectedControlId, { [field]: value });
+      // Controls are keyed by controlId, so editing it renames the record —
+      // follow it, or the panel (and the store's next write) targets a ghost.
+      if (field === 'controlId' && value && value !== selectedControlId) {
+        setSelectedControlId(value);
+      }
     }
   }, [isCreating, selectedControlId, updateControl]);
 
@@ -875,6 +883,13 @@ const UserControls = () => {
                   <div className="flex items-center justify-between gap-2">
                     <h2 className="text-xl font-bold font-mono">{currentControl.controlId}</h2>
                     <div className="flex items-center gap-2">
+                      {!isCreating && (
+                        <CommentsButton
+                          targetType="control"
+                          targetId={currentControl.controlId}
+                          onClick={() => setRecordPanelOpen(true)}
+                        />
+                      )}
                       <button
                         onClick={() => setDetailPanelOpen(false)}
                         className="p-1.5 rounded-full hover:bg-gray-200 text-gray-500"
@@ -922,6 +937,16 @@ const UserControls = () => {
                       )}
                     </div>
                   </div>
+
+                  {!isCreating && (
+                    <RecordPanel
+                      open={recordPanelOpen}
+                      onClose={() => setRecordPanelOpen(false)}
+                      targetType="control"
+                      targetId={currentControl.controlId}
+                      title={currentControl.name ? `${currentControl.controlId} ${currentControl.name}` : currentControl.controlId}
+                    />
+                  )}
 
                   {/* Control Details */}
                   <div className="bg-white p-4 rounded-lg shadow-sm border space-y-4">

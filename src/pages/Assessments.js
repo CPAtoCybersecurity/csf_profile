@@ -19,9 +19,10 @@ import ExportPasswordDialog from '../components/ExportPasswordDialog';
 import AssessmentPicker from '../components/AssessmentPicker';
 import EmptyState from '../components/EmptyState';
 import ScoreSelect from '../components/ScoreSelect';
+import RecordPanel, { CommentsButton } from '../components/RecordPanel';
 
 // Stores
-import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES, ASSESSMENT_CSV_HEADERS } from '../stores/assessmentsStore';
+import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES, ASSESSMENT_CSV_HEADERS, evaluationTargetId } from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore, { isCsfRequirement } from '../stores/requirementsStore';
 import useUserStore from '../stores/userStore';
@@ -107,6 +108,8 @@ const Assessments = () => {
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
   const [editMode, setEditMode] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  // Comments/History panel for the open evaluation record
+  const [recordPanelOpen, setRecordPanelOpen] = useState(false);
   // Quarter sourced from the global uiStore so the terminal status bar
   // selectors stay in sync. Internal code keeps using 'Q1'..'Q4' strings.
   const selectedQuarterNum = useUIStore((s) => s.selectedQuarter);
@@ -762,9 +765,9 @@ Format as a numbered list. Be specific and actionable.`;
         updateObservation(created.id, itemId, wizardAttachObservation(bankEntry, attachPlan.offersByItem[itemId], orgProfile, {
           substituteName: tailorWithProfile,
           adaptStack: adaptStackRefs
-        }));
+        }), { log: false });
       } else if (generatedProcedures[itemId]) {
-        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
+        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] }, { log: false });
       }
     }
 
@@ -1625,6 +1628,11 @@ Format as a numbered list. Be specific and actionable.`;
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                <CommentsButton
+                  targetType="evaluation"
+                  targetId={evaluationTargetId(currentAssessmentId, selectedItemId)}
+                  onClick={() => setRecordPanelOpen(true)}
+                />
                 {editMode ? (
                   <select
                     value={currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started'}
@@ -1662,6 +1670,14 @@ Format as a numbered list. Be specific and actionable.`;
               </div>
             </div>
           </div>
+
+          <RecordPanel
+            open={recordPanelOpen}
+            onClose={() => setRecordPanelOpen(false)}
+            targetType="evaluation"
+            targetId={evaluationTargetId(currentAssessmentId, selectedItemId)}
+            title={`${currentAssessment?.name || 'Assessment'} / ${currentItem.type === 'control' ? currentItem.controlId : currentItem.subcategoryId || currentItem.id}`}
+          />
 
           {/* Two-column layout like Jira - 50/50 split */}
           <div className="grid grid-cols-2 flex-1 min-h-0 overflow-hidden">

@@ -1,42 +1,9 @@
 import React, { useState, useMemo } from 'react';
 import { Download, Trash2, History, Search, Filter } from 'lucide-react';
 import useAuditLogStore from '../stores/auditLogStore';
-
-// Human-readable action labels and badge colors
-const ACTION_META = {
-  score_changed: { label: 'Score Changed', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' },
-  status_changed: { label: 'Status Changed', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' },
-  finding_created: { label: 'Finding Created', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' },
-  finding_updated: { label: 'Finding Updated', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' },
-  finding_deleted: { label: 'Finding Deleted', color: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' },
-  observation_updated: { label: 'Observation Updated', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200' },
-};
-
-const ACTION_OPTIONS = [
-  { value: '', label: 'All Actions' },
-  { value: 'score_changed', label: 'Score Changed' },
-  { value: 'status_changed', label: 'Status Changed' },
-  { value: 'finding_created', label: 'Finding Created' },
-  { value: 'finding_updated', label: 'Finding Updated' },
-  { value: 'finding_deleted', label: 'Finding Deleted' },
-  { value: 'observation_updated', label: 'Observation Updated' },
-];
-
-const formatTimestamp = (isoString) => {
-  if (!isoString) return '—';
-  try {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    }).format(new Date(isoString));
-  } catch {
-    return isoString;
-  }
-};
+// Action labels/colors + timestamp formatting are shared with the per-record
+// History tab (RecordPanel) — one home in utils/auditActions.js.
+import { ACTION_META, ACTION_OPTIONS, formatAuditTimestamp as formatTimestamp } from '../utils/auditActions';
 
 const ActionBadge = ({ action }) => {
   const meta = ACTION_META[action] || { label: action, color: 'bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-200' };
