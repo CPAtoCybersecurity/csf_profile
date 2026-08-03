@@ -10,6 +10,12 @@ This is one of three ways to use the CSF Profile Assessment Database:
 | `GET_THE_SPREADSHEETS/` | You just want CSV/Excel artifacts to work in spreadsheets. |
 | `GET_THE_NOTION_TEMPLATE/` | You prefer to assess inside Notion. Quick-start bundle and import guide. |
 
+## Install from your browser (no toolchain)
+
+The web app is a Progressive Web App: open a **production copy** in Chrome or Edge — a hosted deployment, or a local build served with `npm run build` then `npx serve -s build` — and click the **install icon** in the address bar (or menu → *Install CSF Profile Assessment*). You get a standalone app window, a launcher/dock icon, and offline support: after the first visit the app opens and runs with no connection. (The `npm start` dev server deliberately skips the offline worker so hot reload never fights a cache.) Your data already lives entirely in your browser's local storage, so nothing about installing changes where data goes.
+
+This is the fastest path on machines where you can't install Node or Rust — nothing to build, nothing to run as admin.
+
 ## Quick start
 
 See the main [README — Installation and Setup](../README.md#installation-and-setup) for the full walkthrough. Short version:
