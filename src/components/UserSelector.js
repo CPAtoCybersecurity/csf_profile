@@ -1,6 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useLayoutEffect, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Plus, X } from 'lucide-react';
 import useUserStore from '../stores/userStore';
+
+// Dropdown geometry. WIDTH must stay in sync with the `w-72` class on the
+// panel — the position math needs the width before the panel is measurable.
+const DROPDOWN_WIDTH = 288; // .w-72 = 18rem
+const VIEWPORT_MARGIN = 8;
 
 // Generate a consistent color based on user name
 const getAvatarColor = (name) => {
@@ -72,6 +78,7 @@ const UserSelector = ({
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [browseDirectory, setBrowseDirectory] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState(null);
   const dropdownRef = useRef(null);
   const triggerRef = useRef(null);
 
@@ -134,6 +141,64 @@ const UserSelector = ({
       onChange(null);
     }
   };
+
+  // Anchor the dropdown to the trigger in viewport coordinates.
+  //
+  // The panel is portalled to <body> and positioned `fixed` rather than
+  // absolutely inside the trigger: the Assessments Details pane is an
+  // `overflow-auto` column, so an absolutely-positioned panel is clipped by
+  // that pane instead of overflowing it — the panel scrolls out of sight
+  // rather than being visible on top (issue: auditor list appeared off-screen).
+  // Clamping keeps the panel fully on screen when the trigger sits near an
+  // edge, which is the normal case here — the Auditor trigger is right-aligned.
+  const updateDropdownPosition = useCallback(() => {
+    const trigger = triggerRef.current;
+    if (!trigger) return;
+
+    const t = trigger.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth;
+    const vh = document.documentElement.clientHeight;
+    const panelH = dropdownRef.current?.offsetHeight || 0;
+
+    // Prefer left-aligned with the trigger; pull it back when the panel would
+    // run past the right edge, and never push it past the left edge.
+    const left = Math.max(
+      VIEWPORT_MARGIN,
+      Math.min(t.left, vw - DROPDOWN_WIDTH - VIEWPORT_MARGIN)
+    );
+
+    // Below the trigger, flipping above when there isn't room underneath.
+    let top = t.bottom + VIEWPORT_MARGIN;
+    if (panelH && top + panelH > vh - VIEWPORT_MARGIN) {
+      const above = t.top - panelH - VIEWPORT_MARGIN;
+      top = above >= VIEWPORT_MARGIN
+        ? above
+        : Math.max(VIEWPORT_MARGIN, vh - panelH - VIEWPORT_MARGIN);
+    }
+
+    setDropdownPos((prev) =>
+      prev && prev.top === top && prev.left === left ? prev : { top, left }
+    );
+  }, []);
+
+  // Measure before paint so the panel never flashes at the wrong spot. Track
+  // scroll in the capture phase — the pane that scrolls is an ancestor div,
+  // not window, so a bubbling listener would never fire.
+  useLayoutEffect(() => {
+    if (!dropdownOpen) {
+      setDropdownPos(null);
+      return undefined;
+    }
+    updateDropdownPosition();
+
+    window.addEventListener('resize', updateDropdownPosition);
+    window.addEventListener('scroll', updateDropdownPosition, true);
+    return () => {
+      window.removeEventListener('resize', updateDropdownPosition);
+      window.removeEventListener('scroll', updateDropdownPosition, true);
+    };
+    // Search/browse change the panel's height, which changes the flip decision.
+  }, [dropdownOpen, searchTerm, browseDirectory, updateDropdownPosition]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -221,11 +286,21 @@ const UserSelector = ({
               <Plus size={16} />
             </button>
 
-            {/* Dropdown */}
-            {dropdownOpen && (
+            {/* Dropdown — portalled to <body> so the Details pane's
+                `overflow-auto` can't clip it; see updateDropdownPosition. */}
+            {dropdownOpen && createPortal(
               <div
                 ref={dropdownRef}
-                className="absolute z-[9999] mt-2 left-0 w-72 bg-white border rounded-lg shadow-xl"
+                className="w-72 bg-white border rounded-lg shadow-xl"
+                style={{
+                  position: 'fixed',
+                  top: dropdownPos ? dropdownPos.top : 0,
+                  left: dropdownPos ? dropdownPos.left : 0,
+                  // z-[9999] was a no-op — this stylesheet defines no z-50+
+                  // utilities and no arbitrary-value classes.
+                  zIndex: 9999,
+                  visibility: dropdownPos ? 'visible' : 'hidden',
+                }}
               >
                 {/* Search input */}
                 <div className="p-2 border-b">
@@ -294,7 +369,8 @@ const UserSelector = ({
                     </button>
                   </div>
                 )}
-              </div>
+              </div>,
+              document.body
             )}
           </div>
         )}
