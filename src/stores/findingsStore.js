@@ -49,6 +49,18 @@ const LEGACY_DEMO_FINDING_IDS = new Set(['FND-1', 'FND-2', 'FND-3', 'FND-4']);
  *  - KEPT without a panel surface: `Control ID` and `Linked Artifacts` carry
  *    live seeded data and are reachable from other pages, so dropping them
  *    would destroy state the sheet is supposed to carry.
+ *
+ * What changed (2026-08-05):
+ *  - The three CSV-only columns now have panel rows. `Control ID` (242/243
+ *    rows populated), `Linked Artifacts` (241/243) and the ticket key (242/243)
+ *    were exported but invisible and uneditable in the UI, so the sheet carried
+ *    state the panel could neither show nor correct. Parity is now both ways:
+ *    every column here has a panel surface, and every panel surface has a
+ *    column.
+ *  - RENAMED: `Jira Key` -> `Ticket ID`. The field was never Jira-specific
+ *    (externalUrl already points at Jira/ServiceNow/anything). The importer
+ *    still accepts `Jira Key` and Jira's own `Issue key`, so CSVs exported by
+ *    earlier versions load unchanged.
  */
 export const FINDING_CSV_HEADERS = [
   'Finding ID',
@@ -68,7 +80,7 @@ export const FINDING_CSV_HEADERS = [
   'Last Modified',
   'Control ID',
   'Linked Artifacts',
-  'Jira Key'
+  'Ticket ID'
 ];
 
 /**
@@ -334,7 +346,7 @@ const useFindingsStore = create(
           'Last Modified': csvFormulaGuard(f.lastModified || ''),
           'Control ID': csvFormulaGuard(f.controlId || ''),
           'Linked Artifacts': csvFormulaGuard((f.linkedArtifacts || []).join('; ')),
-          'Jira Key': csvFormulaGuard(f.jiraKey || '')
+          'Ticket ID': csvFormulaGuard(f.jiraKey || '')
         }));
 
         const csv = Papa.unparse(csvData, { columns: FINDING_CSV_HEADERS });
@@ -464,7 +476,10 @@ const useFindingsStore = create(
                   // importer's 'Last Updated' handling.
                   lastModified: (row['Last Modified'] || row['Updated'] || '').trim() || new Date().toISOString(),
                   externalUrl: row['External URL'] || '',
-                  jiraKey: row['Issue key'] || row['Jira Key'] || null,
+                  // 'Ticket ID' is the current column name; 'Jira Key' is what
+                  // this app exported before 2026-08-05 and 'Issue key' is
+                  // Jira's own export header. All three still load.
+                  jiraKey: row['Ticket ID'] || row['Issue key'] || row['Jira Key'] || null,
                   linkedArtifacts: (row['Linked Artifacts'] || '')
                     .split(';').map(s => s.trim()).filter(Boolean)
                 };
