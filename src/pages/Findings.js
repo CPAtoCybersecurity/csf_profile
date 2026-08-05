@@ -227,7 +227,7 @@ const Findings = () => {
       'Last Modified': '',
       'Control ID': 'PR.AA-05 Ex1',
       'Linked Artifacts': 'Access Review Report; IAM Policy',
-      'Jira Key': ''
+      'Ticket ID': 'SEC-123'
     };
 
     const csv = [
@@ -328,7 +328,10 @@ const Findings = () => {
       dueDate: '',
       status: 'Not Started',
       priority: 'Medium',
-      externalUrl: ''
+      externalUrl: '',
+      controlId: '',
+      linkedArtifacts: [],
+      jiraKey: ''
     });
     setEditMode(false);
     setErrors({});
@@ -901,9 +904,11 @@ const Findings = () => {
                     )}
                   </div>
 
-                  {/* CSF Compliance Requirement */}
+                  {/* CSF Compliance Requirement — labelled to match the CSV
+                      column of the same name so the panel and the sheet cannot
+                      drift apart again. */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">CSF Reference</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Compliance Requirement</span>
                     {editMode ? (
                       <input
                         type="text"
@@ -1008,6 +1013,73 @@ const Findings = () => {
                       </span>
                     </div>
                   )}
+
+                  {/* Control ID, Linked Artifacts and Ticket ID were exported
+                      to CSV but had no panel surface, so the sheet carried
+                      state the UI could neither show nor correct. Order here
+                      matches the tail of FINDING_CSV_HEADERS. */}
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Control ID</span>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="controlId"
+                        value={formData.controlId || ''}
+                        onChange={handleChange}
+                        className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white w-32"
+                        placeholder="e.g., DE.AE-03 Ex1"
+                      />
+                    ) : (
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {selectedFinding?.controlId || '-'}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Stored as an array; the CSV joins on '; ' and the importer
+                      splits on ';', so the input round-trips through the same
+                      separator rather than inventing a third representation. */}
+                  <div className="flex items-start justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Linked Artifacts</span>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="linkedArtifacts"
+                        value={(formData.linkedArtifacts || []).join('; ')}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          linkedArtifacts: e.target.value
+                            .split(';').map(s => s.trim()).filter(Boolean)
+                        })}
+                        className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white max-w-[200px]"
+                        placeholder="Report A; Policy B"
+                      />
+                    ) : (
+                      <span className="text-sm text-gray-700 dark:text-gray-300 text-right max-w-[200px] break-words">
+                        {(selectedFinding?.linkedArtifacts || []).length > 0
+                          ? selectedFinding.linkedArtifacts.join('; ')
+                          : 'None'}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Ticket ID</span>
+                    {editMode ? (
+                      <input
+                        type="text"
+                        name="jiraKey"
+                        value={formData.jiraKey || ''}
+                        onChange={handleChange}
+                        className="p-1 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white w-32"
+                        placeholder="e.g., FND-1001"
+                      />
+                    ) : (
+                      <span className="text-sm text-gray-700 dark:text-gray-300">
+                        {selectedFinding?.jiraKey || '-'}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

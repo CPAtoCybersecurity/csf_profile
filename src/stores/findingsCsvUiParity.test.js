@@ -11,10 +11,68 @@
  * are Jira's own import columns, a foreign contract, not this app's to rename.
  */
 
+import fs from 'fs';
+import path from 'path';
 import useFindingsStore, { FINDING_CSV_HEADERS } from './findingsStore';
 import useUserStore from './userStore';
 
 const resetStore = () => useFindingsStore.setState({ findings: [] });
+
+const PANEL_SOURCE = fs.readFileSync(
+  path.join(__dirname, '..', 'pages', 'Findings.js'),
+  'utf8'
+);
+
+/**
+ * How each CSV column reaches the panel. `label` entries must appear verbatim
+ * in Findings.js; the other kinds are surfaces that have no text label (the
+ * record header, the title, the two badges) or whose label is computed at
+ * runtime from the assessment's tracking config.
+ *
+ * Adding a column to FINDING_CSV_HEADERS without adding it here fails the
+ * suite — that is the point. The previous version of this file hard-coded a
+ * copy of the panel's field list, so a column could be added to the sheet with
+ * no panel surface and nothing complained. Control ID, Linked Artifacts and
+ * the ticket key all drifted that way.
+ */
+const PANEL_SURFACE = {
+  'Finding ID': { kind: 'record-header' },
+  'Summary': { kind: 'record-title' },
+  'Status': { kind: 'badge' },
+  'Priority': { kind: 'badge' },
+  'External URL': { kind: 'computed-label' }, // externalUrlLabel(tracking, ...)
+  'Name': { kind: 'label', label: 'Name' },
+  'Description': { kind: 'label', label: 'Description' },
+  'Root Cause': { kind: 'label', label: 'Root Cause' },
+  'Remediation Action Plan': { kind: 'label', label: 'Remediation Action Plan' },
+  'Assessment ID': { kind: 'label', label: 'Assessment' },
+  'Compliance Requirement': { kind: 'label', label: 'Compliance Requirement' },
+  'Remediation Owner': { kind: 'label', label: 'Remediation Owner' },
+  'Due Date': { kind: 'label', label: 'Due Date' },
+  'Created Date': { kind: 'label', label: 'Created' },
+  'Last Modified': { kind: 'label', label: 'Last Modified' },
+  'Control ID': { kind: 'label', label: 'Control ID' },
+  'Linked Artifacts': { kind: 'label', label: 'Linked Artifacts' },
+  'Ticket ID': { kind: 'label', label: 'Ticket ID' }
+};
+
+/** Panel rows that deliberately have no column: derived, not stored. */
+const PANEL_ONLY_LABELS = ['Linked Controls'];
+
+/** Pull every Details-row label out of the real panel source. */
+const detailsSectionLabels = () => {
+  const start = PANEL_SOURCE.indexOf('{/* Details section */}');
+  if (start === -1) throw new Error('Details section marker moved — update this probe');
+  const body = PANEL_SOURCE.slice(start);
+  const labels = [];
+  const re = /className="text-sm text-gray-500[^"]*">([\s\S]*?)<\/span>/g;
+  let m;
+  while ((m = re.exec(body)) !== null) {
+    const text = m[1].replace(/<[^>]*\/>/g, '').replace(/\s+/g, ' ').trim();
+    if (text && /^[A-Z]/.test(text) && !text.includes('{')) labels.push(text);
+  }
+  return labels;
+};
 
 const captureCSV = (run) => {
   const captured = [];
@@ -41,14 +99,37 @@ describe('FINDING_CSV_HEADERS is the single canonical column list', () => {
     expect(descAt).toBe(nameAt + 1);
   });
 
-  it('carries every field the detail panel shows', () => {
-    // Panel surfaces, in panel order
-    ['Finding ID', 'Summary', 'Status', 'Priority', 'External URL', 'Name',
-      'Description', 'Root Cause', 'Remediation Action Plan', 'Assessment ID',
-      'Compliance Requirement', 'Remediation Owner', 'Due Date', 'Created Date',
-      'Last Modified'].forEach((header) => {
-      expect(FINDING_CSV_HEADERS).toContain(header);
-    });
+  it('declares a panel surface for every column', () => {
+    const undeclared = FINDING_CSV_HEADERS.filter(h => !PANEL_SURFACE[h]);
+    expect(undeclared).toEqual([]);
+  });
+
+  it('has no declared surface for a column that no longer exists', () => {
+    const orphaned = Object.keys(PANEL_SURFACE).filter(h => !FINDING_CSV_HEADERS.includes(h));
+    expect(orphaned).toEqual([]);
+  });
+
+  it('renders each labelled column as a literal label in the panel source', () => {
+    // Details rows render as >Label</span>; the prose sections render as an
+    // <h3> with an icon, putting the label on its own line.
+    const rendersLabel = (label) =>
+      PANEL_SOURCE.includes(`>${label}</`) ||
+      PANEL_SOURCE.split('\n').some(line => line.trim() === label);
+
+    const missing = Object.entries(PANEL_SURFACE)
+      .filter(([, s]) => s.kind === 'label')
+      .filter(([, s]) => !rendersLabel(s.label))
+      .map(([header]) => header);
+    expect(missing).toEqual([]);
+  });
+
+  it('has no Details row that the CSV does not carry', () => {
+    const mapped = Object.values(PANEL_SURFACE)
+      .filter(s => s.kind === 'label')
+      .map(s => s.label);
+    const unexported = detailsSectionLabels()
+      .filter(l => !mapped.includes(l) && !PANEL_ONLY_LABELS.includes(l));
+    expect(unexported).toEqual([]);
   });
 
   it('no longer carries Evaluation ID — no UI surface and no seeded data', () => {
@@ -122,6 +203,40 @@ describe('round trip: export → import preserves the new columns', () => {
     expect(restored.description).toBe('No out-of-band verification on payment changes.');
     expect(restored.externalUrl).toBe('https://example.com/ticket/9');
     expect(restored.priority).toBe('Critical');
+  });
+
+  it('restores the three columns that had no panel surface before 2026-08-05', () => {
+    useFindingsStore.getState().createFinding({
+      summary: 'Detection gap',
+      controlId: 'DE.AE-03 Ex1',
+      linkedArtifacts: ['AWS Config Snapshot', 'IAM Policy'],
+      jiraKey: 'FND-1001'
+    });
+
+    const csv = captureCSV(() => useFindingsStore.getState().exportFindingsCSV(useUserStore));
+    expect(headerLine(csv)).toContain('Ticket ID');
+    expect(headerLine(csv)).not.toContain('Jira Key');
+
+    return useFindingsStore.getState().importFindingsCSV(
+      (resetStore(), csv), useUserStore
+    ).then(() => {
+      const [restored] = useFindingsStore.getState().findings;
+      expect(restored.controlId).toBe('DE.AE-03 Ex1');
+      expect(restored.linkedArtifacts).toEqual(['AWS Config Snapshot', 'IAM Policy']);
+      expect(restored.jiraKey).toBe('FND-1001');
+    });
+  });
+
+  it('still imports a sheet written when the column was called Jira Key', async () => {
+    const legacy = [
+      FINDING_CSV_HEADERS.join(',').replace('Ticket ID', 'Jira Key'),
+      ['FND-legacy', 'Old sheet', 'Not Started', 'Medium', '', '', '', '', '',
+        '', '', '', '', '', '', '', '', 'FND-9999'].join(',')
+    ].join('\n');
+
+    await useFindingsStore.getState().importFindingsCSV(legacy, useUserStore);
+    const [restored] = useFindingsStore.getState().findings;
+    expect(restored.jiraKey).toBe('FND-9999');
   });
 
   it('does not accumulate quote characters on an apostrophe (csvFormulaGuard, not escapeCSVValue)', async () => {
