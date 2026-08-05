@@ -8,8 +8,10 @@ import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
 import useSort from '../hooks/useSort';
+import useRowSelection from '../hooks/useRowSelection';
 import { SCOPE_ALL, SCOPE_UNASSIGNED, filterByScope, resolveScopeStamp, defaultScope } from '../utils/assessmentScope';
 import { extractArtifactsFromProfile } from '../updateArtifactLinks';
+import BulkDeleteBar from '../components/BulkDeleteBar';
 import EmptyState from '../components/EmptyState';
 import { sanitizeExternalUrl } from '../utils/externalLinks';
 
@@ -66,6 +68,19 @@ const Artifacts = () => {
 
   // Sorting (over the scoped list — issue #297)
   const { sort, sortedData, handleSort } = useSort(scopedArtifacts);
+
+  // Row selection for bulk actions. Keyed on the rows actually rendered, so
+  // changing the assessment scope drops the rows that left the view out of the
+  // selection instead of leaving them queued for an invisible delete.
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    toggle: toggleSelection,
+    toggleAll,
+    clear: clearSelection,
+    allSelected
+  } = useRowSelection(sortedData);
 
   // Get linked controls for the selected artifact, scoped to the ARTIFACT's
   // own assessment (issue #299): derived chips follow the record's scope, not
@@ -311,6 +326,27 @@ const Artifacts = () => {
     }
   };
 
+  // Delete every selected artifact behind a single confirmation. The ids come
+  // from the selection hook, which has already intersected them with the rows
+  // on screen — nothing hidden by the scope filter can be caught up in this.
+  const handleBulkDelete = () => {
+    if (selectedCount === 0) return;
+    const noun = selectedCount === 1 ? 'artifact' : 'artifacts';
+    if (!window.confirm(`Delete ${selectedCount} ${noun}? This cannot be undone.`)) return;
+
+    const doomed = new Set(selectedIds);
+    selectedIds.forEach(id => deleteArtifact(id));
+    clearSelection();
+    toast.success(`${selectedCount} ${noun} deleted`);
+
+    // The detail panel is a view onto one of the rows we just removed; leaving
+    // it open would render a record that no longer exists.
+    if (selectedArtifact && doomed.has(selectedArtifact.id)) {
+      setSelectedArtifact(null);
+      resetForm();
+    }
+  };
+
   // Reset form
   const resetForm = () => {
     setFormData({
@@ -486,6 +522,12 @@ const Artifacts = () => {
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left - Table */}
         <div className={`${selectedArtifact || editMode ? 'w-1/2' : 'w-full'} overflow-auto border-r dark:border-gray-700`}>
+          <BulkDeleteBar
+            count={selectedCount}
+            onDelete={handleBulkDelete}
+            onClear={clearSelection}
+            noun="artifact"
+          />
           {/* Column headers */}
           {/* min-w-max belongs on the STICKY wrapper, not only on the inner
               row: a block child of an overflow-auto container is sized to the
@@ -494,7 +536,17 @@ const Artifacts = () => {
               past — rows would slide under a transparent header. */}
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700 min-w-max">
             <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400 min-w-max">
-              <div className="w-8 flex-shrink-0"></div>
+              <div className="w-8 flex-shrink-0">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  disabled={sortedData.length === 0}
+                  aria-label="Select all artifacts"
+                  title="Select all artifacts"
+                />
+              </div>
               <div className="w-56 flex-shrink-0">ID</div>
               <div className="w-64 flex-shrink-0">Artifact Name</div>
               <div className="w-28 flex-shrink-0">Assignee</div>
@@ -525,7 +577,10 @@ const Artifacts = () => {
                       <input
                         type="checkbox"
                         className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                        checked={isSelected(artifact.id)}
+                        onChange={() => toggleSelection(artifact.id)}
                         onClick={(e) => e.stopPropagation()}
+                        aria-label={`Select ${artifact.name || artifact.artifactId || artifact.id}`}
                       />
                     </div>
 
