@@ -125,8 +125,19 @@ const useOrgProfileStore = create(
       // A logo is by far the largest value this store will ever hold. Plain
       // localStorage lets zustand persist swallow a quota failure in silence;
       // the quota-safe wrapper (already used by assessmentsStore) tells the
-      // user their changes are not being saved.
-      storage: createJSONStorage(() => quotaSafeLocalStorage)
+      // user their changes are not being saved. Read/serialize semantics are
+      // otherwise identical to the default storage, so values persisted before
+      // this switch hydrate unchanged.
+      storage: createJSONStorage(() => quotaSafeLocalStorage),
+      // Hydration is the FOURTH guard point, and the one that matters most:
+      // localStorage is directly editable, and a poisoned value that only got
+      // caught at render would still sit in state, get re-persisted on the next
+      // unrelated write, and ride the user's next complete backup. Normalizing
+      // here means it never lands in state at all.
+      merge: (persisted, current) => {
+        const merged = { ...current, ...(persisted || {}) };
+        return { ...merged, branding: normalizeBranding(merged.branding) || { ...EMPTY_BRANDING } };
+      }
     }
   )
 );

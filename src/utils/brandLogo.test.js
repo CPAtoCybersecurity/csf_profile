@@ -199,7 +199,9 @@ describe('backup, share, and restore', () => {
     [{ includePrivate: false }, { includePrivate: true }].forEach((mode) => {
       const share = buildShareableExport(stores(), mode);
       expect(share.data.orgProfile).toBeUndefined();
-      expect(JSON.stringify(share)).not.toContain('data:image/png');
+      const serialized = JSON.stringify(share);
+      expect(serialized).not.toContain('data:image/png');
+      expect(serialized).not.toContain('acme.png'); // filename is org-identifying too
     });
   });
 
@@ -229,6 +231,84 @@ describe('backup, share, and restore', () => {
     };
 
     restore(backup);
+    expect(useOrgProfileStore.getState().branding.logoDataUrl).toBe('');
+  });
+});
+
+/**
+ * Gaps surfaced by the pre-completion advisor round, each turned into a probe
+ * rather than an argument.
+ */
+describe('advisor round — hydration, bleed-through, and rollback', () => {
+  const STORAGE_KEY = 'csf-org-profile-storage';
+
+  const hydrateFrom = (persistedState) => {
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ state: persistedState, version: 1 })
+    );
+    useOrgProfileStore.persist.rehydrate();
+  };
+
+  afterEach(() => {
+    window.localStorage.removeItem(STORAGE_KEY);
+  });
+
+  test('a poisoned localStorage value never lands in state — the guard runs at hydration', () => {
+    hydrateFrom({
+      profile: null,
+      cloudConsent: false,
+      branding: { logoDataUrl: 'data:image/svg+xml;utf8,<svg onload="alert(1)"></svg>', logoFileName: 'evil.svg' }
+    });
+
+    // Not merely unrendered: absent from state, so it cannot be re-persisted
+    // on the next write or exported into a complete backup.
+    expect(useOrgProfileStore.getState().branding.logoDataUrl).toBe('');
+    expect(exportAllDataJSON(stores()).data.orgProfile.branding.logoDataUrl).toBe('');
+  });
+
+  test('a value persisted before the quota-safe storage switch still hydrates', () => {
+    // Same key, same envelope shape — quotaSafeLocalStorage only wraps setItem
+    // in a try/catch, so a pre-switch value must survive unchanged.
+    hydrateFrom({ profile: { orgName: 'Legacy Co' }, cloudConsent: true, branding: { logoDataUrl: PNG_1X1, logoFileName: 'legacy.png' } });
+
+    expect(useOrgProfileStore.getState().profile.orgName).toBe('Legacy Co');
+    expect(useOrgProfileStore.getState().cloudConsent).toBe(true);
+    expect(useOrgProfileStore.getState().branding.logoDataUrl).toBe(PNG_1X1);
+  });
+
+  test('a pre-branding persisted value hydrates to the default shield, not undefined', () => {
+    hydrateFrom({ profile: { orgName: 'Pre-branding Co' }, cloudConsent: false });
+
+    expect(useOrgProfileStore.getState().branding).toEqual({ logoDataUrl: '', logoFileName: '' });
+    expect(useOrgProfileStore.getState().hasBrandLogo()).toBe(false);
+  });
+
+  test('current-format exports ALWAYS emit the branding key, even with no logo', () => {
+    // This is what keeps "absent" unambiguous: absent means legacy file, never
+    // "current file that happened to have no logo".
+    expect(exportAllDataJSON(stores()).data.orgProfile).toHaveProperty('branding');
+  });
+
+  test('restoring a current backup taken with no logo CLEARS a pre-existing one', () => {
+    const backupWithNoLogo = exportAllDataJSON(stores());
+    useOrgProfileStore.getState().setBrandLogo(PNG_1X1, 'acme.png');
+
+    restore(backupWithNoLogo);
+
+    // The cross-org bleed case: importing someone else's backup must not leave
+    // your logo standing on their data.
+    expect(useOrgProfileStore.getState().branding.logoDataUrl).toBe('');
+  });
+
+  test('a failed restore rolls a newly-set logo back OFF, not just back to a previous one', () => {
+    // The direction that absent-means-untouched semantics could break: no logo
+    // before, restore sets one, restore then fails.
+    const backup = exportAllDataJSON(stores());
+    backup.data.orgProfile.branding = { logoDataUrl: PNG_1X1, logoFileName: 'acme.png' };
+    const broken = { ...stores(), commentsStore: { getState: () => ({ setComments: undefined }) } };
+
+    expect(() => importCompleteDatabase(backup, broken, { backupFirst: false })).toThrow();
     expect(useOrgProfileStore.getState().branding.logoDataUrl).toBe('');
   });
 });
