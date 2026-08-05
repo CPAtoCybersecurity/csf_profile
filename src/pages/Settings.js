@@ -16,6 +16,7 @@ import {
   Cloud,
   Layers,
   Building2,
+  Image as ImageIcon,
   Database,
   FileText,
   RotateCcw
@@ -38,6 +39,7 @@ import useOrgProfileStore from '../stores/orgProfileStore';
 import useInventoryStore from '../stores/inventoryStore';
 import useCommentsStore from '../stores/commentsStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
+import { LOGO_ACCEPT_ATTR, isSafeLogoDataUrl, prepareLogoFromFile } from '../utils/brandLogo';
 import AssessmentPicker from '../components/AssessmentPicker';
 
 // Utils
@@ -89,6 +91,30 @@ const Settings = () => {
   const orgCloudConsent = useOrgProfileStore((s) => s.cloudConsent);
   const setOrgCloudConsent = useOrgProfileStore((s) => s.setCloudConsent);
   const clearOrgProfile = useOrgProfileStore((s) => s.clearProfile);
+  const branding = useOrgProfileStore((s) => s.branding);
+  const setBrandLogo = useOrgProfileStore((s) => s.setBrandLogo);
+  const clearBrandLogo = useOrgProfileStore((s) => s.clearBrandLogo);
+  const logoInputRef = useRef(null);
+  const customLogo = isSafeLogoDataUrl(branding?.logoDataUrl) ? branding.logoDataUrl : null;
+
+  const handleLogoFile = useCallback(async (event) => {
+    const file = event.target.files?.[0];
+    // Reset the input first: picking the same file twice in a row must still
+    // fire a change event.
+    event.target.value = '';
+    if (!file) return;
+
+    const result = await prepareLogoFromFile(file);
+    if (!result.ok) {
+      toast.error(result.error);
+      return;
+    }
+    if (!setBrandLogo(result.dataUrl, result.fileName)) {
+      toast.error('That image could not be stored as your logo.');
+      return;
+    }
+    toast.success('Logo updated');
+  }, [setBrandLogo]);
 
   const fileInputRef = useRef(null);
   const newFrameworkFileInputRef = useRef(null);
@@ -1020,6 +1046,71 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
               Stored only in this browser. <strong>Never included in shareable exports</strong> — tailored
               procedure text is swapped back to the community version there. It rides complete backups
               only; password-protect backups that carry it.
+            </p>
+          </div>
+
+          {/* Branding — swap the Simply Cyber shield in the sidebar for the
+              org's own mark. Stored beside the org profile, so it inherits the
+              same disposition: complete backups yes, share exports never. */}
+          <div className="card">
+            <div className="card-header flex items-center gap-2">
+              <ImageIcon size={16} style={{ color: 'var(--accent)' }} />
+              <div>
+                <h3 className="settings-section-title">Branding (optional)</h3>
+                <p className="settings-section-desc">
+                  Replace the Simply Cyber shield in the sidebar with your company logo. Leave it unset
+                  and the shield stays.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-4">
+              <div className="terminal-logo-disc" aria-hidden="true">
+                <img src={customLogo || '/SC_Logo.png'} alt="" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="settings-section-desc">
+                  {customLogo
+                    ? `In use: ${branding?.logoFileName || 'your logo'}`
+                    : 'In use: the default Simply Cyber shield'}
+                </span>
+                <div className="flex items-center gap-3">
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept={LOGO_ACCEPT_ATTR}
+                    onChange={handleLogoFile}
+                    className="hidden"
+                    data-testid="brand-logo-input"
+                  />
+                  <button className="btn-terminal" onClick={() => logoInputRef.current?.click()}>
+                    <Upload size={14} />
+                    {customLogo ? 'Replace Logo' : 'Upload Logo'}
+                  </button>
+                  {customLogo && (
+                    <button
+                      className="text-sm hover:underline"
+                      style={{ color: 'var(--text-muted)' }}
+                      onClick={() => {
+                        clearBrandLogo();
+                        toast.success('Default logo restored');
+                      }}
+                    >
+                      Use default logo
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* mt-2, not mt-3: index.css is a hand-written utility subset and
+                stops at mt-2 — `mt-3` elsewhere in this file is a silent no-op. */}
+            <p className="settings-section-desc mt-2">
+              PNG, JPEG, WebP, or GIF up to 2 MB — resized to 256px before it is saved. The mark sits on
+              a <strong>white disc</strong> in both light and dark themes, so a white-on-transparent logo
+              will not show; use a dark or full-colour version. Stored only in this browser, alongside the
+              organization profile: it rides complete backups and is <strong>never</strong> included in
+              shareable exports.
             </p>
           </div>
 

@@ -126,8 +126,16 @@ export const exportAllDataJSON = (stores) => {
       comments: commentsStore?.getState?.()?.comments || [],
       // Object section (not an array): the org profile rides COMPLETE
       // backups only; buildShareableExport strips it unconditionally.
+      // `branding` (the custom sidebar logo) is carried in the same section
+      // and inherits that disposition — a backup restores your logo, a share
+      // export never carries it. Absent in files written before the field
+      // existed, which restore reads as "leave the receiver's logo alone".
       orgProfile: orgProfileState
-        ? { profile: orgProfileState.profile, cloudConsent: orgProfileState.cloudConsent }
+        ? {
+            profile: orgProfileState.profile,
+            cloudConsent: orgProfileState.cloudConsent,
+            branding: orgProfileState.branding
+          }
         : { profile: null, cloudConsent: false }
     }
   };

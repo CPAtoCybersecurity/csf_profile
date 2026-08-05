@@ -392,6 +392,10 @@ Object {
       },
     ],
     "orgProfile": Object {
+      "branding": Object {
+        "logoDataUrl": "",
+        "logoFileName": "",
+      },
       "cloudConsent": false,
       "profile": Object {
         "crownJewels": Array [

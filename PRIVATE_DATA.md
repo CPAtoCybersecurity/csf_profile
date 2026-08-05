@@ -121,6 +121,24 @@ the crown-jewel list plus your tooling reads like an attacker's shopping list. I
   as-is (that is what makes them useful to you). The scrubbed artifact is the **Share
   export** only — hand people `csf_share_*.json`, not a CSV, when org context must stay out.
 
+### Company logo (Settings → Branding)
+
+An org can replace the Simply Cyber shield in the sidebar with its own logo. The image is
+stored as a data URL in the **same** `csf-org-profile-storage` key, in a `branding` slice
+beside the profile — so it inherits the profile's disposition exactly:
+
+- **Rides complete backups**, so a restore brings your branding back with your data.
+- **Never rides a shareable export**, in either mode — the whole `orgProfile` section is
+  deleted by the share registry, and a logo identifies your organization the same way
+  `orgName` does.
+- **Never reaches an AI provider.** `profileToPromptContext` enumerates profile fields
+  positively; the branding slice sits outside the `profile` object and is not among them.
+- **Raster formats only** (PNG / JPEG / WebP / GIF), validated by positive match at upload,
+  at render, and at restore. SVG is refused — it is a document format that can carry script,
+  and a logo does not need it.
+- **Bounded before it is persisted** — resized to 256px and capped — because localStorage is
+  one shared budget with all of your assessment data.
+
 ### Platform procedure references (format 5)
 
 Platform addenda (SCuBA baselines) attach as **references**, never copies:

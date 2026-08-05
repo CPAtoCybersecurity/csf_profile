@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import useUserStore from '../stores/userStore';
+import useOrgProfileStore from '../stores/orgProfileStore';
+import { isSafeLogoDataUrl } from '../utils/brandLogo';
 import {
   LayoutDashboard,
   Users,
@@ -120,17 +122,43 @@ const ActingUserSelect = () => {
   );
 };
 
-const Brand = () => (
-  <div className="app-sidebar-brand">
-    <div className="terminal-logo-disc">
-      <img src="/SC_Logo.png" alt="Simply Cyber shield" />
+// The brand mark. Rendered by BOTH the rail and the drawer, so the custom-logo
+// swap lives here once rather than in two places that could drift.
+const Brand = () => {
+  const branding = useOrgProfileStore((state) => state.branding);
+  const orgName = useOrgProfileStore((state) => state.profile?.orgName);
+  // A stored value can arrive from a restored backup without ever passing the
+  // upload form, so the guard runs at render too — a value that fails it falls
+  // through to the shield rather than becoming an attacker-chosen `src`.
+  const customLogo = isSafeLogoDataUrl(branding?.logoDataUrl) ? branding.logoDataUrl : null;
+  // ...and a data URL that passes the shape check can still be corrupt bytes.
+  // onError retires it for this session so the sidebar shows the shield rather
+  // than a broken-image glyph nobody can clear.
+  const [logoBroken, setLogoBroken] = useState(false);
+  const showCustom = Boolean(customLogo) && !logoBroken;
+
+  useEffect(() => { setLogoBroken(false); }, [customLogo]);
+
+  return (
+    <div className="app-sidebar-brand">
+      <div className="terminal-logo-disc">
+        {showCustom ? (
+          <img
+            src={customLogo}
+            alt={orgName ? `${orgName} logo` : 'Company logo'}
+            onError={() => setLogoBroken(true)}
+          />
+        ) : (
+          <img src="/SC_Logo.png" alt="Simply Cyber shield" />
+        )}
+      </div>
+      <div className="app-sidebar-brand-text">
+        <span className="app-sidebar-brand-name">CSF Profile</span>
+        <span className="app-sidebar-brand-sub">NIST CSF 2.0 Assessment Tool</span>
+      </div>
     </div>
-    <div className="app-sidebar-brand-text">
-      <span className="app-sidebar-brand-name">CSF Profile</span>
-      <span className="app-sidebar-brand-sub">NIST CSF 2.0 Assessment Tool</span>
-    </div>
-  </div>
-);
+  );
+};
 
 const Navigation = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);

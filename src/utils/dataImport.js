@@ -320,7 +320,14 @@ export const importCompleteDatabase = (parsed, stores, { backupFirst = true } = 
       key: 'orgProfile',
       setFn: setProfileState,
       value: data.orgProfile,
-      previous: { profile: orgState.profile, cloudConsent: orgState.cloudConsent }
+      // branding rides the rollback snapshot too — without it a mid-apply
+      // failure would restore the profile but leave the logo as whatever the
+      // partial write left behind.
+      previous: {
+        profile: orgState.profile,
+        cloudConsent: orgState.cloudConsent,
+        branding: orgState.branding
+      }
     });
   } else {
     skipped.push('orgProfile');
