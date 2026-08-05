@@ -590,6 +590,14 @@ code {
 .bottom-0 { bottom: 0; }
 .inset-y-0 { top: 0; bottom: 0; }
 .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+/* .z-10 was missing while JSX used it in four places (the Artifact/Finding/
+   Control pick lists and the Artifacts page's inline picker) plus every
+   `sticky top-0 z-10` table header. This stylesheet is hand-maintained — there
+   is no Tailwind build — so an undefined utility fails silently: the class
+   applies, `z-index` computes to `auto`, and the panel is painted over by any
+   later positioned sibling. That is what put the Findings box on top of the
+   open artifact list. Same class of bug as the inert `z-[9999]` in 40efe46. */
+.z-10 { z-index: 10; }
 .z-20 { z-index: 20; }
 .z-30 { z-index: 30; }
 .z-40 { z-index: 40; }
