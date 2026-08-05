@@ -161,7 +161,8 @@ export const migrateLegacyData = () => {
                 actionPlan: item['Action Plan'] || '',
                 dueDate: item['Remediation Due Date'] || ''
               }
-            });
+            // migration seeding — never audit-logged (bulk lane)
+            }, { log: false });
           });
         }
       });

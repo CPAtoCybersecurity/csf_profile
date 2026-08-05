@@ -1856,3 +1856,71 @@ nav a:active { text-decoration: none !important; }
 .app-toolbar-segment { min-height: 28px; min-width: 34px; }
 .app-drawer-trigger { min-height: 34px; min-width: 34px; }
 .btn-terminal { min-height: 28px; }
+
+/* Acting-user selector (sidebar + drawer): who comments and audit entries
+   are attributed to. Theme-var surface so both modes inherit correctly. */
+.app-acting-user {
+  padding: 10px 12px;
+  border-top: 1px solid var(--border-color);
+}
+.app-acting-user-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-faint);
+  letter-spacing: 0.02em;
+  margin-bottom: 4px;
+}
+.app-acting-user select {
+  width: 100%;
+  font-size: 12px;
+  padding: 4px 6px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+}
+
+/* ==========================================================================
+   Evaluation cards — whole-card link target (Assessments list)
+   Each evaluation is addressable at /assessments?selected=<id>. Its title is
+   a real anchor, so the browser's own context menu supplies "Open Link in New
+   Window" / "New Tab", and the ::after overlay stretches that hit area across
+   the whole card. The card's own buttons are lifted above the overlay so they
+   keep taking clicks. Named rules rather than utilities: the utility layer
+   here is a partial hand-written subset with no z-10/z-0.
+   ========================================================================== */
+
+.evaluation-card { position: relative; }
+
+.evaluation-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.evaluation-card__link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.evaluation-card__actions,
+.evaluation-card__status {
+  position: relative;
+  z-index: 2;
+}
+
+/* The hit area is the whole card, so the focus ring is drawn on the overlay
+   rather than around the title text — otherwise keyboard users see a ring
+   that describes a much smaller target than the one they are about to
+   activate. */
+.evaluation-card__link:focus-visible {
+  outline: none;
+}
+
+.evaluation-card__link:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  border-radius: var(--radius-lg);
+}

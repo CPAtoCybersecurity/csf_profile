@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
@@ -19,9 +20,10 @@ import ExportPasswordDialog from '../components/ExportPasswordDialog';
 import AssessmentPicker from '../components/AssessmentPicker';
 import EmptyState from '../components/EmptyState';
 import ScoreSelect from '../components/ScoreSelect';
+import RecordPanel, { CommentsButton } from '../components/RecordPanel';
 
 // Stores
-import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES, ASSESSMENT_CSV_HEADERS } from '../stores/assessmentsStore';
+import useAssessmentsStore, { normalizeAssessmentUsers, ASSESSMENT_USER_ROLES, ASSESSMENT_CSV_HEADERS, evaluationTargetId } from '../stores/assessmentsStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore, { isCsfRequirement } from '../stores/requirementsStore';
 import useUserStore from '../stores/userStore';
@@ -103,10 +105,16 @@ const Assessments = () => {
   // AI Store for test procedure generation
   const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
 
+  // Deep linking: /assessments?selected=<assessmentId> — same convention the
+  // Findings and Controls pages already honor.
+  const [searchParams, setSearchParams] = useSearchParams();
+
   // Local state
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
   const [editMode, setEditMode] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
+  // Comments/History panel for the open evaluation record
+  const [recordPanelOpen, setRecordPanelOpen] = useState(false);
   // Quarter sourced from the global uiStore so the terminal status bar
   // selectors stay in sync. Internal code keeps using 'Q1'..'Q4' strings.
   const selectedQuarterNum = useUIStore((s) => s.selectedQuarter);
@@ -762,9 +770,9 @@ Format as a numbered list. Be specific and actionable.`;
         updateObservation(created.id, itemId, wizardAttachObservation(bankEntry, attachPlan.offersByItem[itemId], orgProfile, {
           substituteName: tailorWithProfile,
           adaptStack: adaptStackRefs
-        }));
+        }), { log: false });
       } else if (generatedProcedures[itemId]) {
-        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] });
+        updateObservation(created.id, itemId, { testProcedures: generatedProcedures[itemId] }, { log: false });
       }
     }
 
@@ -780,6 +788,22 @@ Format as a numbered list. Be specific and actionable.`;
     setView('scope');
     setSelectedItemId(null);
   }, [setCurrentAssessmentId]);
+
+  // Honor ?selected=<assessmentId> so an evaluation opened in a new window or
+  // tab lands on that evaluation instead of the generic list. useLayoutEffect
+  // rather than useEffect: this runs before paint, so a freshly opened window
+  // shows the evaluation without flashing the list first. Persisted
+  // assessments rehydrate synchronously; a seed-CSV first visit lands on the
+  // re-run once `assessments` populates.
+  useLayoutEffect(() => {
+    const selectedParam = searchParams.get('selected');
+    if (!selectedParam) return;
+    const assessment = assessments.find(a => a.id === selectedParam);
+    if (!assessment) return;
+    handleSelectAssessment(assessment);
+    // Clear the URL parameter after selection
+    setSearchParams({}, { replace: true });
+  }, [searchParams, assessments, handleSelectAssessment, setSearchParams]);
 
   const handleDeleteAssessment = useCallback((assessmentId) => {
     const assessment = assessments.find(a => a.id === assessmentId);
@@ -1195,12 +1219,37 @@ Format as a numbered list. Be specific and actionable.`;
               return (
                 <div
                   key={assessment.id}
-                  className="bg-white border rounded-lg p-4 hover:shadow-md cursor-pointer transition-shadow"
-                  onClick={() => handleSelectAssessment(assessment)}
+                  className="evaluation-card bg-white border rounded-lg p-4 hover:shadow-md cursor-pointer transition-shadow"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-bold text-lg">{assessment.name}</h3>
+                      {/* A real anchor, not a div+onClick: the browser then
+                          supplies "Open Link in New Window"/"New Tab" on
+                          right-click, plus Cmd-click, middle-click and
+                          keyboard focus. Its ::after overlay stretches the hit
+                          area over the whole card. */}
+                      <h3 className="font-bold text-lg">
+                        <Link
+                          to={`/assessments?selected=${encodeURIComponent(assessment.id)}`}
+                          className="evaluation-card__link"
+                          onClick={(e) => {
+                            // A plain left-click selects in place, exactly as
+                            // the old card onClick did — routing through the
+                            // URL would push a history entry that the
+                            // ?selected= handler immediately replaces, leaving
+                            // a Back stack of identical no-op /assessments
+                            // entries. Modified clicks and the context menu
+                            // fall through untouched, which is what makes
+                            // "Open Link in New Window", Cmd-click and
+                            // middle-click work.
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                            e.preventDefault();
+                            handleSelectAssessment(assessment);
+                          }}
+                        >
+                          {assessment.name}
+                        </Link>
+                      </h3>
                       {assessment.description && (
                         <p className="text-gray-600 text-sm mt-1">{assessment.description}</p>
                       )}
@@ -1208,7 +1257,7 @@ Format as a numbered list. Be specific and actionable.`;
                         <span>Scope: {assessment.scopeType === 'controls' ? 'Controls' : 'Requirements'}</span>
                         <span>{prog.total} items</span>
                         <button
-                          className={`${getStatusColor(assessment.status)} hover:opacity-80 transition-opacity`}
+                          className={`evaluation-card__status ${getStatusColor(assessment.status)} hover:opacity-80 transition-opacity`}
                           onClick={(e) => {
                             e.stopPropagation();
                             setCurrentAssessmentId(assessment.id);
@@ -1227,7 +1276,7 @@ Format as a numbered list. Be specific and actionable.`;
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                    <div className="evaluation-card__actions flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button
                         className="p-2 rounded"
                         style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
@@ -1625,6 +1674,11 @@ Format as a numbered list. Be specific and actionable.`;
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                <CommentsButton
+                  targetType="evaluation"
+                  targetId={evaluationTargetId(currentAssessmentId, selectedItemId)}
+                  onClick={() => setRecordPanelOpen(true)}
+                />
                 {editMode ? (
                   <select
                     value={currentObservation.quarters?.[selectedQuarter]?.testingStatus || 'Not Started'}
@@ -1662,6 +1716,14 @@ Format as a numbered list. Be specific and actionable.`;
               </div>
             </div>
           </div>
+
+          <RecordPanel
+            open={recordPanelOpen}
+            onClose={() => setRecordPanelOpen(false)}
+            targetType="evaluation"
+            targetId={evaluationTargetId(currentAssessmentId, selectedItemId)}
+            title={`${currentAssessment?.name || 'Assessment'} / ${currentItem.type === 'control' ? currentItem.controlId : currentItem.subcategoryId || currentItem.id}`}
+          />
 
           {/* Two-column layout like Jira - 50/50 split */}
           <div className="grid grid-cols-2 flex-1 min-h-0 overflow-hidden">

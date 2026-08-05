@@ -1,0 +1,51 @@
+name: Security Review
+
+# AI-assisted diff review of pull requests using Anthropic's
+# claude-code-security-review action. The action analyzes only the files
+# changed in the PR, filters false positives, and leaves inline review
+# comments. It is one layer of the review process, not a gate: findings
+# are advisory and require human verification (see SECURITY.md,
+# "AI-Assisted Security Review").
+#
+# Both actions are pinned to full commit SHAs, not tags or branches.
+# The upstream README says @main; a reviewer with pull-requests: write
+# and an API key is itself a third-party dependency, and mutable refs
+# are how action supply-chain compromises happen. Bump the pins
+# deliberately, via PR.
+
+permissions:
+  pull-requests: write # inline review comments on findings
+  contents: read
+
+on:
+  pull_request:
+
+# One run per PR at a time; force-pushes cancel the superseded run so
+# API spend tracks the newest diff only (tokens already spent are not
+# refunded, but the runner stops).
+concurrency:
+  group: security-review-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-review:
+    name: Claude diff security review
+    # GitHub strips repo secrets from pull_request runs triggered by fork
+    # PRs, so the API key would be empty and every external PR would fail
+    # red. Dependabot runs also cannot read regular Actions secrets. Both
+    # are skipped here; maintainers review external PRs locally with
+    # /security-review instead. Deliberately NOT path-filtered: skills
+    # and prompts are markdown, so markdown stays in scope.
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.actor != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25 # backstop above the action's internal 20-minute default
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 2
+
+      - uses: anthropics/claude-code-security-review@0c6a49f1fa56a1d472575da86a94dbc1edb78eda # main, 2026-07-26
+        with:
+          comment-pr: true
+          claude-api-key: ${{ secrets.CLAUDE_API_KEY }}

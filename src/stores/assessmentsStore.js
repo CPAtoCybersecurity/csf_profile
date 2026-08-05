@@ -19,6 +19,7 @@ import { getBankProcedure, BANK_VERSION } from '../utils/procedureBank';
 import { expandProcedureText } from '../utils/platformBank';
 import { cleanCommunityMarkdown } from '../utils/relatedSection.mjs';
 import useAuditLogStore from './auditLogStore';
+import useCommentsStore from './commentsStore';
 
 // The demo assessment's user roster (issue #297): the 8 shipped Alma
 // directory users, so the example demonstrates the per-assessment user scope
@@ -368,6 +369,13 @@ const buildAssessmentCsvRow = ({ assessment, itemId, obs, getItemName, getImplem
  * Current schema version of csf-assessments-storage. Exported so the restore
  * path (dataImport.js) can migrate older exported payloads before applying them.
  */
+/**
+ * Stable comment/audit target id for one evaluation record (an observation
+ * within an assessment). Shared by the store's change logging and the
+ * evaluation detail view's RecordPanel so both always scope identically.
+ */
+export const evaluationTargetId = (assessmentId, itemId) => `${assessmentId}::${itemId}`;
+
 export const ASSESSMENTS_SCHEMA_VERSION = 16;
 
 /**
@@ -865,6 +873,12 @@ const useAssessmentsStore = create(
         const updatedAssessments = [...assessments, newAssessment];
         get().setAssessments(updatedAssessments);
         set({ currentAssessmentId: newId });
+        useAuditLogStore.getState().addEntry({
+          action: 'assessment_created',
+          entity: newAssessment.name,
+          targetType: 'assessment',
+          targetId: newId
+        });
         return newAssessment;
       },
 
@@ -872,6 +886,23 @@ const useAssessmentsStore = create(
       // normalized at the producer so no future edit surface can persist an
       // unnormalized config (issue #288 doctrine).
       updateAssessment: (assessmentId, updates) => {
+        // Rename logging only — observation edits route through
+        // updateObservation (which logs field-level) and land here as an
+        // `observations` payload that must not double-log.
+        if (updates && updates.name !== undefined) {
+          const beforeAssessment = get().getAssessment(assessmentId);
+          if (beforeAssessment && beforeAssessment.name !== updates.name) {
+            useAuditLogStore.getState().addEntry({
+              action: 'assessment_updated',
+              entity: updates.name,
+              field: 'name',
+              oldValue: beforeAssessment.name,
+              newValue: updates.name,
+              targetType: 'assessment',
+              targetId: assessmentId
+            });
+          }
+        }
         let safeUpdates = updates;
         if (updates && updates.externalTracking !== undefined) {
           safeUpdates = { ...safeUpdates, externalTracking: normalizeExternalTracking(updates.externalTracking) };
@@ -930,10 +961,22 @@ const useAssessmentsStore = create(
 
       // Delete assessment
       deleteAssessment: (assessmentId) => {
+        const existing = get().getAssessment(assessmentId);
         const updatedAssessments = get().assessments.filter(a => a.id !== assessmentId);
         get().setAssessments(updatedAssessments);
         if (get().currentAssessmentId === assessmentId) {
           set({ currentAssessmentId: null });
+        }
+        if (existing) {
+          // Sweep the assessment's discussion and every evaluation thread
+          // under it; the audit trail is retained.
+          useCommentsStore.getState().deleteCommentsForAssessment(assessmentId);
+          useAuditLogStore.getState().addEntry({
+            action: 'assessment_deleted',
+            entity: existing.name,
+            targetType: 'assessment',
+            targetId: assessmentId
+          });
         }
       },
 
@@ -1007,7 +1050,10 @@ const useAssessmentsStore = create(
       // Update observation for a scoped item
       // observationData can include: auditorId, testProcedures, linkedArtifacts, remediation
       // For quarterly data, use updateQuarterlyObservation instead
-      updateObservation: (assessmentId, itemId, observationData) => {
+      // options.log defaults true for user edits; programmatic bulk lanes
+      // (wizard bank-attach loop, migration seeding) pass { log: false } so a
+      // 105-item attach cannot flood the audit log's retention cap.
+      updateObservation: (assessmentId, itemId, observationData, options = {}) => {
         const assessment = get().getAssessment(assessmentId);
         if (!assessment) return;
 
@@ -1061,31 +1107,29 @@ const useAssessmentsStore = create(
 
         get().updateAssessment(assessmentId, { observations: updatedObservations });
 
-        // Audit logging: record score and status changes
-        const entityLabel = `${assessment.name} / ${itemId}`;
-        const logEntry = useAuditLogStore.getState().addEntry;
-
-        if (observationData.score !== undefined && observationData.score !== currentObservation.score) {
-          logEntry({
-            action: 'score_changed',
-            entity: entityLabel,
-            field: 'score',
-            oldValue: currentObservation.score,
-            newValue: observationData.score,
-            user: 'System'
-          });
-        }
-
-        if (observationData.testingStatus !== undefined && observationData.testingStatus !== currentObservation.testingStatus) {
-          logEntry({
-            action: 'status_changed',
-            entity: entityLabel,
-            field: 'testingStatus',
-            oldValue: currentObservation.testingStatus,
-            newValue: observationData.testingStatus,
-            user: 'System'
-          });
-        }
+        // Audit logging: field-level diffs on the evaluation record,
+        // attributed to the acting user. Score/status keep their historical
+        // action names; everything else logs as observation_updated.
+        if (options.log === false) return;
+        useAuditLogStore.getState().logFieldChanges({
+          targetType: 'evaluation',
+          targetId: evaluationTargetId(assessmentId, itemId),
+          entity: `${assessment.name} / ${itemId}`,
+          before: currentObservation,
+          after: sanitizedData,
+          defaultAction: 'observation_updated',
+          fields: [
+            { key: 'score', action: 'score_changed' },
+            { key: 'testingStatus', action: 'status_changed' },
+            'testProcedures',
+            'auditorId',
+            {
+              key: 'remediation',
+              label: 'remediation.actionPlan',
+              get: (obj) => obj?.remediation?.actionPlan
+            }
+          ]
+        });
       },
 
       // Update quarterly observation data for a specific quarter
@@ -1117,6 +1161,27 @@ const useAssessmentsStore = create(
         };
 
         get().updateAssessment(assessmentId, { observations: updatedObservations });
+
+        // Field-level change log for the quarter's editable fields.
+        useAuditLogStore.getState().logFieldChanges({
+          targetType: 'evaluation',
+          targetId: evaluationTargetId(assessmentId, itemId),
+          entity: `${assessment.name} / ${itemId}`,
+          before: currentQuarter,
+          after: {
+            actualScore: quarterData.actualScore,
+            targetScore: quarterData.targetScore,
+            testingStatus: quarterData.testingStatus,
+            // compare the sanitized text that was actually persisted
+            observations: quarterData.observations === undefined ? undefined : sanitizedQuarterData.observations
+          },
+          fields: [
+            { key: 'actualScore', label: `${quarter} actualScore`, action: 'score_changed' },
+            { key: 'targetScore', label: `${quarter} targetScore`, action: 'score_changed' },
+            { key: 'testingStatus', label: `${quarter} testingStatus`, action: 'status_changed' },
+            { key: 'observations', label: `${quarter} observations`, action: 'observation_updated' }
+          ]
+        });
       },
 
       // Get assessment progress (considers all quarters - complete if any quarter is complete)

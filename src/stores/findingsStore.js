@@ -3,6 +3,8 @@ import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
 import { sanitizeInput, escapeCSVValue, csvFormulaGuard } from '../utils/sanitize';
+import useAuditLogStore from './auditLogStore';
+import useCommentsStore from './commentsStore';
 import { COMPREHENSIVE_FINDINGS, COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { LEGACY_EXAMPLE_ASSESSMENT_IDS } from './assessmentsStore';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -17,6 +19,12 @@ export const SEEDED_FINDINGS = COMPREHENSIVE_FINDINGS.map(f => ({
   assessmentId: f.assessmentId || COMPREHENSIVE_ASSESSMENT_ID,
   seedSource: DEMO_SEED_SOURCE
 }));
+
+// Human-readable audit-log label: short id + truncated summary.
+const findingLabel = (finding) => {
+  const summary = (finding.summary || '').slice(0, 60);
+  return summary ? `${finding.id} — ${summary}` : finding.id;
+};
 
 const LEGACY_DEMO_FINDING_IDS = new Set(['FND-1', 'FND-2', 'FND-3', 'FND-4']);
 
@@ -158,6 +166,13 @@ const useFindingsStore = create(
           findings: [...state.findings, newFinding]
         }));
 
+        useAuditLogStore.getState().addEntry({
+          action: 'finding_created',
+          entity: findingLabel(newFinding),
+          targetType: 'finding',
+          targetId: newFinding.id
+        });
+
         return newFinding;
       },
 
@@ -184,18 +199,43 @@ const useFindingsStore = create(
           sanitizedUpdates.remediationActionPlan = sanitizeInput(updates.remediationActionPlan);
         }
 
+        const before = get().findings.find(f => f.id === findingId);
         set((state) => ({
           findings: state.findings.map(f =>
             f.id === findingId ? { ...f, ...sanitizedUpdates } : f
           )
         }));
+
+        if (before) {
+          useAuditLogStore.getState().logFieldChanges({
+            targetType: 'finding',
+            targetId: findingId,
+            entity: findingLabel(before),
+            before,
+            after: sanitizedUpdates,
+            defaultAction: 'finding_updated',
+            fields: ['summary', 'status', 'priority', 'rootCause', 'remediationActionPlan', 'remediationOwner', 'dueDate', 'externalUrl']
+          });
+        }
       },
 
       // Delete finding
       deleteFinding: (findingId) => {
+        const existing = get().findings.find(f => f.id === findingId);
         set((state) => ({
           findings: state.findings.filter(f => f.id !== findingId)
         }));
+        if (existing) {
+          // Discussion goes with the record (unreachable once deleted);
+          // the audit trail is retained.
+          useCommentsStore.getState().deleteCommentsFor('finding', findingId);
+          useAuditLogStore.getState().addEntry({
+            action: 'finding_deleted',
+            entity: findingLabel(existing),
+            targetType: 'finding',
+            targetId: findingId
+          });
+        }
       },
 
       // Link artifact to finding

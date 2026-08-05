@@ -36,6 +36,7 @@ import useFindingsStore from '../stores/findingsStore';
 import useMetricsStore from '../stores/metricsStore';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import useInventoryStore from '../stores/inventoryStore';
+import useCommentsStore from '../stores/commentsStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 import AssessmentPicker from '../components/AssessmentPicker';
 
@@ -138,7 +139,8 @@ const Settings = () => {
     findingsStore: useFindingsStore,
     metricsStore: useMetricsStore,
     orgProfileStore: useOrgProfileStore,
-    inventoryStore: useInventoryStore
+    inventoryStore: useInventoryStore,
+    commentsStore: useCommentsStore
   }), []);
 
   const handleCancelExportPicker = useCallback(() => setPendingExport(null), []);
@@ -328,7 +330,8 @@ const Settings = () => {
         findingsStore: useFindingsStore,
         metricsStore: useMetricsStore,
         orgProfileStore: useOrgProfileStore,
-        inventoryStore: useInventoryStore
+        inventoryStore: useInventoryStore,
+        commentsStore: useCommentsStore
       };
 
       const validation = validateDatabaseExport(parsed);
