@@ -286,7 +286,8 @@ const UserControls = () => {
     toggle: toggleSelection,
     toggleAll,
     clear: clearSelection,
-    allSelected
+    allSelected,
+    someSelected
   } = useRowSelection(currentItems, (control) => control.controlId);
 
   // Get current control
@@ -759,6 +760,9 @@ const UserControls = () => {
                       checked={allSelected}
                       onChange={toggleAll}
                       disabled={currentItems.length === 0}
+                      // See Artifacts: React has no `indeterminate` prop.
+                      ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                      aria-checked={someSelected ? 'mixed' : allSelected}
                       aria-label="Select all controls on this page"
                       title="Select all controls on this page"
                     />

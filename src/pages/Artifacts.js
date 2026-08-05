@@ -79,7 +79,8 @@ const Artifacts = () => {
     toggle: toggleSelection,
     toggleAll,
     clear: clearSelection,
-    allSelected
+    allSelected,
+    someSelected
   } = useRowSelection(sortedData);
 
   // Get linked controls for the selected artifact, scoped to the ARTIFACT's
@@ -543,6 +544,11 @@ const Artifacts = () => {
                   checked={allSelected}
                   onChange={toggleAll}
                   disabled={sortedData.length === 0}
+                  // React has no `indeterminate` prop — a partial selection
+                  // would otherwise draw an empty box, which reads as
+                  // "nothing is selected" while the bar says three are.
+                  ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                  aria-checked={someSelected ? 'mixed' : allSelected}
                   aria-label="Select all artifacts"
                   title="Select all artifacts"
                 />

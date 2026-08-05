@@ -149,7 +149,8 @@ const Findings = () => {
     toggle: toggleSelection,
     toggleAll,
     clear: clearSelection,
-    allSelected
+    allSelected,
+    someSelected
   } = useRowSelection(sortedData);
 
   // Get linked controls for the selected finding based on complianceRequirement
@@ -518,6 +519,9 @@ const Findings = () => {
                   checked={allSelected}
                   onChange={toggleAll}
                   disabled={sortedData.length === 0}
+                  // See Artifacts: React has no `indeterminate` prop.
+                  ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                  aria-checked={someSelected ? 'mixed' : allSelected}
                   aria-label="Select all findings"
                   title="Select all findings"
                 />

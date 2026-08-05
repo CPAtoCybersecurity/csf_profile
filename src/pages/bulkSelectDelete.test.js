@@ -203,3 +203,114 @@ describe('a row checkbox does not open the detail panel', () => {
     expect(screen.queryByTitle('Delete')).not.toBeInTheDocument();
   });
 });
+
+describe('the select-all box shows a partial selection as mixed', () => {
+  // React has no `indeterminate` prop, so this is set through a ref. Without
+  // it a half-selected page draws an empty box — which reads as "nothing
+  // selected" while the bar next to it says one is.
+  it.each([
+    ['Artifacts', Artifacts, '/artifacts', 'Select all artifacts', 'Select Access Review Export'],
+    ['Findings', Findings, '/findings', 'Select all findings', 'Select Logging gap'],
+    ['Controls', UserControls, '/controls', 'Select all controls on this page', 'Select CTRL-001']
+  ])('%s', (_label, Component, route, selectAll, firstRow) => {
+    renderPage(Component, route);
+    const header = screen.getByLabelText(selectAll);
+
+    expect(header.indeterminate).toBe(false);
+
+    fireEvent.click(screen.getByLabelText(firstRow));
+    expect(header.indeterminate).toBe(true);
+    expect(header).toHaveAttribute('aria-checked', 'mixed');
+    expect(header).not.toBeChecked();
+
+    fireEvent.click(screen.getByLabelText(selectAll));
+    expect(header.indeterminate).toBe(false);
+    expect(header).toBeChecked();
+  });
+});
+
+describe('a delete reaches exactly the named row that was checked', () => {
+  // Index-based probes ("the second checkbox") pass even when a checkbox is
+  // bound to the wrong row. These name the row and then assert which record
+  // left the store.
+  it('Artifacts: deletes the checked artifact and leaves the others', () => {
+    confirmWith(true);
+    renderPage(Artifacts, '/artifacts');
+
+    fireEvent.click(screen.getByLabelText('Select Firewall Ruleset'));
+    fireEvent.click(within(screen.getByTestId('bulk-delete-bar')).getByText(/Delete 1/));
+
+    expect(useArtifactStore.getState().artifacts.map(a => a.name))
+      .toEqual(['Access Review Export', 'Backup Test Log']);
+  });
+
+  it('Findings: deletes the checked finding and leaves the others', () => {
+    confirmWith(true);
+    renderPage(Findings, '/findings');
+
+    fireEvent.click(screen.getByLabelText('Select Stale access'));
+    fireEvent.click(within(screen.getByTestId('bulk-delete-bar')).getByText(/Delete 1/));
+
+    expect(useFindingsStore.getState().findings.map(f => f.id))
+      .toEqual(['FND-1', 'FND-3']);
+  });
+
+  it('Controls: deletes the checked control and leaves the others', () => {
+    confirmWith(true);
+    renderPage(UserControls, '/controls');
+
+    fireEvent.click(screen.getByLabelText('Select CTRL-002'));
+    fireEvent.click(within(screen.getByTestId('bulk-delete-bar')).getByText(/Delete 1/));
+
+    expect(useControlsStore.getState().controls.map(c => c.controlId))
+      .toEqual(['CTRL-001', 'CTRL-003']);
+  });
+});
+
+describe('a selection cannot outlive the rows it was made on', () => {
+  /**
+   * The hook prunes ids that leave the view — but proving that at the hook
+   * layer does not prove the PAGE's delete loop consumed the pruned value. A
+   * page that kept its own copy of the raw set would pass every hook test and
+   * still delete a record hidden behind the assessment filter. This drives the
+   * real page: select everything, narrow the scope so rows disappear, delete.
+   */
+  it('Findings: a finding hidden by the scope filter survives a bulk delete', () => {
+    confirmWith(true);
+    // Both findings are stamped to an assessment: `filterByScope` deliberately
+    // fails open for UNASSIGNED records, so an unassigned finding would stay
+    // visible in every scope and could never go hidden.
+    useAssessmentsStore.setState({
+      assessments: [
+        { id: 'ASMT-1', name: 'FY26 Assessment' },
+        { id: 'ASMT-2', name: 'FY25 Assessment' }
+      ],
+      currentAssessmentId: null
+    });
+    useFindingsStore.setState({
+      findings: [
+        { id: 'FND-A', summary: 'Prior year gap', status: 'Not Started', priority: 'High', assessmentId: 'ASMT-2', linkedArtifacts: [] },
+        { id: 'FND-B', summary: 'Current year gap', status: 'Not Started', priority: 'High', assessmentId: 'ASMT-1', linkedArtifacts: [] }
+      ]
+    });
+
+    renderPage(Findings, '/findings');
+
+    // Both rows visible under "All assessments" — select them both.
+    fireEvent.click(screen.getByLabelText('Select all findings'));
+    expect(screen.getByText('2 findings selected')).toBeInTheDocument();
+
+    // Narrow the scope so the unassigned-only view hides FND-B.
+    fireEvent.change(screen.getByLabelText('Assessment scope'), {
+      target: { value: 'ASMT-1' }
+    });
+
+    // The bar now describes only what is on screen.
+    expect(screen.getByText('1 finding selected')).toBeInTheDocument();
+
+    fireEvent.click(within(screen.getByTestId('bulk-delete-bar')).getByText(/Delete 1/));
+
+    // FND-A was selected but is no longer visible — it must survive.
+    expect(useFindingsStore.getState().findings.map(f => f.id)).toEqual(['FND-A']);
+  });
+});
