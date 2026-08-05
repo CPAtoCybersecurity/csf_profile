@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Papa from 'papaparse';
 import { v4 as uuidv4 } from 'uuid';
-import { sanitizeInput, escapeCSVValue } from '../utils/sanitize';
+import { sanitizeInput, escapeCSVValue, csvFormulaGuard } from '../utils/sanitize';
 import { COMPREHENSIVE_FINDINGS, COMPREHENSIVE_ASSESSMENT_ID } from './comprehensiveAssessmentData';
 import { LEGACY_EXAMPLE_ASSESSMENT_IDS } from './assessmentsStore';
 import { DEMO_SEED_SOURCE } from '../utils/assessmentScope';
@@ -19,6 +19,49 @@ export const SEEDED_FINDINGS = COMPREHENSIVE_FINDINGS.map(f => ({
 }));
 
 const LEGACY_DEMO_FINDING_IDS = new Set(['FND-1', 'FND-2', 'FND-3', 'FND-4']);
+
+/**
+ * The ONE finding CSV column list — consumed by exportFindingsCSV, by the
+ * template download in Findings.js, and used as the ordering contract the
+ * importer reads back. Three hand-maintained lists is how the sheet drifted
+ * from the panel in the first place; there is now nothing to keep in sync.
+ *
+ * Ordering mirrors the Findings detail panel top-to-bottom: identity, title,
+ * badges, external ticket, then the four prose blocks, then the Details rows.
+ * `Name` sits immediately before `Description` in both surfaces.
+ *
+ * What changed (2026-08-04):
+ *  - IN: `Name` (new field), `Description` and `External URL` (panel-editable
+ *    but never exported — an export → import round-trip silently erased both),
+ *    `Last Modified` (panel shows it).
+ *  - OUT: `Evaluation ID`. Two-part death certificate: no page or component
+ *    reads or writes `evaluationId`, and no seeded finding carries one. The
+ *    importer still READS the column, so files written by earlier versions
+ *    load unchanged — unknown columns are inert under Papa's header mode.
+ *  - KEPT without a panel surface: `Control ID` and `Linked Artifacts` carry
+ *    live seeded data and are reachable from other pages, so dropping them
+ *    would destroy state the sheet is supposed to carry.
+ */
+export const FINDING_CSV_HEADERS = [
+  'Finding ID',
+  'Summary',
+  'Status',
+  'Priority',
+  'External URL',
+  'Name',
+  'Description',
+  'Root Cause',
+  'Remediation Action Plan',
+  'Assessment ID',
+  'Compliance Requirement',
+  'Remediation Owner',
+  'Due Date',
+  'Created Date',
+  'Last Modified',
+  'Control ID',
+  'Linked Artifacts',
+  'Jira Key'
+];
 
 /**
  * Findings Store
@@ -80,6 +123,13 @@ const useFindingsStore = create(
           id: `FND-${uuidv4()}`,
           summary: sanitizeInput(findingData.summary || ''),
 
+          // `name` and `description` are both panel-editable. `description`
+          // was omitted here, so a finding created through the panel with a
+          // description saved without one — the field only survived on a
+          // later edit, which spreads updates wholesale.
+          name: sanitizeInput(findingData.name || ''),
+          description: sanitizeInput(findingData.description || ''),
+
           // Primary link: Evaluation (point-in-time assessment record)
           evaluationId: findingData.evaluationId || null,
 
@@ -120,6 +170,12 @@ const useFindingsStore = create(
 
         if (updates.summary !== undefined) {
           sanitizedUpdates.summary = sanitizeInput(updates.summary);
+        }
+        if (updates.name !== undefined) {
+          sanitizedUpdates.name = sanitizeInput(updates.name);
+        }
+        if (updates.description !== undefined) {
+          sanitizedUpdates.description = sanitizeInput(updates.description);
         }
         if (updates.rootCause !== undefined) {
           sanitizedUpdates.rootCause = sanitizeInput(updates.rootCause);
@@ -211,25 +267,37 @@ const useFindingsStore = create(
           return user.email ? `${user.name} <${user.email}>` : user.name;
         };
 
+        // Keys stay in lockstep with FINDING_CSV_HEADERS — Papa.unparse is
+        // called with { columns: FINDING_CSV_HEADERS }, so a key that drifts
+        // from the list exports as an empty column instead of silently
+        // reordering the sheet.
+        //
+        // csvFormulaGuard, not escapeCSVValue: this is a Papa.unparse call
+        // site, and escapeCSVValue also wraps-and-quotes. Papa then quotes the
+        // quoted string again, so a summary containing an apostrophe grew two
+        // literal `"` on every export → import cycle.
         const csvData = findings.map(f => ({
-          'Finding ID': f.id,
-          'Summary': escapeCSVValue(f.summary),
-          'Evaluation ID': f.evaluationId || '',
-          'Control ID': escapeCSVValue(f.controlId || ''),
-          'Assessment ID': f.assessmentId || '',
-          'Compliance Requirement': escapeCSVValue(f.complianceRequirement || ''), // Deprecated
-          'Root Cause': escapeCSVValue(f.rootCause),
-          'Remediation Action Plan': escapeCSVValue(f.remediationActionPlan),
-          'Remediation Owner': escapeCSVValue(getUserName(f.remediationOwner)),
-          'Due Date': f.dueDate,
-          'Status': f.status,
-          'Priority': f.priority,
-          'Created Date': f.createdDate,
-          'Jira Key': f.jiraKey || '',
-          'Linked Artifacts': escapeCSVValue((f.linkedArtifacts || []).join('; '))
+          'Finding ID': csvFormulaGuard(f.id),
+          'Summary': csvFormulaGuard(f.summary),
+          'Status': csvFormulaGuard(f.status),
+          'Priority': csvFormulaGuard(f.priority),
+          'External URL': csvFormulaGuard(f.externalUrl || ''),
+          'Name': csvFormulaGuard(f.name || ''),
+          'Description': csvFormulaGuard(f.description || ''),
+          'Root Cause': csvFormulaGuard(f.rootCause),
+          'Remediation Action Plan': csvFormulaGuard(f.remediationActionPlan),
+          'Assessment ID': csvFormulaGuard(f.assessmentId || ''),
+          'Compliance Requirement': csvFormulaGuard(f.complianceRequirement || ''), // Deprecated
+          'Remediation Owner': csvFormulaGuard(getUserName(f.remediationOwner)),
+          'Due Date': csvFormulaGuard(f.dueDate),
+          'Created Date': csvFormulaGuard(f.createdDate),
+          'Last Modified': csvFormulaGuard(f.lastModified || ''),
+          'Control ID': csvFormulaGuard(f.controlId || ''),
+          'Linked Artifacts': csvFormulaGuard((f.linkedArtifacts || []).join('; ')),
+          'Jira Key': csvFormulaGuard(f.jiraKey || '')
         }));
 
-        const csv = Papa.unparse(csvData);
+        const csv = Papa.unparse(csvData, { columns: FINDING_CSV_HEADERS });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -326,9 +394,12 @@ const useFindingsStore = create(
                 return {
                   id: row['Issue key'] || row['Finding ID'] || `FND-${uuidv4()}`,
                   summary: sanitizeInput(row['Summary'] || ''),
+                  name: sanitizeInput(row['Name'] || ''),
                   description: sanitizeInput(row['Description'] || ''),
 
-                  // Primary link: Evaluation
+                  // `Evaluation ID` left the export in the 2026-08-04 parity
+                  // pass (no UI surface, no seeded data). The reader stays so
+                  // a sheet written by an earlier version still lands whole.
                   evaluationId: row['Evaluation ID'] || row['Custom field (Evaluation ID)'] || null,
 
                   // Secondary/cached links
@@ -348,7 +419,11 @@ const useFindingsStore = create(
                   status: mapStatus(row['Status']),
                   priority: row['Priority'] || 'Medium',
                   createdDate: row['Created Date'] || row['Created'] || new Date().toISOString(),
-                  lastModified: row['Updated'] || new Date().toISOString(),
+                  // Honor an exported 'Last Modified' so a round-trip keeps
+                  // when the finding actually changed, mirroring the artifact
+                  // importer's 'Last Updated' handling.
+                  lastModified: (row['Last Modified'] || row['Updated'] || '').trim() || new Date().toISOString(),
+                  externalUrl: row['External URL'] || '',
                   jiraKey: row['Issue key'] || row['Jira Key'] || null,
                   linkedArtifacts: (row['Linked Artifacts'] || '')
                     .split(';').map(s => s.trim()).filter(Boolean)

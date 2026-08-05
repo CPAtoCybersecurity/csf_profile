@@ -1,8 +1,8 @@
 import React, { useState, useRef, useCallback, useEffect, useMemo } from 'react';
-import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar, Shield, ExternalLink } from 'lucide-react';
+import { Edit, Trash2, Save, X, Plus, Upload, Download, ChevronRight, User, AlertTriangle, Calendar, Shield, ExternalLink, FileSpreadsheet } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import useFindingsStore from '../stores/findingsStore';
+import useFindingsStore, { FINDING_CSV_HEADERS } from '../stores/findingsStore';
 import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useRequirementsStore from '../stores/requirementsStore';
@@ -50,6 +50,7 @@ const Findings = () => {
   const [formData, setFormData] = useState({
     id: null,
     summary: '',
+    name: '',
     description: '',
     complianceRequirement: '',
     rootCause: '',
@@ -201,6 +202,48 @@ const Findings = () => {
     }
   }, [exportFindingsCSV]);
 
+  // Download a CSV template. Headers come from the store's canonical list —
+  // the same one the exporter unparses against — so the template can never
+  // drift from the real import format.
+  const handleDownloadTemplate = useCallback(() => {
+    const sampleRow = {
+      'Finding ID': 'FND-001',
+      'Summary': 'Privileged accounts are not reviewed quarterly',
+      'Status': 'Not Started',
+      'Priority': 'High',
+      'External URL': 'https://example.atlassian.net/browse/SEC-123',
+      'Name': 'Stale privileged access',
+      'Description': 'Quarterly access review evidence is missing for two of four systems.',
+      'Root Cause': 'No owner assigned to the review procedure.',
+      'Remediation Action Plan': 'IT Ops to run and document the review by 2026-09-30.',
+      'Assessment ID': '',
+      'Compliance Requirement': 'PR.AA-05',
+      'Remediation Owner': 'Owner Name <owner@example.com>',
+      'Due Date': '2026-09-30',
+      'Created Date': '',
+      'Last Modified': '',
+      'Control ID': 'PR.AA-05 Ex1',
+      'Linked Artifacts': 'Access Review Report; IAM Policy',
+      'Jira Key': ''
+    };
+
+    const csv = [
+      FINDING_CSV_HEADERS.join(','),
+      FINDING_CSV_HEADERS.map(h => `"${sampleRow[h] || ''}"`).join(',')
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'findings_template.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
+  }, []);
+
   // Form validation
   const validateForm = () => {
     const newErrors = {};
@@ -273,6 +316,7 @@ const Findings = () => {
     setFormData({
       id: null,
       summary: '',
+      name: '',
       description: '',
       complianceRequirement: '',
       rootCause: '',
@@ -384,6 +428,14 @@ const Findings = () => {
             >
               <Upload size={16} />
               Import
+            </button>
+            <button
+              onClick={handleDownloadTemplate}
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 py-2 px-3 rounded text-sm"
+              title="Download a CSV template matching the import format"
+            >
+              <FileSpreadsheet size={16} />
+              Template
             </button>
             <button
               onClick={handleExportCSV}
@@ -701,6 +753,29 @@ const Findings = () => {
                   )
                 ) : (
                   <p className="text-sm text-gray-400 dark:text-gray-500">No external ticket linked.</p>
+                )}
+              </div>
+
+              {/* Name — sits immediately before Description in the panel and
+                  in the CSV, so the two surfaces read in the same order */}
+              <div className="mb-6">
+                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
+                  <ChevronRight size={16} className="rotate-90" />
+                  Name
+                </h3>
+                {editMode ? (
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name || ''}
+                    onChange={handleChange}
+                    className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                    placeholder="Short name for this finding"
+                  />
+                ) : (
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
+                    {selectedFinding?.name || 'No name provided.'}
+                  </p>
                 )}
               </div>
 

@@ -523,7 +523,7 @@ const Settings = () => {
 
     try {
       const text = await file.text();
-      const count = await useArtifactStore.getState().importArtifactsCSV(text);
+      const count = await useArtifactStore.getState().importArtifactsCSV(text, useUserStore);
       toast.success(`Imported ${count} artifacts from Jira`);
     } catch (err) {
       console.error('Artifacts import error:', err);
