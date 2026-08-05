@@ -14,6 +14,8 @@ import UserSelector from '../components/UserSelector';
 import DropdownPortal from '../components/DropdownPortal';
 import RecordPanel, { CommentsButton } from '../components/RecordPanel';
 import SortableHeader from '../components/SortableHeader';
+import BulkDeleteBar from '../components/BulkDeleteBar';
+import useRowSelection from '../hooks/useRowSelection';
 
 // Stores
 import useControlsStore, { CONTROL_STATUSES } from '../stores/controlsStore';
@@ -273,6 +275,21 @@ const UserControls = () => {
     return filteredData.slice(start, start + itemsPerPage);
   }, [filteredData, currentPage, itemsPerPage]);
 
+  // Row selection for bulk actions. This table paginates, so the header
+  // checkbox means "every control on this page" — the same thing the visible
+  // checkboxes represent. Ids for rows on other pages are never in the
+  // effective selection, so paging around cannot accumulate a hidden delete.
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    toggle: toggleSelection,
+    toggleAll,
+    clear: clearSelection,
+    allSelected,
+    someSelected
+  } = useRowSelection(currentItems, (control) => control.controlId);
+
   // Get current control
   const currentControl = useMemo(() => {
     if (isCreating) return newControl;
@@ -394,6 +411,25 @@ const UserControls = () => {
       toast.success('Control deleted');
     }
   }, [selectedControlId, deleteControl]);
+
+  // Delete every selected control behind a single confirmation. deleteControl
+  // re-reads the store on each call, so looping is safe — no stale snapshot
+  // resurrects a control removed earlier in the loop.
+  const handleBulkDelete = useCallback(() => {
+    if (selectedCount === 0) return;
+    const noun = selectedCount === 1 ? 'control' : 'controls';
+    if (!window.confirm(`Delete ${selectedCount} ${noun}? This cannot be undone.`)) return;
+
+    const doomed = new Set(selectedIds);
+    selectedIds.forEach(controlId => deleteControl(controlId));
+    clearSelection();
+    toast.success(`${selectedCount} ${noun} deleted`);
+
+    if (selectedControlId && doomed.has(selectedControlId)) {
+      setSelectedControlId(null);
+      setDetailPanelOpen(false);
+    }
+  }, [selectedCount, selectedIds, deleteControl, clearSelection, selectedControlId]);
 
   const handleLinkRequirement = useCallback((reqId) => {
     if (isCreating) {
@@ -708,9 +744,29 @@ const UserControls = () => {
               </p>
             </div>
           ) : (
+            <>
+            <BulkDeleteBar
+              count={selectedCount}
+              onDelete={handleBulkDelete}
+              onClear={clearSelection}
+              noun="control"
+            />
             <table className="table-professional min-w-full">
               <thead className="sticky top-0 z-10">
                 <tr>
+                  <th className="p-3 text-left text-xs font-medium text-gray-500 w-8">
+                    <input
+                      type="checkbox"
+                      checked={allSelected}
+                      onChange={toggleAll}
+                      disabled={currentItems.length === 0}
+                      // See Artifacts: React has no `indeterminate` prop.
+                      ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                      aria-checked={someSelected ? 'mixed' : allSelected}
+                      aria-label="Select all controls on this page"
+                      title="Select all controls on this page"
+                    />
+                  </th>
                   <SortableHeader label="Control ID" sortKey="controlId" currentSort={sort} onSort={handleSort} />
                   <SortableHeader label="Control Name" sortKey="name" currentSort={sort} onSort={handleSort} />
                   <SortableHeader label="Status" sortKey="status" currentSort={sort} onSort={handleSort} />
@@ -737,6 +793,14 @@ const UserControls = () => {
                       }`}
                     onClick={() => handleSelectControl(control)}
                   >
+                    <td className="p-3" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        type="checkbox"
+                        checked={isSelected(control.controlId)}
+                        onChange={() => toggleSelection(control.controlId)}
+                        aria-label={`Select ${control.controlId}`}
+                      />
+                    </td>
                     <td className="p-3 text-sm font-medium font-mono">{control.controlId}</td>
                     <td className="p-3 text-sm">
                       {control.name
@@ -799,6 +863,7 @@ const UserControls = () => {
                 ))}
               </tbody>
             </table>
+            </>
           )}
 
           {/* Pagination */}

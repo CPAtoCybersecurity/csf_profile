@@ -10,6 +10,8 @@ import useAssessmentsStore from '../stores/assessmentsStore';
 import { sanitizeExternalUrl, externalUrlLabel } from '../utils/externalLinks';
 import { SCOPE_ALL, SCOPE_UNASSIGNED, filterByScope, resolveScopeStamp, defaultScope } from '../utils/assessmentScope';
 import useSort from '../hooks/useSort';
+import useRowSelection from '../hooks/useRowSelection';
+import BulkDeleteBar from '../components/BulkDeleteBar';
 import EmptyState from '../components/EmptyState';
 import Markdown from '../components/Markdown';
 import RecordPanel, { CommentsButton } from '../components/RecordPanel';
@@ -137,6 +139,19 @@ const Findings = () => {
 
   // Sorting (over the scoped list — issue #297)
   const { sortedData } = useSort(scopedFindings);
+
+  // Row selection for bulk actions, keyed on the rows actually rendered so a
+  // scope change cannot leave a hidden finding queued for deletion.
+  const {
+    selectedIds,
+    selectedCount,
+    isSelected,
+    toggle: toggleSelection,
+    toggleAll,
+    clear: clearSelection,
+    allSelected,
+    someSelected
+  } = useRowSelection(sortedData);
 
   // Get linked controls for the selected finding based on complianceRequirement
   const linkedControls = useMemo(() => {
@@ -314,6 +329,23 @@ const Findings = () => {
     }
   };
 
+  // Delete every selected finding behind a single confirmation.
+  const handleBulkDelete = () => {
+    if (selectedCount === 0) return;
+    const noun = selectedCount === 1 ? 'finding' : 'findings';
+    if (!window.confirm(`Delete ${selectedCount} ${noun}? This cannot be undone.`)) return;
+
+    const doomed = new Set(selectedIds);
+    selectedIds.forEach(id => deleteFinding(id));
+    clearSelection();
+    toast.success(`${selectedCount} ${noun} deleted`);
+
+    if (selectedFinding && doomed.has(selectedFinding.id)) {
+      setSelectedFinding(null);
+      resetForm();
+    }
+  };
+
   // Reset form
   const resetForm = () => {
     setFormData({
@@ -471,10 +503,29 @@ const Findings = () => {
       <div className="flex flex-1 min-h-0 overflow-hidden">
         {/* Left - Table */}
         <div className={`${selectedFinding || editMode ? 'w-1/2' : 'w-full'} overflow-auto border-r dark:border-gray-700`}>
+          <BulkDeleteBar
+            count={selectedCount}
+            onDelete={handleBulkDelete}
+            onClear={clearSelection}
+            noun="finding"
+          />
           {/* Column headers */}
           <div className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
             <div className="flex items-center gap-3 px-4 py-2 text-xs font-medium text-gray-500 dark:text-gray-400">
-              <div className="w-8 flex-shrink-0"></div>
+              <div className="w-8 flex-shrink-0">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                  checked={allSelected}
+                  onChange={toggleAll}
+                  disabled={sortedData.length === 0}
+                  // See Artifacts: React has no `indeterminate` prop.
+                  ref={(el) => { if (el) el.indeterminate = someSelected; }}
+                  aria-checked={someSelected ? 'mixed' : allSelected}
+                  aria-label="Select all findings"
+                  title="Select all findings"
+                />
+              </div>
               <div className="w-24 flex-shrink-0">ID</div>
               <div className="flex-1 min-w-0">Summary</div>
               <div className="w-24 flex-shrink-0">CSF Ref</div>
@@ -504,7 +555,10 @@ const Findings = () => {
                       <input
                         type="checkbox"
                         className="w-4 h-4 rounded border-gray-300 dark:border-gray-600"
+                        checked={isSelected(finding.id)}
+                        onChange={() => toggleSelection(finding.id)}
                         onClick={(e) => e.stopPropagation()}
+                        aria-label={`Select ${finding.summary || finding.jiraKey || finding.id}`}
                       />
                     </div>
 
