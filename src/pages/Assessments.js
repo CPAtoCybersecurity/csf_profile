@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   Plus, Edit, Save, Trash2, X, CheckCircle, XCircle,
   Download, Upload, ClipboardList, FileSearch, ChevronRight, Copy,
@@ -103,6 +104,10 @@ const Assessments = () => {
 
   // AI Store for test procedure generation
   const { llmProvider, generateWithOllama, generateWithClaude, ollamaStatus, claudeStatus, checkClaude, checkOllama } = useAIStore();
+
+  // Deep linking: /assessments?selected=<assessmentId> — same convention the
+  // Findings and Controls pages already honor.
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Local state
   const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
@@ -784,6 +789,22 @@ Format as a numbered list. Be specific and actionable.`;
     setSelectedItemId(null);
   }, [setCurrentAssessmentId]);
 
+  // Honor ?selected=<assessmentId> so an evaluation opened in a new window or
+  // tab lands on that evaluation instead of the generic list. useLayoutEffect
+  // rather than useEffect: this runs before paint, so a freshly opened window
+  // shows the evaluation without flashing the list first. Persisted
+  // assessments rehydrate synchronously; a seed-CSV first visit lands on the
+  // re-run once `assessments` populates.
+  useLayoutEffect(() => {
+    const selectedParam = searchParams.get('selected');
+    if (!selectedParam) return;
+    const assessment = assessments.find(a => a.id === selectedParam);
+    if (!assessment) return;
+    handleSelectAssessment(assessment);
+    // Clear the URL parameter after selection
+    setSearchParams({}, { replace: true });
+  }, [searchParams, assessments, handleSelectAssessment, setSearchParams]);
+
   const handleDeleteAssessment = useCallback((assessmentId) => {
     const assessment = assessments.find(a => a.id === assessmentId);
     if (window.confirm(`Delete assessment "${assessment?.name}"?`)) {
@@ -1198,12 +1219,37 @@ Format as a numbered list. Be specific and actionable.`;
               return (
                 <div
                   key={assessment.id}
-                  className="bg-white border rounded-lg p-4 hover:shadow-md cursor-pointer transition-shadow"
-                  onClick={() => handleSelectAssessment(assessment)}
+                  className="evaluation-card bg-white border rounded-lg p-4 hover:shadow-md cursor-pointer transition-shadow"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <h3 className="font-bold text-lg">{assessment.name}</h3>
+                      {/* A real anchor, not a div+onClick: the browser then
+                          supplies "Open Link in New Window"/"New Tab" on
+                          right-click, plus Cmd-click, middle-click and
+                          keyboard focus. Its ::after overlay stretches the hit
+                          area over the whole card. */}
+                      <h3 className="font-bold text-lg">
+                        <Link
+                          to={`/assessments?selected=${encodeURIComponent(assessment.id)}`}
+                          className="evaluation-card__link"
+                          onClick={(e) => {
+                            // A plain left-click selects in place, exactly as
+                            // the old card onClick did — routing through the
+                            // URL would push a history entry that the
+                            // ?selected= handler immediately replaces, leaving
+                            // a Back stack of identical no-op /assessments
+                            // entries. Modified clicks and the context menu
+                            // fall through untouched, which is what makes
+                            // "Open Link in New Window", Cmd-click and
+                            // middle-click work.
+                            if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                            e.preventDefault();
+                            handleSelectAssessment(assessment);
+                          }}
+                        >
+                          {assessment.name}
+                        </Link>
+                      </h3>
                       {assessment.description && (
                         <p className="text-gray-600 text-sm mt-1">{assessment.description}</p>
                       )}
@@ -1211,7 +1257,7 @@ Format as a numbered list. Be specific and actionable.`;
                         <span>Scope: {assessment.scopeType === 'controls' ? 'Controls' : 'Requirements'}</span>
                         <span>{prog.total} items</span>
                         <button
-                          className={`${getStatusColor(assessment.status)} hover:opacity-80 transition-opacity`}
+                          className={`evaluation-card__status ${getStatusColor(assessment.status)} hover:opacity-80 transition-opacity`}
                           onClick={(e) => {
                             e.stopPropagation();
                             setCurrentAssessmentId(assessment.id);
@@ -1230,7 +1276,7 @@ Format as a numbered list. Be specific and actionable.`;
                         </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2" onClick={e => e.stopPropagation()}>
+                    <div className="evaluation-card__actions flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button
                         className="p-2 rounded"
                         style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
