@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield, FileArchive } from 'lucide-react';
+import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield, FileArchive, FileSpreadsheet } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
-import useArtifactStore, { ARTIFACT_HEALTH_VALUES } from '../stores/artifactStore';
+import useArtifactStore, { ARTIFACT_HEALTH_VALUES, ARTIFACT_TYPE_VALUES, ARTIFACT_CSV_HEADERS } from '../stores/artifactStore';
 import useUserStore from '../stores/userStore';
 import useControlsStore from '../stores/controlsStore';
 import useAssessmentsStore from '../stores/assessmentsStore';
@@ -47,6 +47,7 @@ const Artifacts = () => {
     name: '',
     description: '',
     link: '',
+    type: 'Document',
     status: 'ACTIVE',
     health: '',
     controlId: '',
@@ -138,7 +139,7 @@ const Artifacts = () => {
 
     try {
       const text = await file.text();
-      const count = await useArtifactStore.getState().importArtifactsCSV(text);
+      const count = await useArtifactStore.getState().importArtifactsCSV(text, useUserStore);
       toast.success(`Imported ${count} artifacts`);
     } catch (err) {
       console.error('Artifact CSV import error:', err);
@@ -155,12 +156,54 @@ const Artifacts = () => {
   // also what this page's own Import reads, so export → import now round-trips.
   const handleExportCSV = useCallback(() => {
     try {
-      useArtifactStore.getState().exportArtifactsCSV();
+      useArtifactStore.getState().exportArtifactsCSV(useUserStore);
       toast.success('Artifacts exported to CSV');
     } catch (err) {
       console.error('Artifact CSV export error:', err);
       toast.error('Export failed. Please try again.');
     }
+  }, []);
+
+  // Download a CSV template. Headers come from the store's canonical list —
+  // the same one the exporter unparses against — so the template can never
+  // drift from the real import format.
+  const handleDownloadTemplate = useCallback(() => {
+    const sampleRow = {
+      'Artifact ID': 'AR-001',
+      'Artifact Name': 'Quarterly Access Review Report',
+      'Type': 'Report',
+      'Status': 'ACTIVE',
+      'Health': 'Healthy',
+      'Priority': 'Medium',
+      'Control ID': 'PR.AA-05 Ex1',
+      'Assessment ID': '',
+      'Link': 'https://example.sharepoint.com/evidence/access-review-q1.pdf',
+      'Description': 'Signed quarterly privileged access review covering all production systems.',
+      'Linked Subcategories': 'PR.AA-05; PR.AA-01',
+      'Assignee': 'Owner Name <owner@example.com>',
+      'Reporter': 'Auditor Name <auditor@example.com>',
+      'Created Date': '',
+      'Last Updated': '',
+      'Linked Evaluation IDs': '',
+      'Compliance Requirement': '',
+      'Jira Key': ''
+    };
+
+    const csv = [
+      ARTIFACT_CSV_HEADERS.join(','),
+      ARTIFACT_CSV_HEADERS.map(h => `"${sampleRow[h] || ''}"`).join(',')
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'artifacts_template.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success('Template downloaded');
   }, []);
 
   // Extract all subcategory IDs from the data
@@ -273,6 +316,7 @@ const Artifacts = () => {
       name: '',
       description: '',
       link: '',
+      type: 'Document',
       status: 'ACTIVE',
       health: '',
       controlId: '',
@@ -401,6 +445,14 @@ const Artifacts = () => {
             >
               <Upload size={16} />
               Import
+            </button>
+            <button
+              onClick={handleDownloadTemplate}
+              className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 py-2 px-3 rounded text-sm"
+              title="Download a CSV template matching the import format"
+            >
+              <FileSpreadsheet size={16} />
+              Template
             </button>
             <button
               onClick={handleExportCSV}
@@ -692,6 +744,34 @@ const Artifacts = () => {
                   ) : (
                     <span className="text-sm font-mono text-gray-700 dark:text-gray-300">
                       {selectedArtifact?.artifactId || formData.artifactId || '—'}
+                    </span>
+                  )}
+                </div>
+
+                {/* Type: a first-class field on every artifact and a column in
+                    the CSV since long before this, but it had no panel surface
+                    — the user could neither read nor set the evidence type the
+                    export was carrying. */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1" htmlFor="artifact-type">Type</label>
+                  {editMode ? (
+                    <select
+                      id="artifact-type"
+                      name="type"
+                      value={formData.type || 'Document'}
+                      onChange={handleChange}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                    >
+                      {ARTIFACT_TYPE_VALUES.map((value) => (
+                        <option key={value} value={value}>{value}</option>
+                      ))}
+                      {formData.type && !ARTIFACT_TYPE_VALUES.includes(formData.type) && (
+                        <option value={formData.type}>{formData.type}</option>
+                      )}
+                    </select>
+                  ) : (
+                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                      {selectedArtifact?.type || 'Document'}
                     </span>
                   )}
                 </div>

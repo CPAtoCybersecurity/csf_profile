@@ -326,13 +326,19 @@ const ARTIFACT = struct({
   jiraKey: SHARE, // named residual (PR #286 follow-up)
   status: SHARE,
   priority: SHARE, // CSV-importer-only field
+  // User ids, not names — same class as findings.remediationOwner. The user
+  // directory is folded separately. Panel-editable since #306; declared here
+  // in the 2026-08-04 CSV parity pass, which made them importable.
+  assigneeId: SHARE,
+  reporterId: SHARE,
   seedSource: SHARE
 });
 
 const FINDING = struct({
   id: SHARE,
   summary: SHARE,
-  description: SHARE, // CSV-importer-only field
+  name: SHARE, // 2026-08-04: panel field, sits before description
+  description: SHARE,
   evaluationId: SHARE,
   controlId: SHARE,
   assessmentId: SHARE,

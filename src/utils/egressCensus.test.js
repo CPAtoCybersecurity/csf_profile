@@ -43,6 +43,9 @@ const EGRESS_INVENTORY = {
   'stores/auditLogStore.js': 'working-artifact',
   'pages/Assessments.js': 'working-artifact', // comparison CSV
   'pages/UserControls.js': 'working-artifact',
+  // CSV templates: a fixed sample row, no user data (2026-08-04 parity pass)
+  'pages/Findings.js': 'static-template',
+  'pages/Artifacts.js': 'static-template',
   'pages/UserManagement.js': 'working-artifact', // user directory CSV (PII, personal use)
   'pages/Settings.js': 'static-template', // CSV import template download
   'hooks/useCSFData.js': 'working-artifact'

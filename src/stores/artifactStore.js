@@ -36,6 +36,96 @@ export const SEEDED_ARTIFACTS = (() => {
 export const ARTIFACT_HEALTH_VALUES = ['Healthy', 'Needs Remediation'];
 
 /**
+ * Evidence type. Already a first-class field with 65 seeded values across the
+ * shipped artifacts, and already in the CSV — but it had no panel surface, so
+ * a user could neither see nor set it. Enumerated here so the Key details
+ * select and any future validation read one list.
+ */
+export const ARTIFACT_TYPE_VALUES = [
+  'Document',
+  'Policy',
+  'Procedure',
+  'Report',
+  'Evidence',
+  'Screenshot',
+  'Diagram',
+  'Log',
+  // A SUPERSET of ArtifactSelector.js's own ARTIFACT_TYPES, which carries
+  // 'Configuration' and 'Other' but lacks Procedure/Evidence/Diagram. Two
+  // vocabularies for one field is the drift this pass exists to remove, but
+  // that component has unrelated work in flight — reconcile it to this list
+  // in a follow-up. Until then, being the superset means a type set through
+  // the selector never falls outside the Key details dropdown.
+  'Configuration',
+  'Other'
+];
+
+/**
+ * The ONE artifact CSV column list — consumed by exportArtifactsCSV and by the
+ * template download in Artifacts.js, and the ordering contract the importer
+ * reads back. Ordering mirrors the Artifacts detail panel: identity, badges,
+ * Key details, then the Details rows.
+ *
+ * What changed (2026-08-04):
+ *  - IN: `Assignee` and `Reporter`. Both are editable in the panel AND shown
+ *    as list columns, yet neither was exported, imported, or declared in the
+ *    share registry — the fail-open class that produced every historical
+ *    leak/loss. An export → import round-trip erased both.
+ *  - KEPT without dropping: `Type` carries seeded data on 65 records, so the
+ *    fix for its missing panel surface is a panel field (see Artifacts.js),
+ *    not a deleted column. `Linked Evaluation IDs`, `Compliance Requirement`
+ *    and `Linked Subcategories` are legacy linkage that would be destroyed by
+ *    a round-trip if removed.
+ */
+export const ARTIFACT_CSV_HEADERS = [
+  'Artifact ID',
+  'Artifact Name',
+  'Type',
+  'Status',
+  'Health',
+  'Priority',
+  'Control ID',
+  'Assessment ID',
+  'Link',
+  'Description',
+  'Linked Subcategories',
+  'Assignee',
+  'Reporter',
+  'Created Date',
+  'Last Updated',
+  'Linked Evaluation IDs',
+  'Compliance Requirement',
+  'Jira Key'
+];
+
+/**
+ * `Name <email>` when the roster knows the user, the bare name when it has no
+ * email, and the raw stored id when the roster has never heard of them — so a
+ * cell never silently empties on export. Mirrors the findings exporter.
+ */
+const serializeArtifactUser = (userId, users) => {
+  if (!userId) return '';
+  const user = users.find(u => u.id === userId);
+  if (!user) return userId;
+  return user.email ? `${user.name} <${user.email}>` : user.name;
+};
+
+/**
+ * Inverse of serializeArtifactUser. Returns the {name, email} shape
+ * findOrCreateUser expects, or null for a blank cell.
+ */
+const parseArtifactUserCell = (str) => {
+  if (!str || !str.trim()) return null;
+  const trimmed = str.trim();
+  const match = trimmed.match(/^(.+?)\s*<([^>]+)>$/);
+  if (match) return { name: match[1].trim(), email: match[2].trim() };
+  if (trimmed.includes('@')) {
+    return { name: trimmed.split('@')[0].replace(/[._]/g, ' '), email: trimmed };
+  }
+  return { name: trimmed, email: null };
+};
+
+/**
  * Artifact Store
  * Manages evidence/artifacts linked to controls and requirements.
  * Enhanced to align with Jira AR (Artifacts) project structure.
@@ -284,36 +374,44 @@ const useArtifactStore = create(
         });
       },
 
-      // Export artifacts to CSV (standard format)
-      exportArtifactsCSV: () => {
+      // Export artifacts to CSV (standard format). `userStore` is optional:
+      // without it Assignee/Reporter fall back to the raw stored id rather
+      // than emptying, so the eight existing call sites keep working.
+      exportArtifactsCSV: (userStore) => {
         const artifacts = get().artifacts;
+        const users = userStore?.getState?.()?.users || [];
 
+        // Keys stay in lockstep with ARTIFACT_CSV_HEADERS — Papa.unparse is
+        // called with { columns: ARTIFACT_CSV_HEADERS }, so a drifting key
+        // exports as an empty column instead of reordering the sheet.
         const csvData = artifacts.map(a => ({
           'Artifact ID': csvFormulaGuard(a.artifactId),
           // 'Name' → 'Artifact Name' (issue #306). Import still accepts the
           // old header, so files exported by earlier versions keep working.
           'Artifact Name': csvFormulaGuard(a.name),
-          'Description': csvFormulaGuard(a.description),
-          'Link': csvFormulaGuard(a.link || ''),
           'Type': csvFormulaGuard(a.type || 'Document'),
           'Status': csvFormulaGuard(a.status || 'ACTIVE'),
           'Health': csvFormulaGuard(a.health || ''),
           'Priority': csvFormulaGuard(a.priority || 'Medium'),
           'Control ID': csvFormulaGuard(a.controlId || ''),
           'Assessment ID': csvFormulaGuard(a.assessmentId || ''),
-          'Linked Evaluation IDs': csvFormulaGuard((a.linkedEvaluationIds || []).join('; ')),
-          'Compliance Requirement': csvFormulaGuard(a.complianceRequirement || ''), // Deprecated
+          'Link': csvFormulaGuard(a.link || ''),
+          'Description': csvFormulaGuard(a.description),
           'Linked Subcategories': csvFormulaGuard((a.linkedSubcategoryIds || []).join('; ')), // Deprecated
+          'Assignee': csvFormulaGuard(serializeArtifactUser(a.assigneeId, users)),
+          'Reporter': csvFormulaGuard(serializeArtifactUser(a.reporterId, users)),
           // Every one of these round-trips through importArtifactsCSV, so
           // every one is user-controlled and must be escaped. 'Last Updated'
           // is new in issue #306; the rest were already importable and
           // already exported raw — same defect class, fixed together.
           'Created Date': csvFormulaGuard(a.createdDate),
           'Last Updated': csvFormulaGuard(a.lastModified || ''),
+          'Linked Evaluation IDs': csvFormulaGuard((a.linkedEvaluationIds || []).join('; ')),
+          'Compliance Requirement': csvFormulaGuard(a.complianceRequirement || ''), // Deprecated
           'Jira Key': csvFormulaGuard(a.jiraKey || '')
         }));
 
-        const csv = Papa.unparse(csvData);
+        const csv = Papa.unparse(csvData, { columns: ARTIFACT_CSV_HEADERS });
         const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         const url = URL.createObjectURL(blob);
@@ -358,13 +456,22 @@ const useArtifactStore = create(
         document.body.removeChild(link);
       },
 
-      // Import artifacts from CSV (supports both standard and Jira export formats)
-      importArtifactsCSV: async (csvText) => {
+      // Import artifacts from CSV (supports both standard and Jira export
+      // formats). `userStore` is optional — without it Assignee/Reporter
+      // cells are ignored rather than throwing, which keeps the existing
+      // single-argument call sites (and their tests) working unchanged.
+      importArtifactsCSV: async (csvText, userStore) => {
         return new Promise((resolve, reject) => {
           Papa.parse(csvText, {
             header: true,
             skipEmptyLines: true,
             complete: (results) => {
+              const findOrCreateUser = userStore?.getState?.()?.findOrCreateUser;
+              const resolveUser = (cell) => {
+                if (!findOrCreateUser) return null;
+                const info = parseArtifactUserCell(cell);
+                return info ? findOrCreateUser(info) : null;
+              };
               const existingArtifacts = get().artifacts;
               const existingKeys = new Set(existingArtifacts.map(a => a.artifactId));
 
@@ -417,6 +524,11 @@ const useArtifactStore = create(
                     // "now" is the honest answer.
                     lastModified: (row['Last Updated'] || '').trim() || new Date().toISOString(),
                     jiraKey: row['Issue key'] || row['Jira Key'] || null,
+                    // Panel-editable and list-visible since #306, but absent
+                    // from the sheet until the 2026-08-04 parity pass — an
+                    // export → import round-trip used to erase both.
+                    assigneeId: resolveUser(row['Assignee']),
+                    reporterId: resolveUser(row['Reporter']),
                     status: row['Status'] || 'ACTIVE',
                     // issue #306 — blank stays blank ("not set"), never
                     // defaulted to Healthy
