@@ -82,27 +82,58 @@ export const readFileAsDataUrl = (file) =>
   });
 
 /**
- * Downscale a data URL so its long edge is at most maxEdge, preserving aspect
- * ratio, and re-encode as PNG. Resolves to the ORIGINAL data URL when the
- * environment has no usable canvas or the image will not decode — the caller
- * still applies the persist cap, so the size invariant holds either way.
+ * Encodings tried in order, each checked against the persist cap. PNG first
+ * because logos are usually flat colour and it is lossless; JPEG after,
+ * because a photographic or gradient-heavy mark can exceed the cap as a
+ * lossless 256px PNG — and re-encoding a JPEG/WebP source to PNG can inflate
+ * it by an order of magnitude, which works against the storage budget this
+ * whole module exists to protect. The last rung halves the edge so a refusal
+ * is genuinely the last resort rather than the second thing we try.
  */
-export const downscaleDataUrl = (dataUrl, maxEdge = LOGO_MAX_EDGE_PX) =>
+const ENCODINGS = [
+  { edge: LOGO_MAX_EDGE_PX, type: 'image/png' },
+  { edge: LOGO_MAX_EDGE_PX, type: 'image/jpeg', quality: 0.85 },
+  { edge: Math.round(LOGO_MAX_EDGE_PX / 2), type: 'image/jpeg', quality: 0.8 }
+];
+
+export const RASTERIZE_OK = 'ok';
+export const RASTERIZE_UNDECODABLE = 'undecodable';
+export const RASTERIZE_NO_CANVAS = 'no-canvas';
+export const RASTERIZE_TOO_LARGE = 'too-large';
+
+/**
+ * Decode a data URL, downscale it so its long edge is at most `edge`, and
+ * re-encode it small enough to persist.
+ *
+ * The three outcomes are kept DISTINCT on purpose. Collapsing "the browser
+ * has no canvas" into "these bytes are not an image" is what lets an
+ * undecodable file — a truncated PNG, or an SVG renamed to .png so `file.type`
+ * lies — be accepted as a success: Settings would say "In use: logo.png" while
+ * the sidebar quietly fell back to the shield.
+ *
+ * Resolves { status, dataUrl? }:
+ *  - ok           re-encoded and under the persist cap
+ *  - undecodable  the bytes are not an image the browser can render
+ *  - too-large    decoded fine, still over the cap at the smallest rung
+ *  - no-canvas    no usable canvas here (jsdom, exotic environments); the
+ *                 caller falls back to the original bytes under the cap
+ */
+export const rasterizeDataUrl = (dataUrl, encodings = ENCODINGS) =>
   new Promise((resolve) => {
     if (typeof document === 'undefined' || typeof Image === 'undefined') {
-      resolve(dataUrl);
+      resolve({ status: RASTERIZE_NO_CANVAS });
       return;
     }
     let canvas;
     try {
       canvas = document.createElement('canvas');
     } catch {
-      resolve(dataUrl);
+      resolve({ status: RASTERIZE_NO_CANVAS });
       return;
     }
     const ctx = canvas.getContext && canvas.getContext('2d');
     if (!ctx || typeof canvas.toDataURL !== 'function') {
-      resolve(dataUrl);
+      resolve({ status: RASTERIZE_NO_CANVAS });
       return;
     }
 
@@ -111,20 +142,34 @@ export const downscaleDataUrl = (dataUrl, maxEdge = LOGO_MAX_EDGE_PX) =>
       try {
         const { width, height } = img;
         if (!width || !height) {
-          resolve(dataUrl);
+          resolve({ status: RASTERIZE_UNDECODABLE });
           return;
         }
-        const scale = Math.min(1, maxEdge / Math.max(width, height));
-        canvas.width = Math.max(1, Math.round(width * scale));
-        canvas.height = Math.max(1, Math.round(height * scale));
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const out = canvas.toDataURL('image/png');
-        resolve(isSafeLogoDataUrl(out) ? out : dataUrl);
+        let best = null;
+        for (const { edge, type, quality } of encodings) {
+          const scale = Math.min(1, edge / Math.max(width, height));
+          canvas.width = Math.max(1, Math.round(width * scale));
+          canvas.height = Math.max(1, Math.round(height * scale));
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const out = canvas.toDataURL(type, quality);
+          // Re-check the OUTPUT, not just the input MIME: what gets persisted
+          // is always canvas-produced, never the user's original bytes.
+          if (!isSafeLogoDataUrl(out)) continue;
+          if (out.length <= LOGO_MAX_PERSISTED_CHARS) {
+            resolve({ status: RASTERIZE_OK, dataUrl: out });
+            return;
+          }
+          best = out;
+        }
+        resolve(best ? { status: RASTERIZE_TOO_LARGE } : { status: RASTERIZE_NO_CANVAS });
       } catch {
-        resolve(dataUrl);
+        resolve({ status: RASTERIZE_NO_CANVAS });
       }
     };
-    img.onerror = () => resolve(dataUrl);
+    // Reached only once a canvas exists, so this means exactly one thing: the
+    // bytes did not decode.
+    img.onerror = () => resolve({ status: RASTERIZE_UNDECODABLE });
     img.src = dataUrl;
   });
 
@@ -144,21 +189,41 @@ export const prepareLogoFromFile = async (file) => {
     return { ok: false, error: error.message || 'Could not read that file.' };
   }
 
+  // The data URL is built from file.type, which validateLogoFile already
+  // allow-listed, so this only catches a FileReader that produced something
+  // other than a data URL. Real decodability is settled by rasterizeDataUrl.
   if (!isSafeLogoDataUrl(raw)) {
-    return { ok: false, error: 'That file did not decode as a supported image.' };
+    return { ok: false, error: 'That file could not be read as an image.' };
   }
 
-  const scaled = await downscaleDataUrl(raw);
-  const dataUrl = isSafeLogoDataUrl(scaled) ? scaled : raw;
+  const raster = await rasterizeDataUrl(raw);
 
-  if (dataUrl.length > LOGO_MAX_PERSISTED_CHARS) {
-    // Only reachable when downscaling could not run (no canvas) and the
-    // source was large. Refuse rather than blow the shared storage budget.
+  if (raster.status === RASTERIZE_OK) {
+    return { ok: true, dataUrl: raster.dataUrl, fileName: file.name || '' };
+  }
+
+  if (raster.status === RASTERIZE_UNDECODABLE) {
+    // A truncated file, or one whose extension lies about its contents (the
+    // MIME comes from the extension, so a .svg renamed .png arrives here
+    // claiming to be a PNG). Refusing keeps Settings and the sidebar telling
+    // the user the same story.
+    return { ok: false, error: 'That file is not a readable image — it may be damaged, or not the format its name claims.' };
+  }
+
+  if (raster.status === RASTERIZE_TOO_LARGE) {
+    return {
+      ok: false,
+      error: 'That logo is still too large to store after resizing. Try a simpler, flatter version of the mark.'
+    };
+  }
+
+  // No usable canvas: fall back to the original bytes, still capped.
+  if (raw.length > LOGO_MAX_PERSISTED_CHARS) {
     return {
       ok: false,
       error: 'That image is too large to store once encoded. Try a logo around 256×256 pixels.'
     };
   }
 
-  return { ok: true, dataUrl, fileName: file.name || '' };
+  return { ok: true, dataUrl: raw, fileName: file.name || '' };
 };

@@ -25,8 +25,9 @@ export const ORG_PROFILE_SCHEMA_VERSION = 1;
  *  - `profileHasContent` (and therefore `hasProfile()`, which gates the
  *    tailoring UI) must not flip to true just because someone uploaded a
  *    logo — a logo is not an org profile;
- *  - `profileToPromptContext` (procedureTailor.js) enumerates profile fields
- *    positively, so a base64 image can never be swept into an AI prompt;
+ *  - `profileContext` (procedureTailor.js), which builds the profile block for
+ *    every AI prompt, enumerates profile fields positively — so a base64 image
+ *    can never be swept into one;
  *  - the export/share plumbing already treats the whole `orgProfile` section
  *    as backup-only (shareRegistry: `orgProfile: { disposition: OMIT }`), so
  *    the logo inherits "rides complete backups, never rides a share" without

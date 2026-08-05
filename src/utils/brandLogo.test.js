@@ -13,7 +13,11 @@ import {
   isSafeLogoDataUrl,
   validateLogoFile,
   prepareLogoFromFile,
-  downscaleDataUrl,
+  rasterizeDataUrl,
+  RASTERIZE_NO_CANVAS,
+  RASTERIZE_OK,
+  RASTERIZE_TOO_LARGE,
+  RASTERIZE_UNDECODABLE,
   LOGO_ACCEPTED_MIME,
   LOGO_ACCEPT_ATTR,
   LOGO_MAX_SOURCE_BYTES,
@@ -114,11 +118,113 @@ describe('validateLogoFile', () => {
   });
 });
 
-describe('downscaleDataUrl', () => {
-  test('resolves to the input when no canvas is available (jsdom has no 2d context)', async () => {
+describe('rasterizeDataUrl', () => {
+  test('reports no-canvas in jsdom, which has no 2d context', async () => {
     // The size invariant is still enforced downstream by the persist cap —
     // this branch must degrade, not throw.
-    await expect(downscaleDataUrl(PNG_1X1)).resolves.toEqual(expect.any(String));
+    await expect(rasterizeDataUrl(PNG_1X1)).resolves.toEqual({ status: RASTERIZE_NO_CANVAS });
+  });
+
+  /**
+   * jsdom returns null from getContext('2d'), so without this harness the
+   * whole canvas branch — the scale math, the encoding ladder, and the
+   * re-check of the canvas OUTPUT — never runs under test. Both defects the
+   * pre-merge review found lived in exactly that unexecuted branch, so it
+   * gets driven directly rather than assumed.
+   */
+  const withFakeCanvas = ({ decode = true, width = 600, height = 600, encode }) => {
+    const drawn = [];
+    const canvas = {
+      width: 0,
+      height: 0,
+      getContext: () => ({ drawImage: () => drawn.push([canvas.width, canvas.height]), clearRect: () => {} }),
+      toDataURL: (type, quality) => encode({ type, quality, width: canvas.width, height: canvas.height })
+    };
+    const createElement = jest.spyOn(document, 'createElement').mockImplementation((tag) =>
+      tag === 'canvas' ? canvas : document.createElement.wrappedMethod?.call(document, tag)
+    );
+    class FakeImage {
+      set src(_value) {
+        this.width = width;
+        this.height = height;
+        setTimeout(() => (decode ? this.onload() : this.onerror()), 0);
+      }
+    }
+    const realImage = global.Image;
+    global.Image = FakeImage;
+    return {
+      drawn,
+      restore: () => { createElement.mockRestore(); global.Image = realImage; }
+    };
+  };
+
+  test('scales the long edge to 256 and preserves aspect ratio', async () => {
+    const harness = withFakeCanvas({
+      width: 1000,
+      height: 400,
+      encode: () => `data:image/png;base64,${'A'.repeat(100)}`
+    });
+    try {
+      const result = await rasterizeDataUrl(PNG_1X1);
+      expect(result.status).toBe(RASTERIZE_OK);
+      // 1000x400 -> long edge 256, short edge round(400 * 256/1000) = 102
+      expect(harness.drawn[0]).toEqual([256, 102]);
+    } finally {
+      harness.restore();
+    }
+  });
+
+  test('undecodable bytes are reported as such, NOT silently passed through', async () => {
+    // The defect this replaces: img.onerror resolved to the original data URL,
+    // so a truncated file was accepted and Settings claimed success while the
+    // sidebar fell back to the shield.
+    const harness = withFakeCanvas({ decode: false, encode: () => '' });
+    try {
+      await expect(rasterizeDataUrl(PNG_1X1)).resolves.toEqual({ status: RASTERIZE_UNDECODABLE });
+    } finally {
+      harness.restore();
+    }
+  });
+
+  test('falls back to JPEG when the PNG rung exceeds the persist cap', async () => {
+    const harness = withFakeCanvas({
+      encode: ({ type }) =>
+        type === 'image/png'
+          ? `data:image/png;base64,${'A'.repeat(LOGO_MAX_PERSISTED_CHARS)}`
+          : `data:image/jpeg;base64,${'A'.repeat(100)}`
+    });
+    try {
+      const result = await rasterizeDataUrl(PNG_1X1);
+      expect(result.status).toBe(RASTERIZE_OK);
+      expect(result.dataUrl.startsWith('data:image/jpeg;base64,')).toBe(true);
+    } finally {
+      harness.restore();
+    }
+  });
+
+  test('halves the edge before giving up, and only then reports too-large', async () => {
+    const harness = withFakeCanvas({
+      encode: () => `data:image/png;base64,${'A'.repeat(LOGO_MAX_PERSISTED_CHARS)}`
+    });
+    try {
+      const result = await rasterizeDataUrl(PNG_1X1);
+      expect(result.status).toBe(RASTERIZE_TOO_LARGE);
+      // Every rung was tried, ending at the halved edge.
+      expect(harness.drawn.map((d) => d[0])).toEqual([256, 256, 128]);
+    } finally {
+      harness.restore();
+    }
+  });
+
+  test('a canvas output that fails the guard is never returned', async () => {
+    const harness = withFakeCanvas({ encode: () => 'data:image/svg+xml;utf8,<svg/>' });
+    try {
+      const result = await rasterizeDataUrl(PNG_1X1);
+      expect(result.status).not.toBe(RASTERIZE_OK);
+      expect(result.dataUrl).toBeUndefined();
+    } finally {
+      harness.restore();
+    }
   });
 });
 

@@ -95,6 +95,7 @@ const Settings = () => {
   const setBrandLogo = useOrgProfileStore((s) => s.setBrandLogo);
   const clearBrandLogo = useOrgProfileStore((s) => s.clearBrandLogo);
   const logoInputRef = useRef(null);
+  const [logoPreviewBroken, setLogoPreviewBroken] = useState(false);
   const customLogo = isSafeLogoDataUrl(branding?.logoDataUrl) ? branding.logoDataUrl : null;
 
   const handleLogoFile = useCallback(async (event) => {
@@ -113,6 +114,7 @@ const Settings = () => {
       toast.error('That image could not be stored as your logo.');
       return;
     }
+    setLogoPreviewBroken(false);
     toast.success('Logo updated');
   }, [setBrandLogo]);
 
@@ -1066,7 +1068,13 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
 
             <div className="flex items-center gap-4">
               <div className="terminal-logo-disc" aria-hidden="true">
-                <img src={customLogo || '/SC_Logo.png'} alt="" />
+                {/* Same onError fallback the sidebar uses, so the preview and
+                    the sidebar can never tell the user different stories. */}
+                <img
+                  src={logoPreviewBroken ? '/SC_Logo.png' : (customLogo || '/SC_Logo.png')}
+                  alt=""
+                  onError={() => setLogoPreviewBroken(true)}
+                />
               </div>
               <div className="flex flex-col gap-1">
                 <span className="settings-section-desc">
@@ -1106,7 +1114,8 @@ nist-csf-2.0,RECOVER (RC),Incident Recovery Plan Execution (RC.RP),RC.RP-01,The 
             {/* mt-2, not mt-3: index.css is a hand-written utility subset and
                 stops at mt-2 — `mt-3` elsewhere in this file is a silent no-op. */}
             <p className="settings-section-desc mt-2">
-              PNG, JPEG, WebP, or GIF up to 2 MB — resized to 256px before it is saved. The mark sits on
+              PNG, JPEG, WebP, or GIF up to 2 MB — resized to 256px and re-encoded before it is saved
+              (an animated GIF keeps its first frame). The mark sits on
               a <strong>white disc</strong> in both light and dark themes, so a white-on-transparent logo
               will not show; use a dark or full-colour version. Stored only in this browser, alongside the
               organization profile: it rides complete backups and is <strong>never</strong> included in
