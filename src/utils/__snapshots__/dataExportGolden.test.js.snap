@@ -545,6 +545,7 @@ Object {
         "controlId": "CTRL-1",
         "createdDate": "2026-01-01",
         "description": "Quarterly evidence",
+        "externalUrl": "",
         "health": "Healthy",
         "id": "AR-row-1",
         "jiraKey": "AJ-1",

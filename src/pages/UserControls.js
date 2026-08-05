@@ -461,6 +461,7 @@ const UserControls = () => {
         'Tests': 'Sample 25 accounts per quarter; confirm reviewer sign-off in the ticket.',
         'Frameworks': 'NIST CSF 2.0; SOC 2',
         'Control Implementation Description': 'Example control description',
+        'External Ticket Link': 'https://example.atlassian.net/browse/CTL-1',
         'Control Owner ID': 'Owner Name <owner@example.com>',
         'Stakeholder IDs': 'Person One <person1@example.com>; Person Two <person2@example.com>',
         'Linked Requirements': 'GV.OC-01-01; GV.OC-01-02'
@@ -474,6 +475,7 @@ const UserControls = () => {
       'Tests',
       'Frameworks',
       'Control Implementation Description',
+      'External Ticket Link',
       'Control Owner ID',
       'Stakeholder IDs',
       'Linked Requirements'
@@ -1037,6 +1039,42 @@ const UserControls = () => {
                             {currentControl.implementationDescription || 'No description'}
                           </Markdown>
                         </div>
+                      )}
+                    </div>
+
+                    {/* External Ticket Link — controls is already an
+                        EXTERNAL_LINK_TYPE and the record already stored
+                        externalUrl; this is the surface that was missing. */}
+                    <div>
+                      <label className="text-sm font-medium text-gray-500">External Ticket Link</label>
+                      {editMode || isCreating ? (
+                        <input
+                          type="url"
+                          value={currentControl.externalUrl || ''}
+                          onChange={(e) => handleFieldChange('externalUrl', e.target.value)}
+                          className="mt-1 w-full p-2 border rounded"
+                          placeholder="https://... (ticket in Jira, ServiceNow, etc.)"
+                        />
+                      ) : currentControl.externalUrl ? (
+                        sanitizeExternalUrl(currentControl.externalUrl) ? (
+                          <p className="mt-1">
+                            <a
+                              href={sanitizeExternalUrl(currentControl.externalUrl)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-sm text-blue-600 dark:text-blue-400 hover:underline break-all"
+                            >
+                              {currentControl.externalUrl}
+                            </a>
+                          </p>
+                        ) : (
+                          <p className="mt-1 text-sm break-all">
+                            {currentControl.externalUrl}
+                            <span className="text-xs text-gray-400 ml-1">(only http/https URLs render as links)</span>
+                          </p>
+                        )
+                      ) : (
+                        <p className="mt-1 text-sm text-gray-400">No external ticket linked</p>
                       )}
                     </div>
 

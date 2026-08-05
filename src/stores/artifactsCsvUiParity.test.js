@@ -39,8 +39,9 @@ const headerLine = (csv) => csv.split('\n')[0].replace(/\r$/, '');
 describe('ARTIFACT_CSV_HEADERS is the single canonical column list', () => {
   it('carries every field the Key details / Details panel shows', () => {
     ['Artifact ID', 'Artifact Name', 'Type', 'Status', 'Health', 'Priority',
-      'Control ID', 'Assessment ID', 'Link', 'Description',
-      'Linked Subcategories', 'Assignee', 'Reporter', 'Last Updated'
+      'Control ID', 'Assessment ID', 'Artifact Link', 'External Ticket Link',
+      'Ticket ID', 'Description', 'Linked Subcategories', 'Assignee',
+      'Reporter', 'Last Updated'
     ].forEach((header) => {
       expect(ARTIFACT_CSV_HEADERS).toContain(header);
     });

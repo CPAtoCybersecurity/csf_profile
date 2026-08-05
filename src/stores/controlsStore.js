@@ -432,6 +432,7 @@ const useControlsStore = create(
                   tests: row['Tests'] || row.tests || '',
                   frameworks: row['Frameworks'] || row.frameworks || '',
                   implementationDescription: sanitizeInput(row['Control Implementation Description'] || row.implementationDescription || ''),
+                  externalUrl: row['External Ticket Link'] || row.externalUrl || '',
                   ownerId,
                   stakeholderIds,
                   linkedRequirementIds: row['Linked Requirements']
@@ -473,6 +474,9 @@ const useControlsStore = create(
           'Tests': csvFormulaGuard(c.tests || ''),
           'Frameworks': csvFormulaGuard(c.frameworks || ''),
           'Control Implementation Description': csvFormulaGuard(c.implementationDescription),
+          // Where this control is tracked in an external system (#284 pattern,
+          // already stored on the record and already a known EXTERNAL_LINK_TYPE).
+          'External Ticket Link': csvFormulaGuard(c.externalUrl || ''),
           'Control Owner': csvFormulaGuard(getUserName(c.ownerId)),
           'Control Owner ID': csvFormulaGuard(c.ownerId || ''),
           'Stakeholder(s)': csvFormulaGuard((c.stakeholderIds || []).map(id => getUserName(id)).join('; ')),

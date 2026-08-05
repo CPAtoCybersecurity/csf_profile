@@ -86,7 +86,8 @@ export const ARTIFACT_CSV_HEADERS = [
   'Priority',
   'Control ID',
   'Assessment ID',
-  'Link',
+  'Artifact Link',
+  'External Ticket Link',
   'Description',
   'Linked Subcategories',
   'Assignee',
@@ -95,7 +96,7 @@ export const ARTIFACT_CSV_HEADERS = [
   'Last Updated',
   'Linked Evaluation IDs',
   'Compliance Requirement',
-  'Jira Key'
+  'Ticket ID'
 ];
 
 /**
@@ -147,7 +148,11 @@ const useArtifactStore = create(
           artifactId: artifact.artifactId || `AR-${uuidv4()}`,
           name: artifact.name || '',
           description: artifact.description || '',
-          link: artifact.link || '', // URL to external evidence
+          link: artifact.link || '', // URL to the evidence itself
+          // Separate from `link`: where this artifact is tracked in an external
+          // system (Jira, ServiceNow). `link` points at the evidence, this
+          // points at the ticket about it.
+          externalUrl: artifact.externalUrl || '',
 
           // Primary link: Control (general evidence for a control)
           controlId: artifact.controlId || null,
@@ -395,7 +400,8 @@ const useArtifactStore = create(
           'Priority': csvFormulaGuard(a.priority || 'Medium'),
           'Control ID': csvFormulaGuard(a.controlId || ''),
           'Assessment ID': csvFormulaGuard(a.assessmentId || ''),
-          'Link': csvFormulaGuard(a.link || ''),
+          'Artifact Link': csvFormulaGuard(a.link || ''),
+          'External Ticket Link': csvFormulaGuard(a.externalUrl || ''),
           'Description': csvFormulaGuard(a.description),
           'Linked Subcategories': csvFormulaGuard((a.linkedSubcategoryIds || []).join('; ')), // Deprecated
           'Assignee': csvFormulaGuard(serializeArtifactUser(a.assigneeId, users)),
@@ -408,7 +414,7 @@ const useArtifactStore = create(
           'Last Updated': csvFormulaGuard(a.lastModified || ''),
           'Linked Evaluation IDs': csvFormulaGuard((a.linkedEvaluationIds || []).join('; ')),
           'Compliance Requirement': csvFormulaGuard(a.complianceRequirement || ''), // Deprecated
-          'Jira Key': csvFormulaGuard(a.jiraKey || '')
+          'Ticket ID': csvFormulaGuard(a.jiraKey || '')
         }));
 
         const csv = Papa.unparse(csvData, { columns: ARTIFACT_CSV_HEADERS });
@@ -494,7 +500,10 @@ const useArtifactStore = create(
                     // the Jira AR column. All three still land here.
                     name: row['Artifact Name'] || row['Name'] || row['Summary'] || '',
                     description: row['Description'] || '',
-                    link: row['Link'] || row['Custom field (Link)'] || '',
+                    // 'Artifact Link' is the current name; 'Link' is what this
+                    // app exported before 2026-08-05. Both still load.
+                    link: row['Artifact Link'] || row['Link'] || row['Custom field (Link)'] || '',
+                    externalUrl: row['External Ticket Link'] || '',
                     type: row['Type'] || row['Custom field (Artifact Type)'] || 'Document',
 
                     // Primary link
@@ -523,7 +532,7 @@ const useArtifactStore = create(
                     // Without the column this is a brand new local record, so
                     // "now" is the honest answer.
                     lastModified: (row['Last Updated'] || '').trim() || new Date().toISOString(),
-                    jiraKey: row['Issue key'] || row['Jira Key'] || null,
+                    jiraKey: row['Ticket ID'] || row['Issue key'] || row['Jira Key'] || null,
                     // Panel-editable and list-visible since #306, but absent
                     // from the sheet until the 2026-08-04 parity pass — an
                     // export → import round-trip used to erase both.
