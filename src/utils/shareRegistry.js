@@ -314,6 +314,9 @@ const ARTIFACT = struct({
   name: SHARE,
   description: SHARE,
   link: { default: EMPTY_STRING, includePrivate: SHARE }, // #284
+  // Same class as findings.externalUrl: a URL the user typed pointing at their
+  // own tracker. Rides shares like `link` does.
+  externalUrl: { default: EMPTY_STRING, includePrivate: SHARE },
   controlId: SHARE,
   assessmentId: SHARE,
   linkedEvaluationIds: SHARE,

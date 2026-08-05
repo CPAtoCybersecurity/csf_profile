@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, Upload, Download, ChevronRight, User, Shield, FileArchive, FileSpreadsheet } from 'lucide-react';
+import { Edit, Trash2, Save, X, Plus, Link as LinkIcon, ExternalLink, Upload, Download, ChevronRight, User, Shield, FileArchive, FileSpreadsheet } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import useCSFStore from '../stores/csfStore';
@@ -47,6 +47,8 @@ const Artifacts = () => {
     name: '',
     description: '',
     link: '',
+    externalUrl: '',
+    jiraKey: '',
     type: 'Document',
     status: 'ACTIVE',
     health: '',
@@ -177,7 +179,8 @@ const Artifacts = () => {
       'Priority': 'Medium',
       'Control ID': 'PR.AA-05 Ex1',
       'Assessment ID': '',
-      'Link': 'https://example.sharepoint.com/evidence/access-review-q1.pdf',
+      'Artifact Link': 'https://example.sharepoint.com/evidence/access-review-q1.pdf',
+      'External Ticket Link': 'https://example.atlassian.net/browse/EV-42',
       'Description': 'Signed quarterly privileged access review covering all production systems.',
       'Linked Subcategories': 'PR.AA-05; PR.AA-01',
       'Assignee': 'Owner Name <owner@example.com>',
@@ -186,7 +189,7 @@ const Artifacts = () => {
       'Last Updated': '',
       'Linked Evaluation IDs': '',
       'Compliance Requirement': '',
-      'Jira Key': ''
+      'Ticket ID': 'EV-42'
     };
 
     const csv = [
@@ -316,6 +319,8 @@ const Artifacts = () => {
       name: '',
       description: '',
       link: '',
+      externalUrl: '',
+      jiraKey: '',
       type: 'Document',
       status: 'ACTIVE',
       health: '',
@@ -834,9 +839,11 @@ const Artifacts = () => {
                   )}
                 </div>
 
-                {/* Link */}
+                {/* Artifact Link — points at the evidence itself. Distinct
+                    from External Ticket Link below, which points at the ticket
+                    tracking this artifact in Jira/ServiceNow. */}
                 <div className="mb-4">
-                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Link</label>
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Artifact Link</label>
                   {editMode ? (
                     <input
                       type="text"
@@ -865,6 +872,59 @@ const Artifacts = () => {
                     )
                   ) : (
                     <p className="text-sm text-gray-400 dark:text-gray-500">No link provided</p>
+                  )}
+                </div>
+
+                {/* External Ticket Link */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">External Ticket Link</label>
+                  {editMode ? (
+                    <input
+                      type="url"
+                      name="externalUrl"
+                      value={formData.externalUrl || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      placeholder="https://... (ticket in Jira, ServiceNow, etc.)"
+                    />
+                  ) : selectedArtifact?.externalUrl ? (
+                    sanitizeExternalUrl(selectedArtifact.externalUrl) ? (
+                      <a
+                        href={sanitizeExternalUrl(selectedArtifact.externalUrl)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 break-all"
+                      >
+                        <ExternalLink size={14} />
+                        {selectedArtifact.externalUrl}
+                      </a>
+                    ) : (
+                      <p className="text-sm text-gray-700 dark:text-gray-300 break-all">
+                        {selectedArtifact.externalUrl}
+                        <span className="text-xs text-gray-400 ml-1">(only http/https URLs render as links)</span>
+                      </p>
+                    )
+                  ) : (
+                    <p className="text-sm text-gray-400 dark:text-gray-500">No external ticket linked</p>
+                  )}
+                </div>
+
+                {/* Ticket ID */}
+                <div className="mb-4">
+                  <label className="text-sm text-gray-500 dark:text-gray-400 block mb-1">Ticket ID</label>
+                  {editMode ? (
+                    <input
+                      type="text"
+                      name="jiraKey"
+                      value={formData.jiraKey || ''}
+                      onChange={handleChange}
+                      className="w-full p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+                      placeholder="e.g., EV-42"
+                    />
+                  ) : (
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {selectedArtifact?.jiraKey || '-'}
+                    </p>
                   )}
                 </div>
 
