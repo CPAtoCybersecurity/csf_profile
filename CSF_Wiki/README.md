@@ -18,4 +18,4 @@ Drop a markdown or text file into the matching `raw/` subfolder (NIST material, 
 
 ## Origin
 
-This grew out of an idea from [issue #79](https://github.com/CPAtoCybersecurity/catalyst/issues/79) — a second brain for the CSF, built on Andrej Karpathy's "LLM wiki" pattern: raw folder in, Claude Code reads everything and builds the linked markdown wiki, no vector database or extra infrastructure required.
+This grew out of an internal planning issue — a second brain for the CSF, built on Andrej Karpathy's "LLM wiki" pattern: raw folder in, Claude Code reads everything and builds the linked markdown wiki, no vector database or extra infrastructure required.
