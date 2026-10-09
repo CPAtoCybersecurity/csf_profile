@@ -135,7 +135,7 @@ export const DEFAULT_CONTROLS = [
   },
   {
     controlId: 'GV.OC-02 Ex1',
-    implementationDescription: 'Alma Security identifies stakeholder expectations through: (1) quarterly Board meetings capturing director expectations, (2) monthly executive meetings for officer input, (3) employee training feedback via Workday, and (4) customer trust surveys following the 2022 security events. Expectations are documented in the security service catalog and inform the public trust rebuilding program.',
+    implementationDescription: 'Alma Security identifies stakeholder expectations through: (1) quarterly Board meetings capturing director expectations, (2) monthly executive meetings for officer input, (3) employee training feedback via Workday, and (4) customer trust surveys following the 2024 incidents (INC-2024-01, INC-2024-02). Expectations are documented in the security service catalog and inform the public trust rebuilding program.',
     ownerId: 2, // CPA to Cybersecurity (Steve)
     stakeholderIds: [2], // Steve McMichael
     linkedRequirementIds: ['GV.OC-02 Ex1'],
