@@ -38,6 +38,7 @@ export const DEMO_ASSESSMENT_USERS = [
 
 const COMPREHENSIVE_ASSESSMENT = {
   id: COMPREHENSIVE_ASSESSMENT_ID,
+  caseStudyId: 'alma-security',
   name: '2026 Alma Security Comprehensive CSF Assessment',
   description: `Catalog-driven assessment covering ${COMPREHENSIVE_SCOPE_IDS.length} subcategory implementation examples sourced from ASSESSMENT_CATALOG. Each requirement is linked to its test procedures, observations, and evidence artifacts from the catalog.`,
   scopeType: 'requirements',
@@ -220,6 +221,7 @@ export const ASSESSMENT_CSV_HEADERS = [
   'Implementation Example',
   'Assessment',
   'Description',
+  'Case Study ID',
   'Scope Type',
   'Framework Filter',
   'Scoring Scale',
@@ -337,6 +339,7 @@ const buildAssessmentCsvRow = ({ assessment, itemId, obs, getItemName, getImplem
     'Implementation Example': csvFormulaGuard(getImplementationExample(itemId)),
     'Assessment': escapeCSVValue(assessment.name),
     'Description': escapeCSVValue(assessment.description || ''),
+    'Case Study ID': escapeCSVValue(assessment.caseStudyId || ''),
     'Scope Type': escapeCSVValue(assessment.scopeType),
     'Framework Filter': escapeCSVValue(assessment.frameworkFilter || ''),
     'Scoring Scale': assessment.scoringScale === 5 ? 5 : 10,
@@ -1357,6 +1360,7 @@ const useAssessmentsStore = create(
         const newAssessment = {
           ...assessment,
           id: `ASM-${Date.now()}`,
+          caseStudyId: assessment.caseStudyId || (assessment.id === COMPREHENSIVE_ASSESSMENT_ID ? 'alma-security' : undefined),
           name: newName || `${assessment.name} (Copy)`,
           status: 'Not Started',
           createdDate: new Date().toISOString(),
@@ -1474,6 +1478,7 @@ const useAssessmentsStore = create(
                   assessmentGroups[assessmentName] = {
                     name: assessmentName,
                     description: epicInfo?.description || row['Description'] || row.description || '',
+                    caseStudyId: row['Case Study ID'] || null,
                     scopeType: scopeType,
                     frameworkFilter: row['Framework Filter'] || row.frameworkFilter || null,
                     // Round-trip the scoring scale; CSVs without the column default to 10 (issue #277)
@@ -1671,6 +1676,7 @@ const useAssessmentsStore = create(
                   id: `ASM-${uuidv4()}`,
                   name: group.name,
                   description: group.description,
+                  caseStudyId: group.caseStudyId,
                   scopeType: group.scopeType,
                   scoringScale: group.scoringScale === 5 ? 5 : 10,
                   year: group.year,

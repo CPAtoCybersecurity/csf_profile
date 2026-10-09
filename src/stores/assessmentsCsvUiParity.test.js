@@ -170,6 +170,18 @@ describe('export carries the UI fields', () => {
 });
 
 describe('export → import round-trips the UI fields', () => {
+  test('keeps a bundled case-study identity through CSV export and import', async () => {
+    const { id } = makeSourceAssessment();
+    useAssessmentsStore.getState().updateAssessment(id, { caseStudyId: 'alma-security' });
+
+    await useAssessmentsStore
+      .getState()
+      .exportAssessmentCSV(id, useControlsStore, useRequirementsStore, useUserStore);
+
+    const imported = await trackImported(capturedText());
+    expect(imported.caseStudyId).toBe('alma-security');
+  });
+
   test('year, roster roles, linked findings/controls and external links survive', async () => {
     const { id, auditorId, ownerId } = makeSourceAssessment();
     await useAssessmentsStore

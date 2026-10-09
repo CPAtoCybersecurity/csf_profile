@@ -42,6 +42,7 @@ import ExternalLinksEditor from '../components/ExternalLinksEditor';
 import ProcedureSourceBadge from '../components/ProcedureSourceBadge';
 import PlatformAddendumBadges from '../components/PlatformAddendumBadges';
 import PlatformCheckPicker from '../components/PlatformCheckPicker';
+import AssessmentBrief from '../components/AssessmentBrief';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -110,7 +111,8 @@ const Assessments = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Local state
-  const [view, setView] = useState('list'); // 'list', 'scope', 'assess'
+  const [view, setView] = useState('list'); // 'list', 'scope', 'assess', 'brief'
+  const [briefReturnView, setBriefReturnView] = useState('scope');
   const [editMode, setEditMode] = useState(false);
   const [selectedItemId, setSelectedItemId] = useState(null);
   // Comments/History panel for the open evaluation record
@@ -789,6 +791,12 @@ Format as a numbered list. Be specific and actionable.`;
     setSelectedItemId(null);
   }, [setCurrentAssessmentId]);
 
+  const openAssessmentBrief = useCallback((assessment, returnView) => {
+    setCurrentAssessmentId(assessment.id);
+    setBriefReturnView(returnView);
+    setView('brief');
+  }, [setCurrentAssessmentId]);
+
   // Honor ?selected=<assessmentId> so an evaluation opened in a new window or
   // tab lands on that evaluation instead of the generic list. useLayoutEffect
   // rather than useEffect: this runs before paint, so a freshly opened window
@@ -1097,6 +1105,7 @@ Format as a numbered list. Be specific and actionable.`;
       'Implementation Example': 'Ex1: Share the organization\'s mission and vision statements with third parties who have a role in achieving the mission',
       'Assessment': '2025 Security Assessment',
       'Description': 'Annual NIST CSF 2.0 assessment',
+      'Case Study ID': '',
       'Scope Type': 'controls',
       'Framework Filter': '',
       'Scoring Scale': '10',
@@ -1278,6 +1287,13 @@ Format as a numbered list. Be specific and actionable.`;
                     </div>
                     <div className="evaluation-card__actions flex items-center gap-2" onClick={e => e.stopPropagation()}>
                       <button
+                        className="assessment-brief__action text-sm"
+                        onClick={() => openAssessmentBrief(assessment, 'list')}
+                        aria-label={`Read case study for ${assessment.name}`}
+                      >
+                        <BookOpen size={16} aria-hidden="true" /> Case Study
+                      </button>
+                      <button
                         className="p-2 rounded"
                         style={{ backgroundColor: '#e5e7eb', color: '#000000' }}
                         onClick={() => handleCloneAssessment(assessment.id)}
@@ -1349,6 +1365,12 @@ Format as a numbered list. Be specific and actionable.`;
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              className="assessment-brief__action text-sm"
+              onClick={() => openAssessmentBrief(currentAssessment, 'scope')}
+            >
+              <BookOpen size={16} aria-hidden="true" /> Case Study
+            </button>
             {currentAssessment?.scopeType === 'requirements' && (
               <button
                 className="flex items-center gap-2 py-2 px-4 rounded-lg"
@@ -1674,6 +1696,12 @@ Format as a numbered list. Be specific and actionable.`;
                 </div>
               </div>
               <div className="flex items-center gap-3">
+                <button
+                  className="assessment-brief__action text-sm"
+                  onClick={() => openAssessmentBrief(currentAssessment, 'assess')}
+                >
+                  <BookOpen size={15} aria-hidden="true" /> Case Study
+                </button>
                 <CommentsButton
                   targetType="evaluation"
                   targetId={evaluationTargetId(currentAssessmentId, selectedItemId)}
@@ -2118,6 +2146,12 @@ Format as a numbered list. Be specific and actionable.`;
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                className="assessment-brief__action text-sm"
+                onClick={() => openAssessmentBrief(currentAssessment, 'assess')}
+              >
+                <BookOpen size={15} aria-hidden="true" /> Case Study
+              </button>
               {/* CSF function/category filters (issue #305) — same state the
                   scope view drives, so a filter carries across the two views */}
               {renderScopedCsfFilters('assess')}
@@ -2299,6 +2333,13 @@ Format as a numbered list. Be specific and actionable.`;
       {view === 'list' && renderListView()}
       {view === 'scope' && currentAssessment && renderScopeView()}
       {view === 'assess' && currentAssessment && renderAssessView()}
+      {view === 'brief' && currentAssessment && (
+        <AssessmentBrief
+          assessment={currentAssessment}
+          onBack={() => setView(briefReturnView)}
+          onSaveDescription={(assessmentId, description) => updateAssessment(assessmentId, { description })}
+        />
+      )}
 
       <AssessmentPicker
         isOpen={showExportAssessmentPicker}

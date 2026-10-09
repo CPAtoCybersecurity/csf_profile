@@ -9,7 +9,7 @@ A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framewor
 Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's the whole arc:
 
 1. **Open the app** — [csf-profile-app.pages.dev](https://csf-profile-app.pages.dev) (no install), or pick another door below.
-2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded; check the Dashboard radar to see where you're headed.
+2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded. In Control Evaluations, open its **Case Study** brief to read the company background, 2024 incidents, technology stack, and strategic risks without leaving the app; check the Dashboard radar to see where you're headed. Other assessments show their own scope and editable background.
 3. **Score your scope** — pick your subcategories and score current vs. target state using the built-in [0-10 scoring legend](#scoring-system).
 4. **Document observations and findings** — record what you examined, who you interviewed, what you tested, and link evidence artifacts.
 5. **Export and report** — export your CSV workpapers and write up results; use the [example audit report](ASSESSMENT_CATALOG/6_Audit_Report/) as your template. That deliverable is your portfolio piece.
