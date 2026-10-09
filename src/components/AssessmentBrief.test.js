@@ -3,7 +3,10 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import AssessmentBrief from './AssessmentBrief';
 import { COMPREHENSIVE_ASSESSMENT_ID } from '../stores/comprehensiveAssessmentData';
 
-jest.mock('./Markdown', () => ({ children }) => <>{children}</>);
+jest.mock('./Markdown', () => ({ children, className }) => {
+  if (className) throw new Error('Markdown does not accept className');
+  return <>{children}</>;
+});
 
 const almaAssessment = {
   id: COMPREHENSIVE_ASSESSMENT_ID,

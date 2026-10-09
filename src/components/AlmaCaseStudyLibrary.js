@@ -132,19 +132,20 @@ const AlmaCaseStudyLibrary = () => {
             </a>
           </div>
           {selected.format === 'md' && (
-            <Markdown
-              className="prose assessment-brief__prose"
-              components={{
-                a: ({ href, children }) => {
-                  const link = resolveSourceLink(selected.sourcePath, href);
-                  return link.document ? (
-                    <button type="button" className="assessment-brief__text-link" onClick={() => setSelectedId(link.document.id)}>{children}</button>
-                  ) : <a href={link.href} target="_blank" rel="noopener noreferrer">{children}</a>;
-                }
-              }}
-            >
-              {selected.content}
-            </Markdown>
+            <div className="prose assessment-brief__prose">
+              <Markdown
+                components={{
+                  a: ({ href, children }) => {
+                    const link = resolveSourceLink(selected.sourcePath, href);
+                    return link.document ? (
+                      <button type="button" className="assessment-brief__text-link" onClick={() => setSelectedId(link.document.id)}>{children}</button>
+                    ) : <a href={link.href} target="_blank" rel="noopener noreferrer">{children}</a>;
+                  }
+                }}
+              >
+                {selected.content}
+              </Markdown>
+            </div>
           )}
           {selected.format === 'csv' && <CsvRecords document={selected} />}
           {selected.format === 'xlsx' && <Workbook document={selected} />}
