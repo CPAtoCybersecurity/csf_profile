@@ -11,7 +11,7 @@ test('opens and closes the selected assessment case study from the list', () => 
   fireEvent.click(screen.getByRole('button', { name: /read case study for 2026 alma security comprehensive csf assessment/i }));
 
   expect(screen.getByRole('heading', { name: '2026 Alma Security Comprehensive CSF Assessment' })).toBeInTheDocument();
-  expect(screen.getByText(/INC-2024-01/)).toBeInTheDocument();
+  expect(screen.getAllByText(/INC-2024-01/).length).toBeGreaterThan(0);
 
   fireEvent.click(screen.getByRole('button', { name: /back to assessment/i }));
   expect(screen.getByRole('heading', { name: 'Control Evaluations' })).toBeInTheDocument();

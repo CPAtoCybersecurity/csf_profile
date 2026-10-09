@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BookOpen, ChevronLeft, ExternalLink, FileText, Pencil, Save, X } from 'lucide-react';
 import { COMPREHENSIVE_ASSESSMENT_ID } from '../stores/comprehensiveAssessmentData';
+import AlmaCaseStudyLibrary from './AlmaCaseStudyLibrary';
 import './AssessmentBrief.css';
 
 const ALMA_FACT_SHEET_URL = 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/0_Methodology/Alma-Fact-Sheet.md';
@@ -97,6 +98,7 @@ const AssessmentBrief = ({ assessment, onBack, onSaveDescription }) => {
                 Read the full source <ExternalLink size={14} aria-hidden="true" />
               </a>
             </p>
+            <AlmaCaseStudyLibrary />
           </>
         )}
 

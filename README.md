@@ -9,7 +9,7 @@ A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framewor
 Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's the whole arc:
 
 1. **Open the app** — [csf-profile-app.pages.dev](https://csf-profile-app.pages.dev) (no install), or pick another door below.
-2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded. In Control Evaluations, open its **Case Study** brief to read the company background, 2024 incidents, technology stack, and strategic risks without leaving the app; check the Dashboard radar to see where you're headed. Other assessments show their own scope and editable background.
+2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded. In Assessments, open its **Case Study** view to read the full catalog backgrounder, business case, fact sheet, methodology, control and assessment records, financials, and KPI trends inside the app; check the Dashboard radar to see where you're headed. Other assessments show their own scope and editable background.
 3. **Score your scope** — pick your subcategories and score current vs. target state using the built-in [0-10 scoring legend](#scoring-system).
 4. **Document observations and findings** — record what you examined, who you interviewed, what you tested, and link evidence artifacts.
 5. **Export and report** — export your CSV workpapers and write up results; use the [example audit report](ASSESSMENT_CATALOG/6_Audit_Report/) as your template. That deliverable is your portfolio piece.
@@ -72,6 +72,8 @@ The same NIST CSF 2.0 guidance, flattened into proper tables, ships in four form
 This project is intentionally a first-contribution-friendly repo for GRC practitioners and career-changers — **including contributions that require no code at all** (test procedures, assessment artifacts, case-study findings, documentation). Coders are equally welcome: features, bug squashes, and UI improvements are labeled in [Issues](https://github.com/CPAtoCybersecurity/csf_profile/issues).
 
 👉 Start with [CONTRIBUTING.md](CONTRIBUTING.md) — it has two tracks: **Contribute Without Code** and **Contribute Code**. Filter issues by [`good first issue`](https://github.com/CPAtoCybersecurity/csf_profile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to find a starting point, and add your name to [CONTRIBUTORS.md](CONTRIBUTORS.md) with your first merged PR.
+
+When changing Alma case-study or methodology sources, regenerate the in-app reader with `python scripts/generate-alma-case-study.py` (requires `openpyxl`). The Markdown files remain the authoritative source; the generated JSON lets the app display them and the source spreadsheets offline.
 
 Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: [https://academy.simplycyber.io/p/accrp](https://academy.simplycyber.io/p/accrp)
 
