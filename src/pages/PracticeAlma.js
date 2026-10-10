@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, BookOpen, Download } from 'lucide-react';
 import { COMPREHENSIVE_ASSESSMENT_ID } from '../stores/comprehensiveAssessmentData';
 import { quotaSafeLocalStorage } from '../utils/safeStorage';
+import useAssessmentsStore from '../stores/assessmentsStore';
 import './PracticeAlma.css';
 
 const STORAGE_KEY = 'alma-practice-draft-v1';
 const INITIAL_DRAFT = { step: 0, score: '', reason: '', gap: '', action: '' };
 const STEP_NAMES = ['Start', 'Evidence', 'Score', 'Compare', 'Finding', 'Portfolio note'];
 const SUGGESTED_SCORES = [4, 4.5, 5, 5.5, 6];
+const STARTER_SCOPE_IDS = ['ID.AM-02 Ex1', 'PR.AT-01 Ex1', 'PR.AA-01 Ex1'];
 const CASE_STUDY_LINK = `/assessments?selected=${COMPREHENSIVE_ASSESSMENT_ID}&brief=1`;
 const OBSERVATION_URL = 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/4_Observations/ID/ID.AM-01-Q1.md';
 
@@ -58,6 +60,10 @@ The catalog's Q1 example scores this outcome **4.5/10**, against a **6.5/10 targ
 `;
 
 const PracticeAlma = () => {
+  const navigate = useNavigate();
+  const practiceAssessment = useAssessmentsStore((state) => state.assessments.find((assessment) => assessment.beginnerPractice === true && assessment.caseStudyId === 'alma-security'));
+  const createAssessment = useAssessmentsStore((state) => state.createAssessment);
+  const setCurrentAssessmentId = useAssessmentsStore((state) => state.setCurrentAssessmentId);
   const [draft, setDraft] = useState(loadDraft);
   const update = (patch) => setDraft((current) => ({ ...current, ...patch }));
   const { step, score, reason, gap, action } = draft;
@@ -76,6 +82,22 @@ const PracticeAlma = () => {
     link.click();
     link.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const openIndependentPractice = () => {
+    const existing = useAssessmentsStore.getState().assessments.find((assessment) => assessment.beginnerPractice === true && assessment.caseStudyId === 'alma-security');
+    const assessment = existing || createAssessment({
+      name: 'Alma Security — My Practice Assessment',
+      description: 'My work on three fictional Alma Security requirements. The completed Alma assessment is reference material.',
+      caseStudyId: 'alma-security',
+      beginnerPractice: true,
+      scopeType: 'requirements',
+      scopeIds: STARTER_SCOPE_IDS,
+      scoringScale: 10,
+      year: 2026
+    });
+    setCurrentAssessmentId(assessment.id);
+    navigate(`/assessments?selected=${encodeURIComponent(assessment.id)}`);
   };
 
   return (
@@ -208,6 +230,11 @@ const PracticeAlma = () => {
               <button type="button" className="alma-practice__secondary" onClick={() => update({ step: 4 })}><ArrowLeft size={17} /> Edit finding</button>
               <button type="button" className="alma-practice__primary" onClick={downloadNote}><Download size={17} /> Download Markdown</button>
             </div>
+            <section className="alma-practice__next">
+              <h3>Ready to try one on your own?</h3>
+              <p>Open a separate Alma practice assessment with three requirements and blank scores. Your walkthrough answer and the completed catalog example stay available for reference.</p>
+              <button type="button" className="alma-practice__primary" onClick={openIndependentPractice}>{practiceAssessment ? 'Resume your assessment' : 'Try your own assessment'} <ArrowRight size={17} /></button>
+            </section>
           </>
         )}
       </main>

@@ -198,6 +198,7 @@ const OBSERVATION = struct({
 const ASSESSMENT = struct({
   id: SHARE,
   caseStudyId: SHARE, // public identity of a bundled fictional case study
+  beginnerPractice: SHARE, // keeps contextual help with a shared practice copy
   name: SHARE,
   description: SHARE,
   scopeType: SHARE,

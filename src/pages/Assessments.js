@@ -43,6 +43,7 @@ import ProcedureSourceBadge from '../components/ProcedureSourceBadge';
 import PlatformAddendumBadges from '../components/PlatformAddendumBadges';
 import PlatformCheckPicker from '../components/PlatformCheckPicker';
 import AssessmentBrief from '../components/AssessmentBrief';
+import { COMPREHENSIVE_ASSESSMENT_ID } from '../stores/comprehensiveAssessmentData';
 import useOrgProfileStore from '../stores/orgProfileStore';
 import OrgProfileWizard from '../components/OrgProfileWizard';
 
@@ -66,6 +67,33 @@ const formatTestProcedures = (text) => {
 
   return formatted;
 };
+
+const BEGINNER_EVIDENCE = {
+  'ID.AM-02 Ex1': 'Software inventory exists in ServiceNow and AWS Systems Manager. SaaS discovery, container inventory, and open-source component tracking are missing.',
+  'PR.AT-01 Ex1': 'Quarterly Workday training reaches employees and phishing click rates improved. Knowledge checks and contractor coverage remain incomplete.',
+  'PR.AA-01 Ex1': 'Workday and ServiceNow automate standard account changes. Testing found one delayed termination, three untracked service accounts, and a shared developer SSH key.'
+};
+
+const BeginnerFieldHelp = ({ title, children }) => (
+  <details className="mt-1 text-xs text-blue-700 dark:text-blue-300">
+    <summary className="cursor-pointer hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">{title}</summary>
+    <p className="mt-2 text-gray-600 dark:text-gray-300 leading-relaxed">{children}</p>
+  </details>
+);
+
+const BeginnerScoreSelect = ({ value, onChange, maxScore, label }) => (
+  <select
+    value={value ?? ''}
+    onChange={(event) => onChange(Number(event.target.value))}
+    aria-label={label}
+    className="p-2 text-sm border dark:border-gray-600 rounded bg-white dark:bg-gray-700 dark:text-white"
+  >
+    <option value="" disabled>Choose score</option>
+    {Array.from({ length: maxScore * 4 + 1 }, (_, index) => index / 4).map((score) => (
+      <option key={score} value={score}>{score.toFixed(2)} / {maxScore}</option>
+    ))}
+  </select>
+);
 
 // Markdown helpers shared with Findings: formatInlineMarkdown breaks
 // single-line catalog text into renderable markdown; stripMarkdown cleans
@@ -1260,6 +1288,8 @@ Format as a numbered list. Be specific and actionable.`;
                           {assessment.name}
                         </Link>
                       </h3>
+                      {assessment.beginnerPractice && <span className="inline-block mt-1 px-2 py-1 rounded bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 text-xs font-semibold">Your practice copy</span>}
+                      {assessment.id === COMPREHENSIVE_ASSESSMENT_ID && <span className="inline-block mt-1 px-2 py-1 rounded bg-gray-100 text-gray-700 dark:bg-gray-700 dark:text-gray-100 text-xs font-semibold">Completed Alma example</span>}
                       {assessment.description && (
                         <p className="text-gray-600 text-sm mt-1">{assessment.description}</p>
                       )}
@@ -1407,6 +1437,12 @@ Format as a numbered list. Be specific and actionable.`;
             </button>
           </div>
         </div>
+
+        {currentAssessment?.beginnerPractice && (
+          <div className="mt-4 p-4 rounded-lg bg-blue-50 dark:bg-blue-950 text-sm text-blue-950 dark:text-blue-100 border border-blue-100 dark:border-blue-900">
+            <strong>This is your practice copy.</strong> It has three Alma requirements and blank scores. Start with ID.AM-02: select Score Assessment, read the case evidence, click Edit, and record your Q1 scores and observation. Use Case Study to review Alma's completed example when you need a reference. <Link to="/practice/alma" className="underline font-semibold">Back to walkthrough</Link>
+          </div>
+        )}
 
         {/* Progress summary - clickable to navigate to scoring */}
         {progress && (
@@ -1746,6 +1782,14 @@ Format as a numbered list. Be specific and actionable.`;
             </div>
           </div>
 
+          {currentAssessment?.beginnerPractice && (
+            <div className="px-6 py-3 bg-blue-50 dark:bg-blue-950 text-sm text-blue-950 dark:text-blue-100 border-b border-blue-100 dark:border-blue-900">
+              <strong>My Alma practice assessment.</strong> Alma's completed assessment is reference material. Read the evidence, click Edit, then record your Q1 scores and observation in this copy.
+              {BEGINNER_EVIDENCE[selectedItemId] && <p className="mt-2 mb-0"><strong>Evidence to consider:</strong> {BEGINNER_EVIDENCE[selectedItemId]}</p>}
+              <Link to="/practice/alma" className="inline-block mt-2 underline font-semibold">Back to walkthrough</Link>
+            </div>
+          )}
+
           <RecordPanel
             open={recordPanelOpen}
             onClose={() => setRecordPanelOpen(false)}
@@ -1783,6 +1827,7 @@ Format as a numbered list. Be specific and actionable.`;
                         Test Procedures
                         <ProcedureSourceBadge source={currentObservation.procedureSource} />
                       </label>
+                      {currentAssessment?.beginnerPractice && <BeginnerFieldHelp title="Help with test procedures">A test procedure says what to inspect or compare. For software inventory, compare the CMDB with cloud and SaaS records.</BeginnerFieldHelp>}
                       <div className="flex items-center gap-3">
                         {editMode && hasOrgProfile && currentObservation.testProcedures && (
                           <button
@@ -1881,6 +1926,7 @@ Format as a numbered list. Be specific and actionable.`;
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-sm text-gray-500 dark:text-gray-400">Artifacts</label>
                     </div>
+                    {currentAssessment?.beginnerPractice && <BeginnerFieldHelp title="What counts as evidence?">An artifact is a source you reviewed, such as an inventory export, training report, or access log. The case study gives you examples to cite in your observation.</BeginnerFieldHelp>}
                     <ArtifactSelector
                       selectedArtifacts={currentObservation.linkedArtifacts || []}
                       onChange={(artifacts) => handleObservationChange('linkedArtifacts', artifacts)}
@@ -1891,6 +1937,7 @@ Format as a numbered list. Be specific and actionable.`;
 
                   {/* Findings */}
                   <div className="mb-4">
+                    {currentAssessment?.beginnerPractice && <BeginnerFieldHelp title="How is a finding different from a gap?">A gap is the difference between current and target practice. A finding records a specific issue supported by evidence, with an action and owner.</BeginnerFieldHelp>}
                     <FindingSelector
                       label="Findings"
                       selectedFindings={currentObservation.linkedFindings || []}
@@ -2067,8 +2114,17 @@ Format as a numbered list. Be specific and actionable.`;
 
                   {/* Q Target Score */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Target Score</span>
-                    {editMode ? (
+                    <div><span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Target Score</span>
+                      {currentAssessment?.beginnerPractice && <BeginnerFieldHelp title="Help with target score">The level Alma wants to reach. Choose a desired future state and explain the improvement needed in your observation.</BeginnerFieldHelp>}
+                    </div>
+                    {editMode && currentAssessment?.beginnerPractice ? (
+                      <BeginnerScoreSelect
+                        value={currentObservation.quarters?.[selectedQuarter]?.targetScore}
+                        onChange={(score) => handleQuarterlyChange('targetScore', score)}
+                        maxScore={getScoringScale(currentAssessment)}
+                        label={`${selectedQuarter} Target Score`}
+                      />
+                    ) : editMode ? (
                       <ScoreSelect
                         value={currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
                         onChange={(score) => handleQuarterlyChange('targetScore', score)}
@@ -2077,15 +2133,26 @@ Format as a numbered list. Be specific and actionable.`;
                       />
                     ) : (
                       <span className="px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
+                        {currentAssessment?.beginnerPractice
+                          ? currentObservation.quarters?.[selectedQuarter]?.targetScore ?? 'Not scored'
+                          : currentObservation.quarters?.[selectedQuarter]?.targetScore || 0}
                       </span>
                     )}
                   </div>
 
                   {/* Q Actual Score */}
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Actual Score</span>
-                    {editMode ? (
+                    <div><span className="text-sm text-gray-500 dark:text-gray-400">{selectedQuarter} Actual Score</span>
+                      {currentAssessment?.beginnerPractice && <BeginnerFieldHelp title="Help with actual score">The level the evidence supports today. The catalog uses a 0–10 rubric; a score of 4 means a regular process with material gaps, while 5 means consistent coverage with minor flaws.</BeginnerFieldHelp>}
+                    </div>
+                    {editMode && currentAssessment?.beginnerPractice ? (
+                      <BeginnerScoreSelect
+                        value={currentObservation.quarters?.[selectedQuarter]?.actualScore}
+                        onChange={(score) => handleQuarterlyChange('actualScore', score)}
+                        maxScore={getScoringScale(currentAssessment)}
+                        label={`${selectedQuarter} Actual Score`}
+                      />
+                    ) : editMode ? (
                       <ScoreSelect
                         value={currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
                         onChange={(score) => handleQuarterlyChange('actualScore', score)}
@@ -2094,7 +2161,9 @@ Format as a numbered list. Be specific and actionable.`;
                       />
                     ) : (
                       <span className={`px-2 py-0.5 rounded text-sm font-bold ${getScoreBadgeStyle(currentObservation.quarters?.[selectedQuarter]?.actualScore)}`}>
-                        {currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
+                        {currentAssessment?.beginnerPractice
+                          ? currentObservation.quarters?.[selectedQuarter]?.actualScore ?? 'Not scored'
+                          : currentObservation.quarters?.[selectedQuarter]?.actualScore || 0}
                       </span>
                     )}
                   </div>
@@ -2102,6 +2171,7 @@ Format as a numbered list. Be specific and actionable.`;
                   {/* Q Observations */}
                   <div>
                     <span className="text-sm text-gray-500 dark:text-gray-400 block mb-2">{selectedQuarter} Observations</span>
+                    {currentAssessment?.beginnerPractice && <BeginnerFieldHelp title="Help with observations">Write what you checked, what the evidence showed, and why your score fits. For example: “ServiceNow tracks software, but SaaS and containers are missing from the inventory.”</BeginnerFieldHelp>}
                     {editMode ? (
                       <textarea
                         value={currentObservation.quarters?.[selectedQuarter]?.observations || ''}

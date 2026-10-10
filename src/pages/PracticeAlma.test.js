@@ -2,6 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import PracticeAlma from './PracticeAlma';
+import useAssessmentsStore from '../stores/assessmentsStore';
 
 beforeEach(() => localStorage.clear());
 
@@ -45,4 +46,32 @@ test('restores a saved practice draft after remount', () => {
 
   render(<MemoryRouter><PracticeAlma /></MemoryRouter>);
   expect(screen.getByRole('heading', { name: 'Review the evidence' })).toBeInTheDocument();
+});
+
+test('starts a separate three-requirement Alma assessment with empty scores and resumes it', () => {
+  const store = useAssessmentsStore.getState();
+  const previousAssessments = store.assessments;
+  const previousCurrentId = store.currentAssessmentId;
+  localStorage.setItem('alma-practice-draft-v1', JSON.stringify({ step: 5, score: '4', reason: 'A system exists with gaps.', gap: 'Inventory is incomplete.', action: 'Reconcile monthly.' }));
+
+  try {
+    const { unmount } = render(<MemoryRouter><PracticeAlma /></MemoryRouter>);
+    fireEvent.click(screen.getByRole('button', { name: 'Try your own assessment' }));
+
+    const practice = useAssessmentsStore.getState().assessments.find((item) => item.beginnerPractice === true);
+    expect(practice).toMatchObject({ caseStudyId: 'alma-security', scopeIds: ['ID.AM-02 Ex1', 'PR.AT-01 Ex1', 'PR.AA-01 Ex1'] });
+    for (const id of practice.scopeIds) {
+      expect(practice.observations[id].quarters.Q1).toMatchObject({ actualScore: null, targetScore: null, observations: '' });
+    }
+    expect(practice.id).not.toBe('ASM-2026-comprehensive-alma');
+
+    unmount();
+    const second = render(<MemoryRouter><PracticeAlma /></MemoryRouter>);
+    fireEvent.click(screen.getByRole('button', { name: 'Resume your assessment' }));
+    expect(useAssessmentsStore.getState().assessments.filter((item) => item.beginnerPractice === true)).toHaveLength(1);
+    second.unmount();
+  } finally {
+    useAssessmentsStore.getState().setAssessments(previousAssessments);
+    useAssessmentsStore.getState().setCurrentAssessmentId(previousCurrentId);
+  }
 });

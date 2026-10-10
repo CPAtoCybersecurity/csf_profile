@@ -58,9 +58,9 @@ export const LEGACY_EXAMPLE_ASSESSMENT_IDS = ['ASM-default-2025-alma', 'ASM-audi
 const DEFAULT_ASSESSMENTS = [COMPREHENSIVE_ASSESSMENT];
 
 // Helper to create default quarterly data structure
-const createDefaultQuarter = () => ({
-  actualScore: 0,
-  targetScore: 0,
+const createDefaultQuarter = (unscored = false) => ({
+  actualScore: unscored ? null : 0,
+  targetScore: unscored ? null : 0,
   observations: '',
   observationDate: '',
   testingStatus: 'Not Started',
@@ -72,11 +72,20 @@ const createDefaultQuarter = () => ({
   metricId: ''
 });
 
-const createDefaultQuarters = () => ({
-  Q1: createDefaultQuarter(),
-  Q2: createDefaultQuarter(),
-  Q3: createDefaultQuarter(),
-  Q4: createDefaultQuarter()
+const createDefaultQuarters = (unscored = false) => ({
+  Q1: createDefaultQuarter(unscored),
+  Q2: createDefaultQuarter(unscored),
+  Q3: createDefaultQuarter(unscored),
+  Q4: createDefaultQuarter(unscored)
+});
+
+const createDefaultObservation = (unscored = false) => ({
+  auditorId: null,
+  testProcedures: '',
+  linkedArtifacts: [],
+  externalLinks: [],
+  remediation: { ownerId: null, actionPlan: '', dueDate: '' },
+  quarters: createDefaultQuarters(unscored)
 });
 
 /**
@@ -847,6 +856,8 @@ const useAssessmentsStore = create(
           id: newId,
           name: assessmentData.name || `Assessment ${assessments.length + 1}`,
           description: assessmentData.description || '',
+          caseStudyId: assessmentData.caseStudyId === 'alma-security' ? 'alma-security' : undefined,
+          beginnerPractice: assessmentData.beginnerPractice === true,
           scopeType: assessmentData.scopeType || 'requirements', // 'requirements' or 'controls'
           // 10-point (default) or 5-point CMMI-style scale; locked at creation (issue #277)
           scoringScale: assessmentData.scoringScale === 5 ? 5 : 10,
@@ -869,8 +880,11 @@ const useAssessmentsStore = create(
           createdDate: new Date().toISOString(),
           lastModified: new Date().toISOString(),
 
-          // Observations keyed by scoped item ID
-          observations: {}
+          // A beginner copy starts visibly unscored while ordinary assessments
+          // retain the existing zero-based defaults.
+          observations: assessmentData.beginnerPractice === true
+            ? Object.fromEntries((assessmentData.scopeIds || []).map(itemId => [itemId, createDefaultObservation(true)]))
+            : {}
         };
 
         const updatedAssessments = [...assessments, newAssessment];
@@ -1036,18 +1050,7 @@ const useAssessmentsStore = create(
         }
 
         // Return default structure with quarterly data
-        return {
-          auditorId: null,
-          testProcedures: '',
-          linkedArtifacts: [],
-          externalLinks: [],
-          remediation: {
-            ownerId: null,
-            actionPlan: '',
-            dueDate: ''
-          },
-          quarters: createDefaultQuarters()
-        };
+        return createDefaultObservation();
       },
 
       // Update observation for a scoped item
