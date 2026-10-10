@@ -148,6 +148,8 @@ macOS typically comes with Git pre-installed. You only need to install Node.js:
 4. **Access the application**
    Open your browser and navigate to [http://localhost:3000](http://localhost:3000)
 
+**Windows shortcut:** After `npm install`, double-click [Open CSF Profile.cmd](Open%20CSF%20Profile.cmd) in the project folder. It starts the app on an available port from 3000–3010 and opens your default browser when the app is ready. Leave the server window open while using the app; close it to stop the server. If the app is already running, the shortcut opens that instance.
+
 ## Encrypted Exports (.enc.csv)
 
 Some exports support optional password protection. If you provide a password, the downloaded file will be named like:
