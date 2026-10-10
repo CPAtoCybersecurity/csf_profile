@@ -23,8 +23,8 @@ const loadDraft = () => {
 
 export const buildPortfolioNote = ({ score, reason, gap, action }) => `# Alma Security — Hardware Inventory Practice Assessment
 
-**Framework outcome:** NIST CSF 2.0 ID.AM-01 — Inventories of hardware managed by the organization are maintained  
-**Assessment period:** Q1 2026  
+- **Framework outcome:** NIST CSF 2.0 ID.AM-01 — Inventories of hardware managed by the organization are maintained
+- **Assessment period:** Q1 2026
 **Type:** Educational practice based on the fictional Alma Security case study
 
 ## Evidence reviewed
@@ -36,12 +36,14 @@ export const buildPortfolioNote = ({ score, reason, gap, action }) => `# Alma Se
 
 ## My assessment
 
-**Current score:** ${score}/10  
+**Current score:** ${score}/10
+
 **Rationale:** ${reason.trim()}
 
 ## Gap and recommended action
 
-**Gap:** ${gap.trim()}  
+**Gap:** ${gap.trim()}
+
 **Recommended action:** ${action.trim()}
 
 ## Learning comparison
