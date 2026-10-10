@@ -176,7 +176,7 @@ fails when any file gains a browser-download path (`URL.createObjectURL` / jsPDF
 without an inventoried posture — a brand-new exporter cannot be born fail-open either.
 
 Complete backups are wholesale by design and bypass the registry. The own-data exports (the
-CSV exports, Jira CSVs, "Assessments Only" JSON) remain the documented exception described
+CSV exports, Jira CSVs, "Assessments Only" JSON, and the Alma practice Markdown note) remain the documented exception described
 above: they are working artifacts for your own use, not the sharing surface.
 
 ### The user directory — private data too

@@ -27,6 +27,7 @@ import { shouldShowBackupReminder, updateLastReminderDate, isFirstVisit } from '
 const Requirements = lazy(() => import('./pages/Requirements'));
 const UserControls = lazy(() => import('./pages/UserControls'));
 const Assessments = lazy(() => import('./pages/Assessments'));
+const PracticeAlma = lazy(() => import('./pages/PracticeAlma'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const UserManagement = lazy(() => import('./pages/UserManagement'));
 const ScoringLegend = lazy(() => import('./pages/ScoringLegend'));
@@ -133,6 +134,7 @@ const AppContent = () => {
               <Route path="/requirements" element={<Requirements />} />
               <Route path="/controls" element={<UserControls />} />
               <Route path="/assessments" element={<Assessments />} />
+              <Route path="/practice/alma" element={<PracticeAlma />} />
               <Route path="/metrics" element={<Metrics />} />
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/dashboard" element={<Dashboard />} />

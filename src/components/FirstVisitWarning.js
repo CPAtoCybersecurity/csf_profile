@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 import { isFirstVisit, acknowledgeFirstVisit } from '../utils/backupTracking';
 
 const MONO_STACK = "'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace";
@@ -11,6 +12,7 @@ const MONO_STACK = "'JetBrains Mono', 'IBM Plex Mono', 'SF Mono', Menlo, Monaco,
  */
 const FirstVisitWarning = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if this is the first visit
@@ -22,6 +24,11 @@ const FirstVisitWarning = () => {
   const handleClose = () => {
     acknowledgeFirstVisit();
     setIsVisible(false);
+  };
+
+  const handlePractice = () => {
+    handleClose();
+    navigate('/practice/alma');
   };
 
   if (!isVisible) {
@@ -82,6 +89,9 @@ const FirstVisitWarning = () => {
             a fictional company — is pre-loaded and selected, so you can explore
             scoring, the dashboard radar, findings, and CSV export right away.
           </p>
+          <p style={{ margin: '0 0 12px', color: '#e5e7eb' }}>
+            New to assessments? Practice one Alma requirement with a guided walkthrough before exploring the full tool.
+          </p>
           <ul style={{ margin: '0 0 12px', paddingLeft: '18px', color: '#e5e7eb', listStyleType: '"> "' }}>
             <li style={{ marginBottom: '4px' }}>Score current vs. target state per subcategory</li>
             <li style={{ marginBottom: '4px' }}>Watch the Dashboard radar update as you go</li>
@@ -95,13 +105,31 @@ const FirstVisitWarning = () => {
         </div>
 
         {/* Footer */}
-        <div style={{ borderTop: '1px solid #33ff66', padding: '14px 20px', display: 'flex', justifyContent: 'flex-end' }}>
+        <div style={{ borderTop: '1px solid #33ff66', padding: '14px 20px', display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'flex-end' }}>
           <button
-            onClick={handleClose}
+            onClick={handlePractice}
             style={{
               backgroundColor: '#33ff66',
               color: '#000000',
               border: 'none',
+              borderRadius: 0,
+              fontFamily: MONO_STACK,
+              fontSize: '12px',
+              fontWeight: 700,
+              letterSpacing: '0.08em',
+              textTransform: 'uppercase',
+              padding: '10px 18px',
+              cursor: 'pointer'
+            }}
+          >
+            Practice with Alma →
+          </button>
+          <button
+            onClick={handleClose}
+            style={{
+              backgroundColor: '#000000',
+              color: '#33ff66',
+              border: '1px solid #33ff66',
               borderRadius: 0,
               fontFamily: MONO_STACK,
               fontSize: '12px',

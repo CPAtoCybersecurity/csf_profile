@@ -15,6 +15,7 @@ import {
   Bot,
   AlertTriangle,
   History,
+  BookOpen,
   Menu,
   X
 } from 'lucide-react';
@@ -25,6 +26,7 @@ const NAV_GROUPS = [
   {
     title: 'Assessment',
     items: [
+      { to: '/practice/alma', label: 'Practice with Alma', Icon: BookOpen },
       // "/" also renders the Dashboard, so the Dashboard link highlights there too
       { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, matchRoot: true },
       { to: '/requirements', label: 'Requirements', Icon: FileText },

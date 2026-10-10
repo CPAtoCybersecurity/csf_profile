@@ -6,6 +6,10 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import FirstVisitWarning from './FirstVisitWarning';
 import * as backupTracking from '../utils/backupTracking';
+import { MemoryRouter, useLocation } from 'react-router-dom';
+
+const CurrentPath = () => <span data-testid="current-path">{useLocation().pathname}</span>;
+const renderModal = () => render(<MemoryRouter><FirstVisitWarning /></MemoryRouter>);
 
 // Mock the backupTracking utility
 jest.mock('../utils/backupTracking');
@@ -24,7 +28,7 @@ describe('FirstVisitWarning Component', () => {
   test('renders welcome modal when it is first visit', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
 
-    render(<FirstVisitWarning />);
+    renderModal();
 
     expect(screen.getByText(/welcome to csf_profile/i)).toBeInTheDocument();
     expect(screen.getByText(/nist csf 2\.0 assessment tool/i)).toBeInTheDocument();
@@ -34,15 +38,15 @@ describe('FirstVisitWarning Component', () => {
   test('does not render when first visit already acknowledged', () => {
     backupTracking.isFirstVisit.mockReturnValue(false);
 
-    const { container } = render(<FirstVisitWarning />);
+    renderModal();
 
-    expect(container.firstChild).toBeNull();
+    expect(screen.queryByText(/welcome to csf_profile/i)).not.toBeInTheDocument();
   });
 
   test('introduces the pre-loaded Alma Security sample assessment', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
 
-    render(<FirstVisitWarning />);
+    renderModal();
 
     expect(screen.getByText(/alma security/i)).toBeInTheDocument();
     expect(screen.getByText(/pre-loaded and selected/i)).toBeInTheDocument();
@@ -51,7 +55,7 @@ describe('FirstVisitWarning Component', () => {
   test('lists what the user can explore', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
 
-    render(<FirstVisitWarning />);
+    renderModal();
 
     expect(screen.getByText(/score current vs\. target state per subcategory/i)).toBeInTheDocument();
     expect(screen.getByText(/watch the dashboard radar update as you go/i)).toBeInTheDocument();
@@ -62,7 +66,7 @@ describe('FirstVisitWarning Component', () => {
   test('warns that data lives in local storage', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
 
-    render(<FirstVisitWarning />);
+    renderModal();
 
     expect(screen.getByText(/data lives in your browser's local storage/i)).toBeInTheDocument();
   });
@@ -70,7 +74,7 @@ describe('FirstVisitWarning Component', () => {
   test('calls acknowledgeFirstVisit when "Start exploring" is clicked', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
 
-    render(<FirstVisitWarning />);
+    renderModal();
 
     const button = screen.getByText(/start exploring/i);
     fireEvent.click(button);
@@ -78,10 +82,20 @@ describe('FirstVisitWarning Component', () => {
     expect(backupTracking.acknowledgeFirstVisit).toHaveBeenCalledTimes(1);
   });
 
+  test('offers a direct beginner path from the welcome modal', () => {
+    backupTracking.isFirstVisit.mockReturnValue(true);
+
+    render(<MemoryRouter><FirstVisitWarning /><CurrentPath /></MemoryRouter>);
+    fireEvent.click(screen.getByRole('button', { name: /practice with alma/i }));
+
+    expect(screen.getByTestId('current-path')).toHaveTextContent('/practice/alma');
+    expect(backupTracking.acknowledgeFirstVisit).toHaveBeenCalledTimes(1);
+  });
+
   test('modal disappears after acknowledgment', () => {
     backupTracking.isFirstVisit.mockReturnValue(true);
 
-    const { rerender } = render(<FirstVisitWarning />);
+    const { rerender } = renderModal();
 
     expect(screen.getByText(/welcome to csf_profile/i)).toBeInTheDocument();
 
@@ -90,7 +104,7 @@ describe('FirstVisitWarning Component', () => {
 
     // After clicking, component should unmount
     backupTracking.isFirstVisit.mockReturnValue(false);
-    rerender(<FirstVisitWarning />);
+    rerender(<MemoryRouter><FirstVisitWarning /></MemoryRouter>);
 
     expect(screen.queryByText(/welcome to csf_profile/i)).not.toBeInTheDocument();
   });

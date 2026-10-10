@@ -8,6 +8,8 @@ A free, open-source, self-hosted toolkit for running NIST Cybersecurity Framewor
 
 Building your GRC portfolio artifact for a Simply Cyber Academy course? Here's the whole arc:
 
+New to assessments? Start with **Practice with Alma** in the app sidebar. It walks through one hardware-inventory requirement, lets you score the evidence before showing the catalog example, and produces a downloadable practice note.
+
 1. **Open the app** — [csf-profile-app.pages.dev](https://csf-profile-app.pages.dev) (no install), or pick another door below.
 2. **Explore the sample** — a comprehensive CSF 2.0 assessment for fictional "Alma Security" is pre-loaded. In Assessments, open its **Case Study** view to read the full catalog backgrounder, business case, fact sheet, methodology, control and assessment records, financials, and KPI trends inside the app; check the Dashboard radar to see where you're headed. Other assessments show their own scope and editable background.
 3. **Score your scope** — pick your subcategories and score current vs. target state using the built-in [0-10 scoring legend](#scoring-system).

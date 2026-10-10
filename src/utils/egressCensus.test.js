@@ -42,6 +42,7 @@ const EGRESS_INVENTORY = {
   'stores/artifactStore.js': 'working-artifact',
   'stores/auditLogStore.js': 'working-artifact',
   'pages/Assessments.js': 'working-artifact', // comparison CSV
+  'pages/PracticeAlma.js': 'working-artifact', // learner-authored practice note
   'pages/UserControls.js': 'working-artifact',
   // CSV templates: a fixed sample row, no user data (2026-08-04 parity pass)
   'pages/Findings.js': 'static-template',
@@ -179,7 +180,7 @@ describe('choke-point wiring rot-stoppers (PR-5)', () => {
     const WRITE_PATTERN = /platformProcedures:|\.platformProcedures\s*=[^=]/;
     const offenders = [];
     walk(SRC).forEach((full) => {
-      const rel = path.relative(SRC, full);
+      const rel = path.relative(SRC, full).split(path.sep).join('/');
       if (WRITE_PATTERN.test(stripComments(fs.readFileSync(full, 'utf8'))) && !WRITERS.has(rel)) {
         offenders.push(rel);
       }

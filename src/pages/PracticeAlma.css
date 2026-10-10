@@ -1,0 +1,37 @@
+.alma-practice { min-height: 100%; overflow-y: auto; padding: var(--space-6); background: var(--bg-primary); color: var(--text-primary); }
+.alma-practice__header, .alma-practice__progress, .alma-practice__panel { max-width: 900px; margin-left: auto; margin-right: auto; }
+.alma-practice__header { margin-bottom: var(--space-5); }
+.alma-practice__eyebrow { margin: 0 0 var(--space-2); color: var(--accent); font: 600 var(--text-xs) var(--font-mono); text-transform: uppercase; letter-spacing: 0.07em; }
+.alma-practice h1 { margin: 0 0 var(--space-2); font-size: var(--text-2xl); }
+.alma-practice__header > p:last-child { max-width: 70ch; color: var(--text-secondary); line-height: 1.6; }
+.alma-practice__progress { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-bottom: var(--space-5); }
+.alma-practice__progress span { display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--border-color); border-radius: var(--radius-md); color: var(--text-muted); background: var(--bg-secondary); font-size: var(--text-sm); }
+.alma-practice__progress b { display: inline-grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; border: 1px solid currentColor; font-size: var(--text-xs); }
+.alma-practice__progress .is-current { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+.alma-practice__progress .is-done { color: var(--terminal-green); }
+.alma-practice__panel { padding: var(--space-6); border: 1px solid var(--border-color); border-radius: var(--radius-lg); background: var(--bg-secondary); }
+.alma-practice__panel h2 { margin: 0 0 var(--space-4); font-size: var(--text-xl); }
+.alma-practice__panel p, .alma-practice__panel li { line-height: 1.65; }
+.alma-practice__panel p { margin: 0 0 var(--space-4); }
+.alma-practice__note { padding: var(--space-3) var(--space-4); border-left: 3px solid var(--accent); background: var(--accent-soft); }
+.alma-practice__evidence { display: grid; gap: var(--space-3); padding-left: var(--space-5); margin: var(--space-5) 0; }
+.alma-practice__evidence li { padding-left: var(--space-1); }
+.alma-practice__field { margin: var(--space-5) 0; }
+.alma-practice__field label { display: block; margin-bottom: var(--space-2); font-weight: 700; }
+.alma-practice__field p { margin: 0 0 var(--space-2); color: var(--text-secondary); font-size: var(--text-sm); }
+.alma-practice__field select, .alma-practice__field textarea { box-sizing: border-box; display: block; width: 100%; max-width: 650px; min-height: 44px; padding: var(--space-3); border: 1px solid var(--border-dark); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); font: inherit; }
+.alma-practice__field textarea { resize: vertical; line-height: 1.5; }
+.alma-practice__panel details { margin: var(--space-5) 0; padding: var(--space-3) var(--space-4); border: 1px solid var(--border-color); border-radius: var(--radius-md); }
+.alma-practice__panel summary { cursor: pointer; font-weight: 600; }
+.alma-practice__panel details p { margin: var(--space-3) 0 0; }
+.alma-practice__panel a:not(.alma-practice__secondary) { color: var(--accent); text-decoration: underline; }
+.alma-practice__score { padding: var(--space-3); border-radius: var(--radius-md); background: var(--bg-tertiary); }
+.alma-practice__preview { max-height: 440px; overflow: auto; padding: var(--space-4); border: 1px solid var(--border-color); border-radius: var(--radius-md); background: var(--bg-primary); color: var(--text-primary); white-space: pre-wrap; overflow-wrap: anywhere; font: var(--text-sm) / 1.6 var(--font-mono); }
+.alma-practice__actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); margin-top: var(--space-6); }
+.alma-practice__primary, .alma-practice__secondary { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 44px; padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
+.alma-practice__primary { border: 1px solid var(--accent); background: var(--accent); color: var(--bg-secondary); }
+.alma-practice__secondary { border: 1px solid var(--border-dark); background: var(--bg-primary); color: var(--text-primary); }
+.alma-practice__primary:disabled { opacity: 0.45; cursor: not-allowed; }
+.alma-practice__primary:not(:disabled):hover, .alma-practice__secondary:hover { filter: brightness(1.1); }
+.alma-practice :is(button, a, select, textarea, summary):focus-visible { outline: 2px solid var(--ring-color); outline-offset: 2px; }
+@media (max-width: 700px) { .alma-practice { padding: var(--space-4); } .alma-practice__panel { padding: var(--space-4); } .alma-practice__progress span { font-size: var(--text-xs); } .alma-practice__actions > * { width: 100%; } }

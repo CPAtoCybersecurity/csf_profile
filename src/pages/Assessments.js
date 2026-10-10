@@ -808,10 +808,11 @@ Format as a numbered list. Be specific and actionable.`;
     if (!selectedParam) return;
     const assessment = assessments.find(a => a.id === selectedParam);
     if (!assessment) return;
-    handleSelectAssessment(assessment);
+    if (searchParams.get('brief') === '1') openAssessmentBrief(assessment, 'list');
+    else handleSelectAssessment(assessment);
     // Clear the URL parameter after selection
     setSearchParams({}, { replace: true });
-  }, [searchParams, assessments, handleSelectAssessment, setSearchParams]);
+  }, [searchParams, assessments, handleSelectAssessment, openAssessmentBrief, setSearchParams]);
 
   const handleDeleteAssessment = useCallback((assessmentId) => {
     const assessment = assessments.find(a => a.id === assessmentId);
