@@ -8,6 +8,7 @@ import './PracticeAlma.css';
 const STORAGE_KEY = 'alma-practice-draft-v1';
 const INITIAL_DRAFT = { step: 0, score: '', reason: '', gap: '', action: '' };
 const STEP_NAMES = ['Start', 'Evidence', 'Score', 'Compare', 'Finding', 'Portfolio note'];
+const SUGGESTED_SCORES = [4, 4.5, 5, 5.5, 6];
 const CASE_STUDY_LINK = `/assessments?selected=${COMPREHENSIVE_ASSESSMENT_ID}&brief=1`;
 const OBSERVATION_URL = 'https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/4_Observations/ID/ID.AM-01-Q1.md';
 
@@ -80,18 +81,14 @@ const PracticeAlma = () => {
   return (
     <div className="alma-practice">
       <header className="alma-practice__header">
-        <p className="alma-practice__eyebrow">Beginner walkthrough · Alma Security</p>
         <h1>Practice with Alma</h1>
         <p>Work through one real case-study example at your own pace. Your practice draft saves in this browser and does not change the main assessment.</p>
       </header>
 
-      <nav className="alma-practice__progress" aria-label="Practice progress">
-        {STEP_NAMES.map((name, index) => (
-          <span key={name} className={index === step ? 'is-current' : index < step ? 'is-done' : ''} aria-current={index === step ? 'step' : undefined}>
-            <b>{index + 1}</b>{name}
-          </span>
-        ))}
-      </nav>
+      <div className="alma-practice__progress" role="status" aria-live="polite">
+        <span>Step {step + 1} of {STEP_NAMES.length} — {STEP_NAMES[step]}</span>
+        <progress value={step + 1} max={STEP_NAMES.length} aria-label="Practice progress" />
+      </div>
 
       <main className="alma-practice__panel">
         {step === 0 && (
@@ -111,13 +108,12 @@ const PracticeAlma = () => {
           <>
             <h2>Review the evidence</h2>
             <p><strong>Evidence</strong> is what the assessor examined or tested. Read these Q1 findings before deciding how well Alma maintains its inventory.</p>
-            <ul className="alma-practice__evidence">
-              <li><strong>A system exists.</strong> Alma uses ServiceNow CMDB for hardware inventory and has a cloud tagging standard.</li>
-              <li><strong>Coverage has gaps.</strong> A network scan found three devices missing from the CMDB. Two listed as active could not be reached.</li>
-              <li><strong>Samples revealed errors.</strong> One of five physical assets could not be located; another had an outdated owner.</li>
-              <li><strong>Cloud tags and reconciliation need work.</strong> 55 of 847 AWS resources missed required tags, and reconciliation was ad hoc.</li>
-            </ul>
-            <details><summary>Where did these facts come from?</summary><p>They come from the catalog's Q1 ID.AM-01 observation. <a href={OBSERVATION_URL} target="_blank" rel="noopener noreferrer">Read the full source</a>.</p></details>
+            <div className="alma-practice__evidence">
+              <section><h3>What works</h3><p>Alma uses ServiceNow CMDB for hardware inventory and has a cloud tagging standard.</p></section>
+              <section><h3>What is missing</h3><p>A network scan found three devices missing from the CMDB. Two listed as active could not be reached. 55 of 847 AWS resources missed required tags, and reconciliation was ad hoc.</p></section>
+              <section><h3>What was tested</h3><p>One of five sampled physical assets could not be located; another had an outdated owner.</p></section>
+            </div>
+            <p className="alma-practice__source">Source: Alma's Q1 ID.AM-01 observation. <a href={OBSERVATION_URL} target="_blank" rel="noopener noreferrer">Read the full observation</a>.</p>
             <div className="alma-practice__actions">
               <button type="button" className="alma-practice__secondary" onClick={() => update({ step: 0 })}><ArrowLeft size={17} /> Back</button>
               <button type="button" className="alma-practice__primary" onClick={() => update({ step: 2 })}>Continue to scoring <ArrowRight size={17} /></button>
@@ -128,13 +124,25 @@ const PracticeAlma = () => {
         {step === 2 && (
           <>
             <h2>Choose a current score</h2>
-            <p>A <strong>current score</strong> describes what the evidence shows now. Alma's rubric uses 0–10 in half-point steps. At 4, a process runs regularly but has material gaps; at 5, it works consistently across the full scope with only minor flaws.</p>
+            <p>A <strong>current score</strong> describes what the evidence shows now. Compare Alma's evidence with these nearby rubric levels.</p>
+            <div className="alma-practice__rubric" aria-label="Nearby scoring rubric levels">
+              <div><strong>4</strong><span>Regular process with material gaps</span></div>
+              <div><strong>5</strong><span>Consistent across scope with only minor flaws</span></div>
+              <div><strong>6</strong><span>Measured and tracked</span></div>
+            </div>
+            <p className="alma-practice__hint">Half points let you place Alma between two rubric levels.</p>
             <div className="alma-practice__field">
-              <label htmlFor="practice-score">Your current score</label>
-              <select id="practice-score" value={score} onChange={(event) => update({ score: event.target.value })}>
-                <option value="">Choose a score</option>
-                {Array.from({ length: 21 }, (_, index) => index / 2).map((value) => <option key={value} value={value}>{value.toFixed(1)} / 10</option>)}
-              </select>
+              <span className="alma-practice__field-label" id="practice-score-label">Choose your current score</span>
+              <div className="alma-practice__score-options" role="group" aria-labelledby="practice-score-label">
+                {SUGGESTED_SCORES.map((value) => <button key={value} type="button" aria-label={`Choose score ${value.toFixed(1)} out of 10`} aria-pressed={Number(score) === value} onClick={() => update({ score: String(value) })}>{value.toFixed(1)}</button>)}
+              </div>
+              <details className="alma-practice__score-more"><summary>Choose another score from the full 0–10 scale</summary>
+                <label htmlFor="practice-score">Your current score</label>
+                <select id="practice-score" value={score} onChange={(event) => update({ score: event.target.value })}>
+                  <option value="">Choose a score</option>
+                  {Array.from({ length: 21 }, (_, index) => index / 2).map((value) => <option key={value} value={value}>{value.toFixed(1)} / 10</option>)}
+                </select>
+              </details>
             </div>
             <div className="alma-practice__field">
               <label htmlFor="practice-reason">Why did you choose that score?</label>
@@ -187,7 +195,15 @@ const PracticeAlma = () => {
           <>
             <h2>Your portfolio note</h2>
             <p>You completed one small assessment. Download this Markdown note as a starting point for a portfolio write-up. Review and edit it before sharing it publicly.</p>
-            <pre className="alma-practice__preview">{buildPortfolioNote(draft)}</pre>
+            <article className="alma-practice__report" aria-label="Portfolio note preview">
+              <header><p>Educational practice · fictional case study</p><h3>Assessment summary</h3><span>NIST CSF 2.0 · ID.AM-01 · Q1 2026</span></header>
+              <div className="alma-practice__report-score"><span>Current score</span><strong>{Number(score).toFixed(1)}<small> / 10</small></strong></div>
+              <section><h4>Evidence reviewed</h4><ul><li>ServiceNow CMDB and a cloud tagging standard exist.</li><li>Three discovered devices were missing from the CMDB; 55 of 847 AWS resources lacked required tags.</li><li>One sampled asset could not be located, and reconciliation was ad hoc.</li></ul></section>
+              <section><h4>My reasoning</h4><p>{reason}</p></section>
+              <section><h4>Gap</h4><p>{gap}</p></section>
+              <section><h4>Recommended action</h4><p>{action}</p></section>
+              <p className="alma-practice__report-footnote">The catalog example scores this outcome 4.5/10 against a 6.5/10 target. The download includes full source links and comparison notes.</p>
+            </article>
             <div className="alma-practice__actions">
               <button type="button" className="alma-practice__secondary" onClick={() => update({ step: 4 })}><ArrowLeft size={17} /> Edit finding</button>
               <button type="button" className="alma-practice__primary" onClick={downloadNote}><Download size={17} /> Download Markdown</button>

@@ -9,13 +9,19 @@ test('guides a beginner from Alma evidence to a portfolio note', () => {
   render(<MemoryRouter><PracticeAlma /></MemoryRouter>);
 
   expect(screen.getByRole('heading', { name: 'Practice with Alma' })).toBeInTheDocument();
+  expect(screen.getByText('Step 1 of 6 — Start')).toBeInTheDocument();
   fireEvent.click(screen.getByRole('button', { name: 'Start practice' }));
   expect(screen.getByRole('heading', { name: 'Review the evidence' })).toBeInTheDocument();
+  expect(screen.getByText('Step 2 of 6 — Evidence')).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'What works' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'What is missing' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'What was tested' })).toBeInTheDocument();
 
   fireEvent.click(screen.getByRole('button', { name: 'Continue to scoring' }));
   const compare = screen.getByRole('button', { name: 'Compare with the example' });
   expect(compare).toBeDisabled();
-  fireEvent.change(screen.getByLabelText('Your current score'), { target: { value: '4' } });
+  expect(screen.getByText(/Half points let you place Alma between two rubric levels/)).toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: 'Choose score 4.0 out of 10' }));
   fireEvent.change(screen.getByLabelText('Why did you choose that score?'), { target: { value: 'A CMDB exists, but the sampled assets and network scan show gaps.' } });
   fireEvent.click(compare);
 
@@ -26,6 +32,8 @@ test('guides a beginner from Alma evidence to a portfolio note', () => {
   fireEvent.click(screen.getByRole('button', { name: 'Review portfolio note' }));
 
   expect(screen.getByRole('heading', { name: 'Your portfolio note' })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'Assessment summary' })).toBeInTheDocument();
+  expect(screen.getByText('Current score')).toBeInTheDocument();
   expect(screen.getByText(/The inventory is not reconciled with scans/)).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Download Markdown' })).toBeInTheDocument();
 });
