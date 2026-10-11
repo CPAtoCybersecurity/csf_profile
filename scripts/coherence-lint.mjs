@@ -109,6 +109,12 @@ const RULES = [
     message: 'Observation dates belong to the CY2026 assessment cycle (Q1 fieldwork starts 2026-01-01).',
   },
   {
+    id: 'stale-incident-year',
+    kind: 'store-content',
+    regex: /2022 security events/i,
+    message: 'Alma\'s canonical incidents are the 2024 incidents (INC-2024-01, INC-2024-02).',
+  },
+  {
     id: 'control-filename',
     kind: 'filename',
     regex: /-Ex\d+\.md$/,
@@ -117,12 +123,14 @@ const RULES = [
 ];
 
 const CONTENT_RULES = RULES.filter((rule) => rule.kind === 'content');
+const STORE_CONTENT_RULES = RULES.filter((rule) => rule.kind === 'store-content');
 const FILENAME_RULES = RULES.filter((rule) => rule.kind === 'filename');
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(scriptPath), '..');
 const catalogDir = path.join(repoRoot, 'ASSESSMENT_CATALOG');
 const controlsDir = path.join(catalogDir, '2_Controls');
+const storesDir = path.join(repoRoot, 'src', 'stores');
 
 const args = process.argv.slice(2);
 const getArg = (name) => {
@@ -132,7 +140,7 @@ const getArg = (name) => {
 };
 
 const usage = () => {
-  console.log('Scan ASSESSMENT_CATALOG Markdown and CSV files for noncanonical Alma facts.');
+  console.log('Scan ASSESSMENT_CATALOG and src/stores files for noncanonical Alma facts.');
   console.log('');
   console.log('Usage:');
   console.log('  node scripts/coherence-lint.mjs [--quiet]');
@@ -167,7 +175,7 @@ const readTextFile = (filePath) => {
   }
 };
 
-const findCatalogFiles = (dirPath) => {
+const findFiles = (dirPath, includeFile) => {
   const entries = readDirectory(dirPath).sort((a, b) => a.name.localeCompare(b.name));
   const files = [];
 
@@ -175,12 +183,12 @@ const findCatalogFiles = (dirPath) => {
     const entryPath = path.join(dirPath, entry.name);
 
     if (entry.isDirectory()) {
-      files.push(...findCatalogFiles(entryPath));
+      files.push(...findFiles(entryPath, includeFile));
       continue;
     }
 
     if (entry.isFile()) {
-      if (isMarkdownOrCsv(entryPath)) {
+      if (includeFile(entryPath)) {
         files.push(entryPath);
       }
 
@@ -212,7 +220,7 @@ const ruleMatchesLine = (rule, line) => {
   return false;
 };
 
-const scanContentRules = (filePath, repoRelativePath) => {
+const scanContentRules = (filePath, repoRelativePath, rules = CONTENT_RULES) => {
   if (isContentRuleExempt(repoRelativePath)) {
     return [];
   }
@@ -222,7 +230,7 @@ const scanContentRules = (filePath, repoRelativePath) => {
   const violations = [];
 
   lines.forEach((line, index) => {
-    for (const rule of CONTENT_RULES) {
+    for (const rule of rules) {
       if (ruleMatchesLine(rule, line)) {
         violations.push({
           file: repoRelativePath,
@@ -303,13 +311,20 @@ if (unknownArg || invalidValuedArg) {
   process.exit(1);
 }
 
-const catalogFiles = findCatalogFiles(catalogDir);
+const catalogFiles = findFiles(catalogDir, isMarkdownOrCsv);
+const storeFiles = findFiles(storesDir, (filePath) =>
+  path.extname(filePath).toLowerCase() === '.js' && !filePath.endsWith('.test.js'));
 const violations = [];
 
 for (const filePath of catalogFiles) {
   const repoRelativePath = toRepoRelativePath(filePath);
   violations.push(...scanFilenameRules(filePath, repoRelativePath));
   violations.push(...scanContentRules(filePath, repoRelativePath));
+}
+
+for (const filePath of storeFiles) {
+  const repoRelativePath = toRepoRelativePath(filePath);
+  violations.push(...scanContentRules(filePath, repoRelativePath, STORE_CONTENT_RULES));
 }
 
 printResults(violations, quiet);
