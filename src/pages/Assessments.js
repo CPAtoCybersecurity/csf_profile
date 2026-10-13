@@ -603,6 +603,8 @@ const Assessments = () => {
       );
     }
 
+    items.sort((a, b) => a.label.localeCompare(b.label));
+
     return items;
   }, [newAssessment.scopeType, controls, csfRequirements, scopeFilterText]);
 
