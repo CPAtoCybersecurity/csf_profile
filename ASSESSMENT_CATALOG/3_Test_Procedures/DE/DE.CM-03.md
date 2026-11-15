@@ -1,52 +1,76 @@
-# DE.CM-03: Personnel Activity Monitoring Test Procedures
+# DE.CM-03: Personnel activity and technology usage are monitored to find potentially adverse events
 
-**CSF Subcategory:** DE.CM-03 — Personnel activity and technology usage are monitored to find potentially adverse events
+**Function:** DETECT (DE) | **Category:** DE.CM — Continuous Monitoring
+**NIST SP 800-53 Ref:** AC-02, AU-12, AU-13, CA-07, CM-10, CM-11
+**Implementation Examples:** 3 (Ex1–Ex3)
 
-**Scope:** Alma Security 2026 CSF Assessment
+## Scope & Applicability
 
-**Auditor:** Steve Mercer, Internal Audit <steve.mercer@almasecurity.com>
+Personnel activity and technology usage monitoring across Alma Security's AWS production/staging environment, the Redwood City Windows domain, and corporate SaaS tools. Covers all employees and any privileged or service accounts with logical access.
 
----
+Slack workspace monitoring is assessed under [DE.CM-09](./DE.CM-09.md). Endpoint application control, including SentinelOne, is assessed under [PR.PS-05](../PR/PR.PS-05.md). Privileged-account usage review is assessed under [PR.AA-02](../PR/PR.AA-02.md). Those steps are out of scope here so this procedure scores only DE.CM-03.
+
+## Continuous Monitoring Indicators
+
+- Daily IAM anomaly review completion (Ex2)
+- Failed-authentication alert volume and time to review (Ex2)
+- Behavior-analytics detection coverage, including platform-native GuardDuty and O365 ATP baselines where dedicated UBA tooling is not deployed (Ex1)
+- Deception technology trigger events, if deployed (Ex3)
 
 ## Test Procedures
 
-1. **Assess user behavior analytics capabilities**
-   - Review GuardDuty behavioral baseline capabilities for AWS API call patterns
-   - Evaluate O365 ATP user behavior analytics for email and collaboration activity
-   - Determine whether dedicated UBA tooling is deployed or planned
-   - Assess detection coverage for insider threat indicators
+### Examine
 
-2. **Verify logical access monitoring**
-   - Confirm CloudTrail captures all IAM authentication events including failures
-   - Verify Active Directory authentication log collection on the Windows Domain Controller
-   - Test detection of credential stuffing, brute force, and impossible travel scenarios
-   - Review monitoring for account lockout events and their investigation workflow
+| # | Procedure | Expected Evidence |
+|---|-----------|-------------------|
+| E1 | Review CloudTrail configuration and confirm IAM authentication events, including failures, are logged | CloudTrail trail configuration; sample IAM authentication event logs |
+| E2 | Review SSO authentication logging configuration across Windows Authenticator and Palo Alto 2FA | SSO/authentication log samples; system configuration documentation |
+| E3 | Review Active Directory authentication log collection on the Windows Domain Controller, including failures and account lockouts | Active Directory Domain Controller authentication log samples |
+| E4 | Review GuardDuty behavioral baseline capabilities for AWS API call patterns and assess coverage for insider-threat indicators | GuardDuty behavioral detection finding examples; detector configuration showing behavioral finding types enabled |
+| E5 | Evaluate O365 ATP user behavior analytics for email and collaboration activity | O365 ATP user behavior analytics configuration and sample anomaly findings |
+| E6 | Review documentation for dedicated user behavior analytics (UBA) tooling, deployed or planned | UBA tooling configuration or roadmap documentation, or confirmation that none exists and that GuardDuty and O365 ATP provide the platform-native coverage |
+| E7 | Review documentation for deception technology (honeypots, honeytokens, canary accounts), deployed or planned | Deception technology deployment configuration, or documented rationale or roadmap if not deployed |
+| E8 | Review the Acceptable Use Policy for employee monitoring and privacy notice language | Acceptable Use Policy document |
 
-3. **Evaluate technology usage monitoring**
-   - Review Slack workspace monitoring for malicious content and policy violations
-   - Assess SentinelOne endpoint monitoring for unauthorized software usage
-   - Verify monitoring of privileged account usage beyond normal job functions
-   - Confirm that monitoring respects employee privacy requirements and is documented in policy
+### Interview
 
-4. **Assess deception technology posture**
-   - Determine whether honeypots, honeytokens, or canary accounts are deployed
-   - If not deployed, document rationale and future plans
-   - Evaluate whether deception technology is in the roadmap following IR Enhancement project
+| # | Role | Key Questions |
+|---|------|---------------|
+| I1 | Detection & Response Lead | What personnel-activity monitoring capabilities exist today? Is behavior-analytics tooling planned? What does the daily anomaly-review process actually cover? |
+| I2 | IAM/IT team member | How are failed-authentication alerts triaged? Is Active Directory Domain Controller authentication logged and reviewed? |
 
----
+### Test
 
-## Evidence Requests
+| # | Procedure | Pass Criteria |
+|---|-----------|---------------|
+| T1 | Sample a failed authentication event and confirm alerting fires and is logged | Alert generated and visible to the IAM team within the documented review cadence |
+| T2 | Attempt to identify detection logic for credential stuffing, brute force, or impossible-travel patterns in existing tooling | Detection logic exists and can be demonstrated for at least one of the three patterns |
+| T3 | If deception technology exists, verify a triggered decoy generates an alert | Alert generated and routed to the security team |
 
+## Evidence Requirements
+
+- [ ] CloudTrail IAM authentication event samples, including failures
+- [ ] SSO authentication log samples (all systems in use)
+- [ ] Active Directory Domain Controller authentication log samples, if applicable
 - [ ] GuardDuty behavioral detection finding examples
 - [ ] O365 ATP user behavior analytics configuration
-- [ ] CloudTrail IAM authentication event samples
-- [ ] Active Directory authentication log samples
-- [ ] Slack monitoring configuration and policy
-- [ ] SentinelOne application control policy
-- [ ] Employee monitoring policy or acceptable use policy
+- [ ] Behavior-analytics tooling configuration or roadmap documentation
+- [ ] Documentation of detection logic for credential stuffing, brute force, or impossible-travel scenarios
+- [ ] Deception technology deployment configuration, or documented rationale or roadmap if not deployed
+- [ ] Employee monitoring / Acceptable Use Policy
 
----
+## Pass/Fail Criteria
 
-## Notes
+DE.CM-03 is adequately implemented when all three NIST-recognized implementation examples are addressed: (1) behavior analytics for insider-threat detection is deployed or formally planned, (2) logical access monitoring includes centralized logging, alerting, and detection for at least one specific attack pattern, and (3) deception technology is deployed or formally planned. A documented employee-monitoring policy is a prerequisite for lawful monitoring but does not itself satisfy any implementation example.
 
-This test procedure evaluates Alma's monitoring of personnel activity and technology usage. The absence of dedicated UBA tooling means Alma relies on platform-native behavioral analytics from GuardDuty and O365 ATP. The SaaS continuous authentication context makes insider threat detection particularly relevant given the sensitivity of the authentication data Alma processes.
+Platform-native behavioral analytics satisfy example (1). At Alma that coverage is GuardDuty behavioral baselines for AWS API call patterns and O365 ATP user behavior analytics for email and collaboration activity. A dedicated UBA product is not required when that coverage is demonstrated.
+
+## Alma Security Context
+
+Alma is a continuous-authentication SaaS provider, which makes the sensitivity of the authentication data it processes a specific driver for insider-threat detection (Ex1). Dedicated user behavior analytics tooling is not deployed. Alma relies on platform-native behavioral analytics from GuardDuty and O365 ATP, supplemented by SOC review of flagged anomalies. Current monitoring is concentrated in logical access monitoring (Ex2): CloudTrail IAM logging, SSO authentication logs across Windows Authenticator and Palo Alto 2FA, Active Directory authentication logs on the Windows Domain Controller, failed-authentication alerting, and daily IAM team review. No deception technology is documented as deployed. Future consideration follows the Incident Response Enhancement project.
+
+## Related
+
+- **Artifacts:** [Incident Response Playbook](../../5_Artifacts/Procedures/PROC-incident-response-playbook.md), [SOC Ticket 1001 Phishing](../../5_Artifacts/Tickets/TKT-SOC-1001-phishing.md), [AWS Config Compliance Evidence](../../5_Artifacts/Evidence/EVD-aws-config-compliance.md), [SOC Ticket 1004](../../5_Artifacts/Tickets/TKT-SOC-1004.md), [Information Security Policy](../../5_Artifacts/Policies/POL-information-security.md)
+- **Controls:** [DE.CM-03_Ex1](../../2_Controls/DE/DE.CM-03_Ex1.md), [DE.CM-03_Ex2](../../2_Controls/DE/DE.CM-03_Ex2.md), [DE.CM-03_Ex3](../../2_Controls/DE/DE.CM-03_Ex3.md)
+- **Observations:** [DE.CM-03-Q1](../../4_Observations/DE/DE.CM-03-Q1.md)
