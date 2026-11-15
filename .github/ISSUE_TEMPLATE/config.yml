@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/CPAtoCybersecurity/csf_profile/blob/main/SECURITY.md
+    about: Report security vulnerabilities by email, using the process in SECURITY.md.

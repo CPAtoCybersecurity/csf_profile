@@ -1,0 +1,45 @@
+name: Bug report
+description: Something in the app, the catalog, or the docs is not working.
+title: "Bug: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting this. A few details help a maintainer reproduce it.
+
+        For a security vulnerability, follow [SECURITY.md](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/SECURITY.md) and email the contact there.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What did you see?
+      placeholder: The dashboard radar stays empty after I import the sample CSV.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: What did you think would happen?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Smallest set of steps that shows the problem.
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See ...
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, operating system, and app version if you know them. Optional.
+      placeholder: Chrome 131 on macOS, v2.2.0
+    validations:
+      required: false

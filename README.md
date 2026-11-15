@@ -71,7 +71,7 @@ The same NIST CSF 2.0 guidance, flattened into proper tables, ships in four form
 
 This project is intentionally a first-contribution-friendly repo for GRC practitioners and career-changers — **including contributions that require no code at all** (test procedures, assessment artifacts, case-study findings, documentation). Coders are equally welcome: features, bug squashes, and UI improvements are labeled in [Issues](https://github.com/CPAtoCybersecurity/csf_profile/issues).
 
-👉 Start with [CONTRIBUTING.md](CONTRIBUTING.md) — it has two tracks: **Contribute Without Code** and **Contribute Code**. Filter issues by [`good first issue`](https://github.com/CPAtoCybersecurity/csf_profile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to find a starting point, and add your name to [CONTRIBUTORS.md](CONTRIBUTORS.md) with your first merged PR.
+👉 Start with [CONTRIBUTING.md](CONTRIBUTING.md). It has two tracks: **Contribute Without Code** and **Contribute Code**. Filter issues by [`good first issue`](https://github.com/CPAtoCybersecurity/csf_profile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) to find a starting point. After your pull request merges, you are listed under [Contributors](#contributors).
 
 Find in depth videos for CSF profile assessments and this tool in Simply Cyber Academy here: [https://academy.simplycyber.io/p/accrp](https://academy.simplycyber.io/p/accrp)
 
@@ -290,7 +290,31 @@ The tool uses a scoring system from 0-10 to assess the current and desired state
 
 ## Contributors
 
-Thank you to our amazing contributors! See [CONTRIBUTORS.md](CONTRIBUTORS.md) for the full list.
+Thank you to everyone who has helped build this project.
+
+| Name | GitHub |
+| --- | --- |
+| bad-antics | [@bad-antics](https://github.com/bad-antics) |
+| Caitlin "Kat" Gifford | [@sadako000](https://github.com/sadako000) |
+| DrDoom26 | [@DrDoom26](https://github.com/DrDoom26) |
+| Eric | [@ericrihm](https://github.com/ericrihm) |
+| Evan Oseen | [@evanoseen](https://github.com/evanoseen) |
+| Gerald Auger | [@gerryguy311](https://github.com/gerryguy311) |
+| Huy | [@huy-sec](https://github.com/huy-sec) |
+| M.V.RAGHUPATHI SAI | [@M-V-RAGHUPATHI-SAI](https://github.com/M-V-RAGHUPATHI-SAI) |
+| Mbonu Blessing | [@Nkemjiks](https://github.com/Nkemjiks) |
+| Navneet Tewatia | [@navneet-97](https://github.com/navneet-97) |
+| Orlando G. | [@greetingsog](https://github.com/greetingsog) |
+| reddyshekhar | [@reddyshekharc55](https://github.com/reddyshekharc55) |
+| Ronel Politesse | [@ElRonEl](https://github.com/ElRonEl) |
+| Sarthak Bhagat | [@Sarthak-Bhagat2006](https://github.com/Sarthak-Bhagat2006) |
+| Sebastian Sartele | [@Sebastians007](https://github.com/Sebastians007) |
+| SecBurg | [@SecBurg](https://github.com/SecBurg) |
+| Shafqat Baloch | [@shafqat-baloch786](https://github.com/shafqat-baloch786) |
+| Ved K | [@Ved178](https://github.com/Ved178) |
+| Vineeth Wilson | [@vineethwilson15](https://github.com/vineethwilson15) |
+
+New here? [CONTRIBUTING.md](CONTRIBUTING.md) explains how to join this list. Notes on a few early contributions live in [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 ## About
 

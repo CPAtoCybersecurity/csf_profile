@@ -1,0 +1,32 @@
+name: Feature idea
+description: Suggest an improvement to the app or the assessment workflow.
+title: "Feature: "
+labels: ["feature"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Small, specific ideas are easier to pick up. If the idea is large, this issue is the right place to shape it before anyone writes code.
+
+        [CONTRIBUTING.md](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/CONTRIBUTING.md) explains how a pull request is reviewed.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem should this solve?
+      description: Who runs into it, and what do they do today?
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: How would it work? An example helps.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else
+      description: Screenshots, related issues, or NIST CSF references. Optional.
+    validations:
+      required: false

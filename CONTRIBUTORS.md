@@ -2,7 +2,9 @@
 
 Thank you to everyone who has contributed to the CSF Profile Assessment Tool!
 
-## Core Contributors
+The full list of community contributors is in the [README Contributors section](README.md#contributors). The notes below are extra detail on a few early contributions.
+
+## Early contribution notes
 
 | Contributor | GitHub | Contributions |
 |-------------|--------|---------------|
@@ -12,11 +14,7 @@ Thank you to everyone who has contributed to the CSF Profile Assessment Tool!
 
 ## How to Contribute
 
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
-
-### Contribution Areas
-
-- CSV/JSON export features, UI improvements, and documentation
+We welcome contributions. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for how to get started. Test procedures and application code are both welcome.
 
 ## Acknowledgments
 
