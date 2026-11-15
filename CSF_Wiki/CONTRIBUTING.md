@@ -2,13 +2,13 @@
 
 This folder is an LLM wiki, built the Karpathy way: drop raw source material into `raw/`, run a Claude Code session, get back linked markdown nodes in `wiki/`. No vector database, no embeddings, no extra infrastructure — just markdown files and `[[wikilinks]]`. Obsidian is optional; it's only a graph viewer on top of these same files.
 
-Source: `CPAtoCybersecurity/catalyst` issue #79. Confirmed by the repo owner as community-facing — write for a public reader who may not know the CSF Profile app, not an internal team note.
+Write these pages for a public reader who may not know the CSF Profile app.
 
 ## Raw folder layout
 
 - `raw/nist_csf/` — NIST CSF 2.0 source material: Function/Category/Subcategory text, Implementation Examples. The canonical text already lives in this repo at `sample_csv_exports/yyyy-mm-dd_CSF_Profile.csv` (columns: Function, Function Description, Category ID, Category, Category Description, Subcategory ID, Subcategory Description, Implementation Example) and in `src/stores/comprehensiveAssessmentData.js` / `defaultControlsData.js` (real-world implementation narratives) — treat those as already-ingested raw material, no need to re-drop them.
 - `raw/simply_cyber/` — Simply Cyber video summaries/transcripts. Drop as plain `.md` or `.txt`, one file per video.
-- `raw/threat_briefing/` — Gerry's Daily Cyber Threat Briefing highlights. Same drop convention.
+- `raw/threat_briefing/` — cyber threat briefing highlights. Same drop convention.
 
 ## Wiki node conventions
 

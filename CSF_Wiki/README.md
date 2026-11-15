@@ -4,7 +4,7 @@ A browsable, cross-linked knowledge base for NIST Cybersecurity Framework 2.0 �
 
 ## What's in here
 
-- `wiki/` — one page per CSF Function, Category, and Subcategory, cross-linked to each other and to related Simply Cyber video highlights and Gerry's Daily Cyber Threat Briefing highlights.
+- `wiki/` — one page per CSF Function, Category, and Subcategory, cross-linked to each other and to related Simply Cyber video highlights and cyber threat briefing highlights.
 - `raw/` — the source material the wiki is generated from (NIST CSF text, video summaries, briefing highlights). See `CONTRIBUTING.md` if you want to understand or extend the generation process.
 
 ## How to browse
@@ -18,4 +18,4 @@ Drop a markdown or text file into the matching `raw/` subfolder (NIST material, 
 
 ## Origin
 
-This grew out of an internal planning issue — a second brain for the CSF, built on Andrej Karpathy's "LLM wiki" pattern: raw folder in, Claude Code reads everything and builds the linked markdown wiki, no vector database or extra infrastructure required.
+This follows Andrej Karpathy's LLM wiki pattern: drop source material in a raw folder, then have an LLM read it and build a linked markdown wiki. No vector database or extra infrastructure is required.

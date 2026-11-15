@@ -9,4 +9,4 @@ NIST CSF 2.0 organizes cybersecurity risk management into six Functions. Each li
 - RESPOND (RS) — not yet seeded
 - RECOVER (RC) — not yet seeded
 
-Source material for all six functions already exists in this repo at `sample_csv_exports/yyyy-mm-dd_CSF_Profile.csv` and `src/stores/comprehensiveAssessmentData.js` — see `../CLAUDE.md` for how to turn that into wiki nodes for the remaining five Functions.
+Source material for all six functions already exists in this repo at `sample_csv_exports/yyyy-mm-dd_CSF_Profile.csv` and `src/stores/comprehensiveAssessmentData.js`. See [CONTRIBUTING.md](../CONTRIBUTING.md) for how to turn that into wiki nodes for the remaining five Functions.

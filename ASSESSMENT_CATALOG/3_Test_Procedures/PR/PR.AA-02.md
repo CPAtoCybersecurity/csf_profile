@@ -36,6 +36,10 @@
    - Check that credential recovery processes maintain binding integrity
    - Review self-service password reset for identity verification requirements
 
+6. **Review privileged account usage**
+   - Verify monitoring of privileged account usage beyond normal job functions
+   - Confirm review records or alerts exist when privileged activity falls outside the account's documented purpose
+
 ---
 
 ## Evidence Requests
@@ -49,6 +53,7 @@
 - [ ] Help desk identity verification scripts/procedures
 - [ ] MFA device replacement procedures
 - [ ] Credential recovery workflow documentation
+- [ ] Privileged account usage review records or alert samples
 
 ---
 

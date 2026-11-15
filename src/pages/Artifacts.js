@@ -591,22 +591,22 @@ const Artifacts = () => {
                     </div>
 
                     {/* ID */}
-                    <div className="w-56 flex-shrink-0">
+                    <div className="w-56 min-w-0 flex-shrink-0">
                       <span className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline truncate block">
                         {artifact.artifactId || `AR-${artifact.id}`}
                       </span>
                     </div>
 
                     {/* Artifact Name (renamed from Summary — issue #306) */}
-                    <div className="w-64 flex-shrink-0">
+                    <div className="w-64 min-w-0 flex-shrink-0">
                       <p className="text-sm text-gray-900 dark:text-white truncate">{artifact.name}</p>
                     </div>
 
                     {/* Assignee */}
-                    <div className="w-28 flex-shrink-0">
+                    <div className="w-28 min-w-0 flex-shrink-0">
                       {assignee ? (
-                        <div className="flex items-center gap-1.5" title={assignee.name}>
-                          <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium">
+                        <div className="flex items-center gap-1.5 min-w-0" title={assignee.name}>
+                          <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
                             {assignee.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                           </div>
                           <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{assignee.name}</span>
@@ -620,10 +620,10 @@ const Artifacts = () => {
                     </div>
 
                     {/* Reporter */}
-                    <div className="w-28 flex-shrink-0">
+                    <div className="w-28 min-w-0 flex-shrink-0">
                       {reporter ? (
-                        <div className="flex items-center gap-1.5" title={reporter.name}>
-                          <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-medium">
+                        <div className="flex items-center gap-1.5 min-w-0" title={reporter.name}>
+                          <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center text-white text-xs font-medium flex-shrink-0">
                             {reporter.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                           </div>
                           <span className="text-sm text-gray-700 dark:text-gray-300 truncate">{reporter.name}</span>
