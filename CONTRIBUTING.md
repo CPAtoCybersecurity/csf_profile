@@ -1,230 +1,136 @@
 # Contributing to CSF Profile Assessment Database
 
-Thanks for contributing to the CSF Profile Assessment Database! Here's what you need to know to get started quickly.
+Thanks for helping. A test procedure is a real contribution, and so is a code fix. A first draft is enough to start the conversation.
 
-## Two Ways to Contribute
+| Track | You will | Start |
+| --- | --- | --- |
+| Test procedures | Write Markdown for one CSF subcategory. No programming. | [Test procedures](#test-procedures) |
+| Application code | Fix a bug or add a feature in the React app. | [Set up the app](#set-up-the-app) |
 
-| Track | Who it's for | Skills needed |
-|-------|-------------|---------------|
-| [📝 Contribute Without Code](#-contribute-without-code) | GRC practitioners, auditors, career-changers, students | GRC knowledge + Markdown. **No programming.** |
-| [💻 Contribute Code](#-contribute-code) | Developers | React / Node.js |
+Longer walkthrough, from creating a GitHub account through a merged pull request: [Your First Contribution to the CSF Profile Assessment Database](https://www.cpatocybersecurity.com/p/your-first-contribution-to-the-simply-cyber-csf-profile-assessment-database).
 
-Both tracks end the same way: a merged PR with your name in [CONTRIBUTORS.md](CONTRIBUTORS.md), on a project listed in the NIST.gov community resources.
+## Claim an issue
 
-## 📝 Contribute Without Code
+Browse open [`good first issue`](https://github.com/CPAtoCybersecurity/csf_profile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) issues. Each catalog issue covers one CSF category and lists its subcategories. Pick one subcategory.
 
-This project needs assessment content as much as it needs code: test procedures, assessment artifacts, observations, and findings for the fictional "Alma Security" case study in [ASSESSMENT_CATALOG/](ASSESSMENT_CATALOG/). Writing these is real GRC work — the same skill you'd use on an engagement — and it makes a strong portfolio piece.
+Comment on the issue and name what you are taking. That comment claims it, so the next person can see it is taken. A claim with no activity for about 30 days is released, and someone else may pick the issue up.
 
-**Your first contribution, step by step:**
+Bug reports, test procedure ideas, and feature ideas each have a template in the issue chooser. Pick the one that fits.
 
-1. **Pick a subcategory.** Browse the open [`good first issue`](https://github.com/CPAtoCybersecurity/csf_profile/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) issues — each covers one CSF category (e.g., GV.SC, RS.CO) and lists its subcategories. Pick ONE subcategory (e.g., RS.CO-02) and **comment on the issue to claim it** so nobody doubles up.
-2. **Read the case study.** [ASSESSMENT_CATALOG/1_Case_Study/](ASSESSMENT_CATALOG/1_Case_Study/) has Alma Security's backgrounder, business case, and financials — enough context to write realistic material.
-3. **Draft your contribution.** For your subcategory, write: a few test-procedure steps, explicit pass/fail criteria, and (optionally) example artifacts or interview questions with expected answers. Use an already-merged contribution as your template — [PR #202](https://github.com/CPAtoCybersecurity/csf_profile/pull/202) is a good model, and the existing files in [ASSESSMENT_CATALOG/3_Test_Procedures/](ASSESSMENT_CATALOG/3_Test_Procedures/) show the file structure and naming pattern.
-4. **Open a PR** referencing the issue. Format your files as Markdown, follow the folder's naming convention, and keep the PR scoped to your subcategory. A maintainer will review and give feedback — first drafts are never expected to be perfect.
+## Test procedures
 
-**Full walkthrough for first-timers** (GitHub account setup through merged PR): [Your First Contribution to the CSF Profile Assessment Database](https://www.cpatocybersecurity.com/p/your-first-contribution-to-the-simply-cyber-csf-profile-assessment-database)
+Catalog test procedures live here:
 
-Other welcome no-code contributions: fixing documentation gaps, improving onramp guides ([GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/), [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/)), and writing example audit reports against the case study.
+`ASSESSMENT_CATALOG/3_Test_Procedures/<FUNCTION>/<ID>.md`
 
-## 💻 Contribute Code
+`<FUNCTION>` is `GV`, `ID`, `PR`, `DE`, `RS`, or `RC`. `<ID>` is the subcategory id, such as `DE.CM-03`. A full path looks like `ASSESSMENT_CATALOG/3_Test_Procedures/DE/DE.CM-03.md`.
 
-## Quick Setup
+You can edit the file on GitHub and open a pull request. A Markdown-only change can stay on GitHub the whole way.
 
-### Prerequisites
+1. Claim the subcategory on its issue.
+2. Read the fictional Alma Security case study in [ASSESSMENT_CATALOG/1_Case_Study/](ASSESSMENT_CATALOG/1_Case_Study/).
+3. Add or edit that one subcategory file.
+4. Open a pull request that links the issue. One subcategory per pull request is the right size.
 
-- Node.js 18+ installed (LTS version recommended)
-- Git configured with your details
-- GitHub CLI (`gh`) recommended
+### House format
 
-### Getting Started
+Use the headings in [ASSESSMENT_CATALOG/3_Test_Procedures/README.md](ASSESSMENT_CATALOG/3_Test_Procedures/README.md). A filled-in example is [ASSESSMENT_CATALOG/3_Test_Procedures/DE/DE.CM-03.md](ASSESSMENT_CATALOG/3_Test_Procedures/DE/DE.CM-03.md).
+
+Each procedure includes:
+
+- A title line: `# {Subcategory ID}: {Subcategory Description}`
+- Function, category, NIST SP 800-53 references, and implementation example count
+- Scope & Applicability
+- Continuous Monitoring Indicators
+- Test Procedures, with Examine, Interview, and Test tables
+- Evidence Requirements
+- Pass/Fail Criteria
+- Alma Security Context
+- Related links to artifacts, controls, and observations
+
+Other welcome catalog work: artifacts, observations, documentation fixes, and the on-ramp guides in [GET_THE_SPREADSHEETS/](GET_THE_SPREADSHEETS/) and [GET_THE_NOTION_TEMPLATE/](GET_THE_NOTION_TEMPLATE/).
+
+### Generated data
+
+The app does not read the catalog Markdown directly. Two scripts regenerate the data:
 
 ```bash
-# Clone your fork (upstream is set automatically)
-gh repo clone YOUR_GITHUB_USER/csf_profile
+node scripts/generate-procedure-bank.mjs
+node scripts/generate-comprehensive-assessment.mjs
+```
+
+The first writes `src/data/communityProcedures.json`. The second writes `src/stores/comprehensiveAssessmentData.js`. CI runs both with `--check` and fails when those files drift from the catalog.
+
+You can run the scripts and commit the result if you want the checks green. If you forget, that is fine. A maintainer will run them before merge.
+
+## Set up the app
+
+CI uses Node.js 20. Install that version, then:
+
+```bash
+git clone https://github.com/YOUR_GITHUB_USER/csf_profile.git
 cd csf_profile
-
-# Install dependencies
-npm install
-
-# Start the development server
+npm ci --legacy-peer-deps
 npm start
-
-# Run tests
-npm test
 ```
 
-The application will be available at [http://localhost:3000](http://localhost:3000).
+`npm ci --legacy-peer-deps` is the install command CI uses. The app opens at [http://localhost:3000](http://localhost:3000).
 
-## Development Guidelines
-
-### Code Style
-
-- Follow standard React/JavaScript conventions
-- Use meaningful variable and function names
-- Write tests for new functionality
-- Keep components focused and small
-- Use functional components with hooks
-
-### Commit Messages
-
-Use descriptive commit messages:
-
-```
-feat: add new dashboard visualization
-fix: resolve CSV export encoding issue
-docs: update installation instructions
-refactor: simplify control scoring logic
-test: add unit tests for import functionality
-```
-
-### Project Structure
-
-```
-src/
-├── components/    # Reusable UI components
-├── hooks/         # Custom React hooks
-├── pages/         # Page-level components
-├── stores/        # Zustand state management
-├── utils/         # Utility functions
-└── App.js         # Main application entry
-public/            # Static assets and templates
-```
-
-## Pull Request Process
-
-### Pull Request Guidelines
-
-Keep pull requests focused and minimal.
-
-PRs that touch a large number of files (50+) without clear functional justification will likely be rejected without detailed review.
-
-### Why We Enforce This
-
-- **Reviewability**: Large PRs are effectively un-reviewable. Reviewer effectiveness drops significantly after ~200-400 lines of code.
-- **Git history**: Sweeping changes pollute git blame, making it harder to trace when and why functional changes were made.
-- **Merge conflicts**: Large PRs increase the likelihood of conflicts with other contributors' work.
-- **Risk**: More changed lines means more opportunities for subtle bugs, even in "safe" refactors.
-
-### What to Do Instead
-
-If you have a large change in mind, break it into logical, independently-mergeable slices. For example:
-
-- "Update all button components to use new design system" (single UI change, easy to verify)
-- "Refactor scoring logic in Dashboard component" (scoped to one feature)
-- "Modernize entire codebase with multiple updates" (too broad, impossible to review)
-
-For sweeping refactors or style changes, open an issue first to discuss the approach with maintainers before investing time in the work.
-
-### PR Steps
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/your-feature-name`)
-3. Make your changes
-4. Write/update tests
-5. Run `npm test` to ensure all tests pass
-6. Run `npm run build` to verify the build succeeds
-7. Submit PR with clear description
-
-### Review Process
-
-- PRs require maintainer review
-- Address feedback promptly
-- Keep PRs focused on single features/fixes
-
-## Testing
-
-### Run Tests
+### Tests
 
 ```bash
-# Run all tests
-npm test
-
-# Run tests with coverage
-npm test -- --coverage
-
-# Run tests in CI mode (non-interactive)
 npm test -- --watchAll=false
 ```
 
-### Test Requirements
+That is the same non-interactive command CI runs. `npm test` by itself stays in watch mode.
 
-- Unit tests for utility functions
-- Component tests for UI logic
-- Integration tests for data import/export functionality
+### Build
 
-## Component Guidelines
-
-### Creating Components
-
-Components go in `src/components/` or `src/pages/`:
-
-```jsx
-import React from 'react';
-
-const MyComponent = ({ prop1, prop2 }) => {
-  // Component logic here
-
-  return (
-    <div className="my-component">
-      {/* JSX content */}
-    </div>
-  );
-};
-
-export default MyComponent;
+```bash
+CI=false npm run build
 ```
 
-### Component Best Practices
+That is the build command CI runs. `CI=false` is there because some older files still have eslint warnings. New JavaScript should still be lint-clean.
 
-- Use functional components with hooks
-- Keep components small and focused
-- Extract reusable logic into custom hooks
-- Use prop-types or TypeScript for type safety
-- Follow existing naming conventions in the codebase
+### Lint
 
-## State Management
+Lint the JavaScript you changed. This is the same eslint invocation CI uses:
 
-This project uses [Zustand](https://github.com/pmndrs/zustand) for state management. Stores are located in `src/stores/`.
+```bash
+npx eslint --env es2022 --env browser --env node --env jest --max-warnings=0 path/to/your-file.js
+```
 
-When adding new state:
+Catalog wording has a separate check:
 
-1. Consider if the state belongs in an existing store
-2. Keep stores focused on specific domains
-3. Use selectors for derived state
-4. Document any complex state interactions
+```bash
+node scripts/coherence-lint.mjs
+```
 
-## Documentation
+CI also checks that the generated catalog data matches, checks Markdown links, and rejects private data files. Keep real assessment packs out of the repo. [PRIVATE_DATA.md](PRIVATE_DATA.md) explains where those files belong.
 
-- Update README.md for new features
-- Include usage examples for new functionality
-- Update SCREENSHOTS.md if UI changes significantly
-- Keep documentation current with code changes
+App code lives under `src/` (components, pages, hooks, stores, utils). Use a short commit message that says what changed, for example `fix: correct CSV export encoding`.
 
-## Security Considerations
+Keep a pull request to one fix, one feature, or one subcategory. If the idea is large, open an issue first so a maintainer can help you split it.
 
-This tool handles cybersecurity assessment data. When contributing:
+## After you open a pull request
 
-- Never log or expose sensitive assessment data
-- Sanitize user inputs (the project uses DOMPurify)
-- Be mindful of XSS vulnerabilities in rendered content
-- Test CSV import/export for injection vulnerabilities
+1. CI runs tests, the build, lint on changed JavaScript, the catalog checks, a Markdown link check, and a guard that blocks private data files.
+2. A maintainer reads the pull request and may leave comments. Questions and small change requests are normal.
+3. Maintainers are volunteers, so a review can take a little while.
+4. When the pull request merges, you are added to the [Contributors](README.md#contributors) list in the README. You can add your own row in that pull request if you prefer.
 
-## Getting Help
+A draft pull request is a fine way to ask for an early look.
 
-- Check existing [issues](https://github.com/CPAtoCybersecurity/csf_profile/issues) first
-- Ask questions in discussions
-- Be patient - maintainers are volunteers
-- Join the [Simply Cyber Discord](https://simplycyber.io/discord) community for broader discussions
+## Other guides
 
-## Feature Requests
+These files already cover their topics. Follow them instead of copying them into a pull request:
 
-If you have ideas for improving CSF assessments or the tool:
+- [CSF_Wiki/CONTRIBUTING.md](CSF_Wiki/CONTRIBUTING.md) explains how to add pages to the CSF wiki.
+- [SECURITY.md](SECURITY.md) explains how to report a vulnerability. Use the email contact there.
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) is the community standard for this project.
 
-1. Check if the feature has already been requested
-2. Open an issue describing the feature and its benefits
-3. Include examples of how it would be used
-4. Reference relevant NIST CSF documentation if applicable
+Questions are welcome on the issue you are working, or in the [Simply Cyber Discord](https://simplycyber.io/discord).
 
 ## License
 
-By contributing, you agree your contributions will be licensed under the [MIT License](LICENSE).
+By contributing, you agree that your contributions are licensed under the [MIT License](LICENSE).

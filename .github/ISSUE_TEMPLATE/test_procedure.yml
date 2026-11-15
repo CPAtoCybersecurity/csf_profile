@@ -1,0 +1,47 @@
+name: Test procedure
+description: Offer a catalog test procedure, or ask for one.
+title: "Test procedure: "
+labels: ["non-code", "csf-2.0"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Test procedures live at `ASSESSMENT_CATALOG/3_Test_Procedures/<FUNCTION>/<ID>.md`.
+
+        The house format is in [ASSESSMENT_CATALOG/3_Test_Procedures/README.md](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/3_Test_Procedures/README.md). A filled-in example is [DE.CM-03](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/ASSESSMENT_CATALOG/3_Test_Procedures/DE/DE.CM-03.md).
+
+        If an issue for this subcategory is already open, comment there to claim it. See [CONTRIBUTING.md](https://github.com/CPAtoCybersecurity/csf_profile/blob/main/CONTRIBUTING.md).
+  - type: input
+    id: subcategory
+    attributes:
+      label: Subcategory ID
+      description: One CSF 2.0 subcategory, such as DE.CM-03 or GV.SC-01.
+      placeholder: DE.CM-03
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What do you want to do?
+      options:
+        - Add a new test procedure
+        - Update an existing test procedure
+        - Ask a maintainer to write one
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What should this procedure cover?
+      description: A short note is enough. You can paste a draft here, or describe the gap.
+      placeholder: Examine, interview, and test steps for personnel activity monitoring at Alma Security.
+    validations:
+      required: true
+  - type: input
+    id: claim
+    attributes:
+      label: Issue you are claiming
+      description: If you already commented on an issue, link it. Otherwise leave this blank.
+      placeholder: "https://github.com/CPAtoCybersecurity/csf_profile/issues/44"
+    validations:
+      required: false
